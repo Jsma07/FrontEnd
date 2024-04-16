@@ -8,13 +8,17 @@ import Usuarios from './pages/Usuarios/Usuarios';
 import Ventas from './pages/Ventas/Ventas';
 import Compras from './pages/Compras/Compras';
 import Agenda from './pages/Agendamiento/Agenda';
+import Login from './components/consts/Login';
 
 
  ReactDOM.render(
   <BrowserRouter>
   <Routes>
+  <Route path="/iniciarSesion" element={<Login />} />
+
     <Route path="/" element={<App />} >
-     <Route path="/roles" element={<Roles />} />
+
+     <Route path="/configuracion/roles" element={<Roles />} />
       <Route path="/usuarios" element={<Usuarios />} />
       <Route path="/ventas" element={<Ventas />} />
       <Route path="/compras" element={<Compras />} />

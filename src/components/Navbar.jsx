@@ -94,10 +94,13 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
+
 export default function MiniDrawer() {
   const theme = useTheme();
-  
+  const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
+  const [openCategory, setOpenCategory] = React.useState(null);
+
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -106,7 +109,9 @@ export default function MiniDrawer() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-const navigate = useNavigate();
+  const handleCategoryClick = (categoryId) => {
+    setOpenCategory(openCategory === categoryId ? null : categoryId);
+  };
   return (
     <Box sx={{ 
         display: 'flex' 
@@ -133,7 +138,7 @@ const navigate = useNavigate();
             <MenuIcon />
           </IconButton>
           <img
-          src='/Logo.png'
+          src='/jacke.png'
           alt='logo'
           style={{ width: '48px', height: '48px', marginRight: '16px'}}
           />
@@ -172,57 +177,63 @@ const navigate = useNavigate();
           </IconButton>
         </DrawerHeader>
         
+
+
         <List>
-  {NavbarItems.map((item, index) => (
-    <ListItem
-      key={item.id}
-      disablePadding
-      sx={{ display: 'block' }}
-      onClick={() => navigate(item.route)}
-    >
-      <ListItemButton
+  {NavbarItems.map((item) => (
+    <React.Fragment key={item.id}>
+      <ListItem
+        button
+        onClick={() => handleCategoryClick(item.id)}
         sx={{
-          minHeight: 48,
-          justifyContent: open ? 'initial' : 'center',
-          px: 2.5,
           borderRadius: '10px',
-          backgroundColor: '#EFD4F5',
-          marginTop:'5px',
+          backgroundColor: openCategory === item.id ? '#EFD4F5' : '#EFD4F5',
+          mt: 1,
           '&:hover': {
-            backgroundColor: '#8C09FF',
-            color: 'white',
-            '& .MuiListItemIcon-root': {
-              color: 'white',
+            backgroundColor: open ? '#8C09FF' : '#8C09FF',
+            color: open ? 'white' : ' white',
+            '& .MuiListItemIcon-root .MuiSvgIcon-root': {
+              color: 'white !important', // Forzar el color blanco con !important
             },
+            
           },
         }}
       >
-        <Tooltip title={item.label} placement="right" arrow>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <ListItemIcon
+        <ListItemIcon>{item.icon}</ListItemIcon>
+        <ListItemText primary={item.label} />
+        {openCategory === item.id ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+      </ListItem>
+      {openCategory === item.id && item.subitems && (
+        <List sx={{ pl: 1, paddingRight: '10px' }}>
+          {item.subitems.map((subitem) => (
+            <ListItem
+              key={subitem.id}
+              button
+              onClick={() => navigate(subitem.route)}
               sx={{
-                minWidth: 0,
-                color: 'black',
-                justifyContent: 'center',
-                marginRight: open ? 3 : 0,
+                paddingLeft: '15px', // Ajusta el paddingLeft para mover los subitems a la derecha
+                paddingRight: '20px', // Añade un paddingRight para separar del borde derecho
+                borderRadius: '10px',
+                backgroundColor: '#EFD4F5',
+                mt: 1,
+                '&:hover': {
+                  backgroundColor: '#8C09FF',
+                  color: 'white',
+                  '& .MuiListItemIcon-root .MuiSvgIcon-root': {
+                    color: 'white !important', // Forzar el color blanco con !important
+                  },
+                },
               }}
             >
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText
-              primary={item.label}
-              sx={{
-                opacity: open ? 1 : 0,
-                display: open ? 'initial' : 'none',
-              }}
-            />
-          </div>
-        </Tooltip>
-      </ListItemButton>
-    </ListItem>
+              <ListItemIcon sx={{ minWidth: '40px' }}>{subitem.icon}</ListItemIcon>
+              <ListItemText primary={subitem.label} />
+            </ListItem>
+          ))}
+        </List>
+      )}
+    </React.Fragment>
   ))}
 </List>
-
 
 
       </Drawer>

@@ -9,15 +9,22 @@ export const NavbarItems =[
     {
         id: 0,
         icon: <SettingsSuggestIcon/>,
-        label: 'Roles',
-        route: '/roles'
+        label: 'Configuración',
+        subitems: [
+            { label: 'Roles', route: '/configuracion/roles', icon: <PeopleIcon /> },
+          
+          ],
     },
     {
         id: 1,
-        icon: <PeopleIcon/>,
+        icon: <PeopleIcon />,
         label: 'Usuarios',
-        route: '/usuarios'
-    },
+        subitems: [
+          { label: 'Administradores', route: '/usuarios/administradores', icon: <PeopleIcon /> },
+          { label: 'Empleados', route: '/usuarios/empleados', icon: <PeopleIcon /> },
+          { label: 'Clientes', route: '/usuarios/clientes',icon: <PeopleIcon /> },
+        ],
+      },
     {
         id: 2,
         icon: <Shopping/>,
