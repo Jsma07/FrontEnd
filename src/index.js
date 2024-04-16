@@ -9,12 +9,15 @@ import Ventas from './pages/Ventas/Ventas';
 import Compras from './pages/Compras/Compras';
 import Agenda from './pages/Agendamiento/Agenda';
 import Login from './components/consts/Login';
+import CrearCuenta from './components/consts/Register';
 
 
  ReactDOM.render(
   <BrowserRouter>
   <Routes>
   <Route path="/iniciarSesion" element={<Login />} />
+  <Route path="/Registrar" element={<CrearCuenta />} />
+
 
     <Route path="/" element={<App />} >
 

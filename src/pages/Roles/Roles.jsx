@@ -1,41 +1,20 @@
 import React, { useState } from "react";
-import { Grid, IconButton } from "@mui/material";
-import Tabla from "../../components/consts/Tabla";
 import CustomSwitch from "../../components/consts/switch";
-import EditIcon from '@mui/icons-material/Edit';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import AddIcon from '@mui/icons-material/Add'; // Importa el icono de agregar
-import { yellow } from "@mui/material/colors";
 import AddRoleModal from "./ModalRol";
-import Modal from '@mui/material/Modal';
 
 const Roles = () => {
   const [selectedRows, setSelectedRows] = useState([]);
-  const [openModal, setOpenModal] = useState(false); // Estado para controlar la apertura y cierre del modal
-  const [originalSize, setOriginalSize] = useState('1');
+  const [openModal, setOpenModal] = useState(false);
 
-  const handleMouseEnter = (event) => {
-    const iconSize = event.target.getBoundingClientRect().width;
-    setOriginalSize(iconSize + 'px');
-    event.target.style.transform = 'scale(1.2)';
-  };
-
-  const handleMouseLeave = (event) => {
-    event.target.style.transform = 'scale(1)';
-  };
   const handleToggle = (id) => {
     // Implementa la lógica para cambiar el estado de isActive para la fila con el id dado
   };
 
-  const handleSelectionModelChange = (newSelection) => {
-    setSelectedRows(newSelection);
-  };
-
-  const handleEditClick = (event, id) => {
+  const handleEditClick = (id) => {
     // Implementa la lógica para manejar el clic en el botón de editar
   };
 
-  const handleViewDetailsClick = (event, id) => {
+  const handleViewDetailsClick = (id) => {
     // Implementa la lógica para manejar el clic en el botón de ver detalles
   };
 
@@ -48,98 +27,73 @@ const Roles = () => {
   };
 
   const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'Nombre', headerName: 'Nombre', width: 130 },
-    { field: 'Permisos', headerName: 'Permisos', width: 130 },
+    { field: 'id', headerName: 'ID', width: 'w-16' },
+    { field: 'Nombre', headerName: 'Nombre', width: 'w-36' },
+    { field: 'Permisos', headerName: 'Permisos', width: 'w-36' },
     {
       field: 'Acciones',
       headerName: 'Acciones',
-      width: 200, // Ajusta el ancho según sea necesario
-      sortable: false,
+      width: 'w-48',
       renderCell: (params) => (
-        <Grid container spacing={1} alignItems="center">
-          <Grid item>
-            <IconButton
-              style={{ color: yellow[500] }}
-              size="small"
-              onClick={() => handleOpenModal(params.row.id)}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}            >
-              <EditIcon />
-            </IconButton>
-          </Grid>
-          <Grid item>
-            <IconButton
-              color="primary"
-              size="small"
-              onClick={() => handleViewDetailsClick(params.row.id)}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}            >
-              <VisibilityIcon />
-            </IconButton>
-          </Grid>
-          {/* Agrega el icono de agregar */}
-          <Grid item>
-          <CustomSwitch
-              active={params.row.isActive}
-              onToggle={() => handleToggle(params.row.id)}
-            />
-          </Grid>
-        </Grid>
+        <div className="flex justify-center space-x-4">
+          <button onClick={handleOpenModal} className="text-yellow-500">
+          <i class='bx bx-edit' style={{ fontSize: "24px" }}></i>
+          </button>
+          <button onClick={() => handleViewDetailsClick(params.row.id)} className="text-blue-500">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12zm0-6a2 2 0 110-4 2 2 0 010 4z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+          <CustomSwitch active={params.row.isActive} onToggle={() => handleToggle(params.row.id)} />
+        </div>
       ),
     },
-    {
-      field: 'Agregar',
-      headerName: '', // Puedes dejarlo vacío para que no haya texto en la cabecera
-      width: 100,
-      sortable: false,
-      renderHeader: () => (
-        <IconButton
-          size="small"
-          onClick={handleOpenModal}
-          onMouseDown={(event) => event.stopPropagation()}
-        >
-          <AddIcon />
-        </IconButton>
-      ),
-    },
+   
   ];
 
-  const [rows, setRows] = useState([
+  const rows = [
     { id: 1, Nombre: 'Administrador', Permisos: 'CRUD', isActive: false },
     { id: 2, Nombre: 'Empleado', Permisos: 'RU', isActive: false },
     { id: 3, Nombre: 'Cliente', Permisos: 'RU', isActive: false },
     { id: 4, Nombre: 'Cajero', Permisos: 'RU', isActive: false },
     { id: 5, Nombre: 'A', Permisos: 'RU', isActive: true },
-  ]);
+  ];
 
   return (
-    <Grid
-      container
-      justifyContent="center"
-      alignItems="center"
-      sx={{
-        position: 'relative',
-        top: '-100px',
-        marginLeft: { md: 'auto' },
-        marginRight: { md: 'auto' },
-        width: '100%',
-        overflow: 'hidden',
-        maxWidth: '100%' // Ocultar el desplazamiento
-      }}
-    >
-      <Grid item xs={12} md={8}>
-        <Tabla
-          rows={rows}
-          columns={columns}
-          pageSizeOptions={[10, 20]}
-          onSelectionModelChange={handleSelectionModelChange}
-          selectionModel={selectedRows}
-        />
-      </Grid>
-      {/* Renderiza el modal */}
+    <div className="overflow-x-auto shadow-md rounded-lg bg-white dark:bg-gray-800 p-4">
+      <div className="mb-4 flex justify-end">
+        <button onClick={handleOpenModal} className="text-blue-500">
+        <i class='bx bxs-shield-plus' style={{ fontSize: "24px" }}></i>
+        </button>
+      </div>
+      <table className="w-full text-sm text-gray-700 dark:text-gray-300">
+        <thead className="bg-gray-200 dark:bg-gray-700">
+          <tr>
+            {columns.map((column) => (
+              <th key={column.field} className={`px-4 py-2 ${column.width}`}>
+                {column.headerName}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id} className="border-b hover:bg-gray-100 dark:hover:bg-gray-700">
+              {columns.map((column, index) => (
+                <td key={index} className={`px-4 py-2 ${column.width}`}>
+                  {column.renderCell ? column.renderCell({ row }) : row[column.field]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <AddRoleModal open={openModal} handleClose={handleCloseModal} />
-    </Grid>
+    </div>
   );
 };
 

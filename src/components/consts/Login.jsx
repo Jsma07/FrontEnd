@@ -1,8 +1,4 @@
 import React from 'react';
-import { Box, Typography, TextField, Button, Grid, Link } from '@mui/material';
-// import { WhatsApp, Instagram } from '@mui/icons-material';
-// import Footer from './Footer';
-
 
 const Login = () => {
   const handleLogin = (e) => {
@@ -12,85 +8,50 @@ const Login = () => {
   };
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="100vh"
-      bgcolor="#f5f5f5"
-    >
-      <Box
-        component="form"
-        sx={{
-          bgcolor: '#FFE0E3',
-          border: '1px solid black',
-          padding: 3,
-          borderRadius: 7,
-          boxShadow: '0px 3px 15px rgba(0,0,0,0.2)',
-          maxWidth: 400,
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center', // Alinea el contenido al centro horizontalmente
-        }}
-        onSubmit={handleLogin}
-      >
-        <Typography variant="h4" align="center" gutterBottom>
-          Iniciar sesión
-        </Typography>
-
-        <Box width="80%" mt={3} mb={3}>
-          <TextField 
-            label="Correo electrónico"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            required
-            type="email"
-            InputProps={{
-              sx: {
-                borderRadius: 3,
-                bgcolor: 'white',
-                '&:hover': {
-                  bgcolor: 'white',
-                },
-              },
-            }}
-          />
-        </Box>
-
-        <Box width="80%" mb={3}>
-          <TextField 
-            label="Contraseña"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            required
-            type="password"
-            InputProps={{
-              sx: {
-                borderRadius: 3,
-                bgcolor: 'white',
-                '&:hover': {
-                  bgcolor: 'white',
-                },
-              },
-            }}
-          />
-        </Box>
-
-        <Box width="40%">
-          <Button type="submit" variant="contained" color="primary" fullWidth sx={{ height: '45px', borderRadius: 4 }}>
+    <div className="container mx-auto my-auto p-4 flex flex-col items-center justify-center">
+      <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+        <img className="w-8 h-8 mr-2" src="Jacke.png" alt="logo" />
+        Jacke Nail    
+      </a>
+      <div className="border border-gray-900 rounded-lg shadow-xl p-8 bg-red-100 max-w-md dark:bg-gray-800 dark:border-gray-700">
+        <div className="p-8 space-y-4 md:space-y-6 sm:p-8 bg-red-100">
+          <h1 className="mb-8 text-center text-lg font-semibold leading-tight text-gray-900 md:text-2xl dark:text-white">
             Iniciar sesión
-          </Button>
-        </Box>
-        
-      </Box>
-      
-    </Box>
-    
+          </h1>
+          <form className="flex flex-col items-center space-y-6 md:space-y-8 p-1" onSubmit={handleLogin}>
+            <div className="relative w-full">
+              <input
+                type="email"
+                id="email"
+                className="block w-full px-4 py-2 text-sm text-gray-900 bg-white rounded-lg border border-gray-900 focus:outline-none focus:border-blue-600"
+                placeholder="Correo electrónico"
+              />
+            </div>
+            <div className="relative w-full">
+              <input
+                type="password"
+                id="password"
+                className="block w-full px-4 py-2 text-sm text-gray-900 bg-white rounded-lg border border-gray-900 focus:outline-none focus:border-blue-600"
+                placeholder="Contraseña"
+              />
+            </div>
+            <div className="w-full flex justify-between">
+              <a href="#" className="text-sm font-medium text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a>
+            </div>
+            <button
+              type="submit"
+              className="w-full py-2 bg-blue-700 hover:bg-blue-800 text-white font-medium rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              Iniciar sesión
+            </button>
+            <div className="mt-3 text-sm">
+              ¿No tienes una cuenta? <a href="/Registrar" className="font-medium text-blue-600 hover:underline">¡Regístrate!</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 };
- 
 
 export default Login;
