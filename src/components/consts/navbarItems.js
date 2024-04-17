@@ -20,9 +20,9 @@ export const NavbarItems =[
         icon: <PeopleIcon />,
         label: 'Usuarios',
         subitems: [
-          { label: 'Administradores', route: '/usuarios/administradores', icon: <PeopleIcon /> },
-          { label: 'Empleados', route: '/usuarios/empleados', icon: <PeopleIcon /> },
-          { label: 'Clientes', route: '/usuarios/clientes',icon: <PeopleIcon /> },
+          { label: 'Administradores', route: '/Usuarios/Administradores', icon: <PeopleIcon /> },
+          { label: 'Empleados', route: '/Usuarios/Empleados', icon: <PeopleIcon /> },
+          { label: 'Clientes', route: '/Usuarios/Clientes',icon: <PeopleIcon /> },
         ],
       },
     {
