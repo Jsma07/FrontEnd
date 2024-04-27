@@ -31,7 +31,11 @@ export const NavbarItems =[
         id: 2,
         icon: <Shopping/>,
         label: 'Ventas',
-        route: '/ventas'
+        subitems: [
+            { label: 'Ventas', route: '/ventas', icon: <PeopleIcon /> },
+            { label: 'Sallida insumos', route: '/SalidaINsumos', icon: <PeopleIcon /> },
+          
+          ],
     },
     {
         id: 3,
