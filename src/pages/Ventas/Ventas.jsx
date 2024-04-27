@@ -56,7 +56,7 @@ const Ventas = () => {
           href="#"
           className="font-medium text-red-600 dark:text-red-500 hover:underline"
         >
-          Linda estrella muñoz
+          Linda estrella muñoz f
         </a>
       ),
       date: "2024-04-25",
