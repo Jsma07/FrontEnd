@@ -213,8 +213,8 @@ export default function MiniDrawer() {
                       button
                       onClick={() => navigate(subitem.route)}
                       sx={{
-                        paddingLeft: "15px", // Ajusta el paddingLeft para mover los subitems a la derecha
-                        paddingRight: "20px", // Añade un paddingRight para separar del borde derecho
+                        paddingLeft: "15px",
+                        paddingRight: "20px",
                         borderRadius: "10px",
                         backgroundColor: "#EFD4F5",
                         mt: 1,

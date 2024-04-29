@@ -6,6 +6,10 @@ import Calendar from '@mui/icons-material/CalendarMonth';
 import Provider from '@mui/icons-material/AssignmentInd';
 import CleanHandsIcon from '@mui/icons-material/CleanHands';
 import BathtubIcon from '@mui/icons-material/Bathtub';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import StoreIcon from '@mui/icons-material/Store';
+import AddHomeWorkIcon from '@mui/icons-material/AddHomeWork';
 
 export const NavbarItems =[
     {
@@ -22,9 +26,9 @@ export const NavbarItems =[
         icon: <PeopleIcon />,
         label: 'Usuarios',
         subitems: [
-          { label: 'Administradores', route: '/Usuarios/Administradores', icon: <PeopleIcon /> },
-          { label: 'Empleados', route: '/Usuarios/Empleados', icon: <PeopleIcon /> },
-          { label: 'Clientes', route: '/Usuarios/Clientes',icon: <PeopleIcon /> },
+          { label: 'Administradores', route: '/usuarios/administradores', icon: <PeopleIcon /> },
+          { label: 'Empleados', route: '/usuarios/empleados', icon: <PeopleIcon /> },
+          { label: 'Clientes', route: '/Clientes',icon: <PeopleIcon /> },
         ],
       },
     {
@@ -32,11 +36,13 @@ export const NavbarItems =[
         icon: <Shopping/>,
         label: 'Ventas',
         subitems: [
-            { label: 'Ventas', route: '/ventas', icon: <PeopleIcon /> },
-            { label: 'Sallida insumos', route: '/SalidaINsumos', icon: <PeopleIcon /> },
+            { label: 'Ventas', route: '/ventas', icon: <StoreIcon /> },
+            { label: 'Sallida insumos', route: '/Salida_Insumos', icon: <ExitToAppIcon /> },
           
           ],
     },
+   
+    
     {
         id: 3,
         icon: <ShoppingBagIcon/>,
@@ -46,17 +52,9 @@ export const NavbarItems =[
             { label: 'Proveedores', route: '/compras/Proveedores', icon: <PeopleIcon /> },
           ],
     },
+
     {
         id: 4,
-        icon: <ShoppingBagIcon/>,
-        label: 'Insumos',
-        subitems: [
-            { label: 'Insumos', route: '/insumos', icon: <PeopleIcon /> },
-            { label: 'Categorias', route: '/insumos/Categorias', icon: <PeopleIcon /> },
-          ],
-    },
-    {
-        id: 5,
         icon: <Calendar/>,
         label: 'Agendamiento',
         subitems: [
@@ -65,4 +63,12 @@ export const NavbarItems =[
           ],
     },
 
+    {
+      id: 5,
+      icon: <Calendar/>,
+      label: 'Servicios',
+      subitems: [
+          { label: 'Insumos', route: '/Insumos', icon: <CleanHandsIcon /> },
+        ],
+     },
 ]
