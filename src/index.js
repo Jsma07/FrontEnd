@@ -25,7 +25,11 @@ import CrearCuenta from './components/consts/Register';
       <Route path="/Usuarios/Administradores" element={<Usuarios />} />
       <Route path="/ventas" element={<Ventas />} />
       <Route path="/compras" element={<Compras />} />
+      <Route path="/compras/Proveedores" element={<Proveedores />} />
       <Route path="/agendamiento" element={<Agenda />} />
+      <Route path="/agendamiento/Servicios" element={<Servicios />} />
+      
+
     </Route>
   </Routes>
 </BrowserRouter>,

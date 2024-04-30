@@ -35,18 +35,28 @@ export const NavbarItems =[
         id: 3,
         icon: <ShoppingBagIcon/>,
         label: 'Compras',
-        route: '/compras'
+        subitems: [
+            { label: 'Compras', route: '/compras', icon: <PeopleIcon /> },
+            { label: 'Proveedores', route: '/compras/Proveedores', icon: <PeopleIcon /> },
+          ],
     },
     {
         id: 4,
-        icon: <Calendar/>,
-        label: 'Agendamiento',
-        route: '/agendamiento'
+        icon: <ShoppingBagIcon/>,
+        label: 'Insumos',
+        subitems: [
+            { label: 'Insumos', route: '/insumos', icon: <PeopleIcon /> },
+            { label: 'Categorias', route: '/insumos/Categorias', icon: <PeopleIcon /> },
+          ],
     },
     {
         id: 5,
-        icon: <Provider/>,
-        label: 'Proveedores',
-        route: '/proveedores'
+        icon: <Calendar/>,
+        label: 'Agendamiento',
+        subitems: [
+            { label: 'Agenda', route: '/agendamiento', icon: <PeopleIcon /> },
+            { label: 'Servicios', route: '/agendamiento/Servicios', icon: <PeopleIcon /> },
+          ],
     },
+
 ]

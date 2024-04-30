@@ -3,7 +3,7 @@ import CustomSwitch from "../../components/consts/switch";
 import AddRoleModal from "./ModalRol";
 import Table from "../../components/consts/Tabla";
 
-const Compras = () => {
+const Proveedores = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [openModal, setOpenModal] = useState(false);
 
@@ -91,4 +91,4 @@ const Compras = () => {
   );
 };
 
-export default Compras;
+export default Proveedores;
