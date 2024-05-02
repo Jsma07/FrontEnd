@@ -10,20 +10,18 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Navbar />
-      <div id="root" className="app-container"> {/* Agrega la clase 'app-container' como contenedor principal */}
-        
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="center"
-          style={{ minHeight: '80vh' }}
-        >
-          <Grid item xs={12} md={8}> {/* Ajusta el tamaño según tus necesidades */}
-            <Outlet />
-          </Grid>
+      <Grid
+        container
+        alignItems="center"
+        justifyContent="center"
+        style={{ minHeight: '80vh' }}
+      >
+        <Grid item xs={12} md={8}> 
+          <Outlet />
         </Grid>
-      </div>
-    </ThemeProvider>
+      </Grid>
+      </ThemeProvider>
+    </>
   );
 }
 
