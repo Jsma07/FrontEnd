@@ -10,6 +10,9 @@ import Compras from './pages/Compras/Compras';
 import Agenda from './pages/Agendamiento/Agenda';
 import Login from './components/consts/Login';
 import CrearCuenta from './components/consts/Register';
+import Servicios from './pages/Agendamiento/Servicios/Servicios';
+
+
 
 
  ReactDOM.render(
@@ -25,11 +28,12 @@ import CrearCuenta from './components/consts/Register';
       <Route path="/Usuarios/Administradores" element={<Usuarios />} />
       <Route path="/ventas" element={<Ventas />} />
       <Route path="/compras" element={<Compras />} />
+      {/* <Route path="/compras/Proveedores" element={<Proveedores />} /> */}
       <Route path="/agendamiento" element={<Agenda />} />
+      <Route path="/agendamiento/Servicios" element={<Servicios/>} />
+      
+
     </Route>
   </Routes>
 </BrowserRouter>,
-document.getElementById('root')
- )
-
-
+document.getElementById('root'))
