@@ -4,6 +4,8 @@ import Shopping from '@mui/icons-material/ShoppingCartCheckout';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import Calendar from '@mui/icons-material/CalendarMonth';
 import Provider from '@mui/icons-material/AssignmentInd';
+import CleanHandsIcon from '@mui/icons-material/CleanHands';
+import BathtubIcon from '@mui/icons-material/Bathtub';
 
 export const NavbarItems =[
     {
@@ -54,8 +56,8 @@ export const NavbarItems =[
         icon: <Calendar/>,
         label: 'Agendamiento',
         subitems: [
-            { label: 'Agenda', route: '/agendamiento', icon: <PeopleIcon /> },
-            { label: 'Servicios', route: '/agendamiento/Servicios', icon: <PeopleIcon /> },
+            { label: 'Agenda', route: '/agendamiento', icon: <CleanHandsIcon /> },
+            { label: 'Servicios', route: '/agendamiento/Servicios', icon: <BathtubIcon /> },
           ],
     },
 
