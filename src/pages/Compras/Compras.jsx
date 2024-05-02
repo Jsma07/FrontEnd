@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import CustomSwitch from "../../components/consts/switch";
-import AddRoleModal from "./ModalRol";
 import Table from "../../components/consts/Tabla";
+import { Grid, Button as CommonButton } from '@mui/material';
+import AddBusinessIcon from '@mui/icons-material/AddBusiness';
+import CustomModal from "../../components/consts/Modal"; // Asumiendo que este es el componente del modal
 
 const Compras = () => {
-  const [selectedRows, setSelectedRows] = useState([]);
   const [openModal, setOpenModal] = useState(false);
 
   const handleToggleSwitch = (id) => {
@@ -38,13 +39,22 @@ const Compras = () => {
     setOpenModal(false);
   };
 
+  const handleClick = () => {
+    handleOpenModal(); // Abre el modal al hacer clic en el botón
+  };
+
+  const handleAddCompra = (formData) => {
+    console.log('Datos del nuevo proveedor:', formData);
+    handleCloseModal();
+  };
+
   const columns = [
     { field: 'id', headerName: 'ID', width: 'w-16' },
-    { field: 'Nombre', headerName: 'Nombre', width: 'w-36' },
-    { field: 'Correo', headerName: 'Correo', width: 'w-36' },
-    { field: 'Telefono', headerName: 'Telefono', width: 'w-36' },
-    { field: 'Direccion', headerName: 'Direccion', width: 'w-36' },
-    { field: 'Empresa', headerName: 'Empresa', width: 'w-36' },
+    { field: 'Fecha', headerName: 'Fecha', width: 'w-36' },
+    { field: 'IVA', headerName: 'IVA', width: 'w-36' },
+    { field: 'Descuento', headerName: 'Descuento', width: 'w-36' },
+    { field: 'Subtotal', headerName: 'Subtotal', width: 'w-36' },
+    { field: 'Estado', headerName: 'Estado', width: 'w-36' },
 
     {
       field: 'Acciones',
@@ -75,19 +85,49 @@ const Compras = () => {
   ];
 
   const [rows, setRows] = useState([
-    { id: 1, Nombre: 'Esneider P', Correo: 'Esne23@gmail.com', Telefono: 3045458593, Direccion: 'Cll 54 #34-50', Empresa: 'Nivea', isActive: false },
-    { id: 2, Nombre: 'Leonardo A', Correo: 'Leo3@gmail.com', Telefono: 3234594584, Direccion: 'Cll 54 #34-50', Empresa: 'Adidas', isActive: false },
-    { id: 3, Nombre: 'Johan M', Correo: 'Jojan@gmail.com', Telefono: 3054584593, Direccion: 'Cll 54 #34-50', Empresa: 'Nivea', isActive: false },
-    { id: 4, Nombre: 'Emerson V', Correo: 'Emers2@gmail.com', Telefono: 3014503495, Direccion: 'Cll 54 #34-50', Empresa: 'Electrox',  isActive: false },
-    { id: 5, Nombre: 'Sofia M', Correo: 'Sofi45@gmail.com', Telefono: 3055695604, Direccion: 'Cll 54 #34-50', Empresa: 'Caramelo', isActive: true },
+    { id: 1, Fecha: '10/11/2023', IVA: 2300, Descuento: 10000, Subtotal: 760000, Estado: 'Terminada' },
+    { id: 2, Fecha: '31/12/2023', IVA: 2300, Descuento: 45000, Subtotal: 1060000, Estado: 'Pendiente'},
+    { id: 3, Fecha: '06/01/2024', IVA: 2500, Descuento: 23000, Subtotal: 940000, Estado: 'Cancelada' },
+    { id: 4, Fecha: '20/02/2024', IVA: 2500, Descuento: 20000, Subtotal: 900000, Estado: 'Terminado' },
+    { id: 5, Fecha: '29/03/2024', IVA: 2500, Descuento: 5000, Subtotal: 250000, Estado: 'Terminada' },
   ]);
 
+
+  const fields = [
+    { name: 'Fecha compra', label: 'Fecha compra', icon: null },
+    { name: 'Estado', label: 'Estado', icon: null },
+
+
+  ];
   return (
-    <div>
-      <h1>Roles</h1>
-      <Table columns={columns} data={rows} />
-      <AddRoleModal open={openModal} handleClose={handleCloseModal} />
-    </div>
+    <Grid item xs={0} md={0} sx={{width: '100%'}}>
+      <div>
+        <center><h1 style={{ marginTop: '-30px' }}>Gestion De Compras</h1></center>
+        <CommonButton
+          color="primary"
+          variant="contained"
+          onClick={handleClick} // Abre el modal al hacer clic en el botón
+          sx={{
+            color: 'black',
+            minHeight: 40,
+            px: 2.5,
+            borderRadius: '10px',
+            backgroundColor: '#EFD4F5',
+            marginTop:'5px',
+            '&:hover': {
+              backgroundColor: '#8C09FF',
+              color: 'white',
+              '& .MuiListItemIcon-root': {
+                color: 'white',
+              },
+            },
+          }}>
+          <AddBusinessIcon />
+        </CommonButton>
+        <Table columns={columns} data={rows} />
+        <CustomModal open={openModal} handleClose={handleCloseModal} title="Actualizar Compra" fields={fields} onSubmit={handleAddCompra} /> {/* Renderiza el modal */}
+      </div>
+    </Grid>
   );
 };
 

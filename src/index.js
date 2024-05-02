@@ -10,6 +10,7 @@ import Compras from './pages/Compras/Compras';
 import Agenda from './pages/Agendamiento/Agenda';
 import Login from './components/consts/Login';
 import CrearCuenta from './components/consts/Register';
+import Proveedores from './pages/Compras/Proveedores';
 
 
  ReactDOM.render(
@@ -26,9 +27,7 @@ import CrearCuenta from './components/consts/Register';
       <Route path="/ventas" element={<Ventas />} />
       <Route path="/compras" element={<Compras />} />
       <Route path="/compras/Proveedores" element={<Proveedores />} />
-      <Route path="/agendamiento" element={<Agenda />} />
-      <Route path="/agendamiento/Servicios" element={<Servicios />} />
-      
+      <Route path="/agendamiento" element={<Agenda />} />      
 
     </Route>
   </Routes>

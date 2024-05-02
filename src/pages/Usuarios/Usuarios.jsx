@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import CustomSwitch from "../../components/consts/switch";
-import AddRoleModal from "../Roles/ModalRol";
+import AddRoleModal from "../../components/consts/Modal";
 import Table from "../../components/consts/Tabla";
 
 const Usuarios = () => {

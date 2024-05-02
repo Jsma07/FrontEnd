@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import CustomSwitch from "../../components/consts/switch";
-import AddRoleModal from "./ModalRol";
+import CustomModal from "../../components/consts/Modal";
 import Table from "../../components/consts/Tabla";
+import { Grid, Button as CommonButton } from '@mui/material';
+import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 
 const Proveedores = () => {
-  const [selectedRows, setSelectedRows] = useState([]);
   const [openModal, setOpenModal] = useState(false);
 
   const handleToggleSwitch = (id) => {
@@ -36,6 +37,16 @@ const Proveedores = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+  };
+
+  const handleClick = () => {
+    handleOpenModal(); // Abre el modal al hacer clic en el botón
+  };
+
+  const handleAddProveedor = (formData) => {
+    // Aquí puedes implementar la lógica para agregar el nuevo proveedor con los datos del formulario
+    console.log('Datos del nuevo proveedor:', formData);
+    handleCloseModal();
   };
 
   const columns = [
@@ -82,12 +93,45 @@ const Proveedores = () => {
     { id: 5, Nombre: 'Sofia M', Correo: 'Sofi45@gmail.com', Telefono: 3055695604, Direccion: 'Cll 54 #34-50', Empresa: 'Caramelo', isActive: true },
   ]);
 
+  const fields = [
+    { name: 'nombre', label: 'Nombre', icon: null },
+    { name: 'correo', label: 'Correo', icon: null },
+    { name: 'telefono', label: 'Teléfono', icon: null },
+    { name: 'direccion', label: 'Dirección', icon: null },
+    { name: 'empresa', label: 'Empresa', icon: null },
+    { name: 'Estado', label: 'Estado', icon: null },
+
+  ];
+
   return (
-    <div>
-      <h1>Roles</h1>
-      <Table columns={columns} data={rows} />
-      <AddRoleModal open={openModal} handleClose={handleCloseModal} />
-    </div>
+    <Grid item xs={0} md={0} sx={{width: '100%'}}>
+      <div>
+        <center><h1 style={{ marginTop: '-30px' }}>Gestion De Proveedores</h1></center>
+        <CommonButton
+          color="primary"
+          variant="contained"
+          onClick={handleClick} 
+          sx={{
+            color: 'black',
+            minHeight: 40,
+            px: 2.5,
+            borderRadius: '10px',
+            backgroundColor: '#EFD4F5',
+            marginTop:'5px',
+            '&:hover': {
+              backgroundColor: '#8C09FF',
+              color: 'white',
+              '& .MuiListItemIcon-root': {
+                color: 'white',
+              },
+            },
+          }}>
+          <AddBusinessIcon />
+        </CommonButton>
+        <Table columns={columns} data={rows} />
+        <CustomModal open={openModal} handleClose={handleCloseModal} title="Agregar Nuevo Proveedor" fields={fields} onSubmit={handleAddProveedor} /> {/* Renderiza el modal */}
+      </div>
+    </Grid>
   );
 };
 
