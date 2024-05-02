@@ -4,6 +4,10 @@ import Shopping from '@mui/icons-material/ShoppingCartCheckout';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import Calendar from '@mui/icons-material/CalendarMonth';
 import Provider from '@mui/icons-material/AssignmentInd';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import StoreIcon from '@mui/icons-material/Store';
+import AddHomeWorkIcon from '@mui/icons-material/AddHomeWork';
 
 export const NavbarItems =[
     {
@@ -20,17 +24,23 @@ export const NavbarItems =[
         icon: <PeopleIcon />,
         label: 'Usuarios',
         subitems: [
-          { label: 'Administradores', route: '/Usuarios/Administradores', icon: <PeopleIcon /> },
-          { label: 'Empleados', route: '/Usuarios/Empleados', icon: <PeopleIcon /> },
-          { label: 'Clientes', route: '/Usuarios/Clientes',icon: <PeopleIcon /> },
+          { label: 'Administradores', route: '/usuarios/administradores', icon: <PeopleIcon /> },
+          { label: 'Empleados', route: '/usuarios/empleados', icon: <PeopleIcon /> },
+          { label: 'Clientes', route: '/Clientes',icon: <PeopleIcon /> },
         ],
       },
     {
         id: 2,
         icon: <Shopping/>,
         label: 'Ventas',
-        route: '/ventas'
+        subitems: [
+            { label: 'Ventas', route: '/ventas', icon: <StoreIcon /> },
+            { label: 'Sallida insumos', route: '/Salida_Insumos', icon: <ExitToAppIcon /> },
+          
+          ],
     },
+   
+    
     {
         id: 3,
         icon: <ShoppingBagIcon/>,
@@ -48,5 +58,14 @@ export const NavbarItems =[
         icon: <Provider/>,
         label: 'Proveedores',
         route: '/proveedores'
+    },
+     {
+        id: 6,
+        icon: <AddHomeWorkIcon/>,
+        label: 'Servicios',
+        subitems: [
+            { label: 'Insumos', route: '/Insumos', icon: <Inventory2Icon /> },
+          
+          ],
     },
 ]
