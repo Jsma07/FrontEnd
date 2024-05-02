@@ -1,24 +1,38 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CustomSwitch from "../../components/consts/switch";
 import AddRoleModal from "../Roles/ModalRol";
 import Table from "../../components/consts/Tabla";
+import axios from 'axios';
 
 const Usuarios = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const respuesta = await axios.get('http://localhost:5000/api/users');
+        setUsers(respuesta.data.usuarios);
+      } catch(error) {
+        console.log(error);
+      }
+    };
+    fetchUsers();
+  }, []);
 
   const handleToggleSwitch = (id) => {
     // Encuentra la fila correspondiente al ID
-    const updatedRows = rows.map((row) => {
-      if (row.id === id) {
-        // Invierte el estado isActive
-        return { ...row, isActive: !row.isActive };
-      }
-      return row;
-    });
+    // const updatedRows = rows.map((row) => {
+    //   if (row.id === id) {
+    //     // Invierte el estado isActive
+    //     return { ...row, isActive: !row.isActive };
+    //   }
+    //   return row;
+    // });
 
     // Actualiza el estado de las filas
-    setRows(updatedRows);
+    // setRows(updatedRows);
   };
 
   const handleEditClick = (id) => {
@@ -40,11 +54,10 @@ const Usuarios = () => {
 
   const columns = [
     { field: 'id', headerName: 'ID', width: 'w-16' },
-    { field: 'Nombre', headerName: 'Nombre', width: 'w-36' },
-    { field: 'Apellido', headerName: 'Apellido', width: 'w-36' },
-    { field: 'Correo', headerName: 'Correo', width: 'w-36' },
-    { field: 'Telefono', headerName: 'Telefono', width: 'w-36' },
-
+    { field: 'nombre', headerName: 'Nombre', width: 'w-36' },
+    { field: 'apellido', headerName: 'Apellido', width: 'w-36' },
+    { field: 'correo', headerName: 'Correo', width: 'w-36' },
+    { field: 'telefono', headerName: 'Telefono', width: 'w-36' },
     {
       field: 'Acciones',
       headerName: 'Acciones',
@@ -56,11 +69,7 @@ const Usuarios = () => {
           </button>
           <button onClick={() => handleViewDetailsClick(params.row.id)} className="text-blue-500">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12zm0-6a2 2 0 110-4 2 2 0 010 4z"
-                clipRule="evenodd"
-              />
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12zm0-6a2 2 0 110-4 2 2 0 010 4z" clipRule="evenodd" />
             </svg>
           </button>
           {/* CustomSwitch que cambia su estado cuando se hace clic */}
@@ -73,18 +82,10 @@ const Usuarios = () => {
     },
   ];
 
-  const [rows, setRows] = useState([
-    { id: 1, Nombre: 'Eduardo', Apellido: 'Mosquera',Correo: 'eduardo@gmail.com' ,Telefono: 30212154 , isActive: false },
-    { id: 2, Nombre: 'Johan', Apellido: 'Martinez',Correo: 'johan@gmail.com' ,Telefono: 30212154 , isActive: false },
-    { id: 3, Nombre: 'Emerson', Apellido: 'V',Correo: 'e@gmail.com' ,Telefono: 30212154 , isActive: false },
-    { id: 4, Nombre: 'Yurani', Apellido: 'E',Correo: 'y@gmail.com' ,Telefono: 30212154 , isActive: false },
-
-  ]);
-
   return (
     <div>
       <h1>Usuarios</h1>
-      <Table columns={columns} data={rows} />
+      <Table columns={columns} data={users} />
       <AddRoleModal open={openModal} handleClose={handleCloseModal} />
     </div>
   );
