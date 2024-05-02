@@ -8,6 +8,7 @@ import './App.css'; // Importa tu archivo CSS con estilos globales
 
 function App() {
   return (
+    <>
     <ThemeProvider theme={theme}>
       <Navbar />
       <div id="root" className="app-container"> {/* Agrega la clase 'app-container' como contenedor principal */}
