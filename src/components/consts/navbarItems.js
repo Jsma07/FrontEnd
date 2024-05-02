@@ -37,7 +37,7 @@ export const NavbarItems =[
         label: 'Compras',
         subitems: [
             { label: 'Compras', route: '/compras', icon: <PeopleIcon /> },
-            { label: 'Proveedores', route: 'compras/proveedores', icon: <PeopleIcon /> },
+            { label: 'Proveedores', route: '/compras/Proveedores', icon: <PeopleIcon /> },
           ],
     },
     {

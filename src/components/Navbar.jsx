@@ -16,10 +16,10 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { NavbarItems } from './consts/navbarItems';
-import Tooltip from '@mui/material/Tooltip';
 import { useNavigate } from 'react-router-dom';
 import SettingsMenu from './consts/sesion';
 import Notifications from '@mui/icons-material/NotificationsNone';
+import DarkModeButton from './consts/DarkModeButton'; // Importa el componente DarkModeButton
 
 const drawerWidth = 240;
 
@@ -48,15 +48,12 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-end',
-
-
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
 const AppBar = styled(MuiAppBar, {
-  
   shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
@@ -94,13 +91,11 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-
 export default function MiniDrawer() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
   const [openCategory, setOpenCategory] = React.useState(null);
-
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -109,17 +104,16 @@ export default function MiniDrawer() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
   const handleCategoryClick = (categoryId) => {
     setOpenCategory(openCategory === categoryId ? null : categoryId);
   };
+
   return (
-    <Box sx={{ 
-        display: 'flex' 
-        
-        }}>
+    <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open}  sx={{backgroundColor:'#FFFEF1'}}>
-        <Toolbar >
+      <AppBar position="fixed" open={open} sx={{ backgroundColor: '#FFFEF1' }}>
+        <Toolbar>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -130,7 +124,7 @@ export default function MiniDrawer() {
               backgroundColor: '#FFE0E3',
               '&:hover': {
                 backgroundColor: '#F291B5',
-                color: 'white' 
+                color: 'white',
               },
               ...(open && { display: 'none' }),
             }}
@@ -138,118 +132,119 @@ export default function MiniDrawer() {
             <MenuIcon />
           </IconButton>
           <img
-          src='/jacke.png'
-          alt='logo'
-          style={{ width: '48px', height: '48px', marginRight: '16px'}}
+            src='/jacke.png'
+            alt='logo'
+            style={{ width: '48px', height: '48px', marginRight: '16px' }}
           />
-        <Typography variant="h6" noWrap component="div">
-           Jacke Nail
+          <Typography variant="h6" noWrap component="div">
+            Jacke Nail
           </Typography>
-          <div style={{ marginLeft: 'auto' }}></div>
+          <div style={{ marginLeft: 'auto', marginRight: '20px' }}>
+            <DarkModeButton /> {/* Renderiza el componente DarkModeButton */}
+          </div>
           <Notifications
             sx={{
               backgroundColor: '#FFE0E3',
-              padding: '10px', // Ajusta el valor de padding según tus preferencias
+              padding: '10px',
               borderRadius: '10px',
               color: 'black',
-              fontSize: '40px', 
-             marginRight:'20px',
+              fontSize: '40px',
+              marginRight: '20px',
               '&:hover': {
                 backgroundColor: '#F291B5',
                 color: 'white',
-                
               },
             }}
           />
-
-          
-        <SettingsMenu/>
+          <SettingsMenu />
         </Toolbar>
       </AppBar>
-      <Drawer variant="permanent" open={open} classes={{ paper: 'drawer-paper' }}
-     
-     >
+      <Drawer
+        variant="permanent"
+        open={open}
+        classes={{ paper: 'drawer-paper' }}
+      >
         <DrawerHeader>
-            
-           
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
           </IconButton>
         </DrawerHeader>
-        
-
-
         <List>
-  {NavbarItems.map((item) => (
-    <React.Fragment key={item.id}>
-      <ListItem
-        button
-        onClick={() => handleCategoryClick(item.id)}
-        sx={{
-          borderRadius: '10px',
-          backgroundColor: openCategory === item.id ? '#EFD4F5' : '#EFD4F5',
-          mt: 1,
-          '&:hover': {
-            backgroundColor: open ? '#8C09FF' : '#8C09FF',
-            color: open ? 'white' : ' white',
-            '& .MuiListItemIcon-root .MuiSvgIcon-root': {
-              color: 'white !important', // Forzar el color blanco con !important
-            },
-            
-          },
-        }}
-      >
-        <ListItemIcon>{item.icon}</ListItemIcon>
-        <ListItemText primary={item.label} />
-        {openCategory === item.id ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-      </ListItem>
-      {openCategory === item.id && item.subitems && (
-        <List sx={{ pl: 1, paddingRight: '10px' }}>
-          {item.subitems.map((subitem) => (
-            <ListItem
-              key={subitem.id}
-              button
-              onClick={() => navigate(subitem.route)}
-              sx={{
-                paddingLeft: '15px', // Ajusta el paddingLeft para mover los subitems a la derecha
-                paddingRight: '20px', // Añade un paddingRight para separar del borde derecho
-                borderRadius: '10px',
-                backgroundColor: '#EFD4F5',
-                mt: 1,
-                '&:hover': {
-                  backgroundColor: '#8C09FF',
-                  color: 'white',
-                  '& .MuiListItemIcon-root .MuiSvgIcon-root': {
-                    color: 'white !important', // Forzar el color blanco con !important
+          {NavbarItems.map((item) => (
+            <React.Fragment key={item.id}>
+              <ListItem
+                button
+                onClick={() => handleCategoryClick(item.id)}
+                sx={{
+                  borderRadius: '10px',
+                  backgroundColor: openCategory === item.id ? '#EFD4F5' : '#EFD4F5',
+                  mt: 1,
+                  '&:hover': {
+                    backgroundColor: open ? '#8C09FF' : '#8C09FF',
+                    color: open ? 'white' : 'white',
+                    '& .MuiListItemIcon-root .MuiSvgIcon-root': {
+                      color: 'white !important',
+                    },
                   },
-                },
-              }}
-            >
-              <ListItemIcon sx={{ minWidth: '40px' }}>{subitem.icon}</ListItemIcon>
-              <ListItemText primary={subitem.label} />
-            </ListItem>
+                }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.label} />
+                {openCategory === item.id ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+              </ListItem>
+              {openCategory === item.id && item.subitems && (
+                <List sx={{ pl: 1, paddingRight: '10px' }}>
+                  {item.subitems.map((subitem) => (
+                    <ListItem
+                      key={subitem.id}
+                      button
+                      onClick={() => navigate(subitem.route)}
+                      sx={{
+                        paddingLeft: '15px',
+                        paddingRight: '20px',
+                        borderRadius: '10px',
+                        backgroundColor: '#EFD4F5',
+                        mt: 1,
+                        '&:hover': {
+                          backgroundColor: '#8C09FF',
+                          color: 'white',
+                          '& .MuiListItemIcon-root .MuiSvgIcon-root': {
+                            color: 'white !important',
+                          },
+                        },
+                      }}
+                    >
+                      <ListItemIcon sx={{ minWidth: '40px' }}>{subitem.icon}</ListItemIcon>
+                      <ListItemText primary={subitem.label} />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </React.Fragment>
           ))}
         </List>
-      )}
-    </React.Fragment>
-  ))}
-</List>
-
-
       </Drawer>
       <style>
-  {`
-    .drawer-paper {
-      background-color: #FFFEF1;
-    }
-  `}
-</style>
-      <Box component="main" sx={{ flexGrow: 1, p: 3,  }}>
-        <DrawerHeader />
-        
-        
+        {`
+          .drawer-paper {
+            background-color: #FFFEF1;
+          }
+          .dark-mode-button {
+            padding: 10px;
+            background-color: ${theme.palette.mode === 'dark' ? '#3b82f6' : '#f59e0b'};
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+          }
+          .dark-mode-button:hover {
+            background-color: ${theme.palette.mode === 'dark' ? '#2563eb' : '#f97316'};
+          }
+        `}
+      </style>
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        {/* Contenido principal */}
       </Box>
     </Box>
-
   );
 }
