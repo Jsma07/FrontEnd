@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import CustomSwitch from "../../components/consts/switch";
+import CustomModal from "../../components/consts/Modal";
 import Table from "../../components/consts/Tabla";
 import { Grid, Button as CommonButton } from '@mui/material';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
-import CustomModal from "../../components/consts/Modal";
 
-const Compras = () => {
+const Categorias = () => {
   const [openModal, setOpenModal] = useState(false);
 
   const handleToggleSwitch = (id) => {
@@ -43,18 +43,16 @@ const Compras = () => {
     handleOpenModal(); // Abre el modal al hacer clic en el botón
   };
 
-  const handleAddCompra = (formData) => {
-    console.log('Datos del nuevo proveedor:', formData);
+  const handleAddCategoria = (formData) => {
+    // Aquí puedes implementar la lógica para agregar el nuevo proveedor con los datos del formulario
+    console.log('Datos de la nueva categoria:', formData);
     handleCloseModal();
   };
 
   const columns = [
     { field: 'id', headerName: 'ID', width: 'w-16' },
-    { field: 'Fecha', headerName: 'Fecha', width: 'w-36' },
-    { field: 'IVA', headerName: 'IVA', width: 'w-36' },
-    { field: 'Descuento', headerName: 'Descuento', width: 'w-36' },
-    { field: 'Subtotal', headerName: 'Subtotal', width: 'w-36' },
-    { field: 'Estado', headerName: 'Estado', width: 'w-36' },
+    { field: 'Imagen', headerName: 'Imagen', width: 'w-36', renderCell: (params) => <img src={params.value} alt="Imagen" style={{ maxWidth: '100%', height: 'auto' }} /> },
+    { field: 'Nombre', headerName: 'Nombre', width: 'w-36' },
 
     {
       field: 'Acciones',
@@ -85,28 +83,24 @@ const Compras = () => {
   ];
 
   const [rows, setRows] = useState([
-    { id: 1, Fecha: '10/11/2023', IVA: 2300, Descuento: 10000, Subtotal: 760000, Estado: 'Terminada' },
-    { id: 2, Fecha: '31/12/2023', IVA: 2300, Descuento: 45000, Subtotal: 1060000, Estado: 'Pendiente'},
-    { id: 3, Fecha: '06/01/2024', IVA: 2500, Descuento: 23000, Subtotal: 940000, Estado: 'Cancelada' },
-    { id: 4, Fecha: '20/02/2024', IVA: 2500, Descuento: 20000, Subtotal: 900000, Estado: 'Terminado' },
-    { id: 5, Fecha: '29/03/2024', IVA: 2500, Descuento: 5000, Subtotal: 250000, Estado: 'Terminada' },
+    { id: 1, Imagen: 'https://cosmeticosforest.com/wp-content/uploads/2021/02/esmaltes-de-unas-forest-manos.jpg', Nombre: 'Esmaltes', isActive: false },
+    { id: 2, Imagen: 'https://m.media-amazon.com/images/I/61iOOVCaOHL._AC_UF1000,1000_QL80_.jpg', Nombre: 'Herramientas', isActive: false },
+    { id: 3, Imagen: 'https://www.apreciosderemate.com/41042-large_default/juego-x6-limas-de-cristal-para-unas-manicure-profesional.jpg', Nombre: 'Limas', isActive: false },
   ]);
 
-
   const fields = [
-    { name: 'Fecha compra', label: 'Fecha compra', icon: null },
-    { name: 'Estado', label: 'Estado', icon: null },
-
-
+    { name: 'Imagen', label: 'Imagen', icon: null },
+    { name: 'Nombre', label: 'Nombre', icon: null },
   ];
+
   return (
     <Grid item xs={0} md={0} sx={{width: '100%'}}>
       <div>
-        <center><h1 style={{ marginTop: '-30px' }}>Gestion De Compras</h1></center>
+        <center><h1 style={{ marginTop: '-80px' }}>Gestion De Categorias</h1></center>
         <CommonButton
           color="primary"
           variant="contained"
-          onClick={handleClick} // Abre el modal al hacer clic en el botón
+          onClick={handleClick} 
           sx={{
             color: 'black',
             minHeight: 40,
@@ -125,10 +119,10 @@ const Compras = () => {
           <AddBusinessIcon />
         </CommonButton>
         <Table columns={columns} data={rows} />
-        <CustomModal open={openModal} handleClose={handleCloseModal} title="Actualizar Compra" fields={fields} onSubmit={handleAddCompra} /> {/* Renderiza el modal */}
+        <CustomModal open={openModal} handleClose={handleCloseModal} title="Agregar Nueva Categoria" fields={fields} onSubmit={handleAddCategoria} /> {/* Renderiza el modal */}
       </div>
     </Grid>
   );
 };
 
-export default Compras;
+export default Categorias;

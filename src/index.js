@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import Roles from './pages/Roles/Roles';
 import Usuarios from './pages/Usuarios/Usuarios';
 import Ventas from './pages/Ventas/Ventas';
+import Categorias from './pages/Insumos/Categorias';
 import Compras from './pages/Compras/Compras';
 import Agenda from './pages/Agendamiento/Agenda';
 import Login from './components/consts/Login';
@@ -27,6 +28,7 @@ import Proveedores from './pages/Compras/Proveedores';
       <Route path="/ventas" element={<Ventas />} />
       <Route path="/compras" element={<Compras />} />
       <Route path="/compras/Proveedores" element={<Proveedores />} />
+      <Route path="/insumos/Categorias" element={<Categorias />} />
       <Route path="/agendamiento" element={<Agenda />} />      
 
     </Route>
