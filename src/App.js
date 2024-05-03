@@ -25,6 +25,7 @@ function App() {
         </Grid>
       </div>
     </ThemeProvider>
+  </>
   );
 }
 

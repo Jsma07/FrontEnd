@@ -66,9 +66,11 @@ export const NavbarItems =[
     {
       id: 5,
       icon: <Calendar/>,
-      label: 'Servicios',
+      label: 'Insumos',
       subitems: [
           { label: 'Insumos', route: '/Insumos', icon: <CleanHandsIcon /> },
+          { label: 'Categorias', route: '/Insumos/Categorias', icon: <CleanHandsIcon /> },
+
         ],
      },
 ]
