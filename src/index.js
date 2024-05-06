@@ -12,6 +12,7 @@ import Login from './components/consts/Login';
 import Salida from './pages/Salida_Insumos/Salida';  
 import Insumosd from './pages/Insumos/Insumos';
 import Clientes from "./pages/Clientes/Clientes";
+import Empleados from "./pages/Empleados/Empleados";
 
 
  ReactDOM.render(
@@ -28,6 +29,7 @@ import Clientes from "./pages/Clientes/Clientes";
   
       <Route path="/Clientes" element={<Clientes />} />
       <Route path="/Insumos" element={<Insumosd />} />
+      <Route path="/Empleados" element={<Empleados />} />
 
     </Route>
   </Routes>

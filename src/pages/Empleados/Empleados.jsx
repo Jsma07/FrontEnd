@@ -2,18 +2,18 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CancelIcon from "@mui/icons-material/Cancel";
 
-const Clientes = () => {
-  const [clientes, setClientes] = useState([]);
+const Empleados = () => {
+  const [Empleados, setEmpleados] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/jackenail/Listar_Clientes"
+          "http://localhost:5000/jackenail/Listar_Empleados"
         );
-        setClientes(response.data);
+        setEmpleados(response.data);
       } catch (error) {
-        console.error("Error al obtener los datos de clientes:", error);
+        console.error("Error al obtener los datos de Empleados:", error);
       }
     };
 
@@ -55,7 +55,7 @@ const Clientes = () => {
       >
         <div className="w-full mx-auto max-w-full">
           <div className="bg-white rounded-lg shadow-md p-8 border border-purple-500">
-            <h4 className="text-5xl mb-4">Gestión de Clientes</h4>
+            <h4 className="text-5xl mb-4">Gestión de empleados</h4>
 
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
               <div className="flex items-center justify-between flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900"></div>
@@ -72,7 +72,7 @@ const Clientes = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {clientes.map((cliente, index) => (
+                    {Empleados.map((cliente, index) => (
                       <tr
                         key={index}
                         className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -127,4 +127,4 @@ const Clientes = () => {
   );
 };
 
-export default Clientes;
+export default Empleados;

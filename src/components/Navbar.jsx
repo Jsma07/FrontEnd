@@ -75,7 +75,7 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-const Drawer = styled(MuiDrawer, {
+const DrawerComponent = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   width: drawerWidth,
@@ -105,15 +105,13 @@ export default function MiniDrawer() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
   const handleCategoryClick = (categoryId) => {
     setOpenCategory(openCategory === categoryId ? null : categoryId);
   };
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-      }}
-    >
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar position="fixed" open={open} sx={{ backgroundColor: "#FFFEF1" }}>
         <Toolbar>
@@ -161,7 +159,7 @@ export default function MiniDrawer() {
           <SettingsMenu />
         </Toolbar>
       </AppBar>
-      <Drawer
+      <DrawerComponent
         variant="permanent"
         open={open}
         classes={{ paper: "drawer-paper" }}
@@ -237,10 +235,17 @@ export default function MiniDrawer() {
             </React.Fragment>
           ))}
         </List>
-      </Drawer>
+      </DrawerComponent>
 
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <DrawerHeader />
+        {openCategory && (
+          <DrawerHeader>
+            {/* Aquí puedes renderizar el contenido que quieras mostrar cuando se selecciona una categoría */}
+            <Typography variant="h5">
+              Contenido de la categoría seleccionada
+            </Typography>
+          </DrawerHeader>
+        )}
       </Box>
     </Box>
   );
