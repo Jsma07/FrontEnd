@@ -140,8 +140,16 @@ const Usuarios = () => {
     { field: 'apellido', headerName: 'Apellido', width: 'w-36' },
     { field: 'correo', headerName: 'Correo', width: 'w-36' },
     { field: 'telefono', headerName: 'Teléfono', width: 'w-36' },
-    { field: 'rolId', headerName: 'Rol', width: 'w-36' },
-
+    { 
+      field: 'rolId', 
+      headerName: 'Rol', 
+      width: 'w-36',
+      renderCell: (params) => {
+        const rol = roles.find(role => role.id === params.value);
+        return rol ? rol.nombre : 'Desconocido';
+      }
+    },
+    
     {
       field: 'Acciones',
       headerName: 'Acciones',
@@ -193,7 +201,7 @@ const Usuarios = () => {
   ]}
 />
 
-      <Table columns={columns} data={users} />
+      <Table columns={columns} data={users} roles={roles} />
     </div>
   );
 };
