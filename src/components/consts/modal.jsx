@@ -1,11 +1,11 @@
-// ModalDinamico.js
 import React, { useState } from 'react';
 import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 
-const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
+const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, seleccionado }) => {
   const [formData, setFormData] = useState({});
 
+  // Función para manejar el cambio en los campos del formulario
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
     const newValue = e.target.type === 'checkbox' ? checked : value;
@@ -15,13 +15,14 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
     }));
   };
   
+  // Función para manejar el envío del formulario
   const handleSubmit = () => {
     onSubmit(formData);
     setFormData({}); // Reinicia el estado del formulario después de enviarlo
     handleClose();
   };
   
-
+  // Función para cancelar y cerrar el modal
   const handleCancel = () => {
     handleClose();
   };
@@ -34,6 +35,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
           {/* Renderizar los campos */}
           {fields && fields.length > 0 && fields.map((field, index) => (
             <Grid item xs={12} key={index}>
+              {/* Manejar los diferentes tipos de campos */}
               {field.type === 'text' && (
                 <TextField
                   id={field.name}
@@ -49,7 +51,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
                     textAlign: 'center',
                     maxWidth: '300px',
                   }}
-                  value={formData[field.name] || ''}
+                  value={formData[field.name] || (seleccionado ? seleccionado[field.name] : '')}
                 />
               )}
               {field.type === 'password' && (
@@ -67,7 +69,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
                     textAlign: 'center',
                     maxWidth: '300px',
                   }}
-                  value={formData[field.name] || ''}
+                  value={formData[field.name] || (seleccionado ? seleccionado[field.name] : '')} 
                 />
               )}
               {field.type === 'select' && (
@@ -81,7 +83,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
                     onChange={handleChange}
                     fullWidth
                     size="small"
-                    value={formData[field.name] || ''}
+                    value={formData[field.name] || (seleccionado ? seleccionado[field.name] : '')} 
                     label={field.label}
                     style={{
                       marginBottom: '0.5rem',
@@ -98,6 +100,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
             </Grid>
           ))}
         </Grid>
+        {/* Botones de enviar y cancelar */}
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
           <Button
             variant="contained"

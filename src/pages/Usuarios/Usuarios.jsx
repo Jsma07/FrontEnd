@@ -3,13 +3,16 @@ import CustomSwitch from "../../components/consts/switch";
 import ModalDinamico from "../../components/consts/modal";
 import Table from "../../components/consts/Tabla";
 import axios from 'axios';
+import LoadingScreen from "../../components/consts/pantallaCarga"; 
 
 const Usuarios = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
-  
+  const [seleccionado , setSeleccionado] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // Estado para controlar la carga de la página
+
   useEffect(() => {
     const fetchRoles = async () => {
         try {
@@ -28,6 +31,7 @@ const Usuarios = () => {
       try {
         const respuesta = await axios.get('http://localhost:5000/api/users');
         setUsers(respuesta.data.usuarios);
+        setIsLoading(false); // Una vez que se cargan los usuarios, cambia isLoading a false
       } catch(error) {
         console.log(error);
       }
@@ -35,13 +39,46 @@ const Usuarios = () => {
     fetchUsers();
   }, []);
 
-  const handleToggleSwitch = (id) => {
-    // Lógica para cambiar el estado del switch
+  const handleToggleSwitch = async (id) => {
+    const updatedUsers = users.map(user => {
+      if (user.id === id) {
+        const newEstado = user.estado === 1 ? 0 : 1; // Cambia el estado
+        return { ...user, estado: newEstado };
+      }
+      return user;
+    });
+    
+    try {
+      const updatedUser = updatedUsers.find(user => user.id === id);
+      if (!updatedUser) {
+        console.error('No se encontró el usuario actualizado');
+        return;
+      }
+      
+      await axios.put(`http://localhost:5000/api/editarUsuario/${id}`, { estado: updatedUser.estado });
+      setUsers(updatedUsers);
+    } catch (error) {
+      console.error('Error al cambiar el estado del usuario:', error);
+    }
   };
+  
 
   const handleEditClick = (id) => {
-    console.log(`Editando usuario con ID: ${id}`);
+    if (users.length === 0) {
+      // Aún no se han cargado los usuarios, manejar esto según tu caso
+      return;
+    }
+  
+    const usuarioEditar = users.find(user => user.id === id);
+    if (!usuarioEditar) {
+      console.log("no encontrado")
+      return;
+    }
+  
+    setOpenModal(true);
+    setSeleccionado(usuarioEditar);
   };
+  
 
   const handleViewDetailsClick = (id) => {
     console.log(`Viendo detalles del usuario con ID: ${id}`);
@@ -53,17 +90,48 @@ const Usuarios = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setSeleccionado(null)
   };
 
   const handleCrearUsuarioClick = () => {
     handleOpenModal();
   };
 
-  const handleCrearUsuario = (formData) => {
-    // Lógica para crear un nuevo usuario con los datos proporcionados
-    console.log('Datos del nuevo usuario:', formData);
-    // Cierra el modal después de enviar el formulario
-    handleCloseModal();
+  const handleSubmit = async(formData) => {
+    try {
+        let response;
+        if(seleccionado){
+          response = await axios.put(
+            `http://localhost:5000/api/editarUsuario/${seleccionado.id}`, formData,
+            {
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+          
+        }else{
+          response = await axios.post(
+            'http://localhost:5000/api/crearUsuario',
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'application/json' // Configura el tipo de contenido como JSON
+                }
+            }
+        );
+        
+        }
+        console.log('Respuesta del servidor:', response.data);
+        handleCloseModal();
+        // setIsLoading(true); 
+        setTimeout(() => {
+          window.location.reload(); // Recargar la página para mostrar el nuevo usuario
+        }, 100);
+        
+    } catch (error) {
+        console.error('Error al crear usuario:', error);
+    }
   };
 
   const columns = [
@@ -72,6 +140,8 @@ const Usuarios = () => {
     { field: 'apellido', headerName: 'Apellido', width: 'w-36' },
     { field: 'correo', headerName: 'Correo', width: 'w-36' },
     { field: 'telefono', headerName: 'Teléfono', width: 'w-36' },
+    { field: 'rolId', headerName: 'Rol', width: 'w-36' },
+
     {
       field: 'Acciones',
       headerName: 'Acciones',
@@ -81,44 +151,48 @@ const Usuarios = () => {
           <button onClick={() => handleEditClick(params.row.id)} className="text-yellow-500">
             <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
           </button>
-          <button onClick={() => handleViewDetailsClick(params.row.id)} className="text-blue-500">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12zm0-6a2 2 0 110-4 2 2 0 010 4z" clipRule="evenodd" />
-            </svg>
-          </button>
+          
           {/* CustomSwitch que cambia su estado cuando se hace clic */}
           <CustomSwitch
-            active={params.row.isActive}
-            onToggle={() => handleToggleSwitch(params.row.id)}
+  active={params.row.estado === 1} // Usar el estado del usuario para determinar si el switch está activo
+  onToggle={() => handleToggleSwitch(params.row.id)}
           />
         </div>
       ),
     },
   ];
 
+  if (isLoading) {
+    return <LoadingScreen />; // Muestra la pantalla de carga mientras isLoading es verdadero
+  }
+
   return (
     <div>
       <h1>Usuarios</h1>
-      <button onClick={handleCrearUsuarioClick} className="text-blue-500">Crear Usuario</button>
+      
+      <button onClick={handleCrearUsuarioClick} className="text-blue-500"><i class='bx bx-user-plus'></i></button>
       <ModalDinamico
-        open={openModal}
-        handleClose={handleCloseModal}
-        onSubmit={handleCrearUsuario}
-        title="Crear Nuevo Usuario"
-        fields={[
-          { name: 'nombre', label: 'Nombre', type: 'text' },
-          { name: 'apellido', label: 'Apellido', type: 'text' },
-          { name: 'correo', label: 'Correo', type: 'text' },
-          { name: 'telefono', label: 'Teléfono', type: 'text' },
-          { 
-            name: 'rol', 
-            label: 'Rol', 
-            type: 'select',
-            options: roles.map(role => ({ value: role.id, label: role.nombre })) // Configura las opciones del select con los roles obtenidos
-          },
-          { name: 'contraseña', label: 'Contraseña', type: 'password' }
-        ]}
-      />
+      seleccionado={seleccionado}
+  open={openModal}
+  handleClose={handleCloseModal}
+  onSubmit={handleSubmit}
+  title={seleccionado ? "Editar Usuario" : "Crear nuevo usuario"}
+  fields={[
+    { name: 'nombre', label: 'Nombre', type: 'text', value: seleccionado ? seleccionado.nombre : '' },
+    { name: 'apellido', label: 'Apellido', type: 'text', value: seleccionado ? seleccionado.apellido : '' },
+    { name: 'correo', label: 'Correo', type: 'text', value: seleccionado ? seleccionado.correo : '' },
+    { name: 'telefono', label: 'Teléfono', type: 'text', value: seleccionado ? seleccionado.telefono : '' },
+    { 
+      name: 'rolId', 
+      label: 'Rol', 
+      type: 'select',
+      options: roles.map(role => ({ value: role.id, label: role.nombre })),
+      value: seleccionado ? seleccionado.rolId : '' // Preselecciona el rol del usuario si existe
+    },
+    { name: 'contrasena', label: 'Contraseña', type: 'password', value: seleccionado ? seleccionado.contrasena : '' }
+  ]}
+/>
+
       <Table columns={columns} data={users} />
     </div>
   );
