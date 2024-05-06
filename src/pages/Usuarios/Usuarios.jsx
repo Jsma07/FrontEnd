@@ -1,33 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
 import CustomSwitch from "../../components/consts/switch";
-import AddRoleModal from "../../components/consts/Modal";
+import ModalDinamico from "../../components/consts/modal";
 import Table from "../../components/consts/Tabla";
 
 const Usuarios = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [roles, setRoles] = useState([]);
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/roles'); 
+        setRoles(response.data.roles);
+      } catch (error) {
+        console.error('Error fetching roles:', error);
+      }
+    };
+
+    fetchRoles();
+  }, []);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const respuesta = await axios.get('http://localhost:5000/api/users');
+        setUsers(respuesta.data.usuarios);
+      } catch(error) {
+        console.log(error);
+      }
+    };
+    fetchUsers();
+  }, []);
 
   const handleToggleSwitch = (id) => {
-    // Encuentra la fila correspondiente al ID
-    const updatedRows = rows.map((row) => {
-      if (row.id === id) {
-        // Invierte el estado isActive
-        return { ...row, isActive: !row.isActive };
-      }
-      return row;
-    });
-
-    // Actualiza el estado de las filas
-    setRows(updatedRows);
+    // Lógica para cambiar el estado del switch
   };
 
   const handleEditClick = (id) => {
-    console.log(`Editando rol con ID: ${id}`);
-    handleOpenModal();
+    console.log(`Editando usuario con ID: ${id}`);
   };
 
   const handleViewDetailsClick = (id) => {
-    console.log(`Viendo detalles del rol con ID: ${id}`);
+    console.log(`Viendo detalles del usuario con ID: ${id}`);
   };
 
   const handleOpenModal = () => {
@@ -38,13 +55,23 @@ const Usuarios = () => {
     setOpenModal(false);
   };
 
+  const handleCrearUsuarioClick = () => {
+    handleOpenModal();
+  };
+
+  const handleCrearUsuario = (formData) => {
+    // Lógica para crear un nuevo usuario con los datos proporcionados
+    console.log('Datos del nuevo usuario:', formData);
+    // Cierra el modal después de enviar el formulario
+    handleCloseModal();
+  };
+
   const columns = [
     { field: 'id', headerName: 'ID', width: 'w-16' },
-    { field: 'Nombre', headerName: 'Nombre', width: 'w-36' },
-    { field: 'Apellido', headerName: 'Apellido', width: 'w-36' },
-    { field: 'Correo', headerName: 'Correo', width: 'w-36' },
-    { field: 'Telefono', headerName: 'Telefono', width: 'w-36' },
-
+    { field: 'nombre', headerName: 'Nombre', width: 'w-36' },
+    { field: 'apellido', headerName: 'Apellido', width: 'w-36' },
+    { field: 'correo', headerName: 'Correo', width: 'w-36' },
+    { field: 'telefono', headerName: 'Teléfono', width: 'w-36' },
     {
       field: 'Acciones',
       headerName: 'Acciones',
@@ -56,14 +83,9 @@ const Usuarios = () => {
           </button>
           <button onClick={() => handleViewDetailsClick(params.row.id)} className="text-blue-500">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12zm0-6a2 2 0 110-4 2 2 0 010 4z"
-                clipRule="evenodd"
-              />
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12zm0-6a2 2 0 110-4 2 2 0 010 4z" clipRule="evenodd" />
             </svg>
           </button>
-          {/* CustomSwitch que cambia su estado cuando se hace clic */}
           <CustomSwitch
             active={params.row.isActive}
             onToggle={() => handleToggleSwitch(params.row.id)}
@@ -73,19 +95,30 @@ const Usuarios = () => {
     },
   ];
 
-  const [rows, setRows] = useState([
-    { id: 1, Nombre: 'Eduardo', Apellido: 'Mosquera',Correo: 'eduardo@gmail.com' ,Telefono: 30212154 , isActive: false },
-    { id: 2, Nombre: 'Johan', Apellido: 'Martinez',Correo: 'johan@gmail.com' ,Telefono: 30212154 , isActive: false },
-    { id: 3, Nombre: 'Emerson', Apellido: 'V',Correo: 'e@gmail.com' ,Telefono: 30212154 , isActive: false },
-    { id: 4, Nombre: 'Yurani', Apellido: 'E',Correo: 'y@gmail.com' ,Telefono: 30212154 , isActive: false },
-
-  ]);
-
   return (
     <div>
       <h1>Usuarios</h1>
-      <Table columns={columns} data={rows} />
-      <AddRoleModal open={openModal} handleClose={handleCloseModal} />
+      <button onClick={handleCrearUsuarioClick} className="text-blue-500">Crear Usuario</button>
+      <ModalDinamico
+        open={openModal}
+        handleClose={handleCloseModal}
+        onSubmit={handleCrearUsuario}
+        title="Crear Nuevo Usuario"
+        fields={[
+          { name: 'nombre', label: 'Nombre', type: 'text' },
+          { name: 'apellido', label: 'Apellido', type: 'text' },
+          { name: 'correo', label: 'Correo', type: 'text' },
+          { name: 'telefono', label: 'Teléfono', type: 'text' },
+          { 
+            name: 'rol', 
+            label: 'Rol', 
+            type: 'select',
+            options: roles.map(role => ({ value: role.id, label: role.nombre })) 
+          },
+          { name: 'contraseña', label: 'Contraseña', type: 'password' }
+        ]}
+      />
+      <Table columns={columns} data={users} />
     </div>
   );
 };

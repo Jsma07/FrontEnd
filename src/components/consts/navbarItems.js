@@ -26,9 +26,12 @@ export const NavbarItems =[
         icon: <PeopleIcon />,
         label: 'Usuarios',
         subitems: [
+
           { label: 'Administradores', route: '/usuarios/administradores', icon: <PeopleIcon /> },
           { label: 'Empleados', route: '/usuarios/empleados', icon: <PeopleIcon /> },
           { label: 'Clientes', route: '/Clientes',icon: <PeopleIcon /> },
+          
+
         ],
       },
     {
@@ -42,7 +45,6 @@ export const NavbarItems =[
           ],
     },
    
-    
     {
         id: 3,
         icon: <ShoppingBagIcon/>,

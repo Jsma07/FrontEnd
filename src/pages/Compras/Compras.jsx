@@ -3,7 +3,7 @@ import CustomSwitch from "../../components/consts/switch";
 import Table from "../../components/consts/Tabla";
 import { Grid, Button as CommonButton } from '@mui/material';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
-import CustomModal from "../../components/consts/Modal";
+import CustomModal from "../../components/consts/modal";
 
 const Compras = () => {
   const [openModal, setOpenModal] = useState(false);
