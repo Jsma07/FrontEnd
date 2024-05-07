@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 
 const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, seleccionado }) => {
   const [formData, setFormData] = useState({});
+
+  useEffect(() => {
+    if (seleccionado) {
+      setFormData(seleccionado);
+    } else {
+      // Limpiar el formulario cuando no hay un usuario seleccionado
+      setFormData({});
+    }
+  }, [seleccionado]);
 
   // Función para manejar el cambio en los campos del formulario
   const handleChange = (e) => {
@@ -18,7 +27,6 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
   // Función para manejar el envío del formulario
   const handleSubmit = () => {
     onSubmit(formData);
-    setFormData({}); // Reinicia el estado del formulario después de enviarlo
     handleClose();
   };
   
@@ -51,7 +59,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
                     textAlign: 'center',
                     maxWidth: '300px',
                   }}
-                  value={formData[field.name] || (seleccionado ? seleccionado[field.name] : '')}
+                  value={formData[field.name] || ''}
                 />
               )}
               {field.type === 'password' && (
@@ -69,7 +77,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
                     textAlign: 'center',
                     maxWidth: '300px',
                   }}
-                  value={formData[field.name] || (seleccionado ? seleccionado[field.name] : '')} 
+                  value={formData[field.name] || ''} 
                 />
               )}
               {field.type === 'select' && (
@@ -83,7 +91,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
                     onChange={handleChange}
                     fullWidth
                     size="small"
-                    value={formData[field.name] || (seleccionado ? seleccionado[field.name] : '')} 
+                    value={formData[field.name] || ''}
                     label={field.label}
                     style={{
                       marginBottom: '0.5rem',

@@ -6,7 +6,6 @@ import axios from 'axios';
 import LoadingScreen from "../../components/consts/pantallaCarga"; 
 
 const Usuarios = () => {
-  const [selectedRows, setSelectedRows] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
@@ -55,12 +54,38 @@ const Usuarios = () => {
         return;
       }
       
-      await axios.put(`http://localhost:5000/api/editarUsuario/${id}`, { estado: updatedUser.estado });
-      setUsers(updatedUsers);
+      // Mostrar Sweet Alert de confirmación
+      const result = await window.Swal.fire({
+        icon: 'warning',
+        title: '¿Estás seguro?',
+        text: '¿Quieres cambiar el estado del usuario?',
+        showCancelButton: true,
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'Cancelar',
+      });
+  
+      if (result.isConfirmed) {
+        // Usuario confirmó, procede a actualizar el estado
+        await axios.put(`http://localhost:5000/api/editarUsuario/${id}`, { estado: updatedUser.estado });
+        setUsers(updatedUsers);
+        // Mostrar Sweet Alert de éxito
+        window.Swal.fire({
+          icon: 'success',
+          title: 'Estado actualizado',
+          text: 'El estado del usuario ha sido actualizado correctamente.',
+        });
+      }
     } catch (error) {
       console.error('Error al cambiar el estado del usuario:', error);
+      // Mostrar Sweet Alert de error
+      window.Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un error al cambiar el estado del usuario. Por favor, inténtalo de nuevo más tarde.',
+      });
     }
   };
+  
   
 
   const handleEditClick = (id) => {
@@ -96,44 +121,81 @@ const Usuarios = () => {
   const handleCrearUsuarioClick = () => {
     handleOpenModal();
   };
-
-  const handleSubmit = async(formData) => {
+  const handleSubmit = async (formData) => {
+    const mandatoryFields = ['nombre', 'correo', 'apellido', 'telefono', 'rolId', 'contrasena'];
+  
+    const areAllMandatoryFieldsFilled = mandatoryFields.every(field => {
+      const value = formData[field];
+      return value !== undefined && value.trim() !== '';
+    });
+  
+    if (!areAllMandatoryFieldsFilled) {
+      window.Swal.fire({
+        icon: 'error',
+        title: 'Campos obligatorios vacíos',
+        text: 'Por favor, completa todos los campos obligatorios antes de continuar.',
+      });
+      return; // Detiene el envío del formulario si no se completaron todos los campos obligatorios
+    }
+    
     try {
-        let response;
-        if(seleccionado){
-          response = await axios.put(
-            `http://localhost:5000/api/editarUsuario/${seleccionado.id}`, formData,
-            {
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            }
-          );
-          
-        }else{
-          response = await axios.post(
-            'http://localhost:5000/api/crearUsuario',
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'application/json' // Configura el tipo de contenido como JSON
-                }
-            }
+      const result = await window.Swal.fire({
+        icon: 'warning',
+        title: '¿Estás seguro?',
+        text: '¿Quieres crear el usuario?',
+        showCancelButton: true,
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'Cancelar',
+      });
+  
+      if (!result.isConfirmed) {
+        return; // No se confirmó
+      }
+  
+      let response;
+      if (seleccionado) {
+        response = await axios.put(
+          `http://localhost:5000/api/editarUsuario/${seleccionado.id}`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
         );
-        
-        }
-        console.log('Respuesta del servidor:', response.data);
-        handleCloseModal();
-        // setIsLoading(true); 
-        setTimeout(() => {
-          window.location.reload(); // Recargar la página para mostrar el nuevo usuario
-        }, 100);
-        
+        window.Swal.fire({
+          icon: 'success',
+          title: 'Usuario editado',
+          text: 'El usuario ha sido editado correctamente.',
+        });
+      } else {
+        response = await axios.post(
+          'http://localhost:5000/api/crearUsuario',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        window.Swal.fire({
+          icon: 'success',
+          title: 'Usuario creado',
+          text: 'El usuario ha sido creado correctamente.',
+        });
+      }
+  
+      console.log('Respuesta del servidor:', response.data);
+      handleCloseModal();
+      setTimeout(() => {
+        window.location.reload(); // Recargar la página para mostrar el nuevo usuario
+      }, 1500);
     } catch (error) {
-        console.error('Error al crear usuario:', error);
+      console.error('Error al crear usuario:', error);
     }
   };
-
+  
+  
   const columns = [
     { field: 'id', headerName: 'ID', width: 'w-16' },
     { field: 'nombre', headerName: 'Nombre', width: 'w-36' },
