@@ -3,7 +3,7 @@ import CustomSwitch from "../../components/consts/switch";
 import Table from "../../components/consts/Tabla";
 import { Grid, Button as CommonButton } from '@mui/material';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
-import CustomModal from "../../components/consts/modal";
+import CustomModal from "../../components/consts/Modal";
 
 const Compras = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -40,7 +40,7 @@ const Compras = () => {
   };
 
   const handleClick = () => {
-    handleOpenModal(); // Abre el modal al hacer clic en el botón
+    handleOpenModal();
   };
 
   const handleAddCompra = (formData) => {
@@ -74,7 +74,6 @@ const Compras = () => {
               />
             </svg>|
           </button>
-          {/* CustomSwitch que cambia su estado cuando se hace clic */}
           <CustomSwitch
             active={params.row.isActive}
             onToggle={() => handleToggleSwitch(params.row.id)}
@@ -106,7 +105,7 @@ const Compras = () => {
         <CommonButton
           color="primary"
           variant="contained"
-          onClick={handleClick} // Abre el modal al hacer clic en el botón
+          onClick={handleClick} 
           sx={{
             color: 'black',
             minHeight: 40,

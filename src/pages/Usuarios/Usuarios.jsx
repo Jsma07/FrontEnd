@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import CustomSwitch from "../../components/consts/switch";
-import ModalDinamico from "../../components/consts/modal";
+import ModalDinamico from "../../components/consts/Modal";
 import Table from "../../components/consts/Tabla";
 
 const Usuarios = () => {

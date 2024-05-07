@@ -2,18 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 
-const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
+const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityData, onChange }) => {
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
-    if (fields && fields.length > 0) {
-      const initialFormData = {};
-      fields.forEach((field) => {
-        initialFormData[field.name] = field.defaultValue || '';
-      });
-      setFormData(initialFormData);
+    if (entityData) {
+      setFormData(entityData);
     }
-  }, [fields]);
+  }, [entityData]);
 
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
@@ -22,21 +18,20 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
       ...prevData,
       [name]: newValue,
     }));
+    // Pasar los cambios al componente padre
+    onChange(name, newValue);
   };
 
   const handleSubmit = () => {
-    if (typeof onSubmit === 'function') {
-      onSubmit(formData);
-      handleClose();
-    } else {
-      console.error('onSubmit is not a function');
-    }
+    onSubmit(formData);
+    handleClose();
   };
 
   const handleCancel = () => {
     handleClose();
   };
 
+  // Renderizar los campos del formulario
   const renderFields = () => {
     return fields.map((field, index) => (
       <Grid item xs={12} sm={6} key={index}>
@@ -45,6 +40,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
     ));
   };
 
+  // Renderizar cada campo según su tipo
   const renderFieldByType = (field) => {
     const { name, label, type, options } = field;
 
@@ -62,7 +58,8 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
             size="medium"
             type={type}
             style={{ marginBottom: '0.5rem', textAlign: 'center' }}
-            value={formData[name] || ''}
+            value={formData[name] || ''} 
+            readOnly={name === 'IdProveedor'}           
           />
         );
       case 'select':
@@ -116,4 +113,4 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
   );
 };
 
-export default ModalDinamico;
+export default ModalEditar;
