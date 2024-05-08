@@ -124,18 +124,36 @@ const Usuarios = () => {
   const handleSubmit = async (formData) => {
     const mandatoryFields = ['nombre', 'correo', 'apellido', 'telefono', 'rolId', 'contrasena'];
   
-    const areAllMandatoryFieldsFilled = mandatoryFields.every(field => {
+    const emptyFields = mandatoryFields.filter(field => {
       const value = formData[field];
-      return value !== undefined && value.trim() !== '';
+      if (field === 'rolId') {
+        return value === undefined || value.toString().trim() === '';
+      }
+      return typeof value !== 'string' || value.trim() === '';
     });
   
-    if (!areAllMandatoryFieldsFilled) {
+    console.log('Campos vacíos:', emptyFields);
+  
+    if (emptyFields.length > 0) {
       window.Swal.fire({
         icon: 'error',
         title: 'Campos obligatorios vacíos',
         text: 'Por favor, completa todos los campos obligatorios antes de continuar.',
       });
-      return; // Detiene el envío del formulario si no se completaron todos los campos obligatorios
+      return;
+    }
+    
+    // Validar si el correo ya existe en el formulario actual
+    console.log('Verificando si el correo existe:', formData.correo);
+    const correoExiste = await axios.get(`http://localhost:5000/api/verificarCorreo/${formData.correo}`);
+    console.log('Respuesta del servidor:', correoExiste.data);
+    if (correoExiste.data.existe) {
+      window.Swal.fire({
+        icon: 'error',
+        title: 'Correo existente',
+        text: 'El correo ingresado ya está en uso. Por favor, utiliza otro correo.',
+      });
+      return;
     }
     
     try {
@@ -193,7 +211,8 @@ const Usuarios = () => {
     } catch (error) {
       console.error('Error al crear usuario:', error);
     }
-  };
+};
+
   
   
   const columns = [
