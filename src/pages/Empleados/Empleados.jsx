@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CancelIcon from "@mui/icons-material/Cancel";
+import ModalDinamico from "../../components/consts/modal";
+import Swal from "sweetalert2";
 
 const Empleados = () => {
+  const [openModalAgregar, setOpenModalAgregar] = useState(false);
   const [Empleados, setEmpleados] = useState([]);
+  const [Empleado, setEmpleado] = useState([]);
+  const [modalData, setModalData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,6 +25,123 @@ const Empleados = () => {
     fetchData();
   }, []);
 
+  const handleSubmit = async (formData) => {
+    try {
+      // Mostrar un diálogo de confirmación antes de registrar el Empleado
+      const result = await Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¿Quieres registrar este Empleado?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí",
+        cancelButtonText: "Cancelar",
+      });
+
+      // Si el usuario hace clic en "Sí", procede con el registro del Empleado
+      if (result.isConfirmed) {
+        // Normalizar el valor del campo "Estado" si es necesario
+        let EstadoNormalizado;
+        if (formData.Estado === "Activo") {
+          EstadoNormalizado = 1;
+        } else if (formData.Estado === "Inactivo") {
+          EstadoNormalizado = 2;
+        } else {
+          // Valor predeterminado si el Estado no coincide con ninguno de los valores esperados
+          EstadoNormalizado = 0;
+        }
+
+        // Convertir campos de texto a números si es necesario
+        const formDataNumerico = {
+          ...formData,
+          Telefono: parseInt(formData.Telefono),
+          Estado: EstadoNormalizado,
+          IdRol: parseInt(formData.IdRol),
+        };
+
+        console.log("Datos del formulario numéricos:", formDataNumerico);
+
+        await axios.post(
+          "http://localhost:5000/Jackenail/RegistrarEmpleados",
+          formDataNumerico
+        );
+
+        // Mostrar una alerta de éxito si el registro es exitoso
+        Swal.fire({
+          icon: "success",
+          title: "¡Registro exitoso!",
+          text: "El usuario se ha registrado correctamente.",
+        });
+
+        // Cerrar el modal después de enviar el formulario
+        setModalData(null);
+      }
+    } catch (error) {
+      console.error("Error al registrar el Empleado:", error);
+
+      // Mostrar una alerta de error si ocurre algún problema durante el registro
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Ocurrió un error al registrar el Empleado.",
+        footer: '<a href="#">Inténtelo nuevamente</a>',
+      });
+    }
+  };
+
+  const handleOpenModal = (data) => {
+    setModalData(data);
+  };
+
+  const handleActualizacionSubmit = async (formData) => {
+    try {
+      // Normalizar el valor del campo "Estado" si es necesario
+      let estadoNormalizado;
+      if (formData.Estado === "Inactivo") {
+        estadoNormalizado = 1;
+      } else if (formData.Estado === "Activo") {
+        estadoNormalizado = 2;
+      } else {
+        estadoNormalizado = 0;
+      }
+
+      // Convertir campos de texto a números si es necesario
+      const formDataNumerico = {
+        ...formData,
+        Telefono: parseInt(formData.Telefono),
+        Estado: estadoNormalizado,
+        IdRol: parseInt(formData.IdRol),
+      };
+
+      console.log(formDataNumerico);
+
+      // Determinar la URL de la API para actualizar el empleado
+      const url = `http://localhost:5000/Jackenail/ActualizarEmpleados/${formDataNumerico.IdEmpleado}`;
+
+      // Realizar la solicitud de actualización a la API utilizando axios.put
+      await axios.put(url, formDataNumerico);
+
+      // Mostrar una alerta de éxito si la actualización es exitosa
+      Swal.fire({
+        icon: "success",
+        title: "¡Actualización exitosa!",
+        text: "El empleado se ha actualizado correctamente.",
+      });
+
+      // Cerrar el modal después de enviar el formulario
+      setModalData(null);
+    } catch (error) {
+      console.error("Error al actualizar el empleado:", error);
+
+      // Mostrar una alerta de error si ocurre algún problema durante la actualización
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Ocurrió un error al actualizar el empleado.",
+        footer: '<a href="#">Inténtelo nuevamente</a>',
+      });
+    }
+  };
+
   const columns = [
     { name: "FotoPerfil", label: "Foto de Perfil" },
     { name: "Nombre", label: "Nombre" },
@@ -28,7 +150,6 @@ const Empleados = () => {
     { name: "Telefono", label: "Teléfono" },
     { name: "Estado", label: "Estado" },
     { name: "IdRol", label: "ID de Rol" },
-    { name: "Acciones", label: "Acciones" },
   ];
 
   return (
@@ -69,10 +190,16 @@ const Empleados = () => {
                           {column.label}
                         </th>
                       ))}
+                      <th>
+                        Acciones
+                        <button onClick={() => handleOpenModal(Empleado)}>
+                          Abrir Modal
+                        </button>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {Empleados.map((cliente, index) => (
+                    {Empleados.map((Empleado, index) => (
                       <tr
                         key={index}
                         className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -84,40 +211,162 @@ const Empleados = () => {
                           >
                             {column.name === "FotoPerfil" ? (
                               <img
-                                src={cliente.FotoPerfil}
+                                src={Empleado.FotoPerfil}
                                 className="w-16 h-16 md:w-24 md:h-24 object-cover rounded-full"
-                                alt={`${cliente.Nombre} ${cliente.Apellido}`}
+                                alt={`${Empleado.Nombre} ${Empleado.Apellido}`}
                               />
                             ) : column.name === "Estado" ? (
                               <span className="inline-flex items-center">
                                 <span
                                   className={`h-2 w-2 rounded-full mr-1 ${
-                                    cliente[column.name] === 1
+                                    Empleado[column.name] === 1
                                       ? "bg-blue-500"
-                                      : cliente[column.name] === 2
+                                      : Empleado[column.name] === 2
                                       ? "bg-green-500"
-                                      : cliente[column.name] === 3
+                                      : Empleado[column.name] === 3
                                       ? "bg-red-500"
                                       : ""
                                   }`}
                                 ></span>{" "}
-                                {cliente[column.name] === 1
-                                  ? "En proceso"
-                                  : cliente[column.name] === 2
-                                  ? "Terminado"
-                                  : cliente[column.name] === 3
-                                  ? "Anulada"
+                                {Empleado[column.name] === 1
+                                  ? "Activo"
+                                  : Empleado[column.name] === 2
+                                  ? "Inactivo"
                                   : ""}
                               </span>
                             ) : (
-                              cliente[column.name]
+                              Empleado[column.name]
                             )}
                           </td>
                         ))}
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={() =>
+                              handleOpenModal({
+                                ...Empleado,
+                                modo: "actualizacion",
+                                seleccionado: Empleado,
+                              })
+                            }
+                          >
+                            Editar
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+                {modalData && (
+                  <ModalDinamico
+                    open={true}
+                    handleClose={() => setModalData(null)}
+                    title={
+                      modalData.modo === "registro"
+                        ? "Registrar Empleado"
+                        : "Actualizar Empleado"
+                    }
+                    fields={[
+                      {
+                        label: "Nombre",
+                        name: "Nombre", // Nombre ajustado a "Nombre"
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Apellido",
+                        name: "Apellido", // Nombre ajustado a "Apellido"
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Correo",
+                        name: "Correo", // Nombre ajustado a "Correo"
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Teléfono",
+                        name: "Telefono", // Nombre ajustado a "Telefono"
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Estado",
+                        name: "Estado", // Nombre ajustado a "Estado"
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Foto de Perfil",
+                        name: "FotoPerfil",
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Rol",
+                        name: "IdRol", // Nombre ajustado a "IdRol"
+                        type: "text",
+                        required: true,
+                      },
+                    ]}
+                    onSubmit={handleSubmit}
+                    seleccionado={modalData}
+                  />
+                )}
+
+                {modalData && modalData.modo === "actualizacion" && (
+                  <ModalDinamico
+                    open={true}
+                    handleClose={() => setModalData(null)}
+                    title="Actualizar Empleado"
+                    fields={[
+                      {
+                        label: "Nombre",
+                        name: "Nombre",
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Apellido",
+                        name: "Apellido",
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Correo",
+                        name: "Correo",
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Teléfono",
+                        name: "Telefono",
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Estado",
+                        name: "Estado",
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Foto de Perfil",
+                        name: "FotoPerfil",
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Rol",
+                        name: "IdRol",
+                        type: "text",
+                        required: true,
+                      },
+                    ]}
+                    onSubmit={handleActualizacionSubmit}
+                    seleccionado={modalData.seleccionado}
+                  />
+                )}
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const Table = ({ columns, data }) => {
   return (
@@ -15,13 +15,17 @@ const Table = ({ columns, data }) => {
           </tr>
         </thead>
         <tbody>
-          {/* Renderiza las filas de la tabla */}
           {data.map((row, rowIndex) => (
-            <tr key={rowIndex} className="border-b hover:bg-gray-100 dark:hover:bg-gray-700">
+            <tr
+              key={rowIndex}
+              className="border-b hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
               {columns.map((column, colIndex) => (
                 <td key={colIndex} className={`px-4 py-2 ${column.width}`}>
                   {/* Renderiza el contenido de cada celda */}
-                  {column.renderCell ? column.renderCell({ row }) : row[column.field]}
+                  {column.renderCell
+                    ? column.renderCell({ row })
+                    : row[column.field]}
                 </td>
               ))}
             </tr>

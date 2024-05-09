@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import CancelIcon from "@mui/icons-material/Cancel";
+import Swal from "sweetalert2";
+import ModalDinamico from "../../components/consts/modal";
 
 const Clientes = () => {
   const [clientes, setClientes] = useState([]);
+  const [cliente, setCliente] = useState([]);
+
+  const [modalData, setModalData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,6 +24,10 @@ const Clientes = () => {
     fetchData();
   }, []);
 
+  const handleOpenModal = (data) => {
+    setModalData(data);
+  };
+
   const columns = [
     { name: "FotoPerfil", label: "Foto de Perfil" },
     { name: "Nombre", label: "Nombre" },
@@ -28,8 +36,119 @@ const Clientes = () => {
     { name: "Telefono", label: "Teléfono" },
     { name: "Estado", label: "Estado" },
     { name: "IdRol", label: "ID de Rol" },
-    { name: "Acciones", label: "Acciones" },
   ];
+  const handleSubmit = async (formData) => {
+    try {
+      // Mostrar un diálogo de confirmación antes de registrar el cliente
+      const result = await Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¿Quieres registrar este cliente?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí",
+        cancelButtonText: "Cancelar",
+      });
+
+      // Si el usuario hace clic en "Sí", procede con el registro del cliente
+      if (result.isConfirmed) {
+        // Normalizar el valor del campo "Estado" si es necesario
+        let EstadoNormalizado;
+        if (formData.Estado === "Activo") {
+          EstadoNormalizado = 1;
+        } else if (formData.Estado === "Inactivo") {
+          EstadoNormalizado = 2;
+        } else {
+          // Valor predeterminado si el Estado no coincide con ninguno de los valores esperados
+          EstadoNormalizado = 0;
+        }
+
+        // Convertir campos de texto a números si es necesario
+        const formDataNumerico = {
+          ...formData,
+          Telefono: parseInt(formData.Telefono),
+          Estado: EstadoNormalizado,
+          IdRol: parseInt(formData.IdRol),
+        };
+
+        console.log("Datos del formulario numéricos:", formDataNumerico);
+
+        await axios.post(
+          "http://localhost:5000/Jackenail/RegistrarClientes",
+          formDataNumerico
+        );
+
+        // Mostrar una alerta de éxito si el registro es exitoso
+        Swal.fire({
+          icon: "success",
+          title: "¡Registro exitoso!",
+          text: "El usuario se ha registrado correctamente.",
+        });
+
+        // Cerrar el modal después de enviar el formulario
+        setModalData(null);
+      }
+    } catch (error) {
+      console.error("Error al registrar el cliente:", error);
+
+      // Mostrar una alerta de error si ocurre algún problema durante el registro
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Ocurrió un error al registrar el cliente.",
+        footer: '<a href="#">Inténtelo nuevamente</a>',
+      });
+    }
+  };
+
+  const handleActualizacionSubmit = async (formData) => {
+    try {
+      // Normalizar el valor del campo "Estado" si es necesario
+      let estadoNormalizado;
+      if (formData.Estado === "Inactivo") {
+        estadoNormalizado = 1;
+      } else if (formData.Estado === "Activo") {
+        estadoNormalizado = 2;
+      } else {
+        estadoNormalizado = 0;
+      }
+
+      // Convertir campos de texto a números si es necesario
+      const formDataNumerico = {
+        ...formData,
+        Telefono: parseInt(formData.Telefono),
+        Estado: estadoNormalizado,
+        IdRol: parseInt(formData.IdRol),
+      };
+
+      console.log(formDataNumerico);
+
+      // Determinar la URL de la API para actualizar el cliente
+      const url = `http://localhost:5000/Jackenail/Actualizar/${formDataNumerico.IdCliente}`;
+
+      // Realizar la solicitud de actualización a la API utilizando axios.put
+      await axios.put(url, formDataNumerico);
+
+      // Mostrar una alerta de éxito si la actualización es exitosa
+      Swal.fire({
+        icon: "success",
+        title: "¡Actualización exitosa!",
+        text: "El cliente se ha actualizado correctamente.",
+      });
+
+      // Cerrar el modal después de enviar el formulario
+      setModalData(null);
+    } catch (error) {
+      console.error("Error al actualizar el cliente:", error);
+
+      // Mostrar una alerta de error si ocurre algún problema durante la actualización
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Ocurrió un error al actualizar el cliente.",
+        footer: '<a href="#">Inténtelo nuevamente</a>',
+      });
+    }
+  };
 
   return (
     <div
@@ -69,6 +188,12 @@ const Clientes = () => {
                           {column.label}
                         </th>
                       ))}
+                      <th>
+                        Acciones
+                        <button onClick={() => handleOpenModal(cliente)}>
+                          Abrir Modal
+                        </button>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -96,17 +221,13 @@ const Clientes = () => {
                                       ? "bg-blue-500"
                                       : cliente[column.name] === 2
                                       ? "bg-green-500"
-                                      : cliente[column.name] === 3
-                                      ? "bg-red-500"
                                       : ""
                                   }`}
                                 ></span>{" "}
                                 {cliente[column.name] === 1
-                                  ? "En proceso"
+                                  ? "Activo"
                                   : cliente[column.name] === 2
-                                  ? "Terminado"
-                                  : cliente[column.name] === 3
-                                  ? "Anulada"
+                                  ? "Inactivo"
                                   : ""}
                               </span>
                             ) : (
@@ -114,10 +235,132 @@ const Clientes = () => {
                             )}
                           </td>
                         ))}
+
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={() =>
+                              handleOpenModal({
+                                ...cliente,
+                                modo: "actualizacion",
+                                seleccionado: cliente,
+                              })
+                            }
+                            class="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                          >
+                            <i class="bx bxs-edit"></i>
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+                {modalData && (
+                  <ModalDinamico
+                    open={true}
+                    handleClose={() => setModalData(null)}
+                    title="Registrar clientes"
+                    fields={[
+                      {
+                        label: "Nombre",
+                        name: "Nombre", // Nombre ajustado a "Nombre"
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Apellido",
+                        name: "Apellido", // Nombre ajustado a "Apellido"
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Correo",
+                        name: "Correo", // Nombre ajustado a "Correo"
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Teléfono",
+                        name: "Telefono", // Nombre ajustado a "Telefono"
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Estado",
+                        name: "Estado", // Nombre ajustado a "Estado"
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Foto de Perfil",
+                        name: "FotoPerfil",
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Rol",
+                        name: "IdRol", // Nombre ajustado a "IdRol"
+                        type: "text",
+                        required: true,
+                      },
+                    ]}
+                    onSubmit={handleSubmit}
+                    seleccionado={modalData}
+                  />
+                )}
+
+                {modalData && modalData.modo === "actualizacion" && (
+                  <ModalDinamico
+                    open={true}
+                    handleClose={() => setModalData(null)}
+                    title="Actualizar Empleado"
+                    fields={[
+                      {
+                        label: "Nombre",
+                        name: "Nombre",
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Apellido",
+                        name: "Apellido",
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Correo",
+                        name: "Correo",
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Teléfono",
+                        name: "Telefono",
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Estado",
+                        name: "Estado",
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Foto de Perfil",
+                        name: "FotoPerfil",
+                        type: "text",
+                        required: true,
+                      },
+                      {
+                        label: "Rol",
+                        name: "IdRol",
+                        type: "text",
+                        required: true,
+                      },
+                    ]}
+                    onSubmit={handleActualizacionSubmit}
+                    seleccionado={modalData.seleccionado}
+                  />
+                )}
               </div>
             </div>
           </div>
