@@ -36,3 +36,7 @@ code {
     opacity: 0;
   }
 }
+
+.swal2-container {
+  z-index: 10000; /* Ajusta este valor según sea necesario */
+}

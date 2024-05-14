@@ -11,7 +11,7 @@ const Usuarios = () => {
   const [roles, setRoles] = useState([]);
   const [seleccionado , setSeleccionado] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // Estado para controlar la carga de la página
-
+  const [buscar, setBuscar] = useState('')
   useEffect(() => {
     const fetchRoles = async () => {
         try {
@@ -37,6 +37,22 @@ const Usuarios = () => {
     };
     fetchUsers();
   }, []);
+
+  const filtrar = users.filter(user =>{
+    const {nombre, apellido, correo, telefono, rolId} = user
+    const terminoABuscar = buscar.toLowerCase();
+    const rol = roles.find(role =>
+      role.id === rolId
+    )
+    const nombreRol = rol ? rol.nombre.toLowerCase() : '';
+    return(
+      nombre.toLowerCase().includes(terminoABuscar) ||
+      apellido.toLowerCase().includes(terminoABuscar) ||
+      correo.toLowerCase().includes(terminoABuscar) ||
+      telefono.includes(terminoABuscar)||
+      nombreRol.includes(terminoABuscar)
+    )
+  })
 
   const handleToggleSwitch = async (id) => {
     const updatedUsers = users.map(user => {
@@ -258,7 +274,12 @@ const Usuarios = () => {
   return (
     <div>
       <h1>Usuarios</h1>
-      
+      <input
+        type="text"
+        placeholder="Buscar usuario..."
+        value={buscar}
+        onChange={(e) => setBuscar(e.target.value)}
+      />
       <button onClick={handleCrearUsuarioClick} className="text-blue-500"><i class='bx bx-user-plus'></i></button>
       <ModalDinamico
       seleccionado={seleccionado}
@@ -270,19 +291,19 @@ const Usuarios = () => {
     { name: 'nombre', label: 'Nombre', type: 'text', value: seleccionado ? seleccionado.nombre : '' },
     { name: 'apellido', label: 'Apellido', type: 'text', value: seleccionado ? seleccionado.apellido : '' },
     { name: 'correo', label: 'Correo', type: 'text', value: seleccionado ? seleccionado.correo : '' },
-    { name: 'telefono', label: 'Teléfono', type: 'text', value: seleccionado ? seleccionado.telefono : '' },
+    { name: 'telefono', label: 'Teléfono', type: 'text', value: seleccionado ? seleccionado.telefono : '', maxLength: 15, minlength: 7 },
     { 
       name: 'rolId', 
       label: 'Rol', 
       type: 'select',
       options: roles.map(role => ({ value: role.id, label: role.nombre })),
-      value: seleccionado ? seleccionado.rolId : '' // Preselecciona el rol del usuario si existe
+      value: seleccionado ? seleccionado.rolId : ''
     },
     { name: 'contrasena', label: 'Contraseña', type: 'password', value: seleccionado ? seleccionado.contrasena : '' }
   ]}
 />
 
-      <Table columns={columns} data={users} roles={roles} />
+      <Table columns={columns} data={filtrar} roles={roles} />
     </div>
   );
 };

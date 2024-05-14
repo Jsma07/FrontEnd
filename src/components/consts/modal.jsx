@@ -14,10 +14,51 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
     }
   }, [seleccionado]);
 
+  const handleEmailValidation = (e) => {
+    const { name, value } = e.target;
+    const validacionCorreo = /^[a-zA-Z0-9._%+-]+@(gmail|outlook|hotmail)\.(com|net|org)$/i;
+
+    if (name === 'correo' && !validacionCorreo.test(value)) {
+      window.Swal.fire({
+        icon: 'error',
+        title: 'Correo inválido',
+        text: `El campo ${name.charAt(0).toUpperCase() + name.slice(1)} tiene un formato inválido.`,
+      });
+    }
+  };
   // Función para manejar el cambio en los campos del formulario
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
     const newValue = e.target.type === 'checkbox' ? checked : value;
+    const maxNumeros = 15;
+    const CaracteresEspeciales = /^[a-zA-Z\s]*$/;
+
+    if (name === 'nombre' || name === 'apellido') {
+      if (!CaracteresEspeciales.test(newValue)) {
+        window.Swal.fire({
+          icon: 'error',
+          title: `${name.charAt(0).toUpperCase() + name.slice(1)} inválido`,
+          text:`El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede contener caracteres especiales ni números.`,
+        });
+        return; // No actualizar el estado si el valor no es válido
+      }
+    }
+    if(name == 'telefono'){
+      const validacionNumeros= /^[0-9]+$/;
+      if(!validacionNumeros.test(newValue)){
+        return;
+      }
+      if(newValue.length > maxNumeros){
+        window.Swal.fire({
+          icon: 'error',
+          title: 'Teléfono inválido',
+          text: `El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede exceder ${maxNumeros} caracteres.`,
+        });
+        return;
+      }
+     
+    }
+  
     setFormData((prevData) => ({
       ...prevData,
       [name]: newValue,
@@ -51,6 +92,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
                   label={field.label}
                   variant="outlined"
                   onChange={handleChange}
+                  onBlur={handleEmailValidation}
                   fullWidth
                   size="small"
                   type="text"
