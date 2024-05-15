@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-
 const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
   const [formData, setFormData] = useState({});
 
