@@ -42,8 +42,8 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
 
   // Renderizar cada campo según su tipo
   const renderFieldByType = (field) => {
-    const { name, label, type, options } = field;
-
+    const { name, label, type, options, readOnly } = field; // Agregar readOnly a las props destructuradas
+  
     switch (type) {
       case 'text':
       case 'password':
@@ -58,8 +58,8 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
             size="medium"
             type={type}
             style={{ marginBottom: '0.5rem', textAlign: 'center' }}
-            value={formData[name] || ''} 
-            readOnly={name === 'IdProveedor'}           
+            value={formData[name] || ''}
+            disabled={readOnly}
           />
         );
       case 'select':

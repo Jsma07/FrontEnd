@@ -3,13 +3,15 @@ import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import Shopping from '@mui/icons-material/ShoppingCartCheckout';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import Calendar from '@mui/icons-material/CalendarMonth';
-import Provider from '@mui/icons-material/AssignmentInd';
+import BusinessIcon from '@mui/icons-material/AddBusiness';
 import CleanHandsIcon from '@mui/icons-material/CleanHands';
 import BathtubIcon from '@mui/icons-material/Bathtub';
-import Inventory2Icon from '@mui/icons-material/Inventory2';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import Diversity2 from '@mui/icons-material/Diversity2';
 import StoreIcon from '@mui/icons-material/Store';
-import AddHomeWorkIcon from '@mui/icons-material/AddHomeWork';
+import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import CategoryIcon from '@mui/icons-material/Category';
+import InventoryIcon from '@mui/icons-material/Inventory';
 
 export const NavbarItems =[
     {
@@ -47,11 +49,11 @@ export const NavbarItems =[
    
     {
         id: 3,
-        icon: <ShoppingBagIcon/>,
+        icon: <BusinessIcon/>,
         label: 'Compras',
         subitems: [
-            { label: 'Compras', route: '/compras', icon: <PeopleIcon /> },
-            { label: 'Proveedores', route: '/compras/proveedores', icon: <PeopleIcon /> },
+            { label: 'Compras', route: '/compras', icon: <ShoppingBagIcon/> },
+            { label: 'Proveedores', route: '/compras/proveedores', icon: <Diversity2 /> },
           ],
     },
 
@@ -60,18 +62,18 @@ export const NavbarItems =[
         icon: <Calendar/>,
         label: 'Agendamiento',
         subitems: [
-            { label: 'Agenda', route: '/agendamiento', icon: <CleanHandsIcon /> },
+            { label: 'Agenda', route: '/agendamiento', icon: <AccessTimeFilledIcon /> },
             { label: 'Servicios', route: '/agendamiento/Servicios', icon: <BathtubIcon /> },
           ],
     },
 
     {
       id: 5,
-      icon: <Calendar/>,
+      icon: <InventoryIcon/>,
       label: 'Insumos',
       subitems: [
           { label: 'Insumos', route: '/Insumos', icon: <CleanHandsIcon /> },
-          { label: 'Categorias', route: '/Insumos/Categorias', icon: <CleanHandsIcon /> },
+          { label: 'Categorias', route: '/Insumos/Categorias', icon: <CategoryIcon /> },
 
         ],
      },
