@@ -80,7 +80,7 @@ const ModalDinamico = ({
           {fields &&
             fields.length > 0 &&
             fields.map((field, index) => (
-              <Grid item xs={12} key={index}>
+              <Grid item xs={12} md={6} key={index}>
                 {/* Manejar los diferentes tipos de campos */}
                 {field.type === "text" && (
                   <TextField
@@ -92,11 +92,6 @@ const ModalDinamico = ({
                     fullWidth
                     size="small"
                     type="text"
-                    style={{
-                      marginBottom: "0.5rem",
-                      textAlign: "center",
-                      maxWidth: "300px",
-                    }}
                     value={formData[field.name] || ""}
                   />
                 )}
@@ -110,11 +105,6 @@ const ModalDinamico = ({
                     fullWidth
                     size="small"
                     type="password"
-                    style={{
-                      marginBottom: "0.5rem",
-                      textAlign: "center",
-                      maxWidth: "300px",
-                    }}
                     value={formData[field.name] || ""}
                   />
                 )}
@@ -133,11 +123,6 @@ const ModalDinamico = ({
                       size="small"
                       value={formData[field.name] || ""}
                       label={field.label}
-                      style={{
-                        marginBottom: "0.5rem",
-                        textAlign: "center",
-                        maxWidth: "300px",
-                      }}
                     >
                       {field.options.map((option, index) => (
                         <MenuItem key={index} value={option.value}>
@@ -150,6 +135,7 @@ const ModalDinamico = ({
               </Grid>
             ))}
         </Grid>
+
         {/* Botones de enviar y cancelar */}
         <div
           style={{

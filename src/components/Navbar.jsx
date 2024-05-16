@@ -240,10 +240,7 @@ export default function MiniDrawer() {
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         {openCategory && (
           <DrawerHeader>
-            {/* Aquí puedes renderizar el contenido que quieras mostrar cuando se selecciona una categoría */}
-            <Typography variant="h5">
-              Contenido de la categoría seleccionada
-            </Typography>
+            <Typography variant="h5"></Typography>
           </DrawerHeader>
         )}
       </Box>

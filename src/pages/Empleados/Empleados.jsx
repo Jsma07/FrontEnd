@@ -27,53 +27,69 @@ const Empleados = () => {
 
   const handleSubmit = async (formData) => {
     try {
-      // Mostrar un diálogo de confirmación antes de registrar el Empleado
-      const result = await Swal.fire({
-        title: "¿Estás seguro?",
-        text: "¿Quieres registrar este Empleado?",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "Sí",
-        cancelButtonText: "Cancelar",
-      });
+      // Verificar si el correo electrónico ya existe en la lista de empleados
+      const correoExistente = Empleados.some(
+        (empleado) => empleado.Correo === formData.Correo
+      );
 
-      // Si el usuario hace clic en "Sí", procede con el registro del Empleado
-      if (result.isConfirmed) {
-        // Normalizar el valor del campo "Estado" si es necesario
-        let EstadoNormalizado;
-        if (formData.Estado === "Activo") {
-          EstadoNormalizado = 1;
-        } else if (formData.Estado === "Inactivo") {
-          EstadoNormalizado = 2;
-        } else {
-          // Valor predeterminado si el Estado no coincide con ninguno de los valores esperados
-          EstadoNormalizado = 0;
-        }
-
-        // Convertir campos de texto a números si es necesario
-        const formDataNumerico = {
-          ...formData,
-          Telefono: parseInt(formData.Telefono),
-          Estado: EstadoNormalizado,
-          IdRol: parseInt(formData.IdRol),
-        };
-
-        console.log("Datos del formulario numéricos:", formDataNumerico);
-
-        await axios.post(
-          "http://localhost:5000/Jackenail/RegistrarEmpleados",
-          formDataNumerico
-        );
-
-        // Mostrar una alerta de éxito si el registro es exitoso
+      if (correoExistente) {
+        // Mostrar una alerta si el correo electrónico ya está registrado
         Swal.fire({
-          icon: "success",
-          title: "¡Registro exitoso!",
-          text: "El usuario se ha registrado correctamente.",
+          icon: "error",
+          title: "Correo electrónico duplicado",
+          text: "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico.",
+        });
+      } else {
+        // Continuar con el registro del empleado si el correo electrónico no está duplicado
+        const result = await Swal.fire({
+          title: "¿Estás seguro?",
+          text: "¿Quieres registrar este Empleado?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Sí",
+          cancelButtonText: "Cancelar",
         });
 
-        // Cerrar el modal después de enviar el formulario
-        setModalData(null);
+        if (result.isConfirmed) {
+          // Normalizar el valor del campo "Estado" si es necesario
+          let EstadoNormalizado;
+          if (formData.Estado === "Activo") {
+            EstadoNormalizado = 1;
+          } else if (formData.Estado === "Inactivo") {
+            EstadoNormalizado = 2;
+          } else {
+            // Valor predeterminado si el Estado no coincide con ninguno de los valores esperados
+            EstadoNormalizado = 0;
+          }
+
+          // Convertir campos de texto a números si es necesario
+          const formDataNumerico = {
+            ...formData,
+            Telefono: parseInt(formData.Telefono),
+            Estado: EstadoNormalizado,
+            IdRol: parseInt(formData.IdRol),
+          };
+
+          console.log("Datos del formulario numéricos:", formDataNumerico);
+
+          await axios.post(
+            "http://localhost:5000/Jackenail/RegistrarEmpleados",
+            formDataNumerico
+          );
+
+          // Mostrar una alerta de éxito si el registro es exitoso
+          Swal.fire({
+            icon: "success",
+            title: "¡Registro exitoso!",
+            text: "El usuario se ha registrado correctamente.",
+          });
+
+          // Cerrar el modal después de enviar el formulario
+          setModalData(null);
+
+          // Agregar el nuevo empleado a la lista de empleados
+          setEmpleados([...Empleados, formDataNumerico]);
+        }
       }
     } catch (error) {
       console.error("Error al registrar el Empleado:", error);
@@ -227,7 +243,7 @@ const Empleados = () => {
                                       ? "bg-red-500"
                                       : ""
                                   }`}
-                                ></span>{" "}
+                                ></span>
                                 {Empleado[column.name] === 1
                                   ? "Activo"
                                   : Empleado[column.name] === 2
@@ -268,45 +284,56 @@ const Empleados = () => {
                     fields={[
                       {
                         label: "Nombre",
-                        name: "Nombre", // Nombre ajustado a "Nombre"
+                        name: "Nombre",
                         type: "text",
                         required: true,
+                        className: "col-span-6 md:col-span-3", // Ocupa 6 columnas en dispositivos pequeños y 3 columnas en dispositivos medianos y grandes
                       },
                       {
                         label: "Apellido",
-                        name: "Apellido", // Nombre ajustado a "Apellido"
+                        name: "Apellido",
                         type: "text",
                         required: true,
+                        className: "col-span-6 md:col-span-3", // Ocupa 6 columnas en dispositivos pequeños y 3 columnas en dispositivos medianos y grandes
                       },
                       {
                         label: "Correo",
-                        name: "Correo", // Nombre ajustado a "Correo"
+                        name: "Correo",
                         type: "text",
                         required: true,
+                        className: "col-span-6 md:col-span-3", // Ocupa 6 columnas en dispositivos pequeños y 3 columnas en dispositivos medianos y grandes
                       },
                       {
                         label: "Teléfono",
-                        name: "Telefono", // Nombre ajustado a "Telefono"
+                        name: "Telefono",
                         type: "text",
                         required: true,
+                        className: "col-span-6 md:col-span-3", // Ocupa 6 columnas en dispositivos pequeños y 3 columnas en dispositivos medianos y grandes
                       },
                       {
                         label: "Estado",
-                        name: "Estado", // Nombre ajustado a "Estado"
-                        type: "text",
+                        name: "Estado",
+                        type: "select",
                         required: true,
+                        options: [
+                          { value: "Activo", label: "Activo" },
+                          { value: "Inactivo", label: "Inactivo" },
+                        ],
+                        className: "col-span-6 md:col-span-3", // Ocupa 6 columnas en dispositivos pequeños y 3 columnas en dispositivos medianos y grandes
                       },
                       {
                         label: "Foto de Perfil",
                         name: "FotoPerfil",
                         type: "text",
                         required: true,
+                        className: "col-span-6 md:col-span-3", // Ocupa 6 columnas en dispositivos pequeños y 3 columnas en dispositivos medianos y grandes
                       },
                       {
                         label: "Rol",
-                        name: "IdRol", // Nombre ajustado a "IdRol"
+                        name: "IdRol",
                         type: "text",
                         required: true,
+                        className: "col-span-6 md:col-span-3", // Ocupa 6 columnas en dispositivos pequeños y 3 columnas en dispositivos medianos y grandes
                       },
                     ]}
                     onSubmit={handleSubmit}
@@ -347,8 +374,13 @@ const Empleados = () => {
                       {
                         label: "Estado",
                         name: "Estado",
-                        type: "text",
+                        type: "select",
                         required: true,
+                        options: [
+                          { value: "Activo", label: "Activo" },
+                          { value: "Inactivo", label: "Inactivo" },
+                        ],
+                        className: "col-span-6 md:col-span-3", // Ocupa 6 columnas en dispositivos pequeños y 3 columnas en dispositivos medianos y grandes
                       },
                       {
                         label: "Foto de Perfil",
