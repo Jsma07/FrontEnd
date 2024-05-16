@@ -31,11 +31,13 @@ function App() {
               container
               alignItems="center"
               justifyContent="center"
-              style={{ minHeight: '80vh' }}
+              style={{ minHeight: '80vh', position: 'relative' }}
             >
               <Grid item xs={12} md={8}> {/* Ajusta el tamaño según tus necesidades */}
                 <Outlet />
               </Grid>
+              {/* Botón en la esquina inferior derecha */}
+             
             </Grid>
           </>
         )}

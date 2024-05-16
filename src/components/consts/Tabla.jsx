@@ -4,9 +4,9 @@ import React from 'react';
 // Define el componente Table
 const Table = ({ columns, data, roles }) => {
   return (
-    <div className="overflow-x-auto shadow-md rounded-lg bg-white dark:bg-gray-800 p-4">
+    <div className="overflow-x-auto shadow-md rounded-lg bg-white dark:bg-gray-800 p-4 border border-1">
       <table className="w-full text-sm text-gray-700 dark:text-gray-300">
-        <thead className="bg-gray-200 dark:bg-gray-700">
+        <thead style={{backgroundColor: '#94CEF2'}}>
           <tr>
             {/* Renderiza las columnas de la tabla */}
             {columns.map((column) => (

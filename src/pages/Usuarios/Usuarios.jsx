@@ -4,6 +4,7 @@ import ModalDinamico from "../../components/consts/modal";
 import Table from "../../components/consts/Tabla";
 import axios from 'axios';
 import LoadingScreen from "../../components/consts/pantallaCarga"; 
+import Fab from '@mui/material/Fab';
 
 const Usuarios = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -272,40 +273,68 @@ const Usuarios = () => {
   }
 
   return (
-    <div>
-      <h1>Usuarios</h1>
-      <input
-        type="text"
-        placeholder="Buscar usuario..."
-        value={buscar}
-        onChange={(e) => setBuscar(e.target.value)}
-      />
-      <button onClick={handleCrearUsuarioClick} className="text-blue-500"><i class='bx bx-user-plus'></i></button>
-      <ModalDinamico
-      seleccionado={seleccionado}
-  open={openModal}
-  handleClose={handleCloseModal}
-  onSubmit={handleSubmit}
-  title={seleccionado ? "Editar Usuario" : "Crear nuevo usuario"}
-  fields={[
-    { name: 'nombre', label: 'Nombre', type: 'text', value: seleccionado ? seleccionado.nombre : '' },
-    { name: 'apellido', label: 'Apellido', type: 'text', value: seleccionado ? seleccionado.apellido : '' },
-    { name: 'correo', label: 'Correo', type: 'text', value: seleccionado ? seleccionado.correo : '' },
-    { name: 'telefono', label: 'Teléfono', type: 'text', value: seleccionado ? seleccionado.telefono : '', maxLength: 15, minlength: 7 },
-    { 
-      name: 'rolId', 
-      label: 'Rol', 
-      type: 'select',
-      options: roles.map(role => ({ value: role.id, label: role.nombre })),
-      value: seleccionado ? seleccionado.rolId : ''
-    },
-    { name: 'contrasena', label: 'Contraseña', type: 'password', value: seleccionado ? seleccionado.contrasena : '' }
-  ]}
-/>
-
+    <div className="container mx-auto p-4 relative">
+      <h1 className="text-3xl font-bold mb-4">Usuarios</h1>
+      <div className="md:flex md:justify-between md:items-center mb-4">
+        <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
+          <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Buscar usuario</label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
+            </div>
+            <input
+              type="search"
+              id="default-search"
+              className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Buscar usuario..."
+              value={buscar}
+              onChange={(e) => setBuscar(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+        <div>
+          <ModalDinamico
+            seleccionado={seleccionado}
+            open={openModal}
+            handleClose={handleCloseModal}
+            onSubmit={handleSubmit}
+            title={seleccionado ? "Editar Usuario" : "Crear nuevo usuario"}
+            fields={[
+              { name: 'nombre', label: 'Nombre', type: 'text', value: seleccionado ? seleccionado.nombre : '' },
+              { name: 'apellido', label: 'Apellido', type: 'text', value: seleccionado ? seleccionado.apellido : '' },
+              { name: 'correo', label: 'Correo', type: 'text', value: seleccionado ? seleccionado.correo : '' },
+              { name: 'telefono', label: 'Teléfono', type: 'text', value: seleccionado ? seleccionado.telefono : '', maxLength: 15, minlength: 7 },
+              { 
+                name: 'rolId', 
+                label: 'Rol', 
+                type: 'select',
+                options: roles.map(role => ({ value: role.id, label: role.nombre })),
+                value: seleccionado ? seleccionado.rolId : ''
+              },
+              { name: 'contrasena', label: 'Contraseña', type: 'password', value: seleccionado ? seleccionado.contrasena : '' }
+            ]}
+          />
+        </div>
+      </div>
       <Table columns={columns} data={filtrar} roles={roles} />
+    <Fab
+      aria-label="add"
+      style={{
+        border: '0.5px solid grey',
+        backgroundColor: '#94CEF2',
+        position: 'fixed',
+        bottom: '16px',
+        right: '16px',
+        zIndex: 1000, // Asegura que el botón flotante esté por encima de otros elementos
+      }}
+      onClick={handleCrearUsuarioClick}
+    >
+<i className='bx bx-plus' style={{ fontSize: '1.3rem' }}></i>
+    </Fab>
     </div>
   );
+  
 };
 
 export default Usuarios;
