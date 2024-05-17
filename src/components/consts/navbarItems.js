@@ -4,10 +4,6 @@ import Shopping from '@mui/icons-material/ShoppingCartCheckout';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import Calendar from '@mui/icons-material/CalendarMonth';
 import Provider from '@mui/icons-material/AssignmentInd';
-import Inventory2Icon from '@mui/icons-material/Inventory2';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import StoreIcon from '@mui/icons-material/Store';
-import AddHomeWorkIcon from '@mui/icons-material/AddHomeWork';
 
 export const NavbarItems =[
     {
@@ -24,48 +20,41 @@ export const NavbarItems =[
         icon: <PeopleIcon />,
         label: 'Usuarios',
         subitems: [
-          { label: 'Administradores', route: '/usuarios/administradores', icon: <PeopleIcon /> },
-          { label: 'Empleados', route: '/empleados', icon: <PeopleIcon /> },
-          { label: 'Clientes', route: '/Clientes',icon: <PeopleIcon /> },
+          { label: 'Administradores', route: '/Usuarios/Administradores', icon: <PeopleIcon /> },
+          { label: 'Empleados', route: '/Usuarios/Empleados', icon: <PeopleIcon /> },
+          { label: 'Clientes', route: '/Usuarios/Clientes',icon: <PeopleIcon /> },
         ],
       },
     {
         id: 2,
         icon: <Shopping/>,
         label: 'Ventas',
-        subitems: [
-            { label: 'Ventas', route: '/ventas', icon: <StoreIcon /> },
-            { label: 'Sallida insumos', route: '/Salida_Insumos', icon: <ExitToAppIcon /> },
-          
-          ],
+        route: '/ventas'
     },
-   
-    
     {
         id: 3,
-        icon: <ShoppingBagIcon/>,
+        icon: <BusinessIcon/>,
         label: 'Compras',
-        route: '/compras'
+        subitems: [
+            { label: 'Compras', route: '/compras', icon: <ShoppingBagIcon/> },
+            { label: 'Proveedores', route: '/compras/proveedores', icon: <Diversity2 /> },
+          ],
     },
+
     {
         id: 4,
         icon: <Calendar/>,
         label: 'Agendamiento',
-        route: '/agendamiento'
-    },
+        subitems: [
+            { label: 'Agenda', route: '/agendamiento', icon: <AccessTimeFilledIcon /> },
+            { label: 'Servicios', route: '/agendamiento/Servicios', icon: <BathtubIcon /> },
+          ],
+    },
+
     {
         id: 5,
         icon: <Provider/>,
         label: 'Proveedores',
         route: '/proveedores'
-    },
-     {
-        id: 6,
-        icon: <AddHomeWorkIcon/>,
-        label: 'Servicios',
-        subitems: [
-            { label: 'Insumos', route: '/Insumos', icon: <Inventory2Icon /> },
-          
-          ],
     },
 ]

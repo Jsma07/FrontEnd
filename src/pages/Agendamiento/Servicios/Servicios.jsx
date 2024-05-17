@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import Table from "../../components/consts/Tabla";
+import Table from "../../../components/consts/Tabla";
 
-const Agenda = () => {
-  const [rows, setRows] = useState([
+const Servicios = () => {
+  const [rows] = useState([
     {
       id: 1,
       Servicio: "https://i.pinimg.com/736x/62/37/42/623742355124564336d097be9016b3b7.jpg",
       Nombre: "Uñas Permanentes",
-      FechaHora: "2022-04-27 10:00 AM",
-      Empleado: "Jacke",
-      Cliente: "Estefania",
+      Tiempo: "2 Horas",
+      Precio: "55.000",
+      NivelUña: "12",
       Estado: "Terminado",
       isActive: false,
     },
@@ -17,9 +17,9 @@ const Agenda = () => {
       id: 2,
       Servicio: "https://i.pinimg.com/474x/24/8b/d9/248bd907c3bcd7ed17557c23d32298e0.jpg",
       Nombre: "Uñas Esculpidas",
-      FechaHora: "2022-04-28 11:30 AM",
-      Empleado: "Monica",
-      Cliente: "Yurani",
+      Tiempo: "1 Horas",
+      Precio: "Monica",
+      NivelUña: "5",
       Estado: "Cancelado",
       isActive: false,
     },
@@ -27,9 +27,9 @@ const Agenda = () => {
       id: 3,
       Servicio: "https://i.pinimg.com/236x/34/3e/3d/343e3d8931ffe5269742f51cc915daa6.jpg",
       Nombre: "Uñas 3D",
-      FechaHora: "2022-04-28 12:30 PM",
-      Empleado: "Monica",
-      Cliente: "Coraline",
+      Tiempo: "3 Horas",
+      Precio: "60.000",
+      NivelUña: "7",
       Estado: "En Proceso",
       isActive: false,
     },
@@ -56,9 +56,9 @@ const Agenda = () => {
       )
     },
     { field: "Nombre", headerName: "Nombre", width: "w-32" },
-    { field: "FechaHora", headerName: "Fecha/Hora", width: "w-32" },
-    { field: "Empleado", headerName: "Empleado", width: "w-32" },
-    { field: "Cliente", headerName: "Cliente", width: "w-32" },
+    { field: "Tiempo", headerName: "Tiempo", width: "w-32" },
+    { field: "Precio", headerName: "Precio", width: "w-32" },
+    { field: "NivelUña", headerName: "NivelUña", width: "w-32", renderCell: (params) => <div className="text-center">{params.row.NivelUña}</div> },
     { field: "Estado", headerName: "Estado", width: "w-55",
       renderCell: (params) => (
         <div>
@@ -89,12 +89,6 @@ const Agenda = () => {
           <button onClick={() => handleEditClick(params.row.id)} className="text-yellow-500">
             <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
           </button>
-          {/* Utilizamos el mismo botón de edición para cada fila */}
-          {/* <CustomSwitch
-            active={params.row.isActive}
-            onToggle={() => handleToggleSwitch(params.row.id)}
-          /> */}
-          {/* Botón de eliminación (trash icon) */}
           <button onClick={() => handleEditClick(params.row.id)} className="text-red-500">
             <i className="bx bx-trash" style={{ fontSize: "24px" }}></i>
           </button>
@@ -105,10 +99,10 @@ const Agenda = () => {
 
   return (
     <div>
-      <h1>Agenda</h1>
+      <h1>Servicios</h1>
       <Table columns={columns} data={rows} />
     </div>
   );
 };
 
-export default Agenda;
+export default Servicios;

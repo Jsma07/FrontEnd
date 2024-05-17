@@ -22,15 +22,23 @@ const ModalDinamico = ({
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
+    if (fields && fields.length > 0) {
+      const initialFormData = {};
+      fields.forEach((field) => {
+        initialFormData[field.name] = field.defaultValue || "";
+      });
+      setFormData(initialFormData);
+    }
+  }, [fields]);
+
+  useEffect(() => {
     if (seleccionado) {
       setFormData(seleccionado);
     } else {
-      // Limpiar el formulario cuando no hay un usuario seleccionado
       setFormData({});
     }
   }, [seleccionado]);
 
-  // Función para manejar el cambio en los campos del formulario
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
     const newValue = e.target.type === "checkbox" ? checked : value;
@@ -40,15 +48,75 @@ const ModalDinamico = ({
     }));
   };
 
-  // Función para manejar el envío del formulario
   const handleSubmit = () => {
-    onSubmit(formData);
+    if (typeof onSubmit === "function") {
+      onSubmit(formData);
+      handleClose();
+    } else {
+      console.error("onSubmit is not a function");
+    }
+  };
+
+  const handleCancel = () => {
     handleClose();
   };
 
-  // Función para cancelar y cerrar el modal
-  const handleCancel = () => {
-    handleClose();
+  const renderFields = () => {
+    return fields.map((field, index) => (
+      <Grid item xs={12} sm={6} key={index}>
+        {renderFieldByType(field)}
+      </Grid>
+    ));
+  };
+
+  const renderFieldByType = (field) => {
+    const { name, label, type, options } = field;
+
+    switch (type) {
+      case "text":
+      case "password":
+        return (
+          <TextField
+            id={name}
+            name={name}
+            label={label}
+            variant="outlined"
+            onChange={handleChange}
+            fullWidth
+            size="medium"
+            type={type}
+            style={{ marginBottom: "0.5rem", textAlign: "center" }}
+            value={formData[name] || ""}
+          />
+        );
+      case "select":
+        return (
+          <div>
+            <InputLabel id={`${name}-label`}>{label}</InputLabel>
+            <Select
+              labelId={`${name}-label`}
+              id={name}
+              name={name}
+              variant="outlined"
+              onChange={handleChange}
+              fullWidth
+              size="medium"
+              value={formData[name] || ""}
+              label={label}
+              style={{ marginBottom: "0.5rem", textAlign: "center" }}
+            >
+              {options &&
+                options.map((option, index) => (
+                  <MenuItem key={index} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+            </Select>
+          </div>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -76,67 +144,8 @@ const ModalDinamico = ({
           {title}
         </Typography>
         <Grid container spacing={2}>
-          {/* Renderizar los campos */}
-          {fields &&
-            fields.length > 0 &&
-            fields.map((field, index) => (
-              <Grid item xs={12} md={6} key={index}>
-                {/* Manejar los diferentes tipos de campos */}
-                {field.type === "text" && (
-                  <TextField
-                    id={field.name}
-                    name={field.name}
-                    label={field.label}
-                    variant="outlined"
-                    onChange={handleChange}
-                    fullWidth
-                    size="small"
-                    type="text"
-                    value={formData[field.name] || ""}
-                  />
-                )}
-                {field.type === "password" && (
-                  <TextField
-                    id={field.name}
-                    name={field.name}
-                    label={field.label}
-                    variant="outlined"
-                    onChange={handleChange}
-                    fullWidth
-                    size="small"
-                    type="password"
-                    value={formData[field.name] || ""}
-                  />
-                )}
-                {field.type === "select" && (
-                  <div>
-                    <InputLabel id={`${field.name}-label`}>
-                      {field.label}
-                    </InputLabel>
-                    <Select
-                      labelId={`${field.name}-label`}
-                      id={field.name}
-                      name={field.name}
-                      variant="outlined"
-                      onChange={handleChange}
-                      fullWidth
-                      size="small"
-                      value={formData[field.name] || ""}
-                      label={field.label}
-                    >
-                      {field.options.map((option, index) => (
-                        <MenuItem key={index} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </div>
-                )}
-              </Grid>
-            ))}
+          {renderFields()}
         </Grid>
-
-        {/* Botones de enviar y cancelar */}
         <div
           style={{
             display: "flex",
