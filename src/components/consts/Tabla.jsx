@@ -17,7 +17,7 @@ const Table = ({ columns, data }) => {
         <tbody>
           {/* Renderiza las filas de la tabla */}
           {data.map((row, rowIndex) => (
-            <tr key={rowIndex} className="border-b hover:bg-gray-100 dark:hover:bg-gray-700">
+            <tr style={{textAlign : 'center'}} key={rowIndex} className="border-b hover:bg-gray-100 dark:hover:bg-gray-700">
               {columns.map((column, colIndex) => (
                 <td key={colIndex} className={`px-4 py-2 ${column.width}`}>
                   {/* Renderiza el contenido de cada celda */}

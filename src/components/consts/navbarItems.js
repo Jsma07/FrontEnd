@@ -27,6 +27,9 @@ export const NavbarItems =[
           { label: 'Administradores', route: '/usuarios/administradores', icon: <PeopleIcon /> },
           { label: 'Empleados', route: '/empleados', icon: <PeopleIcon /> },
           { label: 'Clientes', route: '/Clientes',icon: <PeopleIcon /> },
+          { label: 'Administradores', route: '/Usuarios/Administradores', icon: <PeopleIcon /> },
+          { label: 'Empleados', route: '/Usuarios/Empleados', icon: <PeopleIcon /> },
+          { label: 'Clientes', route: '/Usuarios/Clientes',icon: <PeopleIcon /> },
         ],
       },
     {
@@ -41,6 +44,7 @@ export const NavbarItems =[
     },
    
     
+      
     {
         id: 3,
         icon: <ShoppingBagIcon/>,
