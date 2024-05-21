@@ -3,7 +3,15 @@ import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import Shopping from '@mui/icons-material/ShoppingCartCheckout';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import Calendar from '@mui/icons-material/CalendarMonth';
-import Provider from '@mui/icons-material/AssignmentInd';
+import BusinessIcon from '@mui/icons-material/AddBusiness';
+import CleanHandsIcon from '@mui/icons-material/CleanHands';
+import BathtubIcon from '@mui/icons-material/Bathtub';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import Diversity2 from '@mui/icons-material/Diversity2';
+import StoreIcon from '@mui/icons-material/Store';
+import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import CategoryIcon from '@mui/icons-material/Category';
+import InventoryIcon from '@mui/icons-material/Inventory';
 
 export const NavbarItems =[
     {
@@ -20,17 +28,25 @@ export const NavbarItems =[
         icon: <PeopleIcon />,
         label: 'Usuarios',
         subitems: [
-          { label: 'Administradores', route: '/Usuarios/Administradores', icon: <PeopleIcon /> },
-          { label: 'Empleados', route: '/Usuarios/Empleados', icon: <PeopleIcon /> },
-          { label: 'Clientes', route: '/Usuarios/Clientes',icon: <PeopleIcon /> },
+
+          { label: 'Administradores', route: '/usuarios/administradores', icon: <PeopleIcon /> },
+          { label: 'Empleados', route: '/Empleados', icon: <PeopleIcon /> },
+          { label: 'Clientes', route: '/Clientes',icon: <PeopleIcon /> },
+          
+
         ],
       },
     {
         id: 2,
         icon: <Shopping/>,
         label: 'Ventas',
-        route: '/ventas'
+        subitems: [
+            { label: 'Ventas', route: '/ventas', icon: <StoreIcon /> },
+            { label: 'Sallida insumos', route: '/Salida_Insumos', icon: <ExitToAppIcon /> },
+          
+          ],
     },
+   
     {
         id: 3,
         icon: <BusinessIcon/>,
@@ -52,9 +68,13 @@ export const NavbarItems =[
     },
 
     {
-        id: 5,
-        icon: <Provider/>,
-        label: 'Proveedores',
-        route: '/proveedores'
-    },
+      id: 5,
+      icon: <InventoryIcon/>,
+      label: 'Insumos',
+      subitems: [
+          { label: 'Insumos', route: '/Insumos', icon: <CleanHandsIcon /> },
+          { label: 'Categorias', route: '/Insumos/Categorias', icon: <CategoryIcon /> },
+
+        ],
+     },
 ]

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CancelIcon from "@mui/icons-material/Cancel";
-import ModalDinamico from "../../components/consts/modal";
+import ModalDinamico from "../../components/consts/ModalDinamico";
 import Swal from "sweetalert2";
 
 const Empleados = () => {

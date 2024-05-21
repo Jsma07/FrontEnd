@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import ModalDinamico from "../../components/consts/modal";
+import ModalDinamico from "../../components/consts/ModalDinamico";
 
 const Clientes = () => {
   const [clientes, setClientes] = useState([]);
