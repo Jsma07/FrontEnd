@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import { TimePicker } from '@mui/lab';
-
 const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
   const [formData, setFormData] = useState({});
 
@@ -26,9 +24,8 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
   };
 
   const handleSubmit = () => {
-    if (typeof onSubmit === 'function') {
-      onSubmit(formData);
-      handleClose();
+    onSubmit(formData);
+    handleClose();
     } else {
       console.error('onSubmit is not a function');
     }
@@ -52,7 +49,6 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
     switch (type) {
       case 'text':
       case 'password':
-      case 'number':
         return (
           <TextField
             id={name}
@@ -91,37 +87,6 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
                 ))}
             </Select>
           </div>
-        );
-      case 'date':
-        return (
-          <TextField
-            id={name}
-            name={name}
-            label={label}
-            variant="outlined"
-            onChange={handleChange}
-            fullWidth
-            size="medium"
-            type={type}
-            style={{ marginBottom: '0.5rem', textAlign: 'center' }}
-            value={formData[name] || ''}
-            InputLabelProps={{ shrink: true }}
-          />
-        );
-      case 'time': // Nuevo caso para campos de tipo hora
-        return (
-          <TimePicker
-            id={name}
-            name={name}
-            label={label}
-            variant="outlined"
-            onChange={(newValue) => handleChange({ target: { name, value: newValue } })}
-            fullWidth
-            size="medium"
-            value={formData[name] || null}
-            style={{ marginBottom: '0.5rem', textAlign: 'center' }}
-            renderInput={(params) => <TextField {...params} />}
-          />
         );
       default:
         return null;
