@@ -1,106 +1,311 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
+import CustomSwitch from "../../../components/consts/switch";
 import Table from "../../../components/consts/Tabla";
+import { Grid, Button as CommonButton } from '@mui/material';
+import ModalAgregarServicio from "../../../components/consts/Modal";
+import ModalEditarServicio from "../../../components/consts/modalEditar";
+import CamposObligatorios from "../../../components/consts/camposVacios";
+import AddBusinessIcon from '@mui/icons-material/AddBusiness';
+import SearchIcon from "@mui/icons-material/Search";
 
 const Servicios = () => {
-  const [rows] = useState([
-    {
-      id: 1,
-      Servicio: "https://i.pinimg.com/736x/62/37/42/623742355124564336d097be9016b3b7.jpg",
-      Nombre: "Uñas Permanentes",
-      Tiempo: "2 Horas",
-      Precio: "55.000",
-      NivelUña: "12",
-      Estado: "Terminado",
-      isActive: false,
-    },
-    {
-      id: 2,
-      Servicio: "https://i.pinimg.com/474x/24/8b/d9/248bd907c3bcd7ed17557c23d32298e0.jpg",
-      Nombre: "Uñas Esculpidas",
-      Tiempo: "1 Horas",
-      Precio: "Monica",
-      NivelUña: "5",
-      Estado: "Cancelado",
-      isActive: false,
-    },
-    {
-      id: 3,
-      Servicio: "https://i.pinimg.com/236x/34/3e/3d/343e3d8931ffe5269742f51cc915daa6.jpg",
-      Nombre: "Uñas 3D",
-      Tiempo: "3 Horas",
-      Precio: "60.000",
-      NivelUña: "7",
-      Estado: "En Proceso",
-      isActive: false,
-    },
-    // Agrega más filas según sea necesario
-  ]);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [openModalAgregar, setOpenModalAgregar] = useState(false);
+  const [openModalEditar, setOpenModalEditar] = useState(false);
+  const [servicios, setServicios] = useState([]);
+  const [servicioSeleccionado, setServicioSeleccionado] = useState(null);
+  const [buscar, setBuscar] = useState('')
 
-  const handleEditClick = (id) => {
-    console.log(`Editando rol con ID: ${id}`);
-    // Aquí puedes agregar la lógica para editar el rol directamente sin abrir un modal
+  useEffect(() => {
+    fetchServicios();
+  }, []);
+
+  const fetchServicios = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/servicios');
+      setServicios(response.data);
+    } catch (error) {
+      console.error('Error fetching servicios:', error);
+    }
   };
 
-  const columns = [
-    { field: "id", headerName: "ID", width: "w-1" },
-    {
-      field: "Servicio",
-      headerName: "Servicio",
-      width: "w-32",
-      renderCell: (params) => (
-        <img
-          src={params.row.Servicio}
-          alt="Servicio"
-          style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
-        />
-      )
-    },
-    { field: "Nombre", headerName: "Nombre", width: "w-32" },
-    { field: "Tiempo", headerName: "Tiempo", width: "w-32" },
-    { field: "Precio", headerName: "Precio", width: "w-32" },
-    { field: "NivelUña", headerName: "NivelUña", width: "w-32", renderCell: (params) => <div className="text-center">{params.row.NivelUña}</div> },
-    { field: "Estado", headerName: "Estado", width: "w-55",
-      renderCell: (params) => (
-        <div>
-          {params.row.Estado === "En Proceso" && (
-            <span className="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
-              En Proceso
-            </span>
-          )}
-          {params.row.Estado === "Cancelado" && (
-            <span className="bg-red-100 text-red-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
-              Cancelado
-            </span>
-          )}
-          {params.row.Estado === "Terminado" && (
-            <span className="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
-              Terminado
-            </span>
-          )}
-        </div>
-      )
-    },
-    {
-      field: "Acciones",
-      headerName: "Acciones",
-      width: "w-32",
-      renderCell: (params) => (
-        <div className="flex justify-center space-x-4">
-          <button onClick={() => handleEditClick(params.row.id)} className="text-yellow-500">
-            <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
-          </button>
-          <button onClick={() => handleEditClick(params.row.id)} className="text-red-500">
-            <i className="bx bx-trash" style={{ fontSize: "24px" }}></i>
-          </button>
-        </div>
-      ),
-    },
-  ];
+  const filtrar = servicios.filter(servicio =>{
+    const {Nombre_Servicio, IdServicio} = servicio
+    const terminoABuscar = buscar.toLowerCase();
+    const IdServicioString = IdServicio.toString(); 
+     return(
+      Nombre_Servicio.toLowerCase().includes(terminoABuscar) ||
+      IdServicioString.includes(terminoABuscar) 
+     )
+  })
+
+  const handleAddServicio = async (formData) => {
+    try {
+      const { Nombre_Servicio } = formData;
+      const response = await axios.get('http://localhost:5000/api/servicios');
+      const servicios = response.data;
+      const servicioExistente = servicios.find(servicio => servicio.Nombre_Servicio === Nombre_Servicio && servicio.IdServicio !== formData.IdServicio);
+  
+      // Validación de los campos obligatorios
+      const camposObligatorios = ['ImgServicio','Nombre_Servicio','Tiempo_Servicio','Precio_Servicio'];
+      if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos del servicio.')) {
+        return;
+      }
+  
+      const precio = formData['Precio_Servicio'];
+      if (!/^\d+$/.test(precio)) {
+        window.Swal.fire({
+          icon: 'error',
+          title: 'Precio inválido',
+          text: 'Por favor, ingresa solo números en el campo del precio.',
+        });
+        return;
+      }
+
+      // Verificar si el servicio ya está registrada
+      if (servicioExistente) {
+        window.Swal.fire({
+          icon: 'warning',
+          title: 'Servicio ya registrada',
+          text: 'El servicio ingresada ya está registrada.',
+        });
+        return;
+      }
+  
+      // Confirmación antes de agregar el servicio
+      const confirmation = await window.Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¿Quieres agregar este servicio?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, agregar',
+        cancelButtonText: 'Cancelar'
+      });
+  
+      if (confirmation.isConfirmed) {
+        formData.EstadoServicio = 1;
+        await axios.post('http://localhost:5000/api/servicios/guardarServicio', formData);
+        handleCloseModalAgregar();
+        fetchServicios();
+        window.Swal.fire('¡Servicio agregado!', '', 'success');
+      }
+    } catch (error) {
+      console.error('Error al agregar el servicio:', error);
+    }
+};
+  
+  
+const handleEditServicio = async (formData) => {
+  try {
+    const { Nombre_Servicio, IdServicio } = formData;
+    // Validación de los campos obligatorios
+    const camposObligatorios = ['ImgServicio','Nombre_Servicio','Tiempo_Servicio','Precio_Servicio'];
+    if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos del servicio.')) {
+      return;
+    }
+    
+    const response = await axios.get('http://localhost:5000/api/servicios');
+    const servicios = response.data;
+    const servicioExistente = servicios.find(servicio => servicio.Nombre_Servicio === Nombre_Servicio && servicio.IdServicio !== formData.IdServicio);
+
+    
+    if (servicioExistente) {
+      window.Swal.fire({
+        icon: 'warning',
+        title: 'Servicio ya registrada',
+        text: 'El servicio ingresada ya está registrada.',
+      });
+      return;
+    }
+
+    const precio = formData['Precio_Servicio'];
+      if (!/^\d+$/.test(precio)) {
+        window.Swal.fire({
+        icon: 'error',
+        title: 'Precio inválido',
+        text: 'Por favor, ingresa solo números en el campo del precio.',
+      });
+      return;
+    }    
+
+    const confirmation = await window.Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¿Quieres actualizar esta servicio?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, actualizar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (confirmation.isConfirmed) {
+      await axios.put(`http://localhost:5000/api/servicios/editar/${formData.IdServicio}`, formData);
+      handleCloseModalEditar();
+      fetchServicios();
+      window.Swal.fire('¡Servicios actualizada!', '', 'success');
+    }
+  } catch (error) {
+    console.error('Error al editar el servicio:', error);
+  }
+};
+
+  const handleChange = (name, value) => {
+    setServicioSeleccionado((prevServicio) => ({
+     ...prevServicio,
+       [name]: value,
+     }));
+  };
+
+  const handleToggleSwitch = async (id) => {
+    try {
+      const servicio = servicios.find((prov) => prov.IdServicio === id);
+      const updateServicio = { ...servicio, EstadoServicio: servicio.EstadoServicio === 1 ? 0 : 1 };
+      await axios.put(`http://localhost:5000/api/servicios/editar/${id}`, updateServicio);
+      fetchServicios(); // Actualiza la lista de proveedores después de la actualización
+    } catch (error) {
+      console.error('Error al cambiar estado de los servicios:', error);
+    }
+  };
+
+  const handleCloseModalAgregar = () => {
+    setOpenModalAgregar(false);
+    setServicioSeleccionado(null);
+  };
+
+  const handleCloseModalEditar = () => {
+    setOpenModalEditar(false);
+    setServicioSeleccionado(null);
+  };
+
+  const handleEditClick = (servicio) => {
+    setServicioSeleccionado(servicio);
+    setOpenModalEditar(true);
+  };
 
   return (
     <div>
-      <h1>Servicios</h1>
-      <Table columns={columns} data={rows} />
+      <center><h3 className="text-4xl mb-4" style={{ marginTop: '-130px' }}>Gestion Servicios</h3></center>
+      <div className="flex justify-between items-center">
+        <div>
+          <CommonButton
+            color="primary"
+            variant="contained"
+            onClick={() => setOpenModalAgregar(true)}
+            sx={{
+              color: 'black',
+              minHeight: 40,
+              px: 2.5,
+              borderRadius: '10px',
+              backgroundColor: '#EFD4F5',
+              marginTop: '5px',
+              '&:hover': {
+                backgroundColor: '#8C09FF',
+                color: 'white',
+                '& .MuiListItemIcon-root': {
+                  color: 'white',
+                },
+              },
+            }}>
+            <AddBusinessIcon />
+          </CommonButton>
+        </div>
+        <div className="mt-20 mr-10">
+          <form onSubmit={(e) => e.preventDefault()}>
+            <div className="relative">
+              <input
+                type="search"
+                id="search"
+                className="block w-full p-2 pl-10 pr-10 text-sm border border-gray-300 rounded bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Buscar..."
+                value={buscar}
+                onChange={(e) => setBuscar(e.target.value)}
+                required
+              />
+              <span
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-r text-sm dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                style={{ cursor: 'default', height: '100%' }} 
+              >
+                <SearchIcon className="text-base mr-3" />
+              </span>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <ModalAgregarServicio
+        open={openModalAgregar}
+        handleClose={handleCloseModalAgregar}
+        onSubmit={handleAddServicio}
+        title="Crear Nuevo Servicio"
+        fields={[
+          { name: 'ImgServicio', label: 'Imagen', type: 'text' },
+          { name: 'Nombre_Servicio', label: 'Nombre', type: 'text' },
+          { name: 'Tiempo_Servicio', label: 'Tiempo', type: 'text' },
+          { name: 'Precio_Servicio', label: 'Precio', type: 'number' },
+        ]}
+        onChange={handleChange}
+      />
+
+      <ModalEditarServicio
+        open={openModalEditar}
+        handleClose={handleCloseModalEditar}
+        onSubmit={handleEditServicio}
+        title="Editar Servicio"
+        fields={[
+          { name: 'IdServicio', label: 'Identificador', type: 'text', readOnly: true }, 
+          { name: 'ImgServicio', label: 'Imagen', type: 'text' },
+          { name: 'Nombre_Servicio', label: 'Nombre', type: 'text' },
+          { name: 'Tiempo_Servicio', label: 'Tiempo', type: 'text' },
+          { name: 'Precio_Servicio', label: 'Precio', type: 'number' },
+        ]}
+        onChange={handleChange}
+        entityData={servicioSeleccionado} 
+      />  
+
+      <Table
+        columns={[
+          { field: 'IdServicio', headerName: 'ID', width: 'w-16' },
+          {
+            field: "ImgServicio",
+            headerName: "IMAGEN",
+            width: "w-32",
+            renderCell: (params) => (
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                <img
+                  src={params.row.ImgServicio}
+                  alt="ImgServicio"
+                  style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
+                />
+              </div>
+            )
+          },
+          { field: 'Nombre_Servicio', headerName: 'NOMBRE', width: 'w-36' },
+          { field: 'Tiempo_Servicio', headerName: 'TIEMPO', width: 'w-36' },
+          { field: 'Precio_Servicio', headerName: 'PRECIO', width: 'w-36' },
+
+          {
+            field: 'Acciones',
+            headerName: 'ACCIONES',
+            width: 'w-48',
+            renderCell: (params) => (
+              <div className="flex justify-center space-x-4">
+                <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
+                  <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
+                </button>
+                <CustomSwitch
+                  active={params.row.EstadoServicio === 1}
+                  onToggle={() => handleToggleSwitch(params.row.IdServicio)}
+                />
+              </div>
+            ),
+          },
+        ]}
+        data={filtrar}
+      />
     </div>
   );
 };

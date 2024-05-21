@@ -181,7 +181,7 @@ const Proveedores = () => {
           return;
         }
   
-        // Validación del nombr e_proveedor no debe contener números ni caracteres especiales
+        // Validación del nombre_proveedor no debe contener números ni caracteres especiales
         const nombreProveedor = formData['nombre_proveedor'];
         if (!/^[a-zA-Z\s]+$/.test(nombreProveedor)) {
           window.Swal.fire({
