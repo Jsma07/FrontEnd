@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import ModalDinamico from "../../components/consts/ModalDinamico";
+import Fab from '@mui/material/Fab';
 
 const Clientes = () => {
   const [clientes, setClientes] = useState([]);
@@ -29,13 +30,13 @@ const Clientes = () => {
   };
 
   const columns = [
-    { name: "FotoPerfil", label: "Foto de Perfil" },
+    // { name: "FotoPerfil", label: "Foto" },
     { name: "Nombre", label: "Nombre" },
     { name: "Apellido", label: "Apellido" },
     { name: "Correo", label: "Correo" },
     { name: "Telefono", label: "Teléfono" },
     { name: "Estado", label: "Estado" },
-    { name: "IdRol", label: "ID de Rol" },
+    { name: "IdRol", label: "Rol" },
   ];
   const handleSubmit = async (formData) => {
     try {
@@ -376,31 +377,19 @@ const Clientes = () => {
               />
             )}
           </div>
-
-          <button
-            className="fixed bottom-4 right-4 bg-blue-500 text-white rounded-full p-3 shadow-xl hover:shadow-2xl"
+          <Fab
+            aria-label="add"
             style={{
-              right: "4rem",
-              bottom: "4rem",
-              boxShadow: "0 8px 20px rgba(0, 0, 0, 0.5)", // Sombra negra más pronunciada
+              border: '0.5px solid grey',
+              backgroundColor: '#94CEF2',
+              position: 'fixed',
+              bottom: '16px',
+              right: '16px',
+              zIndex: 1000, // Asegura que el botón flotante esté por encima de otros elementos
             }}
-            onClick={() => handleOpenModal(cliente)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-          </button>
+            onClick={() => handleOpenModal(cliente)}>
+            <i className='bx bx-plus' style={{ fontSize: '1.3rem' }}></i>
+         </Fab>
         </div>
       </div>
     </div>

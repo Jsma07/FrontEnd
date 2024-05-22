@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import CustomSwitch from "../../components/consts/switch";
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { Button as CommonButton } from '@mui/material';
-import ModalAgregarProveedor from "../../components/consts/Modal";
+import ModalAgregarProveedor from "../../components/consts/modal";
 import ModalEditarProveedor from "../../components/consts/modalEditar";
 import Table from "../../components/consts/Tabla";
-import CamposObligatorios from "../../components/consts/camposVacios"
+import CamposObligatorios from "../../components/consts/camposVacios";
 import SearchIcon from "@mui/icons-material/Search";
+import Fab from '@mui/material/Fab';
 
 const Proveedores = () => {
   const [openModalAgregar, setOpenModalAgregar] = useState(false);
@@ -316,55 +316,32 @@ const Proveedores = () => {
     setOpenModalEditar(true);
   };
 
-  return (
-    <div>
-      <center><h3 className="text-4xl mb-4" style={{ marginTop: '-20px' }}>Gestion Proveedores</h3></center>
-      <div className="flex justify-between items-center">
-        <div>
-          <CommonButton
-            color="primary"
-            variant="contained"
-            onClick={() => setOpenModalAgregar(true)}
-            sx={{
-              color: 'black',
-              minHeight: 40,
-              px: 2.5,
-              borderRadius: '10px',
-              backgroundColor: '#EFD4F5',
-              marginTop: '5px',
-              '&:hover': {
-                backgroundColor: '#8C09FF',
-                color: 'white',
-                '& .MuiListItemIcon-root': {
-                  color: 'white',
-                },
-              },
-            }}>
-            <PersonAddIcon />
-          </CommonButton>
+return (
+<div>
+  <div className="flex justify-between items-center mb-4">
+    <h3 className="text-4xl" style={{ marginTop: '-20px' }}>Gestion De Proveedores</h3>
+    <div className="mt-4">
+      <form onSubmit={(e) => e.preventDefault()}>
+        <div className="relative">
+          <input
+            type="search"
+            id="search"
+            className="block w-full p-2 pl-10 pr-10 text-sm border border-gray-300 rounded bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="Buscar..."
+            value={buscar}
+            onChange={(e) => setBuscar(e.target.value)}
+            required
+          />
+          <span
+            className="absolute inset-y-0 right-0 flex items-center px-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-r text-sm dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            style={{ cursor: 'default', height: '100%' }}
+          >
+            <SearchIcon className="text-base mr-3" />
+          </span>
         </div>
-        <div className="mt-20 mr-10">
-          <form onSubmit={(e) => e.preventDefault()}>
-            <div className="relative">
-              <input
-                type="search"
-                id="search"
-                className="block w-full p-2 pl-10 pr-10 text-sm border border-gray-300 rounded bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Buscar..."
-                value={buscar}
-                onChange={(e) => setBuscar(e.target.value)}
-                required
-              />
-              <span
-                className="absolute inset-y-0 right-0 flex items-center px-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-r text-sm dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                style={{ cursor: 'default', height: '100%' }} 
-              >
-                <SearchIcon className="text-base mr-3" />
-              </span>
-            </div>
-          </form>
-        </div>
-      </div>
+      </form>
+    </div>
+  </div>
 
       <ModalAgregarProveedor
           open={openModalAgregar}
@@ -425,6 +402,20 @@ const Proveedores = () => {
         ]}
         data={filtrar}
       />
+      <Fab
+        aria-label="add"
+        style={{
+          border: '0.5px solid grey',
+          backgroundColor: '#94CEF2',
+          position: 'fixed',
+          bottom: '16px',
+          right: '16px',
+          zIndex: 1000, // Asegura que el botón flotante esté por encima de otros elementos
+        }}
+        onClick={() => setOpenModalAgregar(true)}
+      >
+        <i className='bx bx-plus' style={{ fontSize: '1.3rem' }}></i>
+     </Fab>
     </div>
   );
 };

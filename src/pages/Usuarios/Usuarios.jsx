@@ -3,8 +3,8 @@ import axios from "axios";
 import CustomSwitch from "../../components/consts/switch";
 import ModalDinamico from "../../components/consts/ModalDinamico";
 import Table from "../../components/consts/Tabla";
-import axios from 'axios';
 import LoadingScreen from "../../components/consts/pantallaCarga"; 
+import SearchIcon from "@mui/icons-material/Search";
 import Fab from '@mui/material/Fab';
 
 const Usuarios = () => {
@@ -234,14 +234,14 @@ const Usuarios = () => {
   
   
   const columns = [
-    { field: 'id', headerName: 'ID', width: 'w-16' },
-    { field: 'nombre', headerName: 'Nombre', width: 'w-36' },
-    { field: 'apellido', headerName: 'Apellido', width: 'w-36' },
-    { field: 'correo', headerName: 'Correo', width: 'w-36' },
-    { field: 'telefono', headerName: 'Teléfono', width: 'w-36' },
+    { field: 'id', headerName: 'ID', width: 'w-20' },
+    { field: 'nombre', headerName: 'NOMBRE', width: 'w-36' },
+    { field: 'apellido', headerName: 'APELLIDO', width: 'w-36' },
+    { field: 'correo', headerName: 'CORREO', width: 'w-40' },
+    { field: 'telefono', headerName: 'TELEFONO', width: 'w-40' },
     { 
       field: 'rolId', 
-      headerName: 'Rol', 
+      headerName: 'ROL', 
       width: 'w-36',
       renderCell: (params) => {
         const rol = roles.find(role => role.id === params.value);
@@ -250,8 +250,8 @@ const Usuarios = () => {
     },
     
     {
-      field: "Acciones",
-      headerName: "Acciones",
+      field: "ACCIONES",
+      headerName: "ACCIONES",
       width: "w-48",
       renderCell: (params) => (
         <div className="flex justify-center space-x-4">
@@ -262,10 +262,9 @@ const Usuarios = () => {
             <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
           </button>
           
-          {/* CustomSwitch que cambia su estado cuando se hace clic */}
           <CustomSwitch
-  active={params.row.estado === 1} // Usar el estado del usuario para determinar si el switch está activo
-  onToggle={() => handleToggleSwitch(params.row.id)}
+            active={params.row.estado === 1} // Usar el estado del usuario para determinar si el switch está activo
+            onToggle={() => handleToggleSwitch(params.row.id)}
           />
         </div>
       ),
@@ -273,72 +272,75 @@ const Usuarios = () => {
   ];
 
   if (isLoading) {
-    return <LoadingScreen />; // Muestra la pantalla de carga mientras isLoading es verdadero
+    return <LoadingScreen />; 
   }
 
   return (
-    <div className="container mx-auto p-4 relative">
-      <h1 className="text-3xl font-bold mb-4">Usuarios</h1>
-      <div className="md:flex md:justify-between md:items-center mb-4">
-        <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
-          <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Buscar usuario</label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
+    <div className="container mx-auto p-15 relative">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-4xl" style={{ marginTop: '-20px' }}>Gestion De Usuarios</h3>
+        <div className="mt-4 ml-auto"> 
+          <form onSubmit={(e) => e.preventDefault()}>
+            <div className="relative">
+              <input
+                type="search"
+                id="search"
+                className="block w-full p-2 pl-10 pr-10 text-sm border border-gray-300 rounded bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Buscar..."
+                value={buscar}
+                onChange={(e) => setBuscar(e.target.value)}
+                required
+              />
+              <span
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-r text-sm dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                style={{ cursor: 'default', height: '100%' }}
+              >
+                <SearchIcon className="text-base mr-3" />
+              </span>
             </div>
-            <input
-              type="search"
-              id="default-search"
-              className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Buscar usuario..."
-              value={buscar}
-              onChange={(e) => setBuscar(e.target.value)}
-              required
-            />
-          </div>
-        </div>
-        <div>
-          <ModalDinamico
-            seleccionado={seleccionado}
-            open={openModal}
-            handleClose={handleCloseModal}
-            onSubmit={handleSubmit}
-            title={seleccionado ? "Editar Usuario" : "Crear nuevo usuario"}
-            fields={[
-              { name: 'nombre', label: 'Nombre', type: 'text', value: seleccionado ? seleccionado.nombre : '' },
-              { name: 'apellido', label: 'Apellido', type: 'text', value: seleccionado ? seleccionado.apellido : '' },
-              { name: 'correo', label: 'Correo', type: 'text', value: seleccionado ? seleccionado.correo : '' },
-              { name: 'telefono', label: 'Teléfono', type: 'text', value: seleccionado ? seleccionado.telefono : '', maxLength: 15, minlength: 7 },
-              { 
-                name: 'rolId', 
-                label: 'Rol', 
-                type: 'select',
-                options: roles.map(role => ({ value: role.id, label: role.nombre })),
-                value: seleccionado ? seleccionado.rolId : ''
-              },
-              { name: 'contrasena', label: 'Contraseña', type: 'password', value: seleccionado ? seleccionado.contrasena : '' }
-            ]}
-          />
+          </form>
         </div>
       </div>
+      <div>
+        <ModalDinamico
+          seleccionado={seleccionado}
+          open={openModal}
+          handleClose={handleCloseModal}
+          onSubmit={handleSubmit}
+          title={seleccionado ? "Editar Usuario" : "Crear nuevo usuario"}
+          fields={[
+            { name: 'nombre', label: 'Nombre', type: 'text', value: seleccionado ? seleccionado.nombre : '' },
+            { name: 'apellido', label: 'Apellido', type: 'text', value: seleccionado ? seleccionado.apellido : '' },
+            { name: 'correo', label: 'Correo', type: 'text', value: seleccionado ? seleccionado.correo : '' },
+            { name: 'telefono', label: 'Teléfono', type: 'text', value: seleccionado ? seleccionado.telefono : '', maxLength: 15, minlength: 7 },
+            { 
+              name: 'rolId', 
+              label: 'Rol', 
+              type: 'select',
+              options: roles.map(role => ({ value: role.id, label: role.nombre })),
+              value: seleccionado ? seleccionado.rolId : ''
+            },
+            { name: 'contrasena', label: 'Contraseña', type: 'password', value: seleccionado ? seleccionado.contrasena : '' }
+          ]}
+        />
+      </div>
       <Table columns={columns} data={filtrar} roles={roles} />
-    <Fab
-      aria-label="add"
-      style={{
-        border: '0.5px solid grey',
-        backgroundColor: '#94CEF2',
-        position: 'fixed',
-        bottom: '16px',
-        right: '16px',
-        zIndex: 1000, // Asegura que el botón flotante esté por encima de otros elementos
-      }}
-      onClick={handleCrearUsuarioClick}
-    >
-<i className='bx bx-plus' style={{ fontSize: '1.3rem' }}></i>
-    </Fab>
-    </div>
+      <Fab
+        aria-label="add"
+        style={{
+          border: '0.5px solid grey',
+          backgroundColor: '#94CEF2',
+          position: 'fixed',
+          bottom: '16px',
+          right: '16px',
+          zIndex: 1000,
+        }}
+        onClick={handleCrearUsuarioClick}
+      >
+        <i className='bx bx-plus' style={{ fontSize: '1.3rem' }}></i>
+      </Fab>
+  </div>
   );
-  
 };
 
 export default Usuarios;
