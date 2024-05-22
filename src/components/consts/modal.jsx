@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+
 const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
   const [formData, setFormData] = useState({});
 
@@ -24,8 +25,9 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
   };
 
   const handleSubmit = () => {
-    onSubmit(formData);
-    handleClose();
+    if (typeof onSubmit === 'function') {
+      onSubmit(formData);
+      handleClose();
     } else {
       console.error('onSubmit is not a function');
     }
