@@ -5,6 +5,7 @@ import Table from "../../components/consts/Tabla";
 import axios from 'axios';
 import LoadingScreen from "../../components/consts/pantallaCarga"; 
 import Fab from '@mui/material/Fab';
+import {  ValidacionTelefono, ValidacionNombre } from "./validaciones";
 
 const Usuarios = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -102,7 +103,12 @@ const Usuarios = () => {
       });
     }
   };
-  
+  const validaciones={
+    // correo: ValidacionCorreo,
+    nombre: ValidacionNombre,
+    apellido: ValidacionNombre,
+    telefono: ValidacionTelefono
+  };
   
 
   const handleEditClick = (id) => {
@@ -120,11 +126,6 @@ const Usuarios = () => {
     setOpenModal(true);
     setSeleccionado(usuarioEditar);
   };
-  
-
-  const handleViewDetailsClick = (id) => {
-    console.log(`Viendo detalles del usuario con ID: ${id}`);
-  };
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -141,6 +142,7 @@ const Usuarios = () => {
   const handleSubmit = async (formData) => {
     const mandatoryFields = ['nombre', 'correo', 'apellido', 'telefono', 'rolId', 'contrasena'];
   
+    // Verificar campos obligatorios
     const emptyFields = mandatoryFields.filter(field => {
       const value = formData[field];
       if (field === 'rolId') {
@@ -148,8 +150,6 @@ const Usuarios = () => {
       }
       return typeof value !== 'string' || value.trim() === '';
     });
-  
-    console.log('Campos vacíos:', emptyFields);
   
     if (emptyFields.length > 0) {
       window.Swal.fire({
@@ -159,36 +159,49 @@ const Usuarios = () => {
       });
       return;
     }
-    
-    // Validar si el correo ya existe en el formulario actual
-    console.log('Verificando si el correo existe:', formData.correo);
-    const correoExiste = await axios.get(`http://localhost:5000/api/verificarCorreo/${formData.correo}`);
-    console.log('Respuesta del servidor:', correoExiste.data);
-    if (correoExiste.data.existe) {
+  
+    // Validación del formato de correo
+    const validacionCorreo = /^[a-zA-Z0-9._%+-]+@(gmail|outlook|hotmail)\.(com|net|org)$/i;
+    if (!validacionCorreo.test(formData.correo)) {
       window.Swal.fire({
         icon: 'error',
-        title: 'Correo existente',
-        text: 'El correo ingresado ya está en uso. Por favor, utiliza otro correo.',
+        title: 'Correo inválido',
+        text: 'El correo ingresado tiene un formato inválido.',
       });
       return;
     }
-    
+  
     try {
+      // Confirmación de acción
       const result = await window.Swal.fire({
         icon: 'warning',
         title: '¿Estás seguro?',
-        text: '¿Quieres crear el usuario?',
+        text: `¿Quieres ${seleccionado ? 'editar' : 'crear'} el usuario?`,
         showCancelButton: true,
         confirmButtonText: 'Sí',
         cancelButtonText: 'Cancelar',
       });
   
       if (!result.isConfirmed) {
-        return; // No se confirmó
+        return; // Cancelado por el usuario
+      }
+  
+      // Verificar si el correo ya existe solo al crear un usuario nuevo o si se cambió el correo al editar
+      if (!seleccionado || formData.correo !== seleccionado.correo) {
+        const correoExiste = await axios.get(`http://localhost:5000/api/verificarCorreo/${formData.correo}`);
+        if (correoExiste.data.existe) {
+          window.Swal.fire({
+            icon: 'error',
+            title: 'Correo existente',
+            text: 'El correo ingresado ya está en uso. Por favor, utiliza otro correo.',
+          });
+          return;
+        }
       }
   
       let response;
       if (seleccionado) {
+        // Editar usuario existente
         response = await axios.put(
           `http://localhost:5000/api/editarUsuario/${seleccionado.id}`,
           formData,
@@ -204,6 +217,7 @@ const Usuarios = () => {
           text: 'El usuario ha sido editado correctamente.',
         });
       } else {
+        // Crear nuevo usuario
         response = await axios.post(
           'http://localhost:5000/api/crearUsuario',
           formData,
@@ -226,9 +240,16 @@ const Usuarios = () => {
         window.location.reload(); // Recargar la página para mostrar el nuevo usuario
       }, 1500);
     } catch (error) {
-      console.error('Error al crear usuario:', error);
+      console.error('Error al crear/editar usuario:', error);
+      window.Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un error al crear/editar el usuario. Por favor, inténtalo de nuevo más tarde.',
+      });
     }
-};
+  };
+  
+  
 
   
   
@@ -314,6 +335,8 @@ const Usuarios = () => {
               },
               { name: 'contrasena', label: 'Contraseña', type: 'password', value: seleccionado ? seleccionado.contrasena : '' }
             ]}
+            validations={validaciones}
+           
           />
         </div>
       </div>
