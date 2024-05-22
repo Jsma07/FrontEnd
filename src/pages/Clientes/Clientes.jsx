@@ -1,75 +1,171 @@
-import React from "react";
-import CancelIcon from "@mui/icons-material/Cancel";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Swal from "sweetalert2";
+import ModalDinamico from "../../components/consts/ModalDinamico";
 
-const clientes = () => {
+const Clientes = () => {
+  const [clientes, setClientes] = useState([]);
+  const [cliente, setCliente] = useState([]);
+
+  const [modalData, setModalData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/jackenail/Listar_Clientes"
+        );
+        setClientes(response.data);
+      } catch (error) {
+        console.error("Error al obtener los datos de clientes:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleOpenModal = (data) => {
+    setModalData(data);
+  };
+
   const columns = [
-    { name: "Nombres", selector: "image", sortable: true },
-    { name: "apellido", selector: "empleado", sortable: true },
-    { name: "Correo", selector: "Cliente", sortable: true },
-    { name: "telefono", selector: "date", sortable: true },
-    { name: "Estado", selector: "estado", sortable: true },
-    { name: "Acciones", selector: "action", sortable: true },
-    {
-      name: "Agregar",
-      selector: "agregar",
-      ignoreRowClick: true,
-      cell: (row) => (
-        <button
-          onClick={() => handleAgregar(row)}
-          className="text-sm text-white bg-green-500 hover:bg-green-600 px-2 py-1 rounded"
-        >
-          Agregar
-        </button>
-      ),
-    },
+    { name: "FotoPerfil", label: "Foto de Perfil" },
+    { name: "Nombre", label: "Nombre" },
+    { name: "Apellido", label: "Apellido" },
+    { name: "Correo", label: "Correo" },
+    { name: "Telefono", label: "Teléfono" },
+    { name: "Estado", label: "Estado" },
+    { name: "IdRol", label: "ID de Rol" },
   ];
+  const handleSubmit = async (formData) => {
+    try {
+      // Verificar si el correo electrónico ya existe en la lista de clientes
+      const correoExistente = clientes.some(
+        (cliente) => cliente.Correo === formData.Correo
+      );
 
-  const room = [
-    {
-      image:
-        "https://i.pinimg.com/474x/2a/f9/25/2af925b3a97c4bd1d1023d27320cac2c.jpg",
-      Nombres: "julian tatum",
-      apellido: "Mosquera",
-      Correo: "Eduardomosquera@gmail.com",
-      telefono: "202404435",
-      estado: (
-        <span className="inline-flex items-center">
-          <span className="h-2 w-2 rounded-full bg-green-500 mr-1"></span>{" "}
-          Activo
-        </span>
-      ),
-      action: (
-        <button
-          type="button"
-          class="text-white bg-gradient-to-r from-pink-400 via-pink-500 to-pink-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-pink-300 dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-        >
-          <CancelIcon className="text-base mr-1" />
-        </button>
-      ),
-    },
-    {
-      image:
-        "https://i.pinimg.com/474x/6b/e4/25/6be425d231e4706e3f10da187cbf6dde.jpg",
-      Nombres: "Eduardo",
-      apellido: "Mosquera",
-      Correo: "Eduardomosquera@gmail.com",
-      telefono: "202404435",
-      estado: (
-        <span className="inline-flex items-center">
-          <span className="h-2 w-2 rounded-full bg-red-500 mr-1"></span>{" "}
-          Inactivo
-        </span>
-      ),
-      action: (
-        <button
-          type="button"
-          class="text-white bg-gradient-to-r from-pink-400 via-pink-500 to-pink-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-pink-300 dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-        >
-          <CancelIcon className="text-base mr-1" />
-        </button>
-      ),
-    },
-  ];
+      if (correoExistente) {
+        // Mostrar una alerta si el correo electrónico ya está registrado
+        Swal.fire({
+          icon: "error",
+          title: "Correo electrónico duplicado",
+          text: "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico.",
+        });
+      } else {
+        // Continuar con el registro del cliente si el correo electrónico no está duplicado
+        const result = await Swal.fire({
+          title: "¿Estás seguro?",
+          text: "¿Quieres registrar este cliente?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Sí",
+          cancelButtonText: "Cancelar",
+        });
+
+        if (result.isConfirmed) {
+          // Normalizar el valor del campo "Estado" si es necesario
+          let EstadoNormalizado;
+          if (formData.Estado === "Activo") {
+            EstadoNormalizado = 1;
+          } else if (formData.Estado === "Inactivo") {
+            EstadoNormalizado = 2;
+          } else {
+            // Valor predeterminado si el Estado no coincide con ninguno de los valores esperados
+            EstadoNormalizado = 0;
+          }
+
+          // Convertir campos de texto a números si es necesario
+          const formDataNumerico = {
+            ...formData,
+            Telefono: parseInt(formData.Telefono),
+            Estado: EstadoNormalizado,
+            IdRol: parseInt(formData.IdRol),
+          };
+
+          console.log("Datos del formulario numéricos:", formDataNumerico);
+
+          await axios.post(
+            "http://localhost:5000/Jackenail/RegistrarClientes",
+            formDataNumerico
+          );
+
+          // Mostrar una alerta de éxito si el registro es exitoso
+          Swal.fire({
+            icon: "success",
+            title: "¡Registro exitoso!",
+            text: "El cliente se ha registrado correctamente.",
+          });
+
+          // Cerrar el modal después de enviar el formulario
+          setModalData(null);
+
+          // Agregar el nuevo cliente a la lista de clientes
+          setClientes([...clientes, formDataNumerico]);
+        }
+      }
+    } catch (error) {
+      console.error("Error al registrar el cliente:", error);
+
+      // Mostrar una alerta de error si ocurre algún problema durante el registro
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Ocurrió un error al registrar el cliente.",
+        footer: '<a href="#">Inténtelo nuevamente</a>',
+      });
+    }
+  };
+
+  const handleActualizacionSubmit = async (formData) => {
+    try {
+      // Normalizar el valor del campo "Estado" si es necesario
+      let estadoNormalizado;
+      if (formData.Estado === "Inactivo") {
+        estadoNormalizado = 1;
+      } else if (formData.Estado === "Activo") {
+        estadoNormalizado = 2;
+      } else {
+        estadoNormalizado = 0;
+      }
+
+      // Convertir campos de texto a números si es necesario
+      const formDataNumerico = {
+        ...formData,
+        Telefono: parseInt(formData.Telefono),
+        Estado: estadoNormalizado,
+        IdRol: parseInt(formData.IdRol),
+      };
+
+      console.log(formDataNumerico);
+
+      // Determinar la URL de la API para actualizar el cliente
+      const url = `http://localhost:5000/Jackenail/Actualizar/${formDataNumerico.IdCliente}`;
+
+      // Realizar la solicitud de actualización a la API utilizando axios.put
+      await axios.put(url, formDataNumerico);
+
+      // Mostrar una alerta de éxito si la actualización es exitosa
+      Swal.fire({
+        icon: "success",
+        title: "¡Actualización exitosa!",
+        text: "El cliente se ha actualizado correctamente.",
+      });
+
+      // Cerrar el modal después de enviar el formulario
+      setModalData(null);
+    } catch (error) {
+      console.error("Error al actualizar el cliente:", error);
+
+      // Mostrar una alerta de error si ocurre algún problema durante la actualización
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Ocurrió un error al actualizar el cliente.",
+        footer: '<a href="#">Inténtelo nuevamente</a>',
+      });
+    }
+  };
+
   return (
     <div
       style={{
@@ -151,4 +247,5 @@ const clientes = () => {
     </div>
   );
 };
-export default clientes;
+
+export default Clientes;

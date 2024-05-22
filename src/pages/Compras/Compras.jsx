@@ -66,6 +66,7 @@ const Compras = () => {
             <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
           </button>
           <button onClick={() => handleViewDetailsClick(params.row.id)} className="text-blue-500">
+   
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
