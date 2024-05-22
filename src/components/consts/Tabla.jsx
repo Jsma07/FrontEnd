@@ -16,10 +16,7 @@ const Table = ({ columns, data }) => {
         </thead>
         <tbody>
           {data.map((row, rowIndex) => (
-            <tr
-              key={rowIndex}
-              className="border-b hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
+            <tr key={rowIndex} className="border-b hover:bg-gray-100 dark:hover:bg-gray-700">
               {columns.map((column, colIndex) => (
                 <td key={colIndex} className={`px-4 py-2 ${column.width}`}>
                   {/* Renderiza el contenido de cada celda */}

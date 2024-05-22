@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-
-const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityData, onChange }) => {
+const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
-    if (entityData) {
-      setFormData(entityData);
+    if (fields && fields.length > 0) {
+      const initialFormData = {};
+      fields.forEach((field) => {
+        initialFormData[field.name] = field.defaultValue || '';
+      });
+      setFormData(initialFormData);
     }
-  }, [entityData]);
+  }, [fields]);
 
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
@@ -18,20 +21,20 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
       ...prevData,
       [name]: newValue,
     }));
-    // Pasar los cambios al componente padre
-    onChange(name, newValue);
   };
 
   const handleSubmit = () => {
     onSubmit(formData);
     handleClose();
+    } else {
+      console.error('onSubmit is not a function');
+    }
   };
 
   const handleCancel = () => {
     handleClose();
   };
 
-  // Renderizar los campos del formulario
   const renderFields = () => {
     return fields.map((field, index) => (
       <Grid item xs={12} sm={6} key={index}>
@@ -40,9 +43,8 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     ));
   };
 
-  // Renderizar un campo del formulario basado en su tipo
   const renderFieldByType = (field) => {
-    const { name, label, type, options, readOnly } = field; // Agregar readOnly a las props destructuradas
+    const { name, label, type, options } = field;
 
     switch (type) {
       case 'text':
@@ -59,7 +61,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
             type={type}
             style={{ marginBottom: '0.5rem', textAlign: 'center' }}
             value={formData[name] || ''}
-            disabled={readOnly}
           />
         );
       case 'select':
@@ -87,23 +88,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
             </Select>
           </div>
         );
-
-      case 'date':
-        return (
-          <TextField
-            id={name}
-            name={name}
-            label={label}
-            variant="outlined"
-            onChange={handleChange}
-            fullWidth
-            size="medium"
-            type={type}
-            style={{ marginBottom: '0.5rem', textAlign: 'center' }}
-            value={formData[name] || ''}
-            InputLabelProps={{ shrink: true }}
-          />
-        );
       default:
         return null;
     }
@@ -130,4 +114,4 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
   );
 };
 
-export default ModalEditar;
+export default ModalDinamico;

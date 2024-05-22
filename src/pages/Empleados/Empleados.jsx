@@ -159,13 +159,13 @@ const Empleados = () => {
   };
 
   const columns = [
-    { name: "FotoPerfil", label: "Foto de Perfil" },
+    { name: "FotoPerfil", label: "Foto" },
     { name: "Nombre", label: "Nombre" },
     { name: "Apellido", label: "Apellido" },
     { name: "Correo", label: "Correo" },
     { name: "Telefono", label: "Teléfono" },
     { name: "Estado", label: "Estado" },
-    { name: "IdRol", label: "ID de Rol" },
+    { name: "IdRol", label: "Rol" },
   ];
 
   return (
@@ -208,9 +208,7 @@ const Empleados = () => {
                       ))}
                       <th>
                         Acciones
-                        <button onClick={() => handleOpenModal(Empleado)}>
-                          Abrir Modal
-                        </button>
+                        <button onClick={() => handleOpenModal(Empleado)}></button>
                       </th>
                     </tr>
                   </thead>
