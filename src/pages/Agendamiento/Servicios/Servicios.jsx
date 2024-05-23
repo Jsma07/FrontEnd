@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import CustomSwitch from "../../../components/consts/switch";
 import Table from "../../../components/consts/Tabla";
-import { Grid, Button as CommonButton } from '@mui/material';
-import ModalAgregarServicio from "../../../components/consts/Modal";
+import ModalAgregarServicio from "../../../components/consts/modal";
 import ModalEditarServicio from "../../../components/consts/modalEditar";
 import CamposObligatorios from "../../../components/consts/camposVacios";
-import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 import SearchIcon from "@mui/icons-material/Search";
+import Fab from '@mui/material/Fab';
 
 const Servicios = () => {
   const [selectedRows, setSelectedRows] = useState([]);
@@ -186,55 +185,32 @@ const handleEditServicio = async (formData) => {
     setOpenModalEditar(true);
   };
 
-  return (
-    <div>
-      <center><h3 className="text-4xl mb-4" style={{ marginTop: '-130px' }}>Gestion Servicios</h3></center>
-      <div className="flex justify-between items-center">
-        <div>
-          <CommonButton
-            color="primary"
-            variant="contained"
-            onClick={() => setOpenModalAgregar(true)}
-            sx={{
-              color: 'black',
-              minHeight: 40,
-              px: 2.5,
-              borderRadius: '10px',
-              backgroundColor: '#EFD4F5',
-              marginTop: '5px',
-              '&:hover': {
-                backgroundColor: '#8C09FF',
-                color: 'white',
-                '& .MuiListItemIcon-root': {
-                  color: 'white',
-                },
-              },
-            }}>
-            <AddBusinessIcon />
-          </CommonButton>
-        </div>
-        <div className="mt-20 mr-10">
-          <form onSubmit={(e) => e.preventDefault()}>
-            <div className="relative">
-              <input
-                type="search"
-                id="search"
-                className="block w-full p-2 pl-10 pr-10 text-sm border border-gray-300 rounded bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Buscar..."
-                value={buscar}
-                onChange={(e) => setBuscar(e.target.value)}
-                required
-              />
-              <span
-                className="absolute inset-y-0 right-0 flex items-center px-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-r text-sm dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                style={{ cursor: 'default', height: '100%' }} 
-              >
-                <SearchIcon className="text-base mr-3" />
-              </span>
+return (
+  <div>
+    <div className="container mx-auto p-4 relative">
+      <center><h1 className="text-3xl font-bold mb-4">Gestion De Servicios</h1></center>
+      <div className="md:flex md:justify-between md:items-center mb-4">
+        <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
+          <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Buscar usuario</label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
             </div>
-          </form>
+            <input
+              type="search"
+              id="default-search"
+              className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Buscar servicios..."
+              value={buscar}
+              onChange={(e) => setBuscar(e.target.value)}
+              required
+            />
+          </div>
         </div>
+        <div>
       </div>
+    </div>
+  </div>
 
       <ModalAgregarServicio
         open={openModalAgregar}
@@ -306,6 +282,20 @@ const handleEditServicio = async (formData) => {
         ]}
         data={filtrar}
       />
+      <Fab
+        aria-label="add"
+        style={{
+          border: '0.5px solid grey',
+          backgroundColor: '#94CEF2',
+          position: 'fixed',
+          bottom: '16px',
+          right: '16px',
+          zIndex: 1000,
+        }}
+        onClick={() => setOpenModalAgregar(true)}
+      >
+        <i className='bx bx-plus' style={{ fontSize: '1.3rem' }}></i>
+     </Fab>
     </div>
   );
 };

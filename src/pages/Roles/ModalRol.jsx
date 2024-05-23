@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Modal } from "@mui/material";
-import ModalDinamico from "../../components/consts/ModalDinamico";
+import ModalDinamico from "../../components/consts/modal";
 
 const AddRoleModal = ({ open, handleClose }) => {
   const [roleName, setRoleName] = useState("");
