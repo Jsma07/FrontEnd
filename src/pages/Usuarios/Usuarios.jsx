@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import CustomSwitch from "../../components/consts/switch";
-import ModalDinamico from "../../components/consts/ModalDinamico";
+import ModalDinamico from "../../components/consts/modal";
 import Table from "../../components/consts/Tabla";
 import axios from 'axios';
 import LoadingScreen from "../../components/consts/pantallaCarga"; 
 import Fab from '@mui/material/Fab';
-import {  ValidacionTelefono, ValidacionNombre } from "./validaciones";
 
 const Usuarios = () => {
   const [openModal, setOpenModal] = useState(false);
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [seleccionado , setSeleccionado] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // Estado para controlar la carga de la página
-  const [buscar, setBuscar] = useState('')
+  const [isLoading, setIsLoading] = useState(true);
+  const [buscar, setBuscar] = useState('');
+
   useEffect(() => {
     const fetchRoles = async () => {
         try {
@@ -32,7 +32,7 @@ const Usuarios = () => {
       try {
         const respuesta = await axios.get('http://localhost:5000/api/users');
         setUsers(respuesta.data.usuarios);
-        setIsLoading(false); // Una vez que se cargan los usuarios, cambia isLoading a false
+        setIsLoading(false);
       } catch(error) {
         console.log(error);
       }
@@ -41,30 +41,28 @@ const Usuarios = () => {
   }, []);
 
   const filtrar = users.filter(user =>{
-    const {nombre, apellido, correo, telefono, rolId} = user
+    const {nombre, apellido, correo, telefono, rolId} = user;
     const terminoABuscar = buscar.toLowerCase();
-    const rol = roles.find(role =>
-      role.id === rolId
-    )
+    const rol = roles.find(role => role.id === rolId);
     const nombreRol = rol ? rol.nombre.toLowerCase() : '';
     return(
       nombre.toLowerCase().includes(terminoABuscar) ||
       apellido.toLowerCase().includes(terminoABuscar) ||
       correo.toLowerCase().includes(terminoABuscar) ||
-      telefono.includes(terminoABuscar)||
+      telefono.includes(terminoABuscar) ||
       nombreRol.includes(terminoABuscar)
-    )
-  })
+    );
+  });
 
   const handleToggleSwitch = async (id) => {
     const updatedUsers = users.map(user => {
       if (user.id === id) {
-        const newEstado = user.estado === 1 ? 0 : 1; // Cambia el estado
+        const newEstado = user.estado === 1 ? 0 : 1;
         return { ...user, estado: newEstado };
       }
       return user;
     });
-    
+
     try {
       const updatedUser = updatedUsers.find(user => user.id === id);
       if (!updatedUser) {
@@ -72,7 +70,6 @@ const Usuarios = () => {
         return;
       }
       
-      // Mostrar Sweet Alert de confirmación
       const result = await window.Swal.fire({
         icon: 'warning',
         title: '¿Estás seguro?',
@@ -83,10 +80,8 @@ const Usuarios = () => {
       });
   
       if (result.isConfirmed) {
-        // Usuario confirmó, procede a actualizar el estado
         await axios.put(`http://localhost:5000/api/editarUsuario/${id}`, { estado: updatedUser.estado });
         setUsers(updatedUsers);
-        // Mostrar Sweet Alert de éxito
         window.Swal.fire({
           icon: 'success',
           title: 'Estado actualizado',
@@ -95,7 +90,6 @@ const Usuarios = () => {
       }
     } catch (error) {
       console.error('Error al cambiar el estado del usuario:', error);
-      // Mostrar Sweet Alert de error
       window.Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -103,28 +97,20 @@ const Usuarios = () => {
       });
     }
   };
-  const validaciones={
-    // correo: ValidacionCorreo,
-    nombre: ValidacionNombre,
-    apellido: ValidacionNombre,
-    telefono: ValidacionTelefono
-  };
   
-
   const handleEditClick = (id) => {
     if (users.length === 0) {
-      // Aún no se han cargado los usuarios, manejar esto según tu caso
       return;
     }
   
     const usuarioEditar = users.find(user => user.id === id);
     if (!usuarioEditar) {
-      console.log("no encontrado")
+      console.log("no encontrado");
       return;
     }
   
-    setOpenModal(true);
     setSeleccionado(usuarioEditar);
+    setOpenModal(true);
   };
 
   const handleOpenModal = () => {
@@ -133,16 +119,15 @@ const Usuarios = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setSeleccionado(null)
+    setSeleccionado(null);
   };
 
   const handleCrearUsuarioClick = () => {
     handleOpenModal();
   };
+
   const handleSubmit = async (formData) => {
     const mandatoryFields = ['nombre', 'correo', 'apellido', 'telefono', 'rolId', 'contrasena'];
-  
-    // Verificar campos obligatorios
     const emptyFields = mandatoryFields.filter(field => {
       const value = formData[field];
       if (field === 'rolId') {
@@ -160,7 +145,6 @@ const Usuarios = () => {
       return;
     }
   
-    // Validación del formato de correo
     const validacionCorreo = /^[a-zA-Z0-9._%+-]+@(gmail|outlook|hotmail)\.(com|net|org)$/i;
     if (!validacionCorreo.test(formData.correo)) {
       window.Swal.fire({
@@ -172,7 +156,6 @@ const Usuarios = () => {
     }
   
     try {
-      // Confirmación de acción
       const result = await window.Swal.fire({
         icon: 'warning',
         title: '¿Estás seguro?',
@@ -183,10 +166,9 @@ const Usuarios = () => {
       });
   
       if (!result.isConfirmed) {
-        return; // Cancelado por el usuario
+        return;
       }
   
-      // Verificar si el correo ya existe solo al crear un usuario nuevo o si se cambió el correo al editar
       if (!seleccionado || formData.correo !== seleccionado.correo) {
         const correoExiste = await axios.get(`http://localhost:5000/api/verificarCorreo/${formData.correo}`);
         if (correoExiste.data.existe) {
@@ -201,7 +183,6 @@ const Usuarios = () => {
   
       let response;
       if (seleccionado) {
-        // Editar usuario existente
         response = await axios.put(
           `http://localhost:5000/api/editarUsuario/${seleccionado.id}`,
           formData,
@@ -217,7 +198,6 @@ const Usuarios = () => {
           text: 'El usuario ha sido editado correctamente.',
         });
       } else {
-        // Crear nuevo usuario
         response = await axios.post(
           'http://localhost:5000/api/crearUsuario',
           formData,
@@ -237,7 +217,7 @@ const Usuarios = () => {
       console.log('Respuesta del servidor:', response.data);
       handleCloseModal();
       setTimeout(() => {
-        window.location.reload(); // Recargar la página para mostrar el nuevo usuario
+        window.location.reload();
       }, 1500);
     } catch (error) {
       console.error('Error al crear/editar usuario:', error);
@@ -248,11 +228,7 @@ const Usuarios = () => {
       });
     }
   };
-  
-  
 
-  
-  
   const columns = [
     { field: 'id', headerName: 'ID', width: 'w-16' },
     { field: 'nombre', headerName: 'Nombre', width: 'w-36' },
@@ -268,7 +244,6 @@ const Usuarios = () => {
         return rol ? rol.nombre : 'Desconocido';
       }
     },
-    
     {
       field: 'Acciones',
       headerName: 'Acciones',
@@ -278,11 +253,9 @@ const Usuarios = () => {
           <button onClick={() => handleEditClick(params.row.id)} className="text-yellow-500">
             <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
           </button>
-          
-          {/* CustomSwitch que cambia su estado cuando se hace clic */}
           <CustomSwitch
-  active={params.row.estado === 1} // Usar el estado del usuario para determinar si el switch está activo
-  onToggle={() => handleToggleSwitch(params.row.id)}
+            active={params.row.estado === 1}
+            onToggle={() => handleToggleSwitch(params.row.id)}
           />
         </div>
       ),
@@ -290,12 +263,12 @@ const Usuarios = () => {
   ];
 
   if (isLoading) {
-    return <LoadingScreen />; // Muestra la pantalla de carga mientras isLoading es verdadero
+    return <LoadingScreen />;
   }
 
   return (
     <div className="container mx-auto p-4 relative">
-      <center><h1 className="text-3xl font-bold mb-4">Gestion De Usuarios</h1></center>
+      <h1 className="text-3xl font-bold mb-4">Usuarios</h1>
       <div className="md:flex md:justify-between md:items-center mb-4">
         <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
           <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Buscar usuario</label>
@@ -335,29 +308,26 @@ const Usuarios = () => {
               },
               { name: 'contrasena', label: 'Contraseña', type: 'password', value: seleccionado ? seleccionado.contrasena : '' }
             ]}
-            validations={validaciones}
-           
           />
         </div>
       </div>
       <Table columns={columns} data={filtrar} roles={roles} />
-    <Fab
-      aria-label="add"
-      style={{
-        border: '0.5px solid grey',
-        backgroundColor: '#94CEF2',
-        position: 'fixed',
-        bottom: '16px',
-        right: '16px',
-        zIndex: 1000, // Asegura que el botón flotante esté por encima de otros elementos
-      }}
-      onClick={handleCrearUsuarioClick}
-    >
-<i className='bx bx-plus' style={{ fontSize: '1.3rem' }}></i>
-    </Fab>
+      <Fab
+        aria-label="add"
+        style={{
+          border: '0.5px solid grey',
+          backgroundColor: '#94CEF2',
+          position: 'fixed',
+          bottom: '16px',
+          right: '16px',
+          zIndex: 1000,
+        }}
+        onClick={handleCrearUsuarioClick}
+      >
+        <i className='bx bx-plus' style={{ fontSize: '1.3rem' }}></i>
+      </Fab>
     </div>
   );
-  
 };
 
 export default Usuarios;

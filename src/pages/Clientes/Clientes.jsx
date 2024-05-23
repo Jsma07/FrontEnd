@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import ModalDinamico from "../../components/consts/ModalDinamico";
+import ModalDinamico from "../../components/consts/modal";
 import Fab from '@mui/material/Fab';
 
 const Clientes = () => {

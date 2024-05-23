@@ -9,7 +9,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
     if (fields && fields.length > 0) {
       const initialFormData = {};
       fields.forEach((field) => {
-        initialFormData[field.name] = field.defaultValue || '';
+        initialFormData[field.name] = field.value || '';
       });
       setFormData(initialFormData); 
     }
@@ -18,12 +18,46 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
     const newValue = e.target.type === 'checkbox' ? checked : value;
+    const maxNumeros = 15;
+    const CaracteresEspeciales = /^[a-zA-Z\s]*$/;
+
+    if (name === 'nombre' || name === 'apellido') {
+      if (!CaracteresEspeciales.test(newValue)) {
+        window.Swal.fire({
+          icon: 'error',
+          title: `${name.charAt(0).toUpperCase() + name.slice(1)} inválido`,
+          text:`El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede contener caracteres especiales ni números.`,
+        });
+        return; // No actualizar el estado si el valor no es válido
+      }
+    }
+    if(name == 'telefono'){
+      const validacionNumeros= /^[0-9]+$/;
+      if(!validacionNumeros.test(newValue)){
+        window.Swal.fire({
+          icon: 'error',
+          title: 'Teléfono inválido',
+          text: `El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede contener letras ni caracteres especiales.`,
+        });
+        return;
+      }
+      if(newValue.length > maxNumeros){
+        window.Swal.fire({
+          icon: 'error',
+          title: 'Teléfono inválido',
+          text: `El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede exceder ${maxNumeros} caracteres.`,
+        });
+        return;
+      }
+     
+    }
+  
     setFormData((prevData) => ({
       ...prevData,
       [name]: newValue,
     }));
   };
-
+  
   const handleSubmit = () => {
     if (typeof onSubmit === 'function') {
       onSubmit(formData);
