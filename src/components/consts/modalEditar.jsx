@@ -12,13 +12,12 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
   }, [entityData]);
 
   const handleChange = (e) => {
-    const { name, value, checked } = e.target;
-    const newValue = e.target.type === 'checkbox' ? checked : value;
+    const { name, value, checked, type } = e.target;
+    const newValue = type === 'checkbox' ? checked : value;
     setFormData((prevData) => ({
       ...prevData,
       [name]: newValue,
     }));
-    // Pasar los cambios al componente padre
     onChange(name, newValue);
   };
 
@@ -31,7 +30,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     handleClose();
   };
 
-  // Renderizar los campos del formulario
   const renderFields = () => {
     return fields.map((field, index) => (
       <Grid item xs={12} sm={6} key={index}>
@@ -40,13 +38,28 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     ));
   };
 
-  // Renderizar un campo del formulario basado en su tipo
   const renderFieldByType = (field) => {
-    const { name, label, type, options, readOnly } = field; // Agregar readOnly a las props destructuradas
+    const { name, label, type, options, readOnly } = field;
 
     switch (type) {
       case 'text':
       case 'password':
+        return (
+          <TextField
+            id={name}
+            name={name}
+            label={label}
+            variant="outlined"
+            onChange={handleChange}
+            fullWidth
+            size="medium"
+            type={type}
+            style={{ marginBottom: '0.5rem', textAlign: 'center' }}
+            value={formData[name] || ''}
+            disabled={readOnly}
+          />
+        );
+      case 'number':
         return (
           <TextField
             id={name}
@@ -87,7 +100,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
             </Select>
           </div>
         );
-
       case 'date':
         return (
           <TextField
