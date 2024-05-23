@@ -7,7 +7,6 @@ import ModalEditarServicio from "../../../components/consts/modalEditar";
 import CamposObligatorios from "../../../components/consts/camposVacios";
 import Fab from '@mui/material/Fab';
 
-
 const Servicios = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [openModalAgregar, setOpenModalAgregar] = useState(false);
