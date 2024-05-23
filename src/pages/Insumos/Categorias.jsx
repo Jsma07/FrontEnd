@@ -3,7 +3,7 @@ import axios from 'axios';
 import CustomSwitch from "../../components/consts/switch";
 import Table from "../../components/consts/Tabla";
 import { Grid, Button as CommonButton } from '@mui/material';
-import ModalAgregarCategoria from "../../components/consts/Modal";
+import ModalAgregarCategoria from "../../components/consts/modal";
 import ModalEditarCategoria from "../../components/consts/modalEditar";
 import CamposObligatorios from "../../components/consts/camposVacios";
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
