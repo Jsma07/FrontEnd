@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import CustomSwitch from "../../components/consts/switch";
-import { Button as CommonButton } from '@mui/material';
 import ModalAgregarProveedor from "../../components/consts/modal";
 import ModalEditarProveedor from "../../components/consts/modalEditar";
 import Table from "../../components/consts/Tabla";
 import CamposObligatorios from "../../components/consts/camposVacios";
-import SearchIcon from "@mui/icons-material/Search";
 import Fab from '@mui/material/Fab';
 
 const Proveedores = () => {
