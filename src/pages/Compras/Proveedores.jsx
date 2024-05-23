@@ -273,7 +273,7 @@ const Proveedores = () => {
   
         if (confirmation.isConfirmed) {
           formData.estado_proveedor = 1;
-          await axios.put('http://localhost:5000/api/proveedores/editar', formData);
+          await axios.put(`http://localhost:5000/api/proveedores/editar/${formData.IdProveedor}`, formData);
           handleCloseModalEditar();
           fetchProveedores();
           window.Swal.fire('¡Proveedor actualizado!', '', 'success');
@@ -318,28 +318,28 @@ const Proveedores = () => {
 
 return (
 <div>
-  <div className="flex justify-between items-center mb-4">
-    <h3 className="text-4xl" style={{ marginTop: '-20px' }}>Gestion De Proveedores</h3>
-    <div className="mt-4">
-      <form onSubmit={(e) => e.preventDefault()}>
-        <div className="relative">
-          <input
-            type="search"
-            id="search"
-            className="block w-full p-2 pl-10 pr-10 text-sm border border-gray-300 rounded bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="Buscar..."
-            value={buscar}
-            onChange={(e) => setBuscar(e.target.value)}
-            required
-          />
-          <span
-            className="absolute inset-y-0 right-0 flex items-center px-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-r text-sm dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            style={{ cursor: 'default', height: '100%' }}
-          >
-            <SearchIcon className="text-base mr-3" />
-          </span>
+<div className="container mx-auto p-4 relative">
+      <center><h1 className="text-3xl font-bold mb-4">Gestion De Proveedores</h1></center>
+      <div className="md:flex md:justify-between md:items-center mb-4">
+        <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
+          <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Buscar usuario</label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
+            </div>
+            <input
+              type="search"
+              id="default-search"
+              className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Buscar proveedor..."
+              value={buscar}
+              onChange={(e) => setBuscar(e.target.value)}
+              required
+            />
+          </div>
         </div>
-      </form>
+        <div>
+      </div>
     </div>
   </div>
 
