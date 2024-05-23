@@ -290,7 +290,7 @@ return (
           position: 'fixed',
           bottom: '16px',
           right: '16px',
-          zIndex: 1000, // Asegura que el botón flotante esté por encima de otros elementos
+          zIndex: 1000,
         }}
         onClick={() => setOpenModalAgregar(true)}
       >
