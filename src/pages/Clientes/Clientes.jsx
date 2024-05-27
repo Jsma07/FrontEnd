@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import ModalDinamico from "../../components/consts/modal";
-import Fab from '@mui/material/Fab';
+import ModalDinamico from "../../components/consts/modaled";
 
 const Clientes = () => {
   const [clientes, setClientes] = useState([]);
@@ -30,13 +29,13 @@ const Clientes = () => {
   };
 
   const columns = [
-    // { name: "FotoPerfil", label: "Foto" },
+    { name: "FotoPerfil", label: "Foto de Perfil" },
     { name: "Nombre", label: "Nombre" },
     { name: "Apellido", label: "Apellido" },
     { name: "Correo", label: "Correo" },
     { name: "Telefono", label: "Teléfono" },
     { name: "Estado", label: "Estado" },
-    { name: "IdRol", label: "Rol" },
+    { name: "IdRol", label: "ID de Rol" },
   ];
   const handleSubmit = async (formData) => {
     try {
@@ -64,17 +63,7 @@ const Clientes = () => {
         });
 
         if (result.isConfirmed) {
-          // Normalizar el valor del campo "Estado" si es necesario
-          let EstadoNormalizado;
-          if (formData.Estado === "Activo") {
-            EstadoNormalizado = 1;
-          } else if (formData.Estado === "Inactivo") {
-            EstadoNormalizado = 2;
-          } else {
-            // Valor predeterminado si el Estado no coincide con ninguno de los valores esperados
-            EstadoNormalizado = 0;
-          }
-
+          const EstadoNormalizado = formData.Estado ? 1 : 2;
           // Convertir campos de texto a números si es necesario
           const formDataNumerico = {
             ...formData,
@@ -119,15 +108,7 @@ const Clientes = () => {
 
   const handleActualizacionSubmit = async (formData) => {
     try {
-      // Normalizar el valor del campo "Estado" si es necesario
-      let estadoNormalizado;
-      if (formData.Estado === "Inactivo") {
-        estadoNormalizado = 1;
-      } else if (formData.Estado === "Activo") {
-        estadoNormalizado = 2;
-      } else {
-        estadoNormalizado = 0;
-      }
+      const estadoNormalizado = formData.Estado ? 1 : 2;
 
       // Convertir campos de texto a números si es necesario
       const formDataNumerico = {
@@ -145,15 +126,16 @@ const Clientes = () => {
       // Realizar la solicitud de actualización a la API utilizando axios.put
       await axios.put(url, formDataNumerico);
 
-      // Mostrar una alerta de éxito si la actualización es exitosa
       Swal.fire({
         icon: "success",
         title: "¡Actualización exitosa!",
-        text: "El cliente se ha actualizado correctamente.",
+        text: "El empleado se ha actualizado correctamente.",
+      }).then((result) => {
+        if (result.isConfirmed || result.dismiss === Swal.DismissReason.close) {
+          setModalData(null);
+          window.location.reload();
+        }
       });
-
-      // Cerrar el modal después de enviar el formulario
-      setModalData(null);
     } catch (error) {
       console.error("Error al actualizar el cliente:", error);
 
@@ -292,13 +274,9 @@ const Clientes = () => {
                   {
                     label: "Estado",
                     name: "Estado",
-                    type: "select",
+                    type: "switch",
                     required: true,
-                    options: [
-                      { value: "Activo", label: "Activo" },
-                      { value: "Inactivo", label: "Inactivo" },
-                    ],
-                    className: "col-span-6 md:col-span-3", // Ocupa 6 columnas en dispositivos pequeños y 3 columnas en dispositivos medianos y grandes
+                    className: "col-span-6 md:col-span-3",
                   },
                   {
                     label: "Foto de Perfil",
@@ -308,9 +286,10 @@ const Clientes = () => {
                   },
                   {
                     label: "Rol",
-                    name: "IdRol", // Nombre ajustado a "IdRol"
-                    type: "text",
+                    name: "IdRol",
+                    type: "select",
                     required: true,
+                    options: [{ value: 3, label: "Clientes" }],
                   },
                 ]}
                 onSubmit={handleSubmit}
@@ -348,28 +327,26 @@ const Clientes = () => {
                     type: "text",
                     required: true,
                   },
-                  {
-                    label: "Estado",
-                    name: "Estado",
-                    type: "select",
-                    required: true,
-                    options: [
-                      { value: "Activo", label: "Activo" },
-                      { value: "Inactivo", label: "Inactivo" },
-                    ],
-                    className: "col-span-6 md:col-span-3", // Ocupa 6 columnas en dispositivos pequeños y 3 columnas en dispositivos medianos y grandes
-                  },
+
                   {
                     label: "Foto de Perfil",
                     name: "FotoPerfil",
                     type: "text",
                     required: true,
                   },
+
                   {
                     label: "Rol",
                     name: "IdRol",
-                    type: "text",
+                    type: "select",
                     required: true,
+                    options: [{ value: 3, label: "Clientes" }],
+                  },{
+                    label: "Estado",
+                    name: "Estado",
+                    type: "switch",
+                    required: true,
+                    className: "col-span-6 md:col-span-3",
                   },
                 ]}
                 onSubmit={handleActualizacionSubmit}
@@ -377,19 +354,31 @@ const Clientes = () => {
               />
             )}
           </div>
-          <Fab
-            aria-label="add"
+
+          <button
+            className="fixed bottom-4 right-4 bg-blue-500 text-white rounded-full p-3 shadow-xl hover:shadow-2xl"
             style={{
-              border: '0.5px solid grey',
-              backgroundColor: '#94CEF2',
-              position: 'fixed',
-              bottom: '16px',
-              right: '16px',
-              zIndex: 1000, // Asegura que el botón flotante esté por encima de otros elementos
+              right: "4rem",
+              bottom: "4rem",
+              boxShadow: "0 8px 20px rgba(0, 0, 0, 0.5)", // Sombra negra más pronunciada
             }}
-            onClick={() => handleOpenModal(cliente)}>
-            <i className='bx bx-plus' style={{ fontSize: '1.3rem' }}></i>
-         </Fab>
+            onClick={() => handleOpenModal(cliente)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>

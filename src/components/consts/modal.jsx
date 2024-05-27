@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 
-const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
+const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, seleccionado }) => {
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
+   
     if (fields && fields.length > 0) {
       const initialFormData = {};
       fields.forEach((field) => {
@@ -14,6 +15,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
       setFormData(initialFormData); 
     }
   }, [fields]);
+  
 
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
