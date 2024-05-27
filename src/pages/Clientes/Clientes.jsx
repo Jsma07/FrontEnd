@@ -63,17 +63,7 @@ const Clientes = () => {
         });
 
         if (result.isConfirmed) {
-          // Normalizar el valor del campo "Estado" si es necesario
-          let EstadoNormalizado;
-          if (formData.Estado === "Activo") {
-            EstadoNormalizado = 1;
-          } else if (formData.Estado === "Inactivo") {
-            EstadoNormalizado = 2;
-          } else {
-            // Valor predeterminado si el Estado no coincide con ninguno de los valores esperados
-            EstadoNormalizado = 0;
-          }
-
+          const EstadoNormalizado = formData.Estado ? 1 : 2;
           // Convertir campos de texto a números si es necesario
           const formDataNumerico = {
             ...formData,
@@ -118,15 +108,7 @@ const Clientes = () => {
 
   const handleActualizacionSubmit = async (formData) => {
     try {
-      // Normalizar el valor del campo "Estado" si es necesario
-      let estadoNormalizado;
-      if (formData.Estado === "Inactivo") {
-        estadoNormalizado = 1;
-      } else if (formData.Estado === "Activo") {
-        estadoNormalizado = 2;
-      } else {
-        estadoNormalizado = 0;
-      }
+      const estadoNormalizado = formData.Estado ? 1 : 2;
 
       // Convertir campos de texto a números si es necesario
       const formDataNumerico = {
@@ -144,15 +126,16 @@ const Clientes = () => {
       // Realizar la solicitud de actualización a la API utilizando axios.put
       await axios.put(url, formDataNumerico);
 
-      // Mostrar una alerta de éxito si la actualización es exitosa
       Swal.fire({
         icon: "success",
         title: "¡Actualización exitosa!",
-        text: "El cliente se ha actualizado correctamente.",
+        text: "El empleado se ha actualizado correctamente.",
+      }).then((result) => {
+        if (result.isConfirmed || result.dismiss === Swal.DismissReason.close) {
+          setModalData(null);
+          window.location.reload();
+        }
       });
-
-      // Cerrar el modal después de enviar el formulario
-      setModalData(null);
     } catch (error) {
       console.error("Error al actualizar el cliente:", error);
 
@@ -291,13 +274,9 @@ const Clientes = () => {
                   {
                     label: "Estado",
                     name: "Estado",
-                    type: "select",
+                    type: "switch",
                     required: true,
-                    options: [
-                      { value: "Activo", label: "Activo" },
-                      { value: "Inactivo", label: "Inactivo" },
-                    ],
-                    className: "col-span-6 md:col-span-3", // Ocupa 6 columnas en dispositivos pequeños y 3 columnas en dispositivos medianos y grandes
+                    className: "col-span-6 md:col-span-3",
                   },
                   {
                     label: "Foto de Perfil",
@@ -307,7 +286,7 @@ const Clientes = () => {
                   },
                   {
                     label: "Rol",
-                    name: "IdRol", // Nombre ajustado a "IdRol"
+                    name: "IdRol",
                     type: "text",
                     required: true,
                   },
@@ -347,28 +326,27 @@ const Clientes = () => {
                     type: "text",
                     required: true,
                   },
-                  {
-                    label: "Estado",
-                    name: "Estado",
-                    type: "select",
-                    required: true,
-                    options: [
-                      { value: "Activo", label: "Activo" },
-                      { value: "Inactivo", label: "Inactivo" },
-                    ],
-                    className: "col-span-6 md:col-span-3", // Ocupa 6 columnas en dispositivos pequeños y 3 columnas en dispositivos medianos y grandes
-                  },
+
                   {
                     label: "Foto de Perfil",
                     name: "FotoPerfil",
                     type: "text",
                     required: true,
                   },
+
                   {
                     label: "Rol",
                     name: "IdRol",
-                    type: "text",
+                    type: "select",
                     required: true,
+                    options: [{ value: 3, label: "Clientes" }],
+                  },
+                  {
+                    label: "Estado",
+                    name: "Estado",
+                    type: "switch",
+                    required: true,
+                    className: "col-span-6 md:col-span-3",
                   },
                 ]}
                 onSubmit={handleActualizacionSubmit}

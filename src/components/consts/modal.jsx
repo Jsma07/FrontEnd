@@ -8,6 +8,8 @@ import {
   Select,
   MenuItem,
   InputLabel,
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 
@@ -45,10 +47,11 @@ const ModalDinamico = ({
       });
     }
   };
+
   // Función para manejar el cambio en los campos del formulario
   const handleChange = (e) => {
-    const { name, value, checked } = e.target;
-    const newValue = e.target.type === "checkbox" ? checked : value;
+    const { name, value, checked, type } = e.target;
+    const newValue = type === "checkbox" ? checked : value;
     const maxNumeros = 15;
     const CaracteresEspeciales = /^[a-zA-Z\s]*$/;
 
@@ -64,7 +67,7 @@ const ModalDinamico = ({
         return; // No actualizar el estado si el valor no es válido
       }
     }
-    if (name == "telefono") {
+    if (name === "telefono") {
       const validacionNumeros = /^[0-9]+$/;
       if (!validacionNumeros.test(newValue)) {
         return;
@@ -123,11 +126,11 @@ const ModalDinamico = ({
           {title}
         </Typography>
         <Grid container spacing={2}>
-          {/* Renderizar los campos */}
+          {/* Renderizar los campos en grupos de dos */}
           {fields &&
             fields.length > 0 &&
             fields.map((field, index) => (
-              <Grid item xs={12} key={index}>
+              <Grid item xs={12} sm={6} key={index}>
                 {/* Manejar los diferentes tipos de campos */}
                 {field.type === "text" && (
                   <TextField
@@ -143,7 +146,6 @@ const ModalDinamico = ({
                     style={{
                       marginBottom: "0.5rem",
                       textAlign: "center",
-                      maxWidth: "300px",
                     }}
                     value={formData[field.name] || ""}
                   />
@@ -161,7 +163,6 @@ const ModalDinamico = ({
                     style={{
                       marginBottom: "0.5rem",
                       textAlign: "center",
-                      maxWidth: "300px",
                     }}
                     value={formData[field.name] || ""}
                   />
@@ -184,7 +185,6 @@ const ModalDinamico = ({
                       style={{
                         marginBottom: "0.5rem",
                         textAlign: "center",
-                        maxWidth: "300px",
                       }}
                     >
                       {field.options.map((option, index) => (
@@ -195,10 +195,22 @@ const ModalDinamico = ({
                     </Select>
                   </div>
                 )}
+                {field.type === "switch" && (
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={formData[field.name] || false}
+                        onChange={handleChange}
+                        name={field.name}
+                        color="primary"
+                      />
+                    }
+                    label={field.label}
+                  />
+                )}
               </Grid>
             ))}
         </Grid>
-        {/* Botones de enviar y cancelar */}
         <div
           style={{
             display: "flex",
