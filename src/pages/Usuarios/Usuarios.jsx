@@ -156,8 +156,8 @@ const Usuarios = () => {
       return;
     }
 
-    const validacionCorreo =
-      /^[a-zA-Z0-9._%+-]+@(gmail|outlook|hotmail)\.(com|net|org)$/i;
+    const validacionCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
     if (!validacionCorreo.test(formData.correo)) {
       window.Swal.fire({
         icon: "error",

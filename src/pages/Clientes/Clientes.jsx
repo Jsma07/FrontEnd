@@ -116,53 +116,52 @@ const Clientes = () => {
   };
 
   const handleToggleSwitch = async (id) => {
-  const updatedClientes = clientes.map((cliente) => {
-    if (cliente.IdCliente === id) {
-      const newEstado = cliente.Estado === 1 ? 0 : 1;
-      return { ...cliente, Estado: newEstado };
-    }
-    return cliente;
-  });
-
-  try {
-    const updatedCliente = updatedClientes.find(
-      (cliente) => cliente.IdCliente === id
-    );
-    if (!updatedCliente) {
-      console.error("No se encontró el cliente actualizado");
-      return;
-    }
-
-    const result = await Swal.fire({
-      icon: "warning",
-      title: "¿Estás seguro?",
-      text: "¿Quieres cambiar el estado del cliente?",
-      showCancelButton: true,
-      confirmButtonText: "Sí",
-      cancelButtonText: "Cancelar",
+    const updatedClientes = clientes.map((cliente) => {
+      if (cliente.IdCliente === id) {
+        const newEstado = cliente.Estado === 1 ? 0 : 1;
+        return { ...cliente, Estado: newEstado };
+      }
+      return cliente;
     });
 
-    if (result.isConfirmed) {
-      await axios.put(`http://localhost:5000/Jackenail/CambiarEstado/${id}`, {
-        Estado: updatedCliente.Estado,
+    try {
+      const updatedCliente = updatedClientes.find(
+        (cliente) => cliente.IdCliente === id
+      );
+      if (!updatedCliente) {
+        console.error("No se encontró el cliente actualizado");
+        return;
+      }
+
+      const result = await Swal.fire({
+        icon: "warning",
+        title: "¿Estás seguro?",
+        text: "¿Quieres cambiar el estado del cliente?",
+        showCancelButton: true,
+        confirmButtonText: "Sí",
+        cancelButtonText: "Cancelar",
       });
-      setClientes(updatedClientes); // Actualiza el estado local de clientes
+
+      if (result.isConfirmed) {
+        await axios.put(`http://localhost:5000/Jackenail/CambiarEstado/${id}`, {
+          Estado: updatedCliente.Estado,
+        });
+        setClientes(updatedClientes);
+        Swal.fire({
+          icon: "success",
+          title: "Estado actualizado",
+          text: "El estado del cliente ha sido actualizado correctamente.",
+        });
+      }
+    } catch (error) {
+      console.error("Error al cambiar el estado del cliente:", error);
       Swal.fire({
-        icon: "success",
-        title: "Estado actualizado",
-        text: "El estado del cliente ha sido actualizado correctamente.",
+        icon: "error",
+        title: "Error",
+        text: "Hubo un error al cambiar el estado del cliente. Por favor, inténtalo de nuevo más tarde.",
       });
     }
-  } catch (error) {
-    console.error("Error al cambiar el estado del cliente:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: "Hubo un error al cambiar el estado del cliente. Por favor, inténtalo de nuevo más tarde.",
-    });
-  }
-};
-
+  };
 
   const handleActualizacionSubmit = async (formData) => {
     try {

@@ -12,7 +12,7 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator"; // Importa el ícono de arrastre
 
-const Modal = ({
+const ModalDinamico = ({
   open,
   handleClose,
   title = "",
@@ -239,4 +239,4 @@ const Modal = ({
   );
 };
 
-export default Modal;
+export default ModalDinamico;
