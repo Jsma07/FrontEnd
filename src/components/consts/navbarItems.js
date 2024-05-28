@@ -29,7 +29,7 @@ export const NavbarItems =[
         label: 'Usuarios',
         subitems: [
 
-          { label: 'Administradores', route: '/usuarios/administradores', icon: <PeopleIcon /> },
+          { label: 'Usuarios', route: '/usuarios/administradores', icon: <PeopleIcon /> },
           { label: 'Empleados', route: '/Empleados', icon: <PeopleIcon /> },
           { label: 'Clientes', route: '/Clientes',icon: <PeopleIcon /> },
           
