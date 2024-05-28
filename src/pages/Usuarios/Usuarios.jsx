@@ -230,7 +230,6 @@ const Usuarios = () => {
   };
 
   const columns = [
-    { field: 'id', headerName: 'ID', width: 'w-16' },
     { field: 'nombre', headerName: 'Nombre', width: 'w-36' },
     { field: 'apellido', headerName: 'Apellido', width: 'w-36' },
     { field: 'correo', headerName: 'Correo', width: 'w-36' },

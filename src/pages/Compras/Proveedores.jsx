@@ -375,7 +375,6 @@ return (
 
       <Table
         columns={[
-          { field: 'IdProveedor', headerName: 'ID', width: 'w-16' },
           { field: 'nombre_proveedor', headerName: 'NOMBRE', width: 'w-36' },
           { field: 'correo_proveedor', headerName: 'CORREO', width: 'w-36' },
           { field: 'telefono_proveedor', headerName: 'TELEFONO', width: 'w-36' },
