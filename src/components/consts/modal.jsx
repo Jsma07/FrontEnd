@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 
-const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, seleccionado }) => {
+const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
   const [formData, setFormData] = useState({});
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-   
     if (fields && fields.length > 0) {
       const initialFormData = {};
       fields.forEach((field) => {
@@ -15,62 +15,75 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
       setFormData(initialFormData);
     }
   }, [fields]);
-  
+
+  useEffect(() => {
+    if (!open) {
+      setFormData({});
+      setErrors({});
+    }
+  }, [open]);
 
   const handleChange = (e) => {
-    const { name, value, checked } = e.target;
-    const newValue = e.target.type === 'checkbox' ? checked : value;
-    const maxNumeros = 15;
-    const CaracteresEspeciales = /^[a-zA-Z\s]*$/;
-
+    const { name, value, checked, type } = e.target;
+    let newValue = type === 'checkbox' ? checked : value;
+    let errorMessage = '';
+  
     if (name === 'nombre' || name === 'apellido') {
-      if (!CaracteresEspeciales.test(newValue)) {
-        window.Swal.fire({
-          icon: 'error',
-          title: `${name.charAt(0).toUpperCase() + name.slice(1)} inválido`,
-          text: `El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede contener caracteres especiales ni números.`,
-        });
-        return; // No actualizar el estado si el valor no es válido
+      if (!/^[a-zA-Z\s]*$/.test(newValue)) {
+        errorMessage = `El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede contener caracteres especiales ni números.`;
+      }
+    } else if (name === 'telefono') {
+      if (!/^[0-9]+$/.test(newValue)) {
+        errorMessage = `El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede contener letras ni caracteres especiales.`;
+      } else if (newValue.length > 15) {
+        errorMessage = `El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede exceder 15 caracteres.`;
+      }
+    } else if (type === 'number') {
+      if (/^-?\d*$/.test(newValue)) { 
+        newValue = Math.abs(newValue); 
+      } else {
+        errorMessage = 'Ingrese un número entero positivo válido.';
+        newValue = ''; 
       }
     }
-    if (name === 'telefono') {
-      const validacionNumeros = /^[0-9]+$/;
-      if (!validacionNumeros.test(newValue)) {
-        window.Swal.fire({
-          icon: 'error',
-          title: 'Teléfono inválido',
-          text: `El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede contener letras ni caracteres especiales.`,
-        });
-        return;
-      }
-      if (newValue.length > maxNumeros) {
-        window.Swal.fire({
-          icon: 'error',
-          title: 'Teléfono inválido',
-          text: `El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede exceder ${maxNumeros} caracteres.`,
-        });
-        return;
-      }
-
+  
+    if (errorMessage) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: errorMessage,
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: '',
+      }));
     }
-
+  
     setFormData((prevData) => ({
       ...prevData,
       [name]: newValue,
     }));
-
-    // Establecer el estado automáticamente según la cantidad
-    if (name === 'Cantidad') {
-      const cantidad = parseInt(value);
+  
+    if (name === 'Cantidad' && type === 'number') {
+      const cantidad = parseInt(newValue, 10);
       const estadoPorDefecto = cantidad > 0 ? 'Disponible' : 'Terminado';
-      setFormData(prevData => ({
+      setFormData((prevData) => ({
         ...prevData,
         Estado: estadoPorDefecto,
       }));
     }
   };
-
+  
+  
   const handleSubmit = () => {
+    const newErrors = {};
+
+    fields.forEach((field) => {
+      if (!formData[field.name] && field.required) {
+        newErrors[field.name] = 'Este campo es obligatorio';
+      }
+    });
+
     if (typeof onSubmit === 'function') {
       onSubmit(formData);
       handleClose();
@@ -110,6 +123,8 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
             type={type}
             style={{ marginBottom: '0.5rem', textAlign: 'center' }}
             value={formData[name] || ''}
+            error={!!errors[name]}
+            helperText={errors[name]}
           />
         );
       case 'select':
@@ -128,6 +143,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
               label={label}
               style={{ marginBottom: '0.5rem', textAlign: 'center' }}
               disabled={readOnly}
+              error={!!errors[name]}
             >
               {options &&
                 options.map((option, index) => (
@@ -136,6 +152,11 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
                   </MenuItem>
                 ))}
             </Select>
+            {!!errors[name] && (
+              <Typography variant="caption" color="error" display="block" style={{ textAlign: 'center' }}>
+                {errors[name]}
+              </Typography>
+            )}
           </div>
         );
       default:

@@ -11,12 +11,12 @@ const Insumos = () => {
   const [openModalAgregar, setOpenModalAgregar] = useState(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [insumos, setInsumos] = useState([]);
-  const [categorias, setCategorias] = useState([]); // Estado para categorías
+  const [categorias, setCategorias] = useState([]); 
   const [insumoSeleccionado, setInsumoSeleccionado] = useState(null);
 
   useEffect(() => {
     fetchInsumos();
-    fetchCategorias(); // Obtener categorías al montar el componente
+    fetchCategorias();
   }, []);
 
   const fetchInsumos = async () => {
@@ -43,9 +43,13 @@ const Insumos = () => {
   
       // Validación de los campos obligatorios
       const camposObligatorios = ['NombreInsumos', 'Imagen', 'Cantidad', 'UsosDisponibles', 'Estado', 'IdCategoria'];
-      if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos del insumo.')) {
-        return;
-      }
+      const newErrors = {};
+  
+      camposObligatorios.forEach((campo) => {
+        if (!formData[campo]) {
+          newErrors[campo] = 'Este campo es obligatorio';
+        }
+      });
   
       // Confirmación antes de agregar el insumo
       const confirmation = await window.Swal.fire({
@@ -74,6 +78,7 @@ const Insumos = () => {
       console.error('Error al agregar insumo:', error);
     }
   };
+  
 
   const handleEditInsumo = async (formData) => {
     try {
@@ -236,7 +241,7 @@ const Insumos = () => {
               ),
             },
           ]}
-          data={insumos} // Aquí pasamos los datos obtenidos
+          data={insumos} 
         />
         <Fab
           aria-label="add"
@@ -255,6 +260,7 @@ const Insumos = () => {
       </div>
     </div>
   );
+
 };
 
 export default Insumos;
