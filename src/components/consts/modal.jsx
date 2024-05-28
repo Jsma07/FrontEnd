@@ -12,7 +12,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
       fields.forEach((field) => {
         initialFormData[field.name] = field.value || '';
       });
-      setFormData(initialFormData); 
+      setFormData(initialFormData);
     }
   }, [fields]);
   
@@ -28,14 +28,14 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
         window.Swal.fire({
           icon: 'error',
           title: `${name.charAt(0).toUpperCase() + name.slice(1)} inválido`,
-          text:`El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede contener caracteres especiales ni números.`,
+          text: `El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede contener caracteres especiales ni números.`,
         });
         return; // No actualizar el estado si el valor no es válido
       }
     }
-    if(name == 'telefono'){
-      const validacionNumeros= /^[0-9]+$/;
-      if(!validacionNumeros.test(newValue)){
+    if (name === 'telefono') {
+      const validacionNumeros = /^[0-9]+$/;
+      if (!validacionNumeros.test(newValue)) {
         window.Swal.fire({
           icon: 'error',
           title: 'Teléfono inválido',
@@ -43,7 +43,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
         });
         return;
       }
-      if(newValue.length > maxNumeros){
+      if (newValue.length > maxNumeros) {
         window.Swal.fire({
           icon: 'error',
           title: 'Teléfono inválido',
@@ -51,15 +51,25 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
         });
         return;
       }
-     
+
     }
-  
+
     setFormData((prevData) => ({
       ...prevData,
       [name]: newValue,
     }));
+
+    // Establecer el estado automáticamente según la cantidad
+    if (name === 'Cantidad') {
+      const cantidad = parseInt(value);
+      const estadoPorDefecto = cantidad > 0 ? 'Disponible' : 'Terminado';
+      setFormData(prevData => ({
+        ...prevData,
+        Estado: estadoPorDefecto,
+      }));
+    }
   };
-  
+
   const handleSubmit = () => {
     if (typeof onSubmit === 'function') {
       onSubmit(formData);
@@ -82,7 +92,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
   };
 
   const renderFieldByType = (field) => {
-    const { name, label, type, options } = field;
+    const { name, label, type, options, readOnly } = field;
 
     switch (type) {
       case 'text':
@@ -117,6 +127,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, selecc
               value={formData[name] || ''}
               label={label}
               style={{ marginBottom: '0.5rem', textAlign: 'center' }}
+              disabled={readOnly}
             >
               {options &&
                 options.map((option, index) => (

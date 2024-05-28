@@ -2,11 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import CustomSwitch from "../../components/consts/switch";
 import Table from "../../components/consts/Tabla";
-import { Grid, Button as CommonButton } from '@mui/material';
 import ModalAgregarCategoria from "../../components/consts/modal";
 import ModalEditarCategoria from "../../components/consts/modalEditar";
 import CamposObligatorios from "../../components/consts/camposVacios";
-import SearchIcon from "@mui/icons-material/Search";
 import Fab from '@mui/material/Fab';
 
 const Categorias = () => {
@@ -99,7 +97,6 @@ const Categorias = () => {
       console.error('Error al agregar categoría:', error);
     }
   };
-  
   
   const handleEditCategoria = async (formData) => {
     try {
@@ -203,7 +200,6 @@ return (
       </div>
     </div>
   </div>
-
       <ModalAgregarCategoria
         open={openModalAgregar}
         handleClose={handleCloseModalAgregar}
@@ -223,7 +219,6 @@ return (
         fields={[
           { name: 'IdCategoria', label: 'Identificador', type: 'text', readOnly: true }, 
           { name: 'nombre_categoria', label: 'Nombre', type: 'text' },
-          { name: 'estado_categoria', label: 'Estado', type: 'number' },
         ]}
         onChange={handleChange}
         entityData={categoriaSeleccionado} 
