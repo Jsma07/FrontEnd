@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import ModalDinamico from "../../components/consts/modaled";
+import CustomSwitch from "../../components/consts/switch";
 
 const Empleados = () => {
   const [empleados, setEmpleados] = useState([]);
@@ -12,12 +13,12 @@ const Empleados = () => {
   const [modalData, setModalData] = useState(null);
   useEffect(() => {
     const fetchRoles = async () => {
-        try {
-            const response = await axios.get('http://localhost:5000/api/roles'); 
-            setRoles(response.data.roles);
-        } catch (error) {
-            console.error('Error fetching roles:', error);
-        }
+      try {
+        const response = await axios.get("http://localhost:5000/api/roles");
+        setRoles(response.data.roles);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
     };
 
     fetchRoles();
@@ -43,27 +44,35 @@ const Empleados = () => {
   };
 
   const columns = [
-    { name: "FotoPerfil", label: "Foto de Perfil" },
     { name: "Nombre", label: "Nombre" },
     { name: "Apellido", label: "Apellido" },
     { name: "Correo", label: "Correo" },
     { name: "Telefono", label: "Teléfono" },
+    { name: "Documento", label: "Documento" },
+    { name: "Direccion", label: "Direccion" },
     { name: "Estado", label: "Estado" },
-    { 
-      name: 'IdRol', 
-      label: 'Rol', 
-      width: 'w-36',
+
+    {
+      name: "IdRol",
+      label: "Rol",
+      width: "w-36",
       renderCell: (params) => {
-        const rol = roles.find(role => role.id === params.value);
-        return rol ? rol.nombre : 'Desconocido';
-      }
+        const rol = roles.find((role) => role.id === params.value);
+        return rol ? rol.nombre : "Desconocido";
+      },
     },
   ];
 
   const handleSubmit = async (formData) => {
     try {
+      // Verificar si el correo electrónico está duplicado
       const correoExistente = empleados.some(
         (empleado) => empleado.Correo === formData.Correo
+      );
+
+      // Verificar si el documento está duplicado
+      const documentoExistente = empleados.some(
+        (empleado) => empleado.Documento === formData.Documento
       );
 
       if (correoExistente) {
@@ -71,6 +80,12 @@ const Empleados = () => {
           icon: "error",
           title: "Correo electrónico duplicado",
           text: "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico.",
+        });
+      } else if (documentoExistente) {
+        Swal.fire({
+          icon: "error",
+          title: "Documento duplicado",
+          text: "El documento ingresado ya está registrado. Por favor, elija otro documento.",
         });
       } else {
         const result = await Swal.fire({
@@ -83,13 +98,11 @@ const Empleados = () => {
         });
 
         if (result.isConfirmed) {
-          const EstadoNormalizado = formData.Estado ? 1 : 2;
-
           const formDataNumerico = {
             ...formData,
             Telefono: parseInt(formData.Telefono),
-            Estado: EstadoNormalizado,
-            IdRol: parseInt(formData.IdRol),
+            Estado: 1,
+            IdRol: 3,
           };
 
           console.log("Datos del formulario numéricos:", formDataNumerico);
@@ -122,21 +135,87 @@ const Empleados = () => {
     }
   };
 
+  const handleToggleSwitch = async (id) => {
+    const updatedEmpleados = empleados.map((empleado) => {
+      if (empleado.IdEmpleado === id) {
+        const newEstado = empleado.Estado === 1 ? 0 : 1;
+        return { ...empleado, Estado: newEstado };
+      }
+      return empleado;
+    });
+
+    try {
+      const updatedEmpleado = updatedEmpleados.find(
+        (empleado) => empleado.IdEmpleado === id
+      );
+      if (!updatedEmpleado) {
+        console.error("No se encontró el empleado actualizado");
+        return;
+      }
+
+      const result = await Swal.fire({
+        icon: "warning",
+        title: "¿Estás seguro?",
+        text: "¿Quieres cambiar el estado del empleado?",
+        showCancelButton: true,
+        confirmButtonText: "Sí",
+        cancelButtonText: "Cancelar",
+      });
+
+      if (result.isConfirmed) {
+        await axios.put(
+          `http://localhost:5000/Jackenail/CambiarEstadoEmpleado/${id}`,
+          {
+            Estado: updatedEmpleado.Estado,
+          }
+        );
+        setEmpleados(updatedEmpleados);
+        Swal.fire({
+          icon: "success",
+          title: "Estado actualizado",
+          text: "El estado del empleado ha sido actualizado correctamente.",
+        });
+      }
+    } catch (error) {
+      console.error("Error al cambiar el estado del empleado:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Hubo un error al cambiar el estado del empleado. Por favor, inténtalo de nuevo más tarde.",
+      });
+    }
+  };
+
   const handleActualizacionSubmit = async (formData) => {
     try {
-      const estadoNormalizado = formData.Estado ? 1 : 2;
+      // Verificar si el correo o el documento están siendo utilizados por otro empleado
+      const empleadoExistente = empleados.find(
+        (empleado) =>
+          (empleado.Correo === formData.Correo ||
+            empleado.Documento === formData.Documento) &&
+          empleado.IdEmpleado !== formData.IdEmpleado
+      );
 
+      if (empleadoExistente) {
+        Swal.fire({
+          icon: "error",
+          title: "Error de actualización",
+          text: "El correo electrónico o el documento ya están registrados para otro empleado. Por favor, elija otro correo electrónico o documento.",
+        });
+        return;
+      }
+
+      // Convertir campos de texto a números si es necesario
       const formDataNumerico = {
         ...formData,
         Telefono: parseInt(formData.Telefono),
-        Estado: estadoNormalizado,
-        IdRol: parseInt(formData.IdRol),
+        IdRol: 2, // Rol por defecto
       };
 
-      console.log(formDataNumerico);
-
+      // Determinar la URL de la API para actualizar el empleado
       const url = `http://localhost:5000/Jackenail/ActualizarEmpleados/${formDataNumerico.IdEmpleado}`;
 
+      // Realizar la solicitud de actualización a la API utilizando axios.put
       await axios.put(url, formDataNumerico);
 
       Swal.fire({
@@ -152,6 +231,7 @@ const Empleados = () => {
     } catch (error) {
       console.error("Error al actualizar el empleado:", error);
 
+      // Mostrar una alerta de error si ocurre algún problema durante la actualización
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -233,34 +313,24 @@ const Empleados = () => {
                         key={column.name}
                         className="px-6 py-4 font-semibold text-gray-900 dark:text-white"
                       >
-                        {column.name === "FotoPerfil" ? (
-                          <img
-                            src={empleado.FotoPerfil}
-                            className="w-16 h-16 md:w-24 md:h-24 object-cover rounded-full"
-                            alt={`${empleado.Nombre} ${empleado.Apellido}`}
-                          />
-                        ) : column.name === "Estado" ? (
-                          <span className="inline-flex items-center">
-                            <span
-                              className={`h-2 w-2 rounded-full mr-1 ${
-                                empleado[column.name] === 1
-                                  ? "bg-blue-500"
-                                  : empleado[column.name] === 2
-                                  ? "bg-red-500"
-                                  : ""
-                              }`}
-                            ></span>
-                            {empleado[column.name] === 1
-                              ? "Activo"
-                              : empleado[column.name] === 2
-                              ? "Inactivo"
-                              : ""}
-                          </span>
+                        {column.name === "Estado" ? (
+                          <div className="inline-flex items-center">
+                            <CustomSwitch
+                              active={empleado.Estado === 1}
+                              onToggle={() =>
+                                handleToggleSwitch(empleado.IdEmpleado)
+                              }
+                            />
+                            <span className="ml-2">
+                              {empleado.Estado === 1 ? "Activo" : "Inactivo"}
+                            </span>
+                          </div>
                         ) : (
                           empleado[column.name]
                         )}
                       </td>
                     ))}
+
                     <td className="px-6 py-4">
                       <button
                         onClick={() =>
@@ -279,7 +349,7 @@ const Empleados = () => {
                 ))}
               </tbody>
             </table>
-            {modalData && (
+            {modalData && modalData && (
               <ModalDinamico
                 open={true}
                 handleClose={() => setModalData(null)}
@@ -309,27 +379,23 @@ const Empleados = () => {
                     type: "text",
                     required: true,
                   },
-
                   {
-                    label: "Foto de Perfil",
-                    name: "FotoPerfil",
+                    label: "Documento",
+                    name: "Documento",
                     type: "text",
                     required: true,
                   },
-
                   {
-                    label: "Estado",
-                    name: "Estado",
-                    type: "switch",
+                    label: "Direccion",
+                    name: "Direccion",
+                    type: "text",
                     required: true,
-                    className: "col-span-6 md:col-span-3",
                   },
                   {
-                    label: "Rol",
-                    name: "IdRol",
-                    type: "select",
+                    label: "Contraseña",
+                    name: "Contrasena",
+                    type: "password",
                     required: true,
-                    options: [{ value: 3, label: "Clientes" }],
                   },
                 ]}
                 onSubmit={handleSubmit}
@@ -348,7 +414,8 @@ const Empleados = () => {
                     name: "Nombre",
                     type: "text",
                     required: true,
-                  },{
+                  },
+                  {
                     label: "Apellido",
                     name: "Apellido",
                     type: "text",
@@ -366,27 +433,23 @@ const Empleados = () => {
                     type: "text",
                     required: true,
                   },
-
                   {
-                    label: "Foto de Perfil",
-                    name: "FotoPerfil",
+                    label: "Documento",
+                    name: "Documento",
                     type: "text",
                     required: true,
                   },
-
                   {
-                    label: "Rol",
-                    name: "IdRol",
-                    type: "select",
+                    label: "Direccion",
+                    name: "Direccion",
+                    type: "text",
                     required: true,
-                    options: [{ value: 3, label: "Clientes" }],
                   },
                   {
-                    label: "Estado",
-                    name: "Estado",
-                    type: "switch",
+                    label: "Contraseña",
+                    name: "Contrasena",
+                    type: "password",
                     required: true,
-                    className: "col-span-6 md:col-span-3",
                   },
                 ]}
                 onSubmit={handleActualizacionSubmit}

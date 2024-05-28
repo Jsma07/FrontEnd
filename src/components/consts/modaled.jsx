@@ -31,13 +31,11 @@ const ModalDinamico = ({
       setFormData({});
     }
   }, [seleccionado]);
-
   const handleEmailValidation = (e) => {
     const { name, value } = e.target;
-    const validacionCorreo =
-      /^[a-zA-Z0-9._%+-]+@(gmail|outlook|hotmail)\.(com|net|org)$/i;
+    const validacionCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    if (name === "correo" && !validacionCorreo.test(value)) {
+    if (name === "Correo" && !validacionCorreo.test(value)) {
       window.Swal.fire({
         icon: "error",
         title: "Correo inválido",
@@ -55,7 +53,7 @@ const ModalDinamico = ({
     const maxNumeros = 15;
     const CaracteresEspeciales = /^[a-zA-Z\s]*$/;
 
-    if (name === "nombre" || name === "apellido") {
+    if (name === "Nombre" || name === "Apellido") {
       if (!CaracteresEspeciales.test(newValue)) {
         window.Swal.fire({
           icon: "error",
@@ -67,7 +65,7 @@ const ModalDinamico = ({
         return; // No actualizar el estado si el valor no es válido
       }
     }
-    if (name === "telefono") {
+    if (name === "Telefono") {
       const validacionNumeros = /^[0-9]+$/;
       if (!validacionNumeros.test(newValue)) {
         return;
@@ -242,4 +240,3 @@ const ModalDinamico = ({
 };
 
 export default ModalDinamico;
-
