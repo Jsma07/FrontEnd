@@ -73,8 +73,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
       }));
     }
   };
-  
-  
+
   const handleSubmit = () => {
     const newErrors = {};
 

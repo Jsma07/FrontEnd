@@ -192,7 +192,7 @@ const Proveedores = () => {
   
         const correoProveedor = formData['correo_proveedor'];
         // Validación del correo electrónico: debe terminar en @gmail.com o @hotmail.com
-        if (!/\b[A-Za-z0-9._%+-]+@(gmail|hotmail)\.com\b/.test(correoProveedor)) {
+        if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(correoProveedor)) {
           window.Swal.fire({
             icon: 'error',
             title: 'Correo electrónico inválido',
