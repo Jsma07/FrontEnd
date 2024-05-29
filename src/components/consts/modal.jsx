@@ -1,66 +1,74 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator'; // Importa el ícono de arrastre
 
-const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
-  const [formData, setFormData] = useState({});
+const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChange }) => {
+  const [formValues, setFormValues] = useState({});
+  const [dragging, setDragging] = useState(false);
+  const [position, setPosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+  const [modalSize, setModalSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     if (fields && fields.length > 0) {
       const initialFormData = {};
       fields.forEach((field) => {
-        initialFormData[field.name] = field.value || '';
+        if (!formValues[field.name]) {
+          initialFormData[field.name] = field.value || '';
+        }
       });
-      setFormData(initialFormData); 
+      setFormValues(prevFormValues => ({ ...prevFormValues, ...initialFormData }));
     }
-  }, [fields]);
+    // Set the size of the modal when it opens
+    if (open) {
+      const modalContainer = document.getElementById('modal-container');
+      if (modalContainer) {
+        setModalSize({
+          width: modalContainer.offsetWidth,
+          height: modalContainer.offsetHeight
+        });
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fields, open]);
+
+  const handleMouseDown = (e) => {
+    setDragging(true);
+    setStartPosition({ 
+      x: e.clientX,
+      y: e.clientY
+    });
+  };
+
+  const handleMouseMove = (e) => {
+    if (dragging) {
+      const maxX = window.innerWidth - modalSize.width;
+      const maxY = window.innerHeight - modalSize.height;
+      const newX = Math.max(0, Math.min(position.x + e.clientX - startPosition.x, maxX));
+      const newY = Math.max(0, Math.min(position.y + e.clientY - startPosition.y, maxY));
+      setPosition({ x: newX, y: newY });
+      setStartPosition({ x: e.clientX, y: e.clientY });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setDragging(false);
+  };
 
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
     const newValue = e.target.type === 'checkbox' ? checked : value;
-    const maxNumeros = 15;
-    const CaracteresEspeciales = /^[a-zA-Z\s]*$/;
-
-    if (name === 'nombre' || name === 'apellido') {
-      if (!CaracteresEspeciales.test(newValue)) {
-        window.Swal.fire({
-          icon: 'error',
-          title: `${name.charAt(0).toUpperCase() + name.slice(1)} inválido`,
-          text:`El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede contener caracteres especiales ni números.`,
-        });
-        return; // No actualizar el estado si el valor no es válido
-      }
-    }
-    if(name == 'telefono'){
-      const validacionNumeros= /^[0-9]+$/;
-      if(!validacionNumeros.test(newValue)){
-        window.Swal.fire({
-          icon: 'error',
-          title: 'Teléfono inválido',
-          text: `El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede contener letras ni caracteres especiales.`,
-        });
-        return;
-      }
-      if(newValue.length > maxNumeros){
-        window.Swal.fire({
-          icon: 'error',
-          title: 'Teléfono inválido',
-          text: `El campo ${name.charAt(0).toUpperCase() + name.slice(1)} no puede exceder ${maxNumeros} caracteres.`,
-        });
-        return;
-      }
-     
-    }
-  
-    setFormData((prevData) => ({
-      ...prevData,
+    setFormValues((prevFormValues) => ({
+      ...prevFormValues,
       [name]: newValue,
     }));
+    onChange && onChange(name, newValue);
   };
-  
+
   const handleSubmit = () => {
     if (typeof onSubmit === 'function') {
-      onSubmit(formData);
+      onSubmit(formValues);
       handleClose();
     } else {
       console.error('onSubmit is not a function');
@@ -97,7 +105,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
             size="medium"
             type={type}
             style={{ marginBottom: '0.5rem', textAlign: 'center' }}
-            value={formData[name] || ''}
+            value={formValues[name] || ''}
           />
         );
       case 'select':
@@ -112,7 +120,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
               onChange={handleChange}
               fullWidth
               size="medium"
-              value={formData[name] || ''}
+              value={formValues[name] || ''}
               label={label}
               style={{ marginBottom: '0.5rem', textAlign: 'center' }}
             >
@@ -132,8 +140,35 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit }) => {
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'white', borderRadius: '0.375rem', width: '80%', maxWidth: '50rem', maxHeight: '80%', overflow: 'auto', padding: '1.5rem' }}>
-        <Typography variant="h5" gutterBottom style={{ textAlign: 'center', marginBottom: '1.5rem' }}>{title}</Typography>
+      <div 
+        id="modal-container"
+        style={{ 
+          position: 'absolute', 
+          top: `${position.y}px`, 
+          left: `${position.x}px`, 
+          backgroundColor: 'white', 
+          borderRadius: '0.375rem', 
+          width: '80%', 
+          maxWidth: '50rem', 
+          maxHeight: '80%', 
+          overflow: 'auto', 
+          padding: '1.5rem', 
+          cursor: dragging ? 'grabbing' : 'grab',
+          zIndex: 9999
+        }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+      >
+        <Typography variant="h5" gutterBottom style={{ textAlign: 'center', marginBottom: '1.5rem', position: 'relative' }}>
+          <DragIndicatorIcon style={{ 
+            position: 'absolute', 
+            top: '-0.5rem', 
+            left: '0', 
+            fontSize: '2rem' // Ajusta el tamaño del ícono aquí
+          }} /> 
+          {title}
+        </Typography>
         <Grid container spacing={2}>
           {renderFields()}
         </Grid>

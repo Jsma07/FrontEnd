@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import CustomSwitch from "../../../components/consts/switch";
-import Table from "../../../components/consts/Tabla";
+// import Table from "../../../components/consts/Tabla";
 import ModalAgregarServicio from "../../../components/consts/modal";
 import ModalEditarServicio from "../../../components/consts/modalEditar";
 import CamposObligatorios from "../../../components/consts/camposVacios";
+import TablePrueba from "../../../components/consts/TablePrueba";
 import Fab from '@mui/material/Fab';
 
 const Servicios = () => {
@@ -206,7 +207,7 @@ const handleEditServicio = async (formData) => {
               type="search"
               id="default-search"
               className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Buscar proveedor..."
+              placeholder="Buscar Servicio..."
               value={buscar}
               onChange={(e) => setBuscar(e.target.value)}
               required
@@ -247,7 +248,7 @@ const handleEditServicio = async (formData) => {
         entityData={servicioSeleccionado} 
       />  
 
-      <Table
+      <TablePrueba
         columns={[
           { field: 'IdServicio', headerName: 'ID', width: 'w-16' },
           {
@@ -259,6 +260,7 @@ const handleEditServicio = async (formData) => {
                 <img
                   src={params.row.ImgServicio}
                   alt="ImgServicio"
+                  // eslint-disable-next-line no-dupe-keys
                   style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
                 />
               </div>

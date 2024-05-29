@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Table from "../../components/consts/Tabla";
+import TablePrueba from "../../components/consts/TablePrueba"; // Asegúrate de importar correctamente el archivo
 
 const Agenda = () => {
   const [rows, setRows] = useState([
     {
-      id: 1,
+      
       Servicio: "https://i.pinimg.com/736x/62/37/42/623742355124564336d097be9016b3b7.jpg",
       Nombre: "Uñas Permanentes",
       FechaHora: "2022-04-27 10:00 AM",
@@ -14,7 +14,7 @@ const Agenda = () => {
       isActive: false,
     },
     {
-      id: 2,
+     
       Servicio: "https://i.pinimg.com/474x/24/8b/d9/248bd907c3bcd7ed17557c23d32298e0.jpg",
       Nombre: "Uñas Esculpidas",
       FechaHora: "2022-04-28 11:30 AM",
@@ -24,7 +24,7 @@ const Agenda = () => {
       isActive: false,
     },
     {
-      id: 3,
+      
       Servicio: "https://i.pinimg.com/236x/34/3e/3d/343e3d8931ffe5269742f51cc915daa6.jpg",
       Nombre: "Uñas 3D",
       FechaHora: "2022-04-28 12:30 PM",
@@ -42,7 +42,7 @@ const Agenda = () => {
   };
 
   const columns = [
-    { field: "id", headerName: "ID", width: "w-1" },
+    
     {
       field: "Servicio",
       headerName: "Servicio",
@@ -89,12 +89,6 @@ const Agenda = () => {
           <button onClick={() => handleEditClick(params.row.id)} className="text-yellow-500">
             <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
           </button>
-          {/* Utilizamos el mismo botón de edición para cada fila */}
-          {/* <CustomSwitch
-            active={params.row.isActive}
-            onToggle={() => handleToggleSwitch(params.row.id)}
-          /> */}
-          {/* Botón de eliminación (trash icon) */}
           <button onClick={() => handleEditClick(params.row.id)} className="text-red-500">
             <i className="bx bx-trash" style={{ fontSize: "24px" }}></i>
           </button>
@@ -106,7 +100,7 @@ const Agenda = () => {
   return (
     <div>
       <h1>Agenda</h1>
-      <Table columns={columns} data={rows} />
+      <TablePrueba columns={columns} data={rows} />
     </div>
   );
 };

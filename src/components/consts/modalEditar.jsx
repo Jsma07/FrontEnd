@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityData, onChange }) => {
   const [formData, setFormData] = useState({});
+  const [dragging, setDragging] = useState(false);
+  const [position, setPosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     if (entityData) {
@@ -30,6 +34,27 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     handleClose();
   };
 
+  const handleMouseDown = (e) => {
+    setDragging(true);
+    setStartPosition({ 
+      x: e.clientX,
+      y: e.clientY
+    });
+  };
+
+  const handleMouseMove = (e) => {
+    if (dragging) {
+      const newX = position.x + e.clientX - startPosition.x;
+      const newY = position.y + e.clientY - startPosition.y;
+      setPosition({ x: newX, y: newY });
+      setStartPosition({ x: e.clientX, y: e.clientY });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setDragging(false);
+  };
+
   const renderFields = () => {
     return fields.map((field, index) => (
       <Grid item xs={12} sm={6} key={index}>
@@ -44,21 +69,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     switch (type) {
       case 'text':
       case 'password':
-        return (
-          <TextField
-            id={name}
-            name={name}
-            label={label}
-            variant="outlined"
-            onChange={handleChange}
-            fullWidth
-            size="medium"
-            type={type}
-            style={{ marginBottom: '0.5rem', textAlign: 'center' }}
-            value={formData[name] || ''}
-            disabled={readOnly}
-          />
-        );
       case 'number':
         return (
           <TextField
@@ -100,22 +110,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
             </Select>
           </div>
         );
-      case 'date':
-        return (
-          <TextField
-            id={name}
-            name={name}
-            label={label}
-            variant="outlined"
-            onChange={handleChange}
-            fullWidth
-            size="medium"
-            type={type}
-            style={{ marginBottom: '0.5rem', textAlign: 'center' }}
-            value={formData[name] || ''}
-            InputLabelProps={{ shrink: true }}
-          />
-        );
       default:
         return null;
     }
@@ -123,8 +117,34 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'white', borderRadius: '0.375rem', width: '80%', maxWidth: '50rem', maxHeight: '80%', overflow: 'auto', padding: '1.5rem' }}>
-        <Typography variant="h5" gutterBottom style={{ textAlign: 'center', marginBottom: '1.5rem' }}>{title}</Typography>
+      <div 
+        style={{ 
+          position: 'absolute', 
+          top: `${position.y}px`, 
+          left: `${position.x}px`, 
+          backgroundColor: 'white', 
+          borderRadius: '0.375rem', 
+          width: '80%', 
+          maxWidth: '50rem', 
+          maxHeight: '80%', 
+          overflow: 'auto', 
+          padding: '1.5rem', 
+          cursor: dragging ? 'grabbing' : 'grab',
+          zIndex: 9999
+        }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+      >
+        <Typography variant="h5" gutterBottom style={{ textAlign: 'center', marginBottom: '1.5rem', position: 'relative' }}>
+          <DragIndicatorIcon style={{ 
+            position: 'absolute', 
+            top: '-0.5rem', 
+            left: '0', 
+            fontSize: '2rem' 
+          }} /> 
+          {title}
+        </Typography>
         <Grid container spacing={2}>
           {renderFields()}
         </Grid>
