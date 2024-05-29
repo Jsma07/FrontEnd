@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TablePrueba from "../../components/consts/TablePrueba"; // Asegúrate de importar correctamente el archivo
+import TablePrueba from "../../components/consts/Tabla"; // Asegúrate de importar correctamente el archivo
 
 const Agenda = () => {
   const [rows, setRows] = useState([

@@ -5,7 +5,7 @@ import CustomSwitch from "../../../components/consts/switch";
 import ModalAgregarServicio from "../../../components/consts/modal";
 import ModalEditarServicio from "../../../components/consts/modalEditar";
 import CamposObligatorios from "../../../components/consts/camposVacios";
-import TablePrueba from "../../../components/consts/TablePrueba";
+import TablePrueba from "../../../components/consts/Tabla";
 import Fab from '@mui/material/Fab';
 
 const Servicios = () => {
@@ -250,7 +250,7 @@ const handleEditServicio = async (formData) => {
 
       <TablePrueba
         columns={[
-          { field: 'IdServicio', headerName: 'ID', width: 'w-16' },
+          
           {
             field: "ImgServicio",
             headerName: "IMAGEN",
