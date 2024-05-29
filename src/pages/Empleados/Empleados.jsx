@@ -246,6 +246,7 @@ const Empleados = () => {
       empleado.Nombre.toLowerCase().includes(filtro.toLowerCase()) ||
       empleado.Apellido.toLowerCase().includes(filtro.toLowerCase()) ||
       empleado.Correo.toLowerCase().includes(filtro.toLowerCase()) ||
+      empleado.Documento.toLowerCase().includes(filtro.toLowerCase()) ||
       empleado.Telefono.toString().includes(filtro) ||
       (empleado.Estado === 1 ? "Activo" : "Inactivo")
         .toLowerCase()
