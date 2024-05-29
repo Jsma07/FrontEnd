@@ -146,7 +146,6 @@ const Insumos = () => {
     setOpenModalEditar(true);
   };
 
-  // Opciones predefinidas para el campo Estado
   const estadoOptions = [
     { value: 'Disponible', label: 'Disponible' },
     { value: 'Terminado', label: 'Terminado' },
@@ -170,19 +169,12 @@ const Insumos = () => {
             { name: 'NombreInsumos', label: 'Nombre insumo', type: 'text' },
             { name: 'Imagen', label: 'Imagen', type: 'text' },
             { name: 'Cantidad', label: 'Cantidad', type: 'number' },
-            { name: 'UsosDisponibles', label: 'Usos Disponibles', type: 'number'  },
-            { 
-              name: 'Estado', 
-              label: 'Estado', 
-              type: 'select',
-              options: estadoOptions,
-              readOnly: true 
-            },
+            { name: 'UsosDisponibles', label: 'Usos Disponibles', type: 'number'},
             { 
               name: 'IdCategoria', 
               label: 'Categoria insumo', 
               type: 'select', 
-              options: categorias.map(categoria => ({ value: categoria.IdCategoria, label: categoria.nombre_categoria })) 
+              options: categorias.filter(categoria => categoria.estado_categoria === 1).map(categoria => ({ value: categoria.IdCategoria, label: categoria.nombre_categoria })) 
             },
           ]}
           onChange={handleChange}
@@ -198,9 +190,9 @@ const Insumos = () => {
               { name: 'Imagen', label: 'Imagen', type: 'text' },
               { 
                 name: 'IdCategoria', 
-                label: 'Categoría insumo', 
+                label: 'Categoria insumo', 
                 type: 'select', 
-                options: categorias.map(categoria => ({ value: categoria.IdCategoria, label: categoria.nombre_categoria })) 
+                options: categorias.filter(categoria => categoria.estado_categoria === 1).map(categoria => ({ value: categoria.IdCategoria, label: categoria.nombre_categoria })) 
               },
             ]}
             onChange={handleChange}

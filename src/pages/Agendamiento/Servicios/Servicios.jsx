@@ -298,53 +298,44 @@ const Servicios = () => {
         entityData={servicioSeleccionado}
       />
 
-      <Table
-        columns={[
-          {
-            field: "ImgNombreServicio",
-            headerName: "SERVICIO",
-            width: "w-48",
-            renderCell: (params) => (
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <img
-                  src={params.row.ImgServicio}
-                  alt="ImgServicio"
-                  style={{
-                    maxWidth: "100%",
-                    width: "3rem",
-                    height: "3rem",
-                    borderRadius: "50%",
-                    marginRight: "0.5rem",
-                  }}
-                />
-                <span>{params.row.Nombre_Servicio}</span>
-              </div>
-            ),
-          },
-          { field: "Tiempo_Servicio", headerName: "TIEMPO", width: "w-36" },
-          { field: "Precio_Servicio", headerName: "PRECIO", width: "w-36" },
-          {
-            field: "Acciones",
-            headerName: "ACCIONES",
-            width: "w-48",
-            renderCell: (params) => (
-              <div className="flex justify-center space-x-4">
-                <button
-                  onClick={() => handleEditClick(params.row)}
-                  className="text-yellow-500"
-                >
-                  <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
-                </button>
-                <CustomSwitch
-                  active={params.row.EstadoServicio === 1}
-                  onToggle={() => handleToggleSwitch(params.row.IdServicio)}
-                />
-              </div>
-            ),
-          },
-        ]}
-        data={filtrar}
-      />
+<Table
+  columns={[
+    {
+      field: "ImgNombreServicio",
+      headerName: "SERVICIO",
+      width: "w-48",
+      renderCell: (params) => (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <img
+            src={params.row.ImgServicio}
+            alt="ImgServicio"
+            style={{ maxWidth: "100%", width: "3rem", height: "3rem", borderRadius: "50%", marginRight: "0.5rem" }}
+          />
+          <span>{params.row.Nombre_Servicio}</span>
+        </div>
+      )
+    },
+    { field: 'Tiempo_Servicio', headerName: 'TIEMPO', width: 'w-36' },
+    { field: 'Precio_Servicio', headerName: 'PRECIO', width: 'w-36' },
+    {
+      field: 'Acciones',
+      headerName: 'ACCIONES',
+      width: 'w-48',
+      renderCell: (params) => (
+        <div className="flex justify-center space-x-4">
+          <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
+            <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
+          </button>
+          <CustomSwitch
+            active={params.row.EstadoServicio === 1}
+            onToggle={() => handleToggleSwitch(params.row.IdServicio)}
+          />
+        </div>
+      ),
+    },
+  ]}
+  data={filtrar}
+/>
 
       <Fab
         aria-label="add"

@@ -38,7 +38,6 @@ const Categorias = () => {
     )
   })
 
-
   const handleAddCategoria = async (formData) => {
     try {
       const { nombre_categoria } = formData;
@@ -101,40 +100,40 @@ const Categorias = () => {
   const handleEditCategoria = async (formData) => {
     try {
         const camposObligatorios = ['nombre_categoria'];
-  
+
         if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos de la categoría.')) {
-          return;
+            return;
         }
-  
+
         const response = await axios.get('http://localhost:5000/api/categorias');
         const categorias = response.data;
         const categoriaExistente = categorias.find(categoria => categoria.nombre_categoria === formData.nombre_categoria && categoria.IdCategoria !== formData.IdCategoria);
-  
+
         if (categoriaExistente) {
-          window.Swal.fire({
-            icon: 'warning',
-            title: 'Categoría ya registrada',
-            text: 'La categoría ingresada ya está registrada.',
-          });
-          return;
+            window.Swal.fire({
+                icon: 'warning',
+                title: 'Categoría ya registrada',
+                text: 'La categoría ingresada ya está registrada.',
+            });
+            return;
         }
 
         const confirmation = await window.Swal.fire({
-          title: '¿Estás seguro?',
-          text: '¿Quieres actualizar esta categoría?',
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Sí, actualizar',
-          cancelButtonText: 'Cancelar'
+            title: '¿Estás seguro?',
+            text: '¿Quieres actualizar esta categoría?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, actualizar',
+            cancelButtonText: 'Cancelar'
         });
 
         if (confirmation.isConfirmed) {
-          await axios.put(`http://localhost:5000/api/categorias/editar/${formData.IdCategoria}`, formData);
-          handleCloseModalEditar();
-          fetchCategorias();
-          window.Swal.fire('¡Categoría actualizada!', '', 'success');
+            await axios.put(`http://localhost:5000/api/categorias/editar/${formData.IdCategoria}`, formData);
+            handleCloseModalEditar();
+            fetchCategorias();
+            window.Swal.fire('¡Categoría actualizada!', '', 'success');
         }
     } catch (error) {
         console.error('Error al editar categoría:', error);
@@ -148,16 +147,43 @@ const Categorias = () => {
     }));
   };
 
-  const handleToggleSwitch = async (id) => {
-    try {
-      const categoria = categorias.find((prov) => prov.IdCategoria === id);
-      const updateCategoria = { ...categoria, estado_categoria: categoria.estado_categoria === 1 ? 0 : 1 };
-      await axios.put(`http://localhost:5000/api/categorias/editar/${id}`, updateCategoria);
-      fetchCategorias(); // Actualiza la lista de proveedores después de la actualización
-    } catch (error) {
-      console.error('Error al cambiar estado de la categoria:', error);
+const handleToggleSwitch = async (id) => {
+    const categoria = categorias.find(categoria => categoria.IdCategoria === id);
+    if (!categoria) {
+        console.error('Categoría no encontrada');
+        return;
     }
-  };
+
+    const newEstado = categoria.estado_categoria === 1 ? 0 : 1;
+
+    const result = await window.Swal.fire({
+        icon: 'warning',
+        title: '¿Estás seguro?',
+        text: '¿Quieres cambiar el estado de la categoría?',
+        showCancelButton: true,
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'Cancelar',
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await axios.put(`http://localhost:5000/api/categorias/editar/${id}`, { estado_categoria: newEstado });
+            fetchCategorias(); // Actualiza la lista de categorías después de la actualización
+            window.Swal.fire({
+                icon: 'success',
+                title: 'Estado actualizado',
+                text: 'El estado de la categoría ha sido actualizado correctamente.',
+            });
+        } catch (error) {
+            console.error('Error al cambiar el estado de la categoría:', error);
+            window.Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un error al cambiar el estado de la categoría. Por favor, inténtalo de nuevo más tarde.',
+            });
+        }
+    }
+};
 
   const handleCloseModalAgregar = () => {
     setOpenModalAgregar(false);
@@ -234,14 +260,17 @@ return (
             width: 'w-48',
             renderCell: (params) => (
               <div className="flex justify-center space-x-4">
+                {params.row.estado_categoria === 1 && (
                 <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
                   <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
                 </button>
-                <CustomSwitch
-                  active={params.row.estado_categoria === 1}
-                  onToggle={() => handleToggleSwitch(params.row.IdCategoria)}
-                />
-              </div>
+              )}
+              <CustomSwitch
+                active={params.row.estado_categoria === 1}
+                onToggle={() => handleToggleSwitch(params.row.IdCategoria)}
+              />
+            </div>
+               
             ),
           },
         ]}

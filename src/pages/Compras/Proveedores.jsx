@@ -8,6 +8,7 @@ import CamposObligatorios from "../../components/consts/camposVacios";
 import Fab from '@mui/material/Fab';
 
 const Proveedores = () => {
+  const [selectedRows, setSelectedRows] = useState([]);
   const [openModalAgregar, setOpenModalAgregar] = useState(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [proveedores, setProveedores] = useState([]);
@@ -289,14 +290,46 @@ const Proveedores = () => {
   };
 
   const handleToggleSwitch = async (id) => {
-    try {
-      const proveedor = proveedores.find((prov) => prov.IdProveedor === id);
-      const updatedProveedor = { ...proveedor, estado_proveedor: proveedor.estado_proveedor === 1 ? 0 : 1 };
-      await axios.put(`http://localhost:5000/api/proveedores/editar`, updatedProveedor);
-      fetchProveedores(); 
-    } catch (error) {
-      console.error('Error al cambiar estado del proveedor:', error);
+    const proveedor = proveedores.find((prov) => prov.IdProveedor === id);
+    if (!proveedor) {
+        console.error('Proveedor no encontrado');
+        return;
     }
+
+    const newEstado = proveedor.estado_proveedor === 1 ? 0 : 1;
+
+    const result = await window.Swal.fire({
+        icon: 'warning',
+        title: '¿Estás seguro?',
+        text: '¿Quieres cambiar el estado del proveedor?',
+        showCancelButton: true,
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'Cancelar',
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await axios.put(`http://localhost:5000/api/proveedores/editar/${id}`, { estado_proveedor: newEstado });
+            await fetchProveedores(); // Actualiza la lista de proveedores después de la actualización
+            window.Swal.fire({
+                icon: 'success',
+                title: 'Estado actualizado',
+                text: 'El estado del proveedor ha sido actualizado correctamente.',
+            });
+        } catch (error) {
+            console.error('Error al cambiar el estado del proveedor:', error);
+            window.Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un error al cambiar el estado del proveedor. Por favor, inténtalo de nuevo más tarde.',
+            });
+        }
+    }
+};
+
+  const handleEditClick = (proveedor) => {
+    setProveedorSeleccionado(proveedor);
+    setOpenModalEditar(true);
   };
 
   const handleCloseModalAgregar = () => {
@@ -307,11 +340,6 @@ const Proveedores = () => {
   const handleCloseModalEditar = () => {
     setOpenModalEditar(false);
     setProveedorSeleccionado(null);
-  };
-
-  const handleEditClick = (proveedor) => {
-    setProveedorSeleccionado(proveedor);
-    setOpenModalEditar(true);
   };
 
 return (
@@ -386,14 +414,16 @@ return (
             width: 'w-48',
             renderCell: (params) => (
               <div className="flex justify-center space-x-4">
+                {params.row.estado_proveedor === 1 && (
                 <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
                   <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
                 </button>
-                <CustomSwitch
-                  active={params.row.estado_proveedor === 1}
-                  onToggle={() => handleToggleSwitch(params.row.IdProveedor)}
-                />
-              </div>
+              )}
+              <CustomSwitch
+                active={params.row.estado_proveedor === 1}
+                onToggle={() => handleToggleSwitch(params.row.IdProveedor)}
+              />
+            </div>
             ),
           },
         ]}
