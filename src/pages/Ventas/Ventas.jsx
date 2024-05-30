@@ -1,85 +1,27 @@
-import React from "react";
-
-import CancelIcon from "@mui/icons-material/Cancel";
+import React, { useState } from "react";
+import Switch from "@mui/material/Switch";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 const Ventas = () => {
-  const columns = [
-    { name: "img", selector: "image", sortable: true },
-    { name: "Cantidad", selector: "Cantidad", sortable: true },
-    { name: "Empelado", selector: "empleado", sortable: true },
-    { name: "Cliente", selector: "Cliente", sortable: true },
-    { name: "Fecha", selector: "date", sortable: true },
-    { name: "Estado", selector: "estado", sortable: true },
-    { name: "Acciones", selector: "action", sortable: true },
-  ];
+  const [checked, setChecked] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
 
-  const room = [
-    {
-      image:
-        "https://i.pinimg.com/474x/c6/67/23/c66723df095f3a44cf0574c71c492bc6.jpg",
-      product: "Apple Watch",
-      empleado: "Johan steven martinez",
-      cliente: "Eduardo mosquera",
-      date: "2024-04-25",
-      estado: (
-        <span className="inline-flex items-center">
-          <span className="h-2 w-2 rounded-full bg-green-500 mr-1"></span>{" "}
-          Vendido
-        </span>
-      ),
-      action: (
-        <button
-          type="button"
-          class="text-white bg-gradient-to-r from-pink-400 via-pink-500 to-pink-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-pink-300 dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-        >
-          <CancelIcon className="text-base mr-1" />
-        </button>
-      ),
-    },
-    {
-      image:
-        "https://i.pinimg.com/474x/2c/02/89/2c0289313ee273171604c6720971085a.jpg",
-      product: "Apple Watch",
-      empleado: "Johan steven martinez",
-      cliente: "Eduardo mosquera",
-      date: "2024-04-25",
-      estado: (
-        <span className="inline-flex items-center">
-          <span className="h-2 w-2 rounded-full bg-red-500 mr-1"></span> Anulado
-        </span>
-      ),
-      action: (
-        <button
-          type="button"
-          class="text-white bg-gradient-to-r from-pink-400 via-pink-500 to-pink-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-pink-300 dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-        >
-          <CancelIcon className="text-base mr-1" />
-        </button>
-      ),
-    },
-    {
-      image:
-        "https://i.pinimg.com/474x/77/13/e3/7713e3d43b2f83819ac6ccad279d2afc.jpg",
-      product: "Apple Watch",
-      empleado: "Johan steven martinez",
-      cliente: "Eduardo mosquera",
-      date: "2024-04-25",
-      estado: (
-        <span className="inline-flex items-center">
-          <span className="h-2 w-2 rounded-full bg-green-500 mr-1"></span>{" "}
-          Vendido
-        </span>
-      ),
-      action: (
-        <button
-          type="button"
-          class="text-white bg-gradient-to-r from-pink-400 via-pink-500 to-pink-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-pink-300 dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-        >
-          <CancelIcon className="text-base mr-1" />
-        </button>
-      ),
-    },
-  ];
+  const handleSwitchChange = (event) => {
+    setChecked(event.target.checked);
+  };
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <section
       className="bg-gray-50 dark:bg-gray-900 py-3 sm:py-5"
@@ -197,22 +139,22 @@ const Ventas = () => {
                     Cliente
                   </th>
                   <th scope="col" className="px-4 py-3">
-                    Sales/Day
+                    Iva
                   </th>
                   <th scope="col" className="px-4 py-3">
-                    Sales/Month
+                    Fecha
                   </th>
                   <th scope="col" className="px-4 py-3">
-                    Rating
+                    Descuento
                   </th>
                   <th scope="col" className="px-4 py-3">
-                    Sales
+                    Subtotal
                   </th>
                   <th scope="col" className="px-4 py-3">
-                    Revenue
+                    Total
                   </th>
                   <th scope="col" className="px-4 py-3">
-                    Last Update
+                    Estado
                   </th>
                 </tr>
               </thead>
@@ -247,725 +189,51 @@ const Ventas = () => {
                   </th>
                   <td className="px-3 py-2">
                     <span className="bg-primary-100 text-primary-800 text-sm font-medium px-2 py-1 rounded dark:bg-primary-900 dark:text-primary-300">
-                      Desktop PC
+                      Jose alfonso alvarez
                     </span>
                   </td>
                   <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <div className="inline-block w-4 h-4 mr-1 bg-red-700 rounded-full"></div>
-                      95
-                    </div>
+                    <div className="flex items-center">Eduardo Mosquera</div>
                   </td>
                   <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     1.47
                   </td>
                   <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    0.47
+                    10/24/2005
                   </td>
                   <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-4 h-4 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <span className="ml-1 text-gray-500 dark:text-gray-400">
-                        5.0
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewbox="0 0 24 24"
-                        fill="currentColor"
-                        className="w-5 h-5 mr-2 text-gray-400"
-                        aria-hidden="true"
-                      >
-                        <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
-                      </svg>
-                      1.6M
-                    </div>
+                    630%
                   </td>
                   <td className="px-4 py-2">$3.2M</td>
                   <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Just now
+                    3456435
                   </td>
-                </tr>
 
-                <tr className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs sm:text-sm">
-                  <td className="w-6 px-3 py-2">
-                    <div className="flex items-center">
-                      <input
-                        id="checkbox-table-search-1"
-                        type="checkbox"
-                        onClick={(event) => event.stopPropagation()}
-                        className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <label
-                        htmlFor="checkbox-table-search-1"
-                        className="sr-only"
-                      >
-                        checkbox
-                      </label>
-                    </div>
-                  </td>
-                  <th
-                    scope="row"
-                    className="flex items-center px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    <img
-                      src="https://flowbite.s3.amazonaws.com/blocks/application-ui/products/imac-front-image.png"
-                      alt="iMac Front Image"
-                      className="w-auto h-8 mr-2"
-                    />
-                    Apple iMac 27&quot;
-                  </th>
-                  <td className="px-3 py-2">
-                    <span className="bg-primary-100 text-primary-800 text-sm font-medium px-2 py-1 rounded dark:bg-primary-900 dark:text-primary-300">
-                      Desktop PC
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <div className="inline-block w-4 h-4 mr-1 bg-red-700 rounded-full"></div>
-                      95
-                    </div>
-                  </td>
                   <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    1.47
-                  </td>
-                  <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    0.47
-                  </td>
-                  <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
+                    <div>
+                      <IconButton
+                        aria-label="more"
+                        aria-controls="long-menu"
+                        aria-haspopup="true"
+                        onClick={handleMenuClick}
                       >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
+                        <MoreVertIcon />
+                      </IconButton>
+                      <Menu
+                        id="long-menu"
+                        anchorEl={anchorEl}
+                        keepMounted
+                        open={Boolean(anchorEl)}
+                        onClose={handleMenuClose}
                       >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-4 h-4 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <span className="ml-1 text-gray-500 dark:text-gray-400">
-                        5.0
-                      </span>
+                        <MenuItem>
+                          <Switch
+                            checked={checked}
+                            onChange={handleSwitchChange}
+                          />
+                        </MenuItem>
+                      </Menu>
                     </div>
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewbox="0 0 24 24"
-                        fill="currentColor"
-                        className="w-5 h-5 mr-2 text-gray-400"
-                        aria-hidden="true"
-                      >
-                        <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
-                      </svg>
-                      1.6M
-                    </div>
-                  </td>
-                  <td className="px-4 py-2">$3.2M</td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Just now
-                  </td>
-                </tr>
-
-                <tr className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs sm:text-sm">
-                  <td className="w-6 px-3 py-2">
-                    <div className="flex items-center">
-                      <input
-                        id="checkbox-table-search-1"
-                        type="checkbox"
-                        onClick={(event) => event.stopPropagation()}
-                        className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <label
-                        htmlFor="checkbox-table-search-1"
-                        className="sr-only"
-                      >
-                        checkbox
-                      </label>
-                    </div>
-                  </td>
-                  <th
-                    scope="row"
-                    className="flex items-center px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    <img
-                      src="https://flowbite.s3.amazonaws.com/blocks/application-ui/products/imac-front-image.png"
-                      alt="iMac Front Image"
-                      className="w-auto h-8 mr-2"
-                    />
-                    Apple iMac 27&quot;
-                  </th>
-                  <td className="px-3 py-2">
-                    <span className="bg-primary-100 text-primary-800 text-sm font-medium px-2 py-1 rounded dark:bg-primary-900 dark:text-primary-300">
-                      Desktop PC
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <div className="inline-block w-4 h-4 mr-1 bg-red-700 rounded-full"></div>
-                      95
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    1.47
-                  </td>
-                  <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    0.47
-                  </td>
-                  <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-4 h-4 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <span className="ml-1 text-gray-500 dark:text-gray-400">
-                        5.0
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewbox="0 0 24 24"
-                        fill="currentColor"
-                        className="w-5 h-5 mr-2 text-gray-400"
-                        aria-hidden="true"
-                      >
-                        <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
-                      </svg>
-                      1.6M
-                    </div>
-                  </td>
-                  <td className="px-4 py-2">$3.2M</td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Just now
-                  </td>
-                </tr>
-                <tr className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs sm:text-sm">
-                  <td className="w-6 px-3 py-2">
-                    <div className="flex items-center">
-                      <input
-                        id="checkbox-table-search-1"
-                        type="checkbox"
-                        onClick={(event) => event.stopPropagation()}
-                        className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <label
-                        htmlFor="checkbox-table-search-1"
-                        className="sr-only"
-                      >
-                        checkbox
-                      </label>
-                    </div>
-                  </td>
-                  <th
-                    scope="row"
-                    className="flex items-center px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    <img
-                      src="https://flowbite.s3.amazonaws.com/blocks/application-ui/products/imac-front-image.png"
-                      alt="iMac Front Image"
-                      className="w-auto h-8 mr-2"
-                    />
-                    Apple iMac 27&quot;
-                  </th>
-                  <td className="px-3 py-2">
-                    <span className="bg-primary-100 text-primary-800 text-sm font-medium px-2 py-1 rounded dark:bg-primary-900 dark:text-primary-300">
-                      Desktop PC
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <div className="inline-block w-4 h-4 mr-1 bg-red-700 rounded-full"></div>
-                      95
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    1.47
-                  </td>
-                  <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    0.47
-                  </td>
-                  <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-4 h-4 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <span className="ml-1 text-gray-500 dark:text-gray-400">
-                        5.0
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewbox="0 0 24 24"
-                        fill="currentColor"
-                        className="w-5 h-5 mr-2 text-gray-400"
-                        aria-hidden="true"
-                      >
-                        <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
-                      </svg>
-                      1.6M
-                    </div>
-                  </td>
-                  <td className="px-4 py-2">$3.2M</td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Just now
-                  </td>
-                </tr>
-                <tr className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs sm:text-sm">
-                  <td className="w-6 px-3 py-2">
-                    <div className="flex items-center">
-                      <input
-                        id="checkbox-table-search-1"
-                        type="checkbox"
-                        onClick={(event) => event.stopPropagation()}
-                        className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <label
-                        htmlFor="checkbox-table-search-1"
-                        className="sr-only"
-                      >
-                        checkbox
-                      </label>
-                    </div>
-                  </td>
-                  <th
-                    scope="row"
-                    className="flex items-center px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    <img
-                      src="https://flowbite.s3.amazonaws.com/blocks/application-ui/products/imac-front-image.png"
-                      alt="iMac Front Image"
-                      className="w-auto h-8 mr-2"
-                    />
-                    Apple iMac 27&quot;
-                  </th>
-                  <td className="px-3 py-2">
-                    <span className="bg-primary-100 text-primary-800 text-sm font-medium px-2 py-1 rounded dark:bg-primary-900 dark:text-primary-300">
-                      Desktop PC
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <div className="inline-block w-4 h-4 mr-1 bg-red-700 rounded-full"></div>
-                      95
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    1.47
-                  </td>
-                  <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    0.47
-                  </td>
-                  <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-4 h-4 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <span className="ml-1 text-gray-500 dark:text-gray-400">
-                        5.0
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewbox="0 0 24 24"
-                        fill="currentColor"
-                        className="w-5 h-5 mr-2 text-gray-400"
-                        aria-hidden="true"
-                      >
-                        <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
-                      </svg>
-                      1.6M
-                    </div>
-                  </td>
-                  <td className="px-4 py-2">$3.2M</td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Just now
-                  </td>
-                </tr>
-                <tr className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs sm:text-sm">
-                  <td className="w-6 px-3 py-2">
-                    <div className="flex items-center">
-                      <input
-                        id="checkbox-table-search-1"
-                        type="checkbox"
-                        onClick={(event) => event.stopPropagation()}
-                        className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <label
-                        htmlFor="checkbox-table-search-1"
-                        className="sr-only"
-                      >
-                        checkbox
-                      </label>
-                    </div>
-                  </td>
-                  <th
-                    scope="row"
-                    className="flex items-center px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    <img
-                      src="https://flowbite.s3.amazonaws.com/blocks/application-ui/products/imac-front-image.png"
-                      alt="iMac Front Image"
-                      className="w-auto h-8 mr-2"
-                    />
-                    Apple iMac 27&quot;
-                  </th>
-                  <td className="px-3 py-2">
-                    <span className="bg-primary-100 text-primary-800 text-sm font-medium px-2 py-1 rounded dark:bg-primary-900 dark:text-primary-300">
-                      Desktop PC
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <div className="inline-block w-4 h-4 mr-1 bg-red-700 rounded-full"></div>
-                      95
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    1.47
-                  </td>
-                  <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    0.47
-                  </td>
-                  <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-4 h-4 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <span className="ml-1 text-gray-500 dark:text-gray-400">
-                        5.0
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewbox="0 0 24 24"
-                        fill="currentColor"
-                        className="w-5 h-5 mr-2 text-gray-400"
-                        aria-hidden="true"
-                      >
-                        <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
-                      </svg>
-                      1.6M
-                    </div>
-                  </td>
-                  <td className="px-4 py-2">$3.2M</td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Just now
-                  </td>
-                </tr>
-                <tr className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs sm:text-sm">
-                  <td className="w-6 px-3 py-2">
-                    <div className="flex items-center">
-                      <input
-                        id="checkbox-table-search-1"
-                        type="checkbox"
-                        onClick={(event) => event.stopPropagation()}
-                        className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <label
-                        htmlFor="checkbox-table-search-1"
-                        className="sr-only"
-                      >
-                        checkbox
-                      </label>
-                    </div>
-                  </td>
-                  <th
-                    scope="row"
-                    className="flex items-center px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    <img
-                      src="https://flowbite.s3.amazonaws.com/blocks/application-ui/products/imac-front-image.png"
-                      alt="iMac Front Image"
-                      className="w-auto h-8 mr-2"
-                    />
-                    Apple iMac 27&quot;
-                  </th>
-                  <td className="px-3 py-2">
-                    <span className="bg-primary-100 text-primary-800 text-sm font-medium px-2 py-1 rounded dark:bg-primary-900 dark:text-primary-300">
-                      Desktop PC
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <div className="inline-block w-4 h-4 mr-1 bg-red-700 rounded-full"></div>
-                      95
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    1.47
-                  </td>
-                  <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    0.47
-                  </td>
-                  <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        aria-hidden="true"
-                        className="w-4 h-4 text-yellow-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <span className="ml-1 text-gray-500 dark:text-gray-400">
-                        5.0
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewbox="0 0 24 24"
-                        fill="currentColor"
-                        className="w-5 h-5 mr-2 text-gray-400"
-                        aria-hidden="true"
-                      >
-                        <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
-                      </svg>
-                      1.6M
-                    </div>
-                  </td>
-                  <td className="px-4 py-2">$3.2M</td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Just now
                   </td>
                 </tr>
               </tbody>
