@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import ModalDinamico from "../../components/consts/modal";
-import Fab from '@mui/material/Fab';
+import ModalDinamico from "../../components/consts/modaled";
+import CustomSwitch from "../../components/consts/switch";
 
 const Clientes = () => {
   const [clientes, setClientes] = useState([]);
   const [cliente, setCliente] = useState([]);
-
   const [modalData, setModalData] = useState(null);
 
   useEffect(() => {
@@ -30,30 +29,39 @@ const Clientes = () => {
   };
 
   const columns = [
-    // { name: "FotoPerfil", label: "Foto" },
     { name: "Nombre", label: "Nombre" },
     { name: "Apellido", label: "Apellido" },
     { name: "Correo", label: "Correo" },
     { name: "Telefono", label: "Teléfono" },
+    { name: "Documento", label: "Documento" },
+    { name: "Direccion", label: "Direccion" },
     { name: "Estado", label: "Estado" },
-    { name: "IdRol", label: "Rol" },
   ];
   const handleSubmit = async (formData) => {
     try {
-      // Verificar si el correo electrónico ya existe en la lista de clientes
+      // Verificar si el correo electrónico o el documento están siendo utilizados por otro cliente
       const correoExistente = clientes.some(
         (cliente) => cliente.Correo === formData.Correo
       );
 
+      const documentoExistente = clientes.some(
+        (cliente) => cliente.Documento === formData.Documento
+      );
+
       if (correoExistente) {
-        // Mostrar una alerta si el correo electrónico ya está registrado
         Swal.fire({
           icon: "error",
           title: "Correo electrónico duplicado",
           text: "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico.",
         });
+      } else if (documentoExistente) {
+        Swal.fire({
+          icon: "error",
+          title: "Documento duplicado",
+          text: "El documento ingresado ya está registrado. Por favor, elija otro documento.",
+        });
       } else {
-        // Continuar con el registro del cliente si el correo electrónico no está duplicado
+        // Continuar con el registro del cliente si el correo y el documento no están duplicados
         const result = await Swal.fire({
           title: "¿Estás seguro?",
           text: "¿Quieres registrar este cliente?",
@@ -64,23 +72,13 @@ const Clientes = () => {
         });
 
         if (result.isConfirmed) {
-          // Normalizar el valor del campo "Estado" si es necesario
-          let EstadoNormalizado;
-          if (formData.Estado === "Activo") {
-            EstadoNormalizado = 1;
-          } else if (formData.Estado === "Inactivo") {
-            EstadoNormalizado = 2;
-          } else {
-            // Valor predeterminado si el Estado no coincide con ninguno de los valores esperados
-            EstadoNormalizado = 0;
-          }
-
+          const EstadoNormalizado = 1;
           // Convertir campos de texto a números si es necesario
           const formDataNumerico = {
             ...formData,
             Telefono: parseInt(formData.Telefono),
             Estado: EstadoNormalizado,
-            IdRol: parseInt(formData.IdRol),
+            IdRol: 2,
           };
 
           console.log("Datos del formulario numéricos:", formDataNumerico);
@@ -117,43 +115,112 @@ const Clientes = () => {
     }
   };
 
-  const handleActualizacionSubmit = async (formData) => {
+  const handleToggleSwitch = async (id) => {
+    const updatedClientes = clientes.map((cliente) => {
+      if (cliente.IdCliente === id) {
+        const newEstado = cliente.Estado === 1 ? 0 : 1;
+        return { ...cliente, Estado: newEstado };
+      }
+      return cliente;
+    });
+
     try {
-      // Normalizar el valor del campo "Estado" si es necesario
-      let estadoNormalizado;
-      if (formData.Estado === "Inactivo") {
-        estadoNormalizado = 1;
-      } else if (formData.Estado === "Activo") {
-        estadoNormalizado = 2;
-      } else {
-        estadoNormalizado = 0;
+      const updatedCliente = updatedClientes.find(
+        (cliente) => cliente.IdCliente === id
+      );
+      if (!updatedCliente) {
+        console.error("No se encontró el cliente actualizado");
+        return;
       }
 
-      // Convertir campos de texto a números si es necesario
-      const formDataNumerico = {
-        ...formData,
-        Telefono: parseInt(formData.Telefono),
-        Estado: estadoNormalizado,
-        IdRol: parseInt(formData.IdRol),
-      };
-
-      console.log(formDataNumerico);
-
-      // Determinar la URL de la API para actualizar el cliente
-      const url = `http://localhost:5000/Jackenail/Actualizar/${formDataNumerico.IdCliente}`;
-
-      // Realizar la solicitud de actualización a la API utilizando axios.put
-      await axios.put(url, formDataNumerico);
-
-      // Mostrar una alerta de éxito si la actualización es exitosa
-      Swal.fire({
-        icon: "success",
-        title: "¡Actualización exitosa!",
-        text: "El cliente se ha actualizado correctamente.",
+      const result = await Swal.fire({
+        icon: "warning",
+        title: "¿Estás seguro?",
+        text: "¿Quieres cambiar el estado del cliente?",
+        showCancelButton: true,
+        confirmButtonText: "Sí",
+        cancelButtonText: "Cancelar",
       });
 
-      // Cerrar el modal después de enviar el formulario
-      setModalData(null);
+      if (result.isConfirmed) {
+        await axios.put(`http://localhost:5000/Jackenail/CambiarEstado/${id}`, {
+          Estado: updatedCliente.Estado,
+        });
+        setClientes(updatedClientes);
+        Swal.fire({
+          icon: "success",
+          title: "Estado actualizado",
+          text: "El estado del cliente ha sido actualizado correctamente.",
+        });
+      }
+    } catch (error) {
+      console.error("Error al cambiar el estado del cliente:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Hubo un error al cambiar el estado del cliente. Por favor, inténtalo de nuevo más tarde.",
+      });
+    }
+  };
+
+  const handleActualizacionSubmit = async (formData) => {
+    try {
+      // Verificar si el correo electrónico o el documento están siendo utilizados por otro cliente
+      const correoExistente = clientes.some(
+        (cliente) =>
+          cliente.Correo === formData.Correo &&
+          cliente.IdCliente !== formData.IdCliente
+      );
+
+      const documentoExistente = clientes.some(
+        (cliente) =>
+          cliente.Documento === formData.Documento &&
+          cliente.IdCliente !== formData.IdCliente
+      );
+
+      if (correoExistente) {
+        Swal.fire({
+          icon: "error",
+          title: "Correo electrónico duplicado",
+          text: "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico.",
+        });
+      } else if (documentoExistente) {
+        Swal.fire({
+          icon: "error",
+          title: "Documento duplicado",
+          text: "El documento ingresado ya está registrado. Por favor, elija otro documento.",
+        });
+      } else {
+        // Convertir campos de texto a números si es necesario
+        const formDataNumerico = {
+          ...formData,
+          Telefono: parseInt(formData.Telefono),
+          IdRol: 2, // Rol por defecto
+        };
+
+        console.log(formDataNumerico);
+        console.log(formDataNumerico.IdCliente);
+
+        // Determinar la URL de la API para actualizar el cliente
+        const url = `http://localhost:5000/Jackenail/Actualizar/${formDataNumerico.IdCliente}`;
+
+        // Realizar la solicitud de actualización a la API utilizando axios.put
+        await axios.put(url, formDataNumerico);
+
+        Swal.fire({
+          icon: "success",
+          title: "¡Actualización exitosa!",
+          text: "El cliente se ha actualizado correctamente.",
+        }).then((result) => {
+          if (
+            result.isConfirmed ||
+            result.dismiss === Swal.DismissReason.close
+          ) {
+            setModalData(null);
+            window.location.reload();
+          }
+        });
+      }
     } catch (error) {
       console.error("Error al actualizar el cliente:", error);
 
@@ -212,29 +279,21 @@ const Clientes = () => {
                         key={column.name}
                         className="px-6 py-4 font-semibold text-gray-900 dark:text-white"
                       >
-                        {column.name === "FotoPerfil" ? (
-                          <img
-                            src={cliente.FotoPerfil}
-                            className="w-16 h-16 md:w-24 md:h-24 object-cover rounded-full"
-                            alt={`${cliente.Nombre} ${cliente.Apellido}`}
-                          />
-                        ) : column.name === "Estado" ? (
-                          <span className="inline-flex items-center">
-                            <span
-                              className={`h-2 w-2 rounded-full mr-1 ${
-                                cliente[column.name] === 1
-                                  ? "bg-blue-500"
-                                  : cliente[column.name] === 2
-                                  ? "bg-green-500"
-                                  : ""
-                              }`}
-                            ></span>{" "}
-                            {cliente[column.name] === 1
-                              ? "Activo"
-                              : cliente[column.name] === 2
-                              ? "Inactivo"
-                              : ""}
-                          </span>
+                        {column.name === "Estado" ? (
+                          <div className="inline-flex items-center">
+                            <CustomSwitch
+                              active={cliente[column.name] === 1}
+                              onToggle={() =>
+                                handleToggleSwitch(cliente.IdCliente)
+                              }
+                            />
+                            {/* Se muestra el estado del cliente */}
+                            <span className="ml-2">
+                              {cliente[column.name] === 1
+                                ? "Activo"
+                                : "Inactivo"}
+                            </span>
+                          </div>
                         ) : (
                           cliente[column.name]
                         )}
@@ -250,9 +309,9 @@ const Clientes = () => {
                             seleccionado: cliente,
                           })
                         }
-                        class="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                        className="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
                       >
-                        <i class="bx bxs-edit"></i>
+                        <i className="bx bxs-edit"></i>
                       </button>
                     </td>
                   </tr>
@@ -290,26 +349,21 @@ const Clientes = () => {
                     required: true,
                   },
                   {
-                    label: "Estado",
-                    name: "Estado",
-                    type: "select",
-                    required: true,
-                    options: [
-                      { value: "Activo", label: "Activo" },
-                      { value: "Inactivo", label: "Inactivo" },
-                    ],
-                    className: "col-span-6 md:col-span-3", // Ocupa 6 columnas en dispositivos pequeños y 3 columnas en dispositivos medianos y grandes
-                  },
-                  {
-                    label: "Foto de Perfil",
-                    name: "FotoPerfil",
+                    label: "Documento",
+                    name: "Documento",
                     type: "text",
                     required: true,
                   },
                   {
-                    label: "Rol",
-                    name: "IdRol", // Nombre ajustado a "IdRol"
+                    label: "Direccion",
+                    name: "Direccion",
                     type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Contraseña",
+                    name: "Contrasena",
+                    type: "password",
                     required: true,
                   },
                 ]}
@@ -326,49 +380,44 @@ const Clientes = () => {
                 fields={[
                   {
                     label: "Nombre",
-                    name: "Nombre",
+                    name: "Nombre", // Nombre ajustado a "Nombre"
                     type: "text",
                     required: true,
                   },
                   {
                     label: "Apellido",
-                    name: "Apellido",
+                    name: "Apellido", // Nombre ajustado a "Apellido"
                     type: "text",
                     required: true,
                   },
                   {
                     label: "Correo",
-                    name: "Correo",
+                    name: "Correo", // Nombre ajustado a "Correo"
                     type: "text",
                     required: true,
                   },
                   {
                     label: "Teléfono",
-                    name: "Telefono",
+                    name: "Telefono", // Nombre ajustado a "Telefono"
                     type: "text",
                     required: true,
                   },
                   {
-                    label: "Estado",
-                    name: "Estado",
-                    type: "select",
-                    required: true,
-                    options: [
-                      { value: "Activo", label: "Activo" },
-                      { value: "Inactivo", label: "Inactivo" },
-                    ],
-                    className: "col-span-6 md:col-span-3", // Ocupa 6 columnas en dispositivos pequeños y 3 columnas en dispositivos medianos y grandes
-                  },
-                  {
-                    label: "Foto de Perfil",
-                    name: "FotoPerfil",
+                    label: "Documento",
+                    name: "Documento",
                     type: "text",
                     required: true,
                   },
                   {
-                    label: "Rol",
-                    name: "IdRol",
+                    label: "Direccion",
+                    name: "Direccion",
                     type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Contraseña",
+                    name: "Contrasena",
+                    type: "password",
                     required: true,
                   },
                 ]}
@@ -377,19 +426,31 @@ const Clientes = () => {
               />
             )}
           </div>
-          <Fab
-            aria-label="add"
+
+          <button
+            className="fixed bottom-4 right-4 bg-blue-500 text-white rounded-full p-3 shadow-xl hover:shadow-2xl"
             style={{
-              border: '0.5px solid grey',
-              backgroundColor: '#94CEF2',
-              position: 'fixed',
-              bottom: '16px',
-              right: '16px',
-              zIndex: 1000, // Asegura que el botón flotante esté por encima de otros elementos
+              right: "4rem",
+              bottom: "4rem",
+              boxShadow: "0 8px 20px rgba(0, 0, 0, 0.5)", // Sombra negra más pronunciada
             }}
-            onClick={() => handleOpenModal(cliente)}>
-            <i className='bx bx-plus' style={{ fontSize: '1.3rem' }}></i>
-         </Fab>
+            onClick={() => handleOpenModal(cliente)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>

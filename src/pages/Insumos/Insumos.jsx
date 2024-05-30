@@ -1,249 +1,258 @@
-import React, { useState } from "react";
-import KitchenOutlinedIcon from "@mui/icons-material/KitchenOutlined";
-import SwapVertIcon from "@mui/icons-material/SwapVert";
-import UpdateOutlinedIcon from "@mui/icons-material/UpdateOutlined";
-import SearchIcon from "@mui/icons-material/Search";
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
+import Table from "../../components/consts/Tabla";
+import ModalAgregarInsumo from "../../components/consts/modal";
+import ModalEditarInsumo from "../../components/consts/modalEditar";
+import CamposObligatorios from "../../components/consts/camposVacios";
+import Fab from '@mui/material/Fab';
 
 const Insumos = () => {
-  const columns = [
-    { name: "Insumo", selector: "insumos", sortable: true },
-    { name: "Cantidad", selector: "Cantidad", sortable: true },
-    { name: "usos", selector: "usos", sortable: true },
-    { name: "Categoria", selector: "Categoria", sortable: true },
-    { name: "Estado", selector: "estado", sortable: true },
-    { name: "Acciones", selector: "action", sortable: true },
-  ];
-  const room = [
-    {
-      id: 1,
-      insumos: "Esmaltes",
-      image:
-        "https://i.pinimg.com/474x/e9/38/36/e93836e510ab80e701899800512fc3de.jpg",
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [openModalAgregar, setOpenModalAgregar] = useState(false);
+  const [openModalEditar, setOpenModalEditar] = useState(false);
+  const [insumos, setInsumos] = useState([]);
+  const [categorias, setCategorias] = useState([]); 
+  const [insumoSeleccionado, setInsumoSeleccionado] = useState(null);
 
-      Cantidad: 1,
-      usos: "45545",
-      estado: (
-        <span className="inline-flex items-center">
-          <span className="h-2 w-2 rounded-full bg-blue-500 mr-1"></span>{" "}
-          Habilitado
-        </span>
-      ),
-      Categoria: "frutas",
+  useEffect(() => {
+    fetchInsumos();
+    fetchCategorias();
+  }, []);
 
-      action: (
-        <div className="inline">
-          <button
-            type="button"
-            class="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-          >
-            <UpdateOutlinedIcon className="text-base mr-1" />
-          </button>
-          <button
-            type="button"
-            class="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-          >
-            <SwapVertIcon className="text-base mr-1" />
-          </button>
-        </div>
-      ),
-    },
-    {
-      id: 1,
-      insumos: "Limas",
-      image:
-        "https://i.pinimg.com/474x/ec/c8/e3/ecc8e36917edc160f08bf13e2deb27d9.jpg",
-
-      Cantidad: 1,
-      usos: "45545",
-      estado: (
-        <span className="inline-flex items-center">
-          <span className="h-2 w-2 rounded-full bg-red-500 mr-1"></span>{" "}
-          Inactivo
-        </span>
-      ),
-      Categoria: "frutas",
-
-      action: (
-        <div className="inline">
-          <button
-            type="button"
-            class="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-          >
-            <UpdateOutlinedIcon className="text-base mr-1" />
-          </button>
-          <button
-            type="button"
-            class="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-          >
-            <SwapVertIcon className="text-base mr-1" />
-          </button>
-        </div>
-      ),
-    },
-    {
-      id: 1,
-      insumos: "Corta uñas",
-      image:
-        "https://i.pinimg.com/474x/84/44/fe/8444fee797bb5496ac11f292ca8d24e7.jpg",
-
-      Cantidad: 1,
-      usos: "45545",
-      estado: (
-        <span className="inline-flex items-center">
-          <span className="h-2 w-2 rounded-full bg-green-500 mr-1"></span>{" "}
-          Activo
-        </span>
-      ),
-      Categoria: "frutas",
-
-      action: (
-        <div className="inline">
-          <button
-            type="button"
-            class="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-          >
-            <UpdateOutlinedIcon className="text-base mr-1" />
-          </button>
-          <button
-            type="button"
-            class="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-          >
-            <SwapVertIcon className="text-base mr-1" />
-          </button>
-        </div>
-      ),
-    },
-  ];
-
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
+  const fetchInsumos = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/insumos');
+      setInsumos(response.data);
+    } catch (error) {
+      console.error('Error fetching insumos:', error);
+    }
   };
 
-  const filteredRoom = room.filter((row) =>
-    Object.values(row).some(
-      (value) =>
-        typeof value === "string" &&
-        value.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+  const fetchCategorias = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/categorias');
+      setCategorias(response.data);
+    } catch (error) {
+      console.error('Error fetching categorias:', error);
+    }
+  };
+
+  const handleAddInsumo = async (formData) => {
+    try {
+      const { NombreInsumos, Cantidad, UsosDisponibles, Estado, IdCategoria } = formData;
+  
+      // Validación de los campos obligatorios
+      const camposObligatorios = ['NombreInsumos', 'Imagen', 'Cantidad', 'UsosDisponibles', 'Estado', 'IdCategoria'];
+      const newErrors = {};
+  
+      camposObligatorios.forEach((campo) => {
+        if (!formData[campo]) {
+          newErrors[campo] = 'Este campo es obligatorio';
+        }
+      });
+  
+      // Confirmación antes de agregar el insumo
+      const confirmation = await window.Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¿Quieres agregar este insumo?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, agregar',
+        cancelButtonText: 'Cancelar'
+      });
+  
+      if (confirmation.isConfirmed) {
+        await axios.post('http://localhost:5000/api/insumos/guardarInsumo', {
+          ...formData,
+          // Convertir campos numéricos a números
+          Cantidad: parseInt(Cantidad),
+          UsosDisponibles: parseInt(UsosDisponibles),
+        });
+        handleCloseModalAgregar();
+        fetchInsumos();
+        window.Swal.fire('Insumo agregado!', '', 'success');
+      }
+    } catch (error) {
+      console.error('Error al agregar insumo:', error);
+    }
+  };
+  
+
+  const handleEditInsumo = async (formData) => {
+    try {
+        const camposObligatorios = ['NombreInsumos', 'Imagen', 'Cantidad', 'UsosDisponibles', 'Estado', 'IdCategoria'];
+
+        if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos del insumo.')) {
+          return;
+        }
+
+        const response = await axios.get('http://localhost:5000/api/insumos');
+        const insumos = response.data;
+        const insumoExistente = insumos.find(insumo => insumo.NombreInsumos === formData.NombreInsumos && insumo.IdInsumo !== formData.IdInsumo);
+
+        if (insumoExistente) {
+          window.Swal.fire({
+            icon: 'warning',
+            title: 'Insumo ya registrado',
+            text: 'El insumo ingresado ya está registrado.',
+          });
+          return;
+        }
+
+        const confirmation = await window.Swal.fire({
+          title: '¿Estás seguro?',
+          text: '¿Quieres actualizar este insumo?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sí, actualizar',
+          cancelButtonText: 'Cancelar'
+        });
+
+        if (confirmation.isConfirmed) {
+          await axios.put(`http://localhost:5000/api/insumos/editar/${formData.IdInsumos}`, formData);
+          handleCloseModalEditar();
+          fetchInsumos();
+          window.Swal.fire('¡Insumo actualizado!', '', 'success');
+        }
+    } catch (error) {
+        console.error('Error al editar insumo:', error);
+    }
+};
+
+
+  const handleChange = (name, value) => {
+    setInsumoSeleccionado((prevInsumo) => ({
+      ...prevInsumo,
+      [name]: value,
+    }));
+  };
+
+  const handleCloseModalAgregar = () => {
+    setOpenModalAgregar(false);
+    setInsumoSeleccionado(null);
+  };
+
+  const handleCloseModalEditar = () => {
+    setOpenModalEditar(false);
+    setInsumoSeleccionado(null);
+  };
+
+  const handleEditClick = (insumo) => {
+    setInsumoSeleccionado(insumo);
+    setOpenModalEditar(true);
+  };
+
+  const estadoOptions = [
+    { value: 'Disponible', label: 'Disponible' },
+    { value: 'Terminado', label: 'Terminado' },
+  ];
 
   return (
-    <div
-      style={{
-        paddingTop: "5px",
-        width: "90vw",
-        margin: "0 auto",
-        marginLeft: "-11vw",
-        borderRadius: "50% 50% 50% 50% / 40% 40% 60% 60%",
-        marginTop: "-40px",
-      }}
-    >
-      <div
-        className="w-full mx-auto max-w-full"
-        style={{
-          position: "fixed",
-          top: "calc(50% - 90px)",
-          left: "90px",
-          top: "80px",
-          width: "92%",
-          overflowY: "auto",
-        }}
-      >
-        <div className="w-full mx-auto max-w-full">
-          <div className="bg-white rounded-lg shadow-md p-8 border border-purple-500">
-            <h4 className="text-4xl mb-4">
-              {" "}
-              Gestión insumos
-              <KitchenOutlinedIcon className="text-base mr-3" />
-            </h4>
-
-            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-              <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                <div className="mt-20 mr-4 flex justify-end">
-                  <form onSubmit={(e) => e.preventDefault()}>
-                    <label htmlFor="search" className="sr-only">
-                      Search
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="search"
-                        id="search"
-                        className="block w-full p-2 pl-8 pr-10 text-sm border border-gray-300 rounded bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="Search"
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        required
-                      />
-                      <button
-                        type="submit"
-                        className="absolute inset-y-0 right-0 px-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-r text-sm dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                      >
-                        <SearchIcon className="text-base mr-3" />
-                      </button>
-                    </div>
-                  </form>
-                </div>
-
-                <div className="-mt-16">
-                  <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    <thead className="text-xs text-gray-700 uppercase bg-pink-100 dark:bg-pink-700 dark:text-gray-400">
-                      <tr>
-                        {columns.map((column, index) => (
-                          <th key={index} scope="col" className="px-6 py-3">
-                            {column.name}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredRoom.map((row, index) => (
-                        <tr
-                          key={index}
-                          className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                        >
-                          <td className="py-4">
-                            <div className="flex items-center">
-                              <img
-                                src={row.image}
-                                className="w-16 h-16 md:w-24 md:h-24 object-cover rounded-full"
-                                alt={row.insumos}
-                              />
-                              <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                                {row.insumos}
-                              </td>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">{row.Cantidad}</td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center">
-                              <div>
-                                <input
-                                  type="number"
-                                  id="first_product"
-                                  className="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                  placeholder={row.Cantidad}
-                                  required
-                                />
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">{row.Categoria}</td>
-                          <td className="px-6 py-4">{row.estado}</td>
-                          <td className="px-6 py-4">{row.action}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+    <div>
+      <div className="container mx-auto p-4 relative">
+        <center><h1 className="text-3xl font-bold mb-4">Gestion De Insumos</h1></center>
+        <div className="md:flex md:justify-between md:items-center mb-4">
+          <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
+            <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Buscar usuario</label>
           </div>
         </div>
+        <ModalAgregarInsumo
+          open={openModalAgregar}
+          handleClose={handleCloseModalAgregar}
+          onSubmit={handleAddInsumo}
+          title="Crear Nuevo Insumo"
+          fields={[
+            { name: 'NombreInsumos', label: 'Nombre insumo', type: 'text' },
+            { name: 'Imagen', label: 'Imagen', type: 'text' },
+            { name: 'Cantidad', label: 'Cantidad', type: 'number' },
+            { name: 'UsosDisponibles', label: 'Usos Disponibles', type: 'number'},
+            { 
+              name: 'IdCategoria', 
+              label: 'Categoria insumo', 
+              type: 'select', 
+              options: categorias.filter(categoria => categoria.estado_categoria === 1).map(categoria => ({ value: categoria.IdCategoria, label: categoria.nombre_categoria })) 
+            },
+          ]}
+          onChange={handleChange}
+        />
+        <ModalEditarInsumo
+            open={openModalEditar}
+            handleClose={handleCloseModalEditar}
+            onSubmit={handleEditInsumo}
+            title="Editar Insumo"
+            fields={[
+              { name: 'IdInsumos', label: 'Identificador', type: 'text', readOnly: true },
+              { name: 'NombreInsumos', label: 'Nombre insumo', type: 'text' },
+              { name: 'Imagen', label: 'Imagen', type: 'text' },
+              { 
+                name: 'IdCategoria', 
+                label: 'Categoria insumo', 
+                type: 'select', 
+                options: categorias.filter(categoria => categoria.estado_categoria === 1).map(categoria => ({ value: categoria.IdCategoria, label: categoria.nombre_categoria })) 
+              },
+            ]}
+            onChange={handleChange}
+            entityData={insumoSeleccionado} 
+          />
+
+        <Table
+          columns={[
+            { field: 'nombre_categoria', headerName: 'CATEGORIA', width: 'w-36' },
+            {
+              field: "ImgNombreInsumo",
+              headerName: "INSUMO",
+              width: "w-48",
+              renderCell: (params) => (
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <img
+                    src={params.row.Imagen}
+                    alt="Imagen"
+                    style={{ maxWidth: "100%", width: "3rem", height: "3rem", borderRadius: "50%", marginRight: "0.5rem" }}
+                  />
+                  <span>{params.row.NombreInsumos}</span>
+                </div>
+              )
+            },
+            { field: 'Cantidad', headerName: 'CANTIDAD', width: 'w-36' },
+            { field: 'UsosDisponibles', headerName: 'USOS DISPONIBLES', width: 'w-36' },
+            { field: 'Estado', headerName: 'ESTADO', width: 'w-36', readOnly: true },
+            {
+              field: 'Acciones',
+              headerName: 'ACCIONES',
+              width: 'w-48',
+              renderCell: (params) => (
+                <div className="flex justify-center space-x-4">
+                  <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
+                    <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
+                  </button>
+                </div>
+              ),
+            },
+          ]}
+          data={insumos} 
+        />
+        <Fab
+          aria-label="add"
+          style={{
+            border: '0.5px solid grey',
+            backgroundColor: '#94CEF2',
+            position: 'fixed',
+            bottom: '16px',
+            right: '16px',
+            zIndex: 1000, 
+          }}
+          onClick={() => setOpenModalAgregar(true)}
+        >
+          <i className='bx bx-plus' style={{ fontSize: '1.3rem' }}></i>
+        </Fab>
       </div>
     </div>
   );
+
 };
 
 export default Insumos;

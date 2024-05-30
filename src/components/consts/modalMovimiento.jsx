@@ -1,12 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel } from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator'; // Importa el ícono de arrastre
+import React, { useState, useEffect } from "react";
+import {
+  Button,
+  Modal,
+  Typography,
+  Grid,
+  TextField,
+  Select,
+  MenuItem,
+  InputLabel,
+} from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator"; // Importa el ícono de arrastre
 
-const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChange }) => {
+const ModalDinamico = ({
+  open,
+  handleClose,
+  title = "",
+  fields,
+  onSubmit,
+  onChange,
+}) => {
   const [formValues, setFormValues] = useState({});
   const [dragging, setDragging] = useState(false);
-  const [position, setPosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+  const [position, setPosition] = useState({
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2,
+  });
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
   const [modalSize, setModalSize] = useState({ width: 0, height: 0 });
 
@@ -15,29 +34,32 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
       const initialFormData = {};
       fields.forEach((field) => {
         if (!formValues[field.name]) {
-          initialFormData[field.name] = field.value || '';
+          initialFormData[field.name] = field.value || "";
         }
       });
-      setFormValues(prevFormValues => ({ ...prevFormValues, ...initialFormData }));
+      setFormValues((prevFormValues) => ({
+        ...prevFormValues,
+        ...initialFormData,
+      }));
     }
     // Set the size of the modal when it opens
     if (open) {
-      const modalContainer = document.getElementById('modal-container');
+      const modalContainer = document.getElementById("modal-container");
       if (modalContainer) {
         setModalSize({
           width: modalContainer.offsetWidth,
-          height: modalContainer.offsetHeight
+          height: modalContainer.offsetHeight,
         });
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fields, open]);
 
   const handleMouseDown = (e) => {
     setDragging(true);
-    setStartPosition({ 
+    setStartPosition({
       x: e.clientX,
-      y: e.clientY
+      y: e.clientY,
     });
   };
 
@@ -45,8 +67,14 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
     if (dragging) {
       const maxX = window.innerWidth - modalSize.width;
       const maxY = window.innerHeight - modalSize.height;
-      const newX = Math.max(0, Math.min(position.x + e.clientX - startPosition.x, maxX));
-      const newY = Math.max(0, Math.min(position.y + e.clientY - startPosition.y, maxY));
+      const newX = Math.max(
+        0,
+        Math.min(position.x + e.clientX - startPosition.x, maxX)
+      );
+      const newY = Math.max(
+        0,
+        Math.min(position.y + e.clientY - startPosition.y, maxY)
+      );
       setPosition({ x: newX, y: newY });
       setStartPosition({ x: e.clientX, y: e.clientY });
     }
@@ -58,18 +86,16 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
 
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
-    const newValue = e.target.type === 'checkbox' ? checked : value;
+    const newValue = e.target.type === "checkbox" ? checked : value;
     setFormValues((prevFormValues) => ({
       ...prevFormValues,
       [name]: newValue,
     }));
     onChange && onChange(name, newValue);
-    onChange && onChange(name, newValue);
   };
 
-
   const handleSubmit = () => {
-    if (typeof onSubmit === 'function') {
+    if (typeof onSubmit === "function") {
       onSubmit(formValues);
       handleClose();
     } else {
@@ -106,8 +132,8 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
             fullWidth
             size="medium"
             type={type}
-            style={{ marginBottom: '0.5rem', textAlign: 'center' }}
-            value={formValues[name] || ''}
+            style={{ marginBottom: "0.5rem", textAlign: "center" }}
+            value={formValues[name] || ""}
           />
         );
       case "select":
@@ -122,7 +148,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
               onChange={handleChange}
               fullWidth
               size="medium"
-              value={formValues[name] || ''}
+              value={formValues[name] || ""}
               label={label}
               style={{ marginBottom: "0.5rem", textAlign: "center" }}
             >
@@ -142,33 +168,43 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <div 
+      <div
         id="modal-container"
-        style={{ 
-          position: 'absolute', 
-          top: `${position.y}px`, 
-          left: `${position.x}px`, 
-          backgroundColor: 'white', 
-          borderRadius: '0.375rem', 
-          width: '80%', 
-          maxWidth: '50rem', 
-          maxHeight: '80%', 
-          overflow: 'auto', 
-          padding: '1.5rem', 
-          cursor: dragging ? 'grabbing' : 'grab',
-          zIndex: 9999
+        style={{
+          position: "absolute",
+          top: `${position.y}px`,
+          left: `${position.x}px`,
+          backgroundColor: "white",
+          borderRadius: "0.375rem",
+          width: "80%",
+          maxWidth: "50rem",
+          maxHeight: "80%",
+          overflow: "auto",
+          padding: "1.5rem",
+          cursor: dragging ? "grabbing" : "grab",
+          zIndex: 9999,
         }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        <Typography variant="h5" gutterBottom style={{ textAlign: 'center', marginBottom: '1.5rem', position: 'relative' }}>
-          <DragIndicatorIcon style={{ 
-            position: 'absolute', 
-            top: '-0.5rem', 
-            left: '0', 
-            fontSize: '2rem' // Ajusta el tamaño del ícono aquí
-          }} /> 
+        <Typography
+          variant="h5"
+          gutterBottom
+          style={{
+            textAlign: "center",
+            marginBottom: "1.5rem",
+            position: "relative",
+          }}
+        >
+          <DragIndicatorIcon
+            style={{
+              position: "absolute",
+              top: "-0.5rem",
+              left: "0",
+              fontSize: "2rem", // Ajusta el tamaño del ícono aquí
+            }}
+          />
           {title}
         </Typography>
         <Grid container spacing={2}>
