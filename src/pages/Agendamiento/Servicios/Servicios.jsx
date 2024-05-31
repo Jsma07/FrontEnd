@@ -193,29 +193,51 @@ const Servicios = () => {
     }
   };
 
-  const handleChange = (name, value) => {
-    setServicioSeleccionado((prevServicio) => ({
-      ...prevServicio,
-      [name]: value,
-    }));
-  };
 
   const handleToggleSwitch = async (id) => {
-    try {
-      const servicio = servicios.find((prov) => prov.IdServicio === id);
-      const updateServicio = {
-        ...servicio,
-        EstadoServicio: servicio.EstadoServicio === 1 ? 0 : 1,
-      };
-      await axios.put(
-        `http://localhost:5000/api/servicios/editar/${id}`,
-        updateServicio
-      );
-      fetchServicios(); // Actualiza la lista de proveedores después de la actualización
-    } catch (error) {
-      console.error("Error al cambiar estado de los servicios:", error);
+    const servicio = servicios.find(servicio => servicio.IdServicio === id);
+    if (!servicio) {
+        console.error('Servicio no encontrada');
+        return;
     }
-  };
+
+    const newEstado = servicio.EstadoServicio === 1 ? 0 : 1;
+
+    const result = await window.Swal.fire({
+        icon: 'warning',
+        title: '¿Estás seguro?',
+        text: '¿Quieres cambiar el estado del servicio?',
+        showCancelButton: true,
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'Cancelar',
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await axios.put(`http://localhost:5000/api/servicios/editar/${id}`, { EstadoServicio: newEstado });
+            fetchServicios(); // Actualiza la lista de categorías después de la actualización
+            window.Swal.fire({
+                icon: 'success',
+                title: 'Estado actualizado',
+                text: 'El estado del servicio ha sido actualizado correctamente.',
+            });
+        } catch (error) {
+            console.error('Error al cambiar el estado del servicio:', error);
+            window.Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un error al cambiar el estado del servicio. Por favor, inténtalo de nuevo más tarde.',
+            });
+        }
+    }
+};
+
+const handleChange = (name, value) => {
+  setServicioSeleccionado((prevServicio) => ({
+    ...prevServicio,
+    [name]: value,
+  }));
+};
 
   const handleCloseModalAgregar = () => {
     setOpenModalAgregar(false);
@@ -321,14 +343,16 @@ const Servicios = () => {
             width: 'w-48',
             renderCell: (params) => (
               <div className="flex justify-center space-x-4">
+                {params.row.EstadoServicio === 1 && (
                 <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
                   <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
                 </button>
-                <CustomSwitch
-                  active={params.row.EstadoServicio === 1}
-                  onToggle={() => handleToggleSwitch(params.row.IdServicio)}
-                />
-              </div>
+              )}
+              <CustomSwitch
+                active={params.row.EstadoServicio === 1}
+                onToggle={() => handleToggleSwitch(params.row.IdServicio)}
+              />
+            </div>
             ),
           },
         ]}

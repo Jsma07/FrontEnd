@@ -250,15 +250,14 @@ const Usuarios = () => {
   };
 
   const columns = [
-    { field: "nombre", headerName: "Nombre", width: "w-36" },
-    { field: "apellido", headerName: "Apellido", width: "w-36" },
-    { field: "correo", headerName: "Correo", width: "w-36" },
-    { field: "telefono", headerName: "Teléfono", width: "w-36" },
-    { field: "Documento", headerName: "Documento", width: "w-36" },
+    { field: "nombre", headerName: "Nombre" },
+    { field: "apellido", headerName: "Apellido" },
+    { field: "correo", headerName: "Correo" },
+    { field: "telefono", headerName: "Teléfono" },
+    { field: "Documento", headerName: "Documento" },
     {
       field: "rolId",
       headerName: "Rol",
-      width: "w-36",
       renderCell: (params) => {
         const rol = roles.find((role) => role.id === params.value);
         return rol ? rol.nombre : "Desconocido";
@@ -267,23 +266,22 @@ const Usuarios = () => {
     {
       field: "Acciones",
       headerName: "Acciones",
-      width: "w-48",
       renderCell: (params) => (
         <div className="flex justify-center space-x-4">
-          <button
-            onClick={() => handleEditClick(params.row.id)}
-            className="text-yellow-500"
-          >
-            <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
-          </button>
-          <CustomSwitch
-            active={params.row.estado === 1}
-            onToggle={() => handleToggleSwitch(params.row.id)}
-          />
-        </div>
+          {params.row.estado === 1 && (
+                <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
+                  <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
+                </button>
+              )}
+              <CustomSwitch
+                active={params.row.estado === 1}
+                onToggle={() => handleToggleSwitch(params.row.id)}
+              />
+            </div>
       ),
     },
   ];
+  
 
   if (isLoading) {
     return <LoadingScreen />;

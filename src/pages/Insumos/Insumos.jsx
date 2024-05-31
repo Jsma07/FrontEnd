@@ -203,20 +203,21 @@ const Insumos = () => {
           columns={[
             { field: 'nombre_categoria', headerName: 'CATEGORIA', width: 'w-36' },
             {
-              field: "ImgNombreInsumo",
-              headerName: "INSUMO",
-              width: "w-48",
+              field: "Imagen",
+              headerName: "IMAGEN",
+              width: "w-32",
               renderCell: (params) => (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                   <img
                     src={params.row.Imagen}
                     alt="Imagen"
-                    style={{ maxWidth: "100%", width: "3rem", height: "3rem", borderRadius: "50%", marginRight: "0.5rem" }}
+                    // eslint-disable-next-line no-dupe-keys
+                    style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
                   />
-                  <span>{params.row.NombreInsumos}</span>
                 </div>
               )
             },
+            { field: 'NombreInsumos', headerName: 'NOMBRE', width: 'w-36' },
             { field: 'Cantidad', headerName: 'CANTIDAD', width: 'w-36' },
             { field: 'UsosDisponibles', headerName: 'USOS DISPONIBLES', width: 'w-36' },
             { field: 'Estado', headerName: 'ESTADO', width: 'w-36', readOnly: true },
