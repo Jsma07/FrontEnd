@@ -18,30 +18,34 @@ const Usuarios = () => {
     const fetchRoles = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/roles");
-        setRoles(response.data.roles);
+        console.log("Roles response:", response.data); // Verifica la estructura de los datos aquí
+        setRoles(response.data.roles || []);
       } catch (error) {
         console.error("Error fetching roles:", error);
+        // Añade lógica para manejar el error, como mostrar un mensaje de error al usuario
       }
     };
-
+  
     fetchRoles();
   }, []);
+  
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const respuesta = await axios.get("http://localhost:5000/api/users");
-        setUsers(respuesta.data.usuarios);
+        const response = await axios.get("http://localhost:5000/api/users");
+        setUsers(response.data.usuarios);
         setIsLoading(false);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching users:", error);
+        setIsLoading(false); // Asegúrate de marcar isLoading como false en caso de error
       }
     };
     fetchUsers();
   }, []);
 
   const filtrar = users.filter((user) => {
-    const { nombre, apellido, correo, telefono, rolId } = user;
+    const { nombre, apellido, documento, correo, telefono, rolId } = user;
     const terminoABuscar = buscar.toLowerCase();
     const rol = roles.find((role) => role.id === rolId);
     const nombreRol = rol ? rol.nombre.toLowerCase() : "";
@@ -50,6 +54,7 @@ const Usuarios = () => {
       apellido.toLowerCase().includes(terminoABuscar) ||
       correo.toLowerCase().includes(terminoABuscar) ||
       telefono.includes(terminoABuscar) ||
+      documento.includes(terminoABuscar) ||
       nombreRol.includes(terminoABuscar)
     );
   });
@@ -107,7 +112,7 @@ const Usuarios = () => {
 
     const usuarioEditar = users.find((user) => user.id === id);
     if (!usuarioEditar) {
-      console.log("no encontrado");
+      console.log("Usuario no encontrado");
       return;
     }
 
@@ -264,24 +269,24 @@ const Usuarios = () => {
       },
     },
     {
-      field: "Acciones",
-      headerName: "Acciones",
+      field: 'Acciones',
+      headerName: 'Acciones',
+      width: 'w-48',
       renderCell: (params) => (
         <div className="flex justify-center space-x-4">
-          {params.row.estado === 1 && (
-                <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
-                  <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
-                </button>
-              )}
-              <CustomSwitch
-                active={params.row.estado === 1}
-                onToggle={() => handleToggleSwitch(params.row.id)}
-              />
-            </div>
+          {params.row.estado == 1 && (
+            <button onClick={() => handleEditClick(params.row.id)} className="text-yellow-500">
+              <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
+            </button>
+          )}
+          <CustomSwitch
+            active={params.row.estado === 1}
+            onToggle={() => handleToggleSwitch(params.row.id)}
+          />
+        </div>
       ),
     },
   ];
-  
 
   if (isLoading) {
     return <LoadingScreen />;

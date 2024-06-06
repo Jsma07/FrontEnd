@@ -1,48 +1,95 @@
-import React, { useState } from "react";
-import { Button, Modal } from "@mui/material";
-import ModalDinamico from "../../components/consts/modal";
+import React, { useState, useEffect } from 'react';
+import ModalDinamico from "../../components/consts/modal"; // Ajusta la ruta según la ubicación real de ModalDinamico
+import axios from "axios";
 
 const AddRoleModal = ({ open, handleClose }) => {
-  const [roleName, setRoleName] = useState("");
-  const [permissions, setPermissions] = useState({
-    Dashboard: { Leer: false, Crear: false },
-    Usuarios: { Leer: false, Crear: false },
-    Configuracion: { Leer: false, Crear: false },
-    Ventas: { Leer: false, Crear: false },
-  });
+  const [rol, setRol] = useState(""); // Estado para el nombre del rol
+  const [permisos, setPermisos] = useState([]);
 
-  const fields = [
-    { name: "roleName", label: "Nombre", type: "text" },
-    { name: "Dashboard.Leer", label: "Leer Dashboard", type: "checkbox" },
-    { name: "Dashboard.Crear", label: "Crear Dashboard", type: "checkbox" },
-    { name: "Usuarios.Leer", label: "Leer Usuarios", type: "checkbox" },
-    { name: "Usuarios.Crear", label: "Crear Usuarios", type: "checkbox" },
-    {
-      name: "Configuracion.Leer",
-      label: "Leer Configuración",
-      type: "checkbox",
-    },
-    {
-      name: "Configuracion.Crear",
-      label: "Crear Configuración",
-      type: "checkbox",
-    },
-    { name: "Ventas.Leer", label: "Leer Ventas", type: "checkbox" },
-    { name: "Ventas.Crear", label: "Crear Ventas", type: "checkbox" },
-  ];
-
-  const handleAddRole = () => {
-    // Aquí puedes implementar la lógica para agregar el nuevo rol con los permisos seleccionados
-    console.log("Nuevo rol y permisos:", { roleName, permissions });
-    // Luego puedes cerrar el modal
-    handleClose();
+  useEffect(() => {
+    const fetchPermisos = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/permisos");
+        if (response.data) {
+          const permisosFromApi = response.data.map(permiso => ({
+            ...permiso,
+            selected: false
+          }));
+          console.log("Permisos fetched from API:", permisosFromApi); // Depuración
+          setPermisos(permisosFromApi);
+        } else {
+          console.error("Error: No se obtuvieron datos de permisos");
+        }
+      } catch (error) {
+        console.error("Error al obtener permisos:", error);
+      }
+    };
+  
+    fetchPermisos();
+  }, []);
+  
+  const handleChange = (e) => {
+    const { value } = e.target;
+    setRol(value.trim()); // Actualizar el estado del nombre del rol
   };
 
+  const handleCheckboxChange = (event) => {
+    const { name, checked } = event.target;
+    const updatedPermisos = permisos.map((permiso) =>
+      permiso.idPermiso.toString() === name ? { ...permiso, selected: checked } : permiso
+    );
+    console.log("Checkbox state updated:", updatedPermisos); // Depuración
+    setPermisos(updatedPermisos);
+  };
+  
+  const handleAddRole = async (formData) => {
+    try {
+      const permisosSeleccionados = Object.keys(formData)
+        .filter(key => key !== "nombre" && formData[key])
+        .map(Number);
+        
+      console.log("Permisos seleccionados antes de enviar:", permisosSeleccionados);
+      console.log("Submitting form data:", {
+        nombre: formData.nombre,
+        permisos: permisosSeleccionados
+      });
+  
+      // Aquí se realiza la petición POST al backend
+      const response = await axios.post("http://localhost:5000/api/roles/crearRol", {
+        nombre: formData.nombre,
+        permisos: permisosSeleccionados
+      });
+  
+      // Manejo de la respuesta del backend
+      if (response.data && response.data.mensaje === 'Rol creado exitosamente') {
+        console.log('Rol creado exitosamente:', response.data);
+        handleClose();
+      } else {
+        console.error('Error al crear el rol:', response.data);
+      }
+    } catch (error) {
+      console.error("Error al crear el rol:", error);
+    }
+  };
+
+  // Definir los campos dinámicos para el formulario modal
+  const fields = [
+    { name: "nombre", label: "Nombre", type: "text", value: rol, onChange: handleChange }, // Campo para el nombre del rol
+    ...permisos.map(permiso => ({
+      name: permiso.idPermiso.toString(),
+      label: permiso.nombre,
+      type: "checkbox",
+      checked: permiso.selected || false,
+      onChange: handleCheckboxChange,
+    })),
+  ];
+
+  // Renderizar el componente ModalDinamico con los campos dinámicos y funciones correspondientes
   return (
     <ModalDinamico
       open={open}
       handleClose={handleClose}
-      handleSubmit={handleAddRole}
+      onSubmit={handleAddRole} // Pasar la función handleAddRole como onSubmit
       title="Agregar Nuevo Rol"
       fields={fields}
     />

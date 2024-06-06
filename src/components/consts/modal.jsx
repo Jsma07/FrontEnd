@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel } from '@mui/material';
+import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel, FormControlLabel, Checkbox } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator'; // Importa el ícono de arrastre
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChange }) => {
   const [formValues, setFormValues] = useState({});
@@ -14,13 +14,11 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
     if (fields && fields.length > 0) {
       const initialFormData = {};
       fields.forEach((field) => {
-        if (!formValues[field.name]) {
-          initialFormData[field.name] = field.value || '';
-        }
+        initialFormData[field.name] = field.type === 'checkbox' ? field.checked : field.value || '';
       });
-      setFormValues(prevFormValues => ({ ...prevFormValues, ...initialFormData }));
+      setFormValues(initialFormData);
     }
-    // Set the size of the modal when it opens
+
     if (open) {
       const modalContainer = document.getElementById('modal-container');
       if (modalContainer) {
@@ -30,7 +28,6 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
         });
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fields, open]);
 
   const handleMouseDown = (e) => {
@@ -57,19 +54,19 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
   };
 
   const handleChange = (e) => {
-    const { name, value, checked } = e.target;
-    const newValue = e.target.type === 'checkbox' ? checked : value;
+    const { name, value, checked, type } = e.target;
+    const newValue = type === 'checkbox' ? checked : value;
     setFormValues((prevFormValues) => ({
       ...prevFormValues,
       [name]: newValue,
     }));
-    onChange && onChange(name, newValue);
+    console.log(`Field ${name} changed to ${newValue}`); // Depuración
     onChange && onChange(name, newValue);
   };
 
-
   const handleSubmit = () => {
     if (typeof onSubmit === 'function') {
+      console.log("Form data before submit:", formValues); // Depuración
       onSubmit(formValues);
       handleClose();
     } else {
@@ -135,6 +132,19 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
             </Select>
           </div>
         );
+      case 'checkbox':
+        return (
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={!!formValues[name]}
+                onChange={handleChange}
+                name={name}
+              />
+            }
+            label={label}
+          />
+        );
       default:
         return null;
     }
@@ -167,7 +177,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
             position: 'absolute', 
             top: '-0.5rem', 
             left: '0', 
-            fontSize: '2rem' // Ajusta el tamaño del ícono aquí
+            fontSize: '2rem' 
           }} /> 
           {title}
         </Typography>
