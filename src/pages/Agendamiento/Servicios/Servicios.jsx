@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CustomSwitch from "../../../components/consts/switch";
-// import Table from "../../../components/consts/Tabla";
 import ModalAgregarServicio from "../../../components/consts/modal";
-import ModalEditarServicio from "../../../components/consts/modalMovimiento";
+import ModalEditarServicio from "../../../components/consts/modalEditar"; // Cambiado el nombre para mayor claridad
 import CamposObligatorios from "../../../components/consts/camposVacios";
 import TablePrueba from "../../../components/consts/Tabla";
 import Fab from '@mui/material/Fab';
@@ -50,7 +49,6 @@ const Servicios = () => {
           servicio.IdServicio !== formData.IdServicio
       );
 
-      // Validación de los campos obligatorios
       const camposObligatorios = [
         "ImgServicio",
         "Nombre_Servicio",
@@ -77,7 +75,6 @@ const Servicios = () => {
         return;
       }
 
-      // Verificar si el servicio ya está registrada
       if (servicioExistente) {
         window.Swal.fire({
           icon: "warning",
@@ -87,7 +84,6 @@ const Servicios = () => {
         return;
       }
 
-      // Confirmación antes de agregar el servicio
       const confirmation = await window.Swal.fire({
         title: "¿Estás seguro?",
         text: "¿Quieres agregar este servicio?",
@@ -123,15 +119,8 @@ const Servicios = () => {
         "Precio_Servicio",
       ];
 
-      console.log("Datos del formulario antes de validación:", formData); // Verificar datos del formulario
-      camposObligatorios.forEach((campo) => {
-        console.log(`Campo ${campo}:`, formData[campo]); // Verificar cada campo obligatorio
-      });
-
-      // Convertir `Precio_Servicio` a cadena de texto antes de la validación
       formData["Precio_Servicio"] = formData["Precio_Servicio"].toString();
 
-      // Validación de los campos obligatorios
       const todosCamposValidos = CamposObligatorios(
         formData,
         camposObligatorios,
@@ -193,11 +182,10 @@ const Servicios = () => {
     }
   };
 
-
   const handleToggleSwitch = async (id) => {
     const servicio = servicios.find(servicio => servicio.IdServicio === id);
     if (!servicio) {
-        console.error('Servicio no encontrada');
+        console.error('Servicio no encontrado');
         return;
     }
 
@@ -215,7 +203,7 @@ const Servicios = () => {
     if (result.isConfirmed) {
         try {
             await axios.put(`http://localhost:5000/api/servicios/editar/${id}`, { EstadoServicio: newEstado });
-            fetchServicios(); // Actualiza la lista de categorías después de la actualización
+            fetchServicios();
             window.Swal.fire({
                 icon: 'success',
                 title: 'Estado actualizado',
@@ -230,14 +218,14 @@ const Servicios = () => {
             });
         }
     }
-};
+  };
 
-const handleChange = (name, value) => {
-  setServicioSeleccionado((prevServicio) => ({
-    ...prevServicio,
-    [name]: value,
-  }));
-};
+  const handleChange = (name, value) => {
+    setServicioSeleccionado((prevServicio) => ({
+      ...prevServicio,
+      [name]: value,
+    }));
+  };
 
   const handleCloseModalAgregar = () => {
     setOpenModalAgregar(false);
@@ -256,30 +244,30 @@ const handleChange = (name, value) => {
 
   return (
     <div>
-     <div className="container mx-auto p-4 relative">
-      <center><h1 className="text-3xl font-bold mb-4">Gestion De Servicios</h1></center>
-      <div className="md:flex md:justify-between md:items-center mb-4">
-        <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
-          <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Buscar usuario</label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
+      <div className="container mx-auto p-4 relative">
+        <center><h1 className="text-3xl font-bold mb-4">Gestion De Servicios</h1></center>
+        <div className="md:flex md:justify-between md:items-center mb-4">
+          <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
+            <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Buscar servicio</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
+              </div>
+              <input
+                type="search"
+                id="default-search"
+                className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Buscar Servicio..."
+                value={buscar}
+                onChange={(e) => setBuscar(e.target.value)}
+                required
+              />
             </div>
-            <input
-              type="search"
-              id="default-search"
-              className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Buscar Servicio..."
-              value={buscar}
-              onChange={(e) => setBuscar(e.target.value)}
-              required
-            />
+          </div>
+          <div>
           </div>
         </div>
-        <div>
       </div>
-    </div>
-  </div>
       <ModalAgregarServicio
         open={openModalAgregar}
         handleClose={handleCloseModalAgregar}
@@ -317,7 +305,6 @@ const handleChange = (name, value) => {
 
       <TablePrueba
         columns={[
-          
           {
             field: "ImgServicio",
             headerName: "IMAGEN",
@@ -327,7 +314,6 @@ const handleChange = (name, value) => {
                 <img
                   src={params.row.ImgServicio}
                   alt="ImgServicio"
-                  // eslint-disable-next-line no-dupe-keys
                   style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
                 />
               </div>
@@ -336,7 +322,6 @@ const handleChange = (name, value) => {
           { field: 'Nombre_Servicio', headerName: 'NOMBRE', width: 'w-36' },
           { field: 'Tiempo_Servicio', headerName: 'TIEMPO', width: 'w-36' },
           { field: 'Precio_Servicio', headerName: 'PRECIO', width: 'w-36' },
-
           {
             field: 'Acciones',
             headerName: 'ACCIONES',
@@ -377,3 +362,4 @@ const handleChange = (name, value) => {
 };
 
 export default Servicios;
+

@@ -9,6 +9,7 @@ import Ventas from './pages/Ventas/Ventas';
 import Insumos from './pages/Insumos/Insumos';
 import Categorias from './pages/Insumos/Categorias';
 import Compras from './pages/Compras/Compras';
+import CrearCompra from './pages/Compras/crearCompra';
 import Agenda from './pages/Agendamiento/Agenda';
 import Login from './components/consts/Login';
 import Proveedores from './pages/Compras/Proveedores';
@@ -29,6 +30,7 @@ ReactDOM.render(
         <Route path="/ventas" element={<Ventas />} />
         <Route path="/compras" element={<Compras />} />
         <Route path="/compras/Proveedores" element={<Proveedores />} />
+        <Route path="/compras/crearCompra" element={<CrearCompra />}/>
         <Route path="/Insumos/Categorias" element={<Categorias />} />
         <Route path="/agendamiento" element={<Agenda />} /> 
         <Route path="/Salida_Insumos" element={<Salida />} />
