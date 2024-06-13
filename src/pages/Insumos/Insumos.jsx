@@ -211,7 +211,6 @@ const Insumos = () => {
                   <img
                     src={params.row.Imagen}
                     alt="Imagen"
-                    // eslint-disable-next-line no-dupe-keys
                     style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
                   />
                 </div>
