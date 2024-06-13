@@ -64,8 +64,10 @@ const Insumos = () => {
       });
   
       if (confirmation.isConfirmed) {
-        await axios.post('http://localhost:5000/api/insumos/guardarInsumo', {
-          ...formData,
+        await axios.post('http://localhost:5000/api/insumos/guardarInsumo', formData, {
+          headers:{
+            'Content-Type': 'multipart/form-data'
+          },
           // Convertir campos numéricos a números
           Cantidad: parseInt(Cantidad),
           UsosDisponibles: parseInt(UsosDisponibles),
@@ -82,46 +84,64 @@ const Insumos = () => {
 
   const handleEditInsumo = async (formData) => {
     try {
-        const camposObligatorios = ['NombreInsumos', 'Imagen', 'Cantidad', 'UsosDisponibles', 'Estado', 'IdCategoria'];
-
-        if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos del insumo.')) {
-          return;
-        }
-
-        const response = await axios.get('http://localhost:5000/api/insumos');
-        const insumos = response.data;
-        const insumoExistente = insumos.find(insumo => insumo.NombreInsumos === formData.NombreInsumos && insumo.IdInsumo !== formData.IdInsumo);
-
-        if (insumoExistente) {
-          window.Swal.fire({
-            icon: 'warning',
-            title: 'Insumo ya registrado',
-            text: 'El insumo ingresado ya está registrado.',
-          });
-          return;
-        }
-
-        const confirmation = await window.Swal.fire({
-          title: '¿Estás seguro?',
-          text: '¿Quieres actualizar este insumo?',
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Sí, actualizar',
-          cancelButtonText: 'Cancelar'
+      const camposObligatorios = ['NombreInsumos', 'Imagen', 'PrecioUnitario', 'Estado', 'IdCategoria'];
+  
+      // Validar campos obligatorios excluyendo IdCategoria
+      if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos del insumo.')) {
+        return;
+      }
+  
+      // Validar si el nombre del insumo ya existe
+      const response = await axios.get('http://localhost:5000/api/insumos');
+      const insumos = response.data;
+      const insumoExistente = insumos.find(insumo => insumo.NombreInsumos === formData.NombreInsumos && insumo.IdInsumos !== formData.IdInsumos);
+  
+      if (insumoExistente) {
+        window.Swal.fire({
+          icon: 'warning',
+          title: 'Insumo ya registrado',
+          text: 'El insumo ingresado ya está registrado.',
         });
-
-        if (confirmation.isConfirmed) {
-          await axios.put(`http://localhost:5000/api/insumos/editar/${formData.IdInsumos}`, formData);
-          handleCloseModalEditar();
-          fetchInsumos();
-          window.Swal.fire('¡Insumo actualizado!', '', 'success');
-        }
+        return;
+      }
+  
+      // Confirmación antes de actualizar el insumo
+      const confirmation = await window.Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¿Quieres actualizar este insumo?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, actualizar',
+        cancelButtonText: 'Cancelar'
+      });
+  
+      if (confirmation.isConfirmed) {
+        // Convertir campos numéricos a números si es necesario
+        const formDataWithNumbers = {
+          ...formData,
+          Cantidad: parseInt(formData.Cantidad),
+          UsosDisponibles: parseInt(formData.UsosDisponibles),
+        };
+  
+        // Realizar la solicitud PUT para actualizar el insumo
+        const response = await axios.put(`http://localhost:5000/api/insumos/editar/${formData.IdInsumos}`, formDataWithNumbers, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+  
+        // Cerrar el modal y actualizar la lista de insumos
+        handleCloseModalEditar();
+        fetchInsumos();
+        window.Swal.fire('¡Insumo actualizado!', '', 'success');
+      }
     } catch (error) {
-        console.error('Error al editar insumo:', error);
+      console.error('Error al editar insumo:', error);
     }
-};
+  };
+  
 
 
   const handleChange = (name, value) => {
@@ -167,8 +187,9 @@ const Insumos = () => {
           title="Crear Nuevo Insumo"
           fields={[
             { name: 'NombreInsumos', label: 'Nombre insumo', type: 'text' },
-            { name: 'Imagen', label: 'Imagen', type: 'text' },
             { name: 'Cantidad', label: 'Cantidad', type: 'number' },
+            { name: 'PrecioUnitario', label: 'Precio Unitario', type: 'number' },
+            { name: 'usos_unitarios', label: 'Usos Unitarios', type: 'number'},
             { name: 'UsosDisponibles', label: 'Usos Disponibles', type: 'number'},
             { 
               name: 'IdCategoria', 
@@ -176,6 +197,7 @@ const Insumos = () => {
               type: 'select', 
               options: categorias.filter(categoria => categoria.estado_categoria === 1).map(categoria => ({ value: categoria.IdCategoria, label: categoria.nombre_categoria })) 
             },
+            { name: 'Imagen', label: 'Imagen', type: 'file' },
           ]}
           onChange={handleChange}
         />
@@ -187,13 +209,14 @@ const Insumos = () => {
             fields={[
               { name: 'IdInsumos', label: 'Identificador', type: 'text', readOnly: true },
               { name: 'NombreInsumos', label: 'Nombre insumo', type: 'text' },
-              { name: 'Imagen', label: 'Imagen', type: 'text' },
               { 
                 name: 'IdCategoria', 
                 label: 'Categoria insumo', 
                 type: 'select', 
                 options: categorias.filter(categoria => categoria.estado_categoria === 1).map(categoria => ({ value: categoria.IdCategoria, label: categoria.nombre_categoria })) 
               },
+              { name: 'PrecioUnitario', label: 'Precio Unitario', type: 'number' },
+              { name: 'Imagen', label: 'Imagen', type: 'file' },
             ]}
             onChange={handleChange}
             entityData={insumoSeleccionado} 
@@ -209,9 +232,8 @@ const Insumos = () => {
               renderCell: (params) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                   <img
-                    src={params.row.Imagen}
+                    src={`http://localhost:5000${params.row.Imagen}`} // Asegúrate de usar la URL completa
                     alt="Imagen"
-                    // eslint-disable-next-line no-dupe-keys
                     style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
                   />
                 </div>
@@ -219,7 +241,9 @@ const Insumos = () => {
             },
             { field: 'NombreInsumos', headerName: 'NOMBRE', width: 'w-36' },
             { field: 'Cantidad', headerName: 'CANTIDAD', width: 'w-36' },
+            { field: 'usos_unitarios', headerName: 'USOS UNITARIOS', width: 'w-36' },
             { field: 'UsosDisponibles', headerName: 'USOS DISPONIBLES', width: 'w-36' },
+            { field: 'PrecioUnitario', headerName: 'PRECIO UNITARIO', width: 'w-36' },
             { field: 'Estado', headerName: 'ESTADO', width: 'w-36', readOnly: true },
             {
               field: 'Acciones',

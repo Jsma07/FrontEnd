@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import { Grid } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './components/consts/theme';
+
 import LoadingScreen from './components/consts/pantallaCarga'; // Importa tu componente de pantalla de carga
 
 function App() {

@@ -40,7 +40,14 @@ const Servicios = () => {
 
   const handleAddServicio = async (formData) => {
     try {
-      const { Nombre_Servicio } = formData;
+      const { Nombre_Servicio, ImgServicio } = formData;
+
+      if (ImgServicio && ImgServicio.size > 5 * 1024 * 1024) { // 5 MB en bytes
+        window.alert("El tamaño del archivo de imagen excede el límite permitido (5 MB).");
+        return;
+      }
+ 
+
       const response = await axios.get("http://localhost:5000/api/servicios");
       const servicios = response.data;
       const servicioExistente = servicios.find(
@@ -48,6 +55,7 @@ const Servicios = () => {
           servicio.Nombre_Servicio === Nombre_Servicio &&
           servicio.IdServicio !== formData.IdServicio
       );
+      
 
       const camposObligatorios = [
         "ImgServicio",
@@ -96,10 +104,19 @@ const Servicios = () => {
       });
 
       if (confirmation.isConfirmed) {
-        formData.EstadoServicio = 1;
+        const formDataObj = new FormData();
+        for (const key in formData) {
+          formDataObj.append(key, formData[key]);
+        }
+        formDataObj.append('EstadoServicio', 1);
         await axios.post(
           "http://localhost:5000/api/servicios/guardarServicio",
-          formData
+          formDataObj,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            }
+          }
         );
         handleCloseModalAgregar();
         fetchServicios();
@@ -169,9 +186,18 @@ const Servicios = () => {
       });
 
       if (confirmation.isConfirmed) {
+        const formDataObj = new FormData();
+        for (const key in formData) {
+          formDataObj.append(key, formData[key]);
+        }
         await axios.put(
           `http://localhost:5000/api/servicios/editar/${formData.IdServicio}`,
-          formData
+          formDataObj,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            }
+          }
         );
         handleCloseModalEditar();
         fetchServicios();
@@ -250,7 +276,7 @@ const Servicios = () => {
           <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
             <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Buscar servicio</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
               </div>
               <input
@@ -265,43 +291,60 @@ const Servicios = () => {
             </div>
           </div>
           <div>
+            <Fab
+              aria-label="add"
+              style={{
+                border: "0.5px solid grey",
+                backgroundColor: "#94CEF2",
+                position: "fixed",
+                bottom: "16px",
+                right: "16px",
+                zIndex: 1000,
+              }}
+              onClick={() => setOpenModalAgregar(true)}
+            >
+              <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
+            </Fab>
           </div>
         </div>
       </div>
-      <ModalAgregarServicio
-        open={openModalAgregar}
-        handleClose={handleCloseModalAgregar}
-        onSubmit={handleAddServicio}
-        title="Crear Nuevo Servicio"
-        fields={[
-          { name: "ImgServicio", label: "Imagen", type: "text" },
-          { name: "Nombre_Servicio", label: "Nombre", type: "text" },
-          { name: "Tiempo_Servicio", label: "Tiempo", type: "text" },
-          { name: "Precio_Servicio", label: "Precio", type: "number" },
-        ]}
-        onChange={handleChange}
-      />
 
-      <ModalEditarServicio
-        open={openModalEditar}
-        handleClose={handleCloseModalEditar}
-        onSubmit={handleEditServicio}
-        title="Editar Servicio"
-        fields={[
-          {
-            name: "IdServicio",
-            label: "Identificador",
-            type: "text",
-            readOnly: true,
-          },
-          { name: "ImgServicio", label: "Imagen", type: "text" },
-          { name: "Nombre_Servicio", label: "Nombre", type: "text" },
-          { name: "Tiempo_Servicio", label: "Tiempo", type: "text" },
-          { name: "Precio_Servicio", label: "Precio", type: "number" },
-        ]}
-        onChange={handleChange}
-        entityData={servicioSeleccionado}
-      />
+      <ModalAgregarServicio
+  open={openModalAgregar}
+  handleClose={handleCloseModalAgregar}
+  onSubmit={handleAddServicio}
+  title="Crear Nuevo Servicio"
+  fields={[
+    
+    { name: "Nombre_Servicio", label: "Nombre", type: "text" },
+    { name: "Tiempo_Servicio", label: "Tiempo", type: "text" },
+    { name: "Precio_Servicio", label: "Precio", type: "number" },
+    { name: "ImgServicio", label: "Imagen", type: "file" },
+  ]}
+  onChange={handleChange}
+/>
+
+<ModalEditarServicio
+  open={openModalEditar}
+  handleClose={handleCloseModalEditar}
+  onSubmit={handleEditServicio}
+  title="Editar Servicio"
+  fields={[
+    {
+      name: "IdServicio",
+      label: "Identificador",
+      type: "text",
+      readOnly: true,
+    },
+    { name: "Nombre_Servicio", label: "Nombre", type: "text" },
+    { name: "Tiempo_Servicio", label: "Tiempo", type: "text" },
+    { name: "Precio_Servicio", label: "Precio", type: "number" },
+    { name: "ImgServicio", label: "Imagen", type: "file" },
+
+  ]}
+  onChange={handleChange}
+  entityData={servicioSeleccionado}
+/>
 
       <TablePrueba
         columns={[
@@ -312,7 +355,7 @@ const Servicios = () => {
             renderCell: (params) => (
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                 <img
-                  src={params.row.ImgServicio}
+                  src={`http://localhost:5000${params.row.ImgServicio}`} // Ajustar la URL según la configuración del servidor
                   alt="ImgServicio"
                   style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
                 />
@@ -343,23 +386,8 @@ const Servicios = () => {
         ]}
         data={filtrar}
       />
-       <Fab
-        aria-label="add"
-        style={{
-          border: "0.5px solid grey",
-          backgroundColor: "#94CEF2",
-          position: "fixed",
-          bottom: "16px",
-          right: "16px",
-          zIndex: 1000,
-        }}
-        onClick={() => setOpenModalAgregar(true)}
-      >
-        <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
-      </Fab>
     </div>
   );
 };
 
 export default Servicios;
-
