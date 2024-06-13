@@ -45,22 +45,48 @@ const Proveedores = () => {
 
   const handleAddProveedor = async (formData) => {
     try {
-      const { correo_proveedor, telefono_proveedor, direccion_proveedor, empresa_proveedor } = formData;
+      const { NIT, correo_proveedor, telefono_proveedor, direccion_proveedor, empresa_proveedor } = formData;
       const response = await axios.get('http://localhost:5000/api/proveedores');
       const proveedores = response.data;
+      const proveedorExistenteNIT = proveedores.find(proveedor => proveedor.NIT === NIT);
       const proveedorExistenteCorreo = proveedores.find(proveedor => proveedor.correo_proveedor === correo_proveedor);
       const proveedorExistenteTelefono = proveedores.find(proveedor => proveedor.telefono_proveedor === telefono_proveedor);
       const proveedorExistenteDireccion = proveedores.find(proveedor => proveedor.direccion_proveedor === direccion_proveedor);
       const proveedorExistenteEmpresa = proveedores.find(proveedor => proveedor.empresa_proveedor === empresa_proveedor);
   
-      //Validacion de los campos vacios 
-      const camposObligatorios = ['nombre_proveedor', 'correo_proveedor', 'telefono_proveedor', 'direccion_proveedor', 'empresa_proveedor'];
+      const camposObligatorios = ['NIT','nombre_proveedor', 'correo_proveedor', 'telefono_proveedor', 'direccion_proveedor', 'empresa_proveedor'];
 
       if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos del proveedor.')) {
         return;
       }
 
-       // Validación de nombre_proveedor: no debe contener números ni caracteres especiales
+      if (proveedorExistenteNIT) {
+        window.Swal.fire({
+          icon: 'warning',
+          title: 'NIT ya registrado',
+          text: 'El NIT de la empresa ingresado ya está registrado para otro proveedor.',
+        });
+        return;
+      }
+      const nit = formData['NIT'];
+      if (!/^\d+$/.test(nit)) {
+        window.Swal.fire({
+          icon: 'error',
+          title: 'NIT de la empresa inválido',
+          text: 'Por favor, ingresa solo números en el campo del NIT de la empresa.',
+        });
+        return;
+      }
+
+      if (NIT.length !== 10) {
+        window.Swal.fire({
+          icon: 'error',
+          title: 'NIT de la empresa inválido',
+          text: 'Por favor, asegúrate de que el NIT de la empresa tenga 10 dígitos.',
+        });
+        return;
+      }
+
     const nombreProveedor = formData['nombre_proveedor'];
     if (!/^[a-zA-Z\s]+$/.test(nombreProveedor)) {
       window.Swal.fire({
@@ -72,7 +98,6 @@ const Proveedores = () => {
     }
 
     const correoProveedor = formData['correo_proveedor'];
-    // Validación del correo electrónico: debe terminar en @gmail.com o @hotmail.com
     if (!/\b[A-Za-z0-9._%+-]+@(gmail|hotmail)\.com\b/.test(correoProveedor)) {
       window.Swal.fire({
         icon: 'error',
@@ -82,7 +107,7 @@ const Proveedores = () => {
       return;
     }
      
-      const telefono = formData['telefono_proveedor'];
+    const telefono = formData['telefono_proveedor'];
       if (!/^\d+$/.test(telefono)) {
         window.Swal.fire({
           icon: 'error',
@@ -90,9 +115,8 @@ const Proveedores = () => {
           text: 'Por favor, ingresa solo números en el campo de teléfono.',
         });
         return;
-      }
+     }
 
-      // Validar longitud del número de teléfono
       if (telefono.length !== 10) {
         window.Swal.fire({
           icon: 'error',
@@ -375,6 +399,7 @@ return (
           onSubmit={(formData) => handleAddProveedor(formData)} 
           title="Crear Nuevo Proveedor"
           fields={[
+            { name: 'NIT', label: 'NIT', type: 'number' },
             { name: 'nombre_proveedor', label: 'Nombre', type: 'text' },
             { name: 'correo_proveedor', label: 'Correo', type: 'text' },
             { name: 'telefono_proveedor', label: 'Teléfono', type: 'text' },
@@ -391,6 +416,7 @@ return (
           title="Editar Proveedor"
           fields={[
             { name: 'IdProveedor', label: 'Identificador', type: 'text', readOnly: true }, 
+            { name: 'NIT', label: 'NIT', type: 'number' },
             { name: 'nombre_proveedor', label: 'Nombre', type: 'text' },
             { name: 'correo_proveedor', label: 'Correo', type: 'text' },
             { name: 'telefono_proveedor', label: 'Teléfono', type: 'text' },
@@ -403,6 +429,7 @@ return (
 
       <Table
         columns={[
+          { field: 'NIT', headerName: 'NIT', width: 'w-36' },
           { field: 'nombre_proveedor', headerName: 'NOMBRE', width: 'w-36' },
           { field: 'correo_proveedor', headerName: 'CORREO', width: 'w-36' },
           { field: 'telefono_proveedor', headerName: 'TELEFONO', width: 'w-36' },
@@ -437,7 +464,7 @@ return (
           position: 'fixed',
           bottom: '16px',
           right: '16px',
-          zIndex: 1000, // Asegura que el botón flotante esté por encima de otros elementos
+          zIndex: 1000, 
         }}
         onClick={() => setOpenModalAgregar(true)}
       >
