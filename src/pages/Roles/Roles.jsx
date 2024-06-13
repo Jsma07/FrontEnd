@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import CustomSwitch from "../../components/consts/switch";
 import AddRoleModal from "./ModalRol";
-import ModalEditar from "./ModalEditar"; // Asegúrate de importar correctamente el componente ModalEditar
+import ModalEditar from "./ModalEditar";
 import Table from "../../components/consts/Tabla";
 import axios from 'axios';
 import { Fab } from "@mui/material";
@@ -32,24 +32,48 @@ const Roles = () => {
   }, []);
 
   const handleToggleSwitch = async (id) => {
+    const updatedRoles = roles.map((rol) =>
+      rol.idRol === id ? { ...rol, EstadoRol: rol.EstadoRol === 1 ? 0 : 1 } : rol
+    );
+
     try {
-      const response = await axios.put(`http://localhost:5000/api/roles/${id}/toggle`);
-      if (response.data && response.data.success) {
-        const updatedRoles = roles.map(role => {
-          if (role.idRol === id) {
-            return {
-              ...role,
-              isActive: !role.isActive
-            };
-          }
-          return role;
-        });
-        setRoles(updatedRoles);
-      } else {
-        console.error('Error toggling role:', response.data);
+      const updatedRole = updatedRoles.find((rol) => rol.idRol === id);
+      if (!updatedRole) {
+        console.error("No se encontró el rol actualizado");
+        return;
       }
+
+      const result = await window.Swal.fire({
+        icon: "warning",
+        title: "¿Estás seguro?",
+        text: "¿Quieres cambiar el estado del rol?",
+        showCancelButton: true,
+        confirmButtonText: "Sí",
+        cancelButtonText: "Cancelar",
+      });
+
+      if (result.isConfirmed) {
+        const response = await axios.put(`http://localhost:5000/api/editarRol/${id}`, {
+          EstadoRol: updatedRole.EstadoRol,
+          nombre: updatedRole.nombre,
+          permisos: updatedRole.permisos.map(permiso => permiso.idPermiso)
+        });
+        if (response.status === 200) {
+          setRoles(updatedRoles);
+          window.Swal.fire({
+            icon: "success",
+            title: "Estado actualizado",
+            text: "El estado del rol ha sido actualizado correctamente.",
+          });
+        }}
     } catch (error) {
-      console.error('Error toggling role:', error);
+      console.error("Error al cambiar el estado del rol:", error);
+      window.Swal.fire({
+        icon: "error",
+        title: "Error",
+        text:
+          "Hubo un error al cambiar el estado del rol. Por favor, inténtalo de nuevo más tarde.",
+      });
     }
   };
 
@@ -78,10 +102,8 @@ const Roles = () => {
     { 
       field: 'permisos', 
       headerName: 'Modulo Permiso', 
-      
       width: 'w-36',
       renderCell: (params) => (
-        
         <ul style={{ textAlign: 'center' }}>
           {params.row.permisos && Array.isArray(params.row.permisos) ? (
             params.row.permisos.map(permiso => (
@@ -112,7 +134,7 @@ const Roles = () => {
             </svg>
           </button>
           <CustomSwitch
-            active={params.row.isActive}
+            active={params.row.EstadoRol === 1}
             onToggle={() => handleToggleSwitch(params.row.idRol)}
           />
         </div>

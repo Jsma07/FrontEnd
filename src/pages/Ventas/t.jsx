@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ModalInsumos from "../../components/consts/Modalventas";
-import Swal from "sweetalert2";
 
 const Registrar = () => {
   const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
@@ -93,9 +92,6 @@ const Registrar = () => {
     const idServicio = parseInt(event.target.Servicios.value);
     const idEmpleado = parseInt(event.target.Empleado.value);
     const idCliente = parseInt(event.target.Cliente.value);
-    const iva = parseFloat(event.target.iva.value);
-    const fecha = event.target.fecha.value;
-    const descuento = event.target.Descuento.value;
 
     // Recalcula los valores de subtotal, iva y total
     let subtotal = 0;
@@ -103,66 +99,33 @@ const Registrar = () => {
       subtotal +=
         insumo.precio_unitario * (cantidadInsumos[insumo.IdInsumos] || 0);
     });
-    const total = subtotal + (subtotal * iva) / 100;
+    const iva = subtotal * (parseFloat(event.target.iva.value) / 100);
+    const total = subtotal + iva;
 
-    const ventaData = {
+    const DatosGuardar = {
       idServicio: idServicio,
       idEmpleado: idEmpleado,
       IdCliente: idCliente,
-      Iva: iva,
+      Iva: event.target.iva.value,
       Subtotal: subtotal.toFixed(2),
-      Fecha: fecha,
-      Descuento: descuento,
-      Total: total.toFixed(2),
+      Fecha: event.target.fecha.value,
+      Descuento: event.target.Descuento.value,
+      Total: total.toFixed(2), 
       Estado: 2,
     };
 
-    console.log(ventaData);
+    console.log(DatosGuardar);
 
     try {
-      const ventaResponse = await axios.post(
+      const response = await axios.post(
         "http://localhost:5000/Jackenail/RegistrarVenta",
-        ventaData
+        DatosGuardar
       );
-
-      console.log("Venta registrada con éxito:", ventaResponse.data);
-
-      // Muestra la alerta de SweetAlert2
-      Swal.fire({
-        position: "bottom-end",
-        icon: "success",
-        title: "Venta registrada con éxito",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-
-      const detallesVenta = insumosSeleccionados.map((insumo) => {
-        const cantidad = cantidadInsumos[insumo.IdInsumos] || 0;
-        return {
-          Idventa: ventaResponse.data.idVentas,
-          Idinsumo: insumo.IdInsumos,
-          Usos: parseInt(cantidad),
-
-          Precio_unitario: insumo.precio_unitario,
-        };
-      });
-
-      console.log(detallesVenta);
-
-      const detallesResponse = await axios.post(
-        "http://localhost:5000/Jackenail/Detalleregistrar",
-        detallesVenta
-      );
-
-      console.log(
-        "Detalles de venta registrados con éxito:",
-        detallesResponse.data
-      );
+      console.log("Venta registrada con éxito:", response.data);
     } catch (error) {
       console.error("Error al registrar la venta:", error);
     }
   };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -296,6 +259,17 @@ const Registrar = () => {
                   </div>
 
                   <div className="form-group">
+                    <label htmlFor="total">Total</label>
+                    <input
+                      type="number" // Usamos el tipo de entrada de número
+                      id="total"
+                      name="total"
+                      className="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:border-gray-200 dark:text-gray-400 dark:border-gray-700"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
                     <label
                       htmlFor="first_name"
                       class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -309,6 +283,23 @@ const Registrar = () => {
                       placeholder="Iva"
                       name="iva"
                       required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label
+                      htmlFor="first_name"
+                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Subtotal
+                    </label>
+                    <input
+                      type="text"
+                      id="subtotal"
+                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="Subtotal"
+                      required
+                      name="subtotal"
                     />
                   </div>
 
@@ -351,29 +342,7 @@ const Registrar = () => {
                     insumosSeleccionados={insumosSeleccionados}
                     setInsumosSeleccionados={setInsumosSeleccionados}
                   />
-
-                  <div className="flex justify-center">
-                    <div className="form-group col-lg-3 col-md-3 col-sm-6 col-xs-12 mt-2 mb-3 mx-2">
-                      <button
-                        type="button"
-                        className="text-gray-900 bg-gradient-to-r from-lime-200 via-lime-400 to-lime-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-lime-300 dark:focus:ring-lime-800 shadow-lg shadow-lime-500/50 dark:shadow-lg dark:shadow-lime-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                        onClick={abrirModal}
-                      >
-                        <i className="fa-solid fa-cart-shopping"></i>insumos
-                      </button>
-                    </div>
-
-                    <div className="form-group col-lg-3 col-md-3 col-sm-6 col-xs-12 mt-2 mb-3 mx-2">
-                      <button
-                        type="submit"
-                        className="text-white bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 shadow-lg shadow-teal-500/50 dark:shadow-lg dark:shadow-teal-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                      >
-                        Guardar
-                      </button>
-                    </div>
-                  </div>
                 </form>
-
                 <div
                   className="panel-body"
                   style={{ marginBottom: "30px", overflowX: "auto" }}
@@ -438,6 +407,26 @@ const Registrar = () => {
                         </tfoot>
                       </tbody>
                     </table>
+                  </div>
+                </div>
+                <div className="flex justify-center">
+                  <div className="form-group col-lg-3 col-md-3 col-sm-6 col-xs-12 mt-2 mb-3 mx-2">
+                    <button
+                      type="button"
+                      className="text-gray-900 bg-gradient-to-r from-lime-200 via-lime-400 to-lime-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-lime-300 dark:focus:ring-lime-800 shadow-lg shadow-lime-500/50 dark:shadow-lg dark:shadow-lime-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                      onClick={abrirModal}
+                    >
+                      <i className="fa-solid fa-cart-shopping"></i>insumos
+                    </button>
+                  </div>
+
+                  <div className="form-group col-lg-3 col-md-3 col-sm-6 col-xs-12 mt-2 mb-3 mx-2">
+                    <button
+                      type="submit"
+                      className="text-white bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 shadow-lg shadow-teal-500/50 dark:shadow-lg dark:shadow-teal-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                    >
+                      Guardar
+                    </button>
                   </div>
                 </div>
               </div>

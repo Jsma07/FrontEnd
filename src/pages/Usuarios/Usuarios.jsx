@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
 import CustomSwitch from "../../components/consts/switch";
-import ModalDinamico from "../../components/consts/modal";
+import React, { useEffect, useState } from "react";
+import ModalDinamico from "../../components/consts/modalJ";
 import Table from "../../components/consts/Tabla";
 import axios from "axios";
 import LoadingScreen from "../../components/consts/pantallaCarga";
@@ -13,24 +13,35 @@ const Usuarios = () => {
   const [seleccionado, setSeleccionado] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [buscar, setBuscar] = useState("");
+  const [rolesActivos, setRolesActivos] = useState([]);
+
+
+  const [errors, setErrors] = useState({
+    nombre: "",
+    apellido: "",
+    correo: "",
+    telefono: "",
+    Documento: "",
+  });
+
+  useEffect(() => {
+    // Filtrar roles activos
+    const rolesFiltrados = roles.filter((rol) => rol.EstadoRol === 1);
+    setRolesActivos(rolesFiltrados);
+  }, [roles]);
 
   useEffect(() => {
     const fetchRoles = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/roles");
-        console.log("Roles response:", response.data); // Verifica la estructura de los datos aquí
-        setRoles(response.data.roles || []);
+        console.log("Roles response:", response.data);
+        setRoles(response.data);
       } catch (error) {
         console.error("Error fetching roles:", error);
-        // Añade lógica para manejar el error, como mostrar un mensaje de error al usuario
+        setRoles([]);
       }
     };
-  
-    fetchRoles();
-  }, []);
-  
 
-  useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/users");
@@ -38,35 +49,32 @@ const Usuarios = () => {
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching users:", error);
-        setIsLoading(false); // Asegúrate de marcar isLoading como false en caso de error
+        setIsLoading(false);
       }
     };
+
+    fetchRoles();
     fetchUsers();
   }, []);
-
   const filtrar = users.filter((user) => {
     const { nombre, apellido, documento, correo, telefono, rolId } = user;
     const terminoABuscar = buscar.toLowerCase();
-    const rol = roles.find((role) => role.id === rolId);
-    const nombreRol = rol ? rol.nombre.toLowerCase() : "";
+    const rol = roles.find((role) => role.idRol === rolId);
+    const nombreRol = rol ? rol.nombre : "";
     return (
       nombre.toLowerCase().includes(terminoABuscar) ||
       apellido.toLowerCase().includes(terminoABuscar) ||
       correo.toLowerCase().includes(terminoABuscar) ||
       telefono.includes(terminoABuscar) ||
       documento.includes(terminoABuscar) ||
-      nombreRol.includes(terminoABuscar)
+      nombreRol.toLowerCase().includes(terminoABuscar)
     );
   });
 
   const handleToggleSwitch = async (id) => {
-    const updatedUsers = users.map((user) => {
-      if (user.id === id) {
-        const newEstado = user.estado === 1 ? 0 : 1;
-        return { ...user, estado: newEstado };
-      }
-      return user;
-    });
+    const updatedUsers = users.map((user) =>
+      user.id === id ? { ...user, estado: user.estado === 1 ? 0 : 1 } : user
+    );
 
     try {
       const updatedUser = updatedUsers.find((user) => user.id === id);
@@ -100,7 +108,8 @@ const Usuarios = () => {
       window.Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Hubo un error al cambiar el estado del usuario. Por favor, inténtalo de nuevo más tarde.",
+        text:
+          "Hubo un error al cambiar el estado del usuario. Por favor, inténtalo de nuevo más tarde.",
       });
     }
   };
@@ -127,6 +136,13 @@ const Usuarios = () => {
   const handleCloseModal = () => {
     setOpenModal(false);
     setSeleccionado(null);
+    setErrors({
+      nombre: "",
+      apellido: "",
+      correo: "",
+      telefono: "",
+      Documento: "",
+    });
   };
 
   const handleCrearUsuarioClick = () => {
@@ -156,7 +172,8 @@ const Usuarios = () => {
       window.Swal.fire({
         icon: "error",
         title: "Campos obligatorios vacíos",
-        text: "Por favor, completa todos los campos obligatorios antes de continuar.",
+        text:
+          "Por favor, completa todos los campos obligatorios antes de continuar.",
       });
       return;
     }
@@ -164,10 +181,56 @@ const Usuarios = () => {
     const validacionCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!validacionCorreo.test(formData.correo)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        correo: "El correo ingresado tiene un formato inválido.",
+      }));
+      return;
+    }
+
+    const validacionNombreApellido = /^[a-zA-ZÀ-ÿ\s]{1,40}$/;
+
+    if (!validacionNombreApellido.test(formData.nombre)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        nombre: "El nombre ingresado tiene caracteres no válidos.",
+      }));
+      return;
+    }
+
+    if (!validacionNombreApellido.test(formData.apellido)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        apellido: "El apellido ingresado tiene caracteres no válidos.",
+      }));
+      return;
+    }
+
+    const validacionDocumento = /^[0-9]{1,10}$/;
+
+    if (!validacionDocumento.test(formData.Documento)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        Documento: "El documento ingresado debe contener solo números.",
+      }));
+      return;
+    }
+
+    const validacionTelefono = /^[0-9]{7,15}$/;
+
+    if (!validacionTelefono.test(formData.telefono)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        telefono: "El teléfono ingresado debe contener solo números.",
+      }));
+      return;
+    }
+    const rolSeleccionado = rolesActivos.find((rol) => rol.idRol === formData.rolId);
+    if (!rolSeleccionado) {
       window.Swal.fire({
-        icon: "error",
-        title: "Correo inválido",
-        text: "El correo ingresado tiene un formato inválido.",
+        icon: 'error',
+        title: 'Rol inactivo',
+        text: 'El rol seleccionado está inactivo. Por favor selecciona un rol activo.',
       });
       return;
     }
@@ -186,8 +249,6 @@ const Usuarios = () => {
         return;
       }
 
-      setIsLoading(true);
-
       // Verificar si el Documento ya existe
       const DocumentoExiste = users.some(
         (user) =>
@@ -198,9 +259,9 @@ const Usuarios = () => {
         window.Swal.fire({
           icon: "error",
           title: "Documento existente",
-          text: "El Documento ingresado ya está en uso. Por favor, utiliza otro Documento.",
+          text:
+            "El Documento ingresado ya está en uso. Por favor, utiliza otro Documento.",
         });
-        setIsLoading(false);
         return;
       }
 
@@ -215,11 +276,16 @@ const Usuarios = () => {
             },
           }
         );
+        const updatedUsers = users.map((user) =>
+          user.id === seleccionado.id ? { ...user, ...formData } : user
+        );
+        setUsers(updatedUsers);
         window.Swal.fire({
           icon: "success",
           title: "Usuario editado",
           text: "El usuario ha sido editado correctamente.",
         });
+
       } else {
         response = await axios.post(
           "http://localhost:5000/api/crearUsuario",
@@ -235,13 +301,13 @@ const Usuarios = () => {
           title: "Usuario creado",
           text: "El usuario ha sido creado correctamente.",
         });
+        setUsers([...users, formData]);
+
       }
 
       console.log("Respuesta del servidor:", response.data);
       handleCloseModal();
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
+     
     } catch (error) {
       console.error("Error al crear/editar usuario:", error);
       window.Swal.fire({
@@ -260,14 +326,14 @@ const Usuarios = () => {
     { field: "correo", headerName: "Correo", width: "w-36" },
     { field: "telefono", headerName: "Teléfono", width: "w-36" },
     { field: "Documento", headerName: "Documento", width: "w-36" },
-    {
-      field: "rolId",
-      headerName: "Rol",
-      width: "w-36",
+    { 
+      field: 'rolId', 
+      headerName: 'Rol', 
+      width: 'w-36',
       renderCell: (params) => {
-        const rol = roles.find((role) => role.id === params.value);
-        return rol ? rol.nombre : "Desconocido";
-      },
+        const rol = roles.find(role => role.id === params.value);
+        return  rol.nombre 
+      }
     },
     {
       field: "Acciones",
@@ -289,6 +355,8 @@ const Usuarios = () => {
       ),
     },
   ];
+  console.log("Roles en Usuarios:", roles); // Verifica los roles aquí antes de pasarlos a la tabla
+
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -365,7 +433,7 @@ const Usuarios = () => {
                 label: "Rol",
                 type: "select",
                 options: roles.map((role) => ({
-                  value: role.id,
+                  value: role.idRol,
                   label: role.nombre,
                 })),
                 value: seleccionado ? seleccionado.rolId : "",

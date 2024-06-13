@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import ModalDinamico from "../../components/consts/modal";
+import ModalDinamico from "../../components/consts/modalJ";
 import axios from "axios";
 
 const ModalEditar = ({ open, handleClose, roleId }) => {
@@ -7,7 +7,26 @@ const ModalEditar = ({ open, handleClose, roleId }) => {
   const [permisosSeleccionados, setPermisosSeleccionados] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const [formValues, setFormValues] = useState({});
-
+ const [roles, setRoles] = useState([])
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/roles'); 
+        if (response.data && Array.isArray(response.data)) {
+          const rolesWithPermissions = response.data.map(role => ({
+            ...role,
+            permisos: role.permisos || [] // Asegurar que permisos siempre sea un array
+          }));
+          setRoles(rolesWithPermissions);
+        } else {
+          console.error('Data received is empty or malformed:', response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching roles:', error);
+      }
+    };
+    fetchRoles();
+  }, []);
   useEffect(() => {
     if (open && roleId) {
       fetchRoleData();
@@ -68,12 +87,49 @@ const ModalEditar = ({ open, handleClose, roleId }) => {
     console.log(`Field ${name} changed to ${value}`); // Depuración
   };
 
-  const handleEditRole = async () => {
-    try {
-      if (!rol.trim()) {
-        console.error("Nombre del rol es requerido");
+  const handleEditRole = async (Data) => {
+    if (!Data.nombre.trim()){
+      console.log("campo nombre del rol vacio");
+      window.Swal.fire({
+        icon: "error",
+        title: "Nombre del rol vacío",
+        text: "Por favor, ingresa el nombre del rol.",
+      });
         return;
-      }
+    }
+    const RolExiste = roles.some(
+      (rol) =>
+        rol.nombre === Data.nombre && rol.idRol !== roleId
+    );
+
+    if (RolExiste) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Rol existente",
+        text: "El Rol ingresado ya está creado. Por favor, utiliza otro nombre.",
+      });
+      return;
+    }
+    const permisosSeleccionados = Object.keys(Data)
+    .filter(key => key !== "nombre" && Data[key])
+    .map(Number);
+    
+  console.log("Permisos seleccionados antes de enviar:", permisosSeleccionados);
+  console.log("Submitting form data:", {
+    nombre: Data.nombre,
+    permisos: permisosSeleccionados
+  });
+  // se verifica que al menos se seleccione un permiso antes de mandar la peticion
+    if (permisosSeleccionados.length === 0) {
+      console.log("Debes seleccionar al menos un permiso");
+      window.Swal.fire({
+        icon: "error",
+        title: "Permiso sin seleccionar",
+        text: "Por favor, selecciona al menos un permiso.",
+      });      return;
+    }
+    try {
+    
 
       const response = await axios.put(
         `http://localhost:5000/api/editarRol/${roleId}`,

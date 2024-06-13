@@ -1,14 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import ModalDinamico from "../../components/consts/modal"; // Ajusta la ruta según la ubicación real de ModalDinamico
+import ModalDinamico from "../../components/consts/modalJ"; // Ajusta la ruta según la ubicación real de ModalDinamico
 import axios from "axios";
 
 const AddRoleModal = ({ open, handleClose }) => {
   const [rol, setRol] = useState(""); // Estado para el nombre del rol
   const [permisos, setPermisos] = useState([]);
+  const [roles, setRoles] = useState([])
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/roles'); 
+        if (response.data && Array.isArray(response.data)) {
+          const rolesWithPermissions = response.data.map(role => ({
+            ...role,
+            permisos: role.permisos || [] // Asegurar que permisos siempre sea un array
+          }));
+          setRoles(rolesWithPermissions);
+        } else {
+          console.error('Data received is empty or malformed:', response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching roles:', error);
+      }
+    };
+    fetchRoles();
+  }, []);
+
 
   useEffect(() => {
     const fetchPermisos = async () => {
       try {
+        // se hace una peticion para traer los permisos 
         const response = await axios.get("http://localhost:5000/api/permisos");
         if (response.data) {
           const permisosFromApi = response.data.map(permiso => ({
@@ -43,16 +65,50 @@ const AddRoleModal = ({ open, handleClose }) => {
   };
   
   const handleAddRole = async (formData) => {
-    try {
-      const permisosSeleccionados = Object.keys(formData)
-        .filter(key => key !== "nombre" && formData[key])
-        .map(Number);
-        
-      console.log("Permisos seleccionados antes de enviar:", permisosSeleccionados);
-      console.log("Submitting form data:", {
-        nombre: formData.nombre,
-        permisos: permisosSeleccionados
+    // se verifica que el nombre del rol no sea vacio
+    if (!formData.nombre.trim()){
+      console.log("campo nombre del rol vacio");
+      window.Swal.fire({
+        icon: "error",
+        title: "Nombre del rol vacío",
+        text: "Por favor, ingresa el nombre del rol.",
       });
+        return;
+    }
+    const RolExiste = roles.some(
+      (rol) =>
+        rol.nombre === formData.nombre 
+    );
+
+    if (RolExiste) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Rol existente",
+        text: "El Rol ingresado ya está creado. Por favor, utiliza otro nombre.",
+      });
+      return;
+    }
+    const permisosSeleccionados = Object.keys(formData)
+    .filter(key => key !== "nombre" && formData[key])
+    .map(Number);
+    
+  console.log("Permisos seleccionados antes de enviar:", permisosSeleccionados);
+  console.log("Submitting form data:", {
+    nombre: formData.nombre,
+    permisos: permisosSeleccionados
+  });
+  // se verifica que al menos se seleccione un permiso antes de mandar la peticion
+    if (permisosSeleccionados.length === 0) {
+      console.log("Debes seleccionar al menos un permiso");
+      window.Swal.fire({
+        icon: "error",
+        title: "Permiso sin seleccionar",
+        text: "Por favor, selecciona al menos un permiso.",
+      });      return;
+    }
+    try {
+     
+      
   
       // Aquí se realiza la petición POST al backend
       const response = await axios.post("http://localhost:5000/api/roles/crearRol", {
@@ -89,10 +145,11 @@ const AddRoleModal = ({ open, handleClose }) => {
     <ModalDinamico
       open={open}
       handleClose={handleClose}
-      onSubmit={handleAddRole} // Pasar la función handleAddRole como onSubmit
+      onSubmit={handleAddRole} 
       title="Agregar Nuevo Rol"
       fields={fields}
     />
+   
   );
 };
 
