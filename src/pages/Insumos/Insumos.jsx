@@ -239,7 +239,7 @@ const Insumos = () => {
                 </div>
               )
             },
-            { field: 'NombreInsumos', headerName: 'NOMBRE', width: 'w-36' },
+            { field: 'NombreInsumos', headerName: 'NOMBRE INSUMO', width: 'w-36' },
             { field: 'Cantidad', headerName: 'CANTIDAD', width: 'w-36' },
             { field: 'usos_unitarios', headerName: 'USOS UNITARIOS', width: 'w-36' },
             { field: 'UsosDisponibles', headerName: 'USOS DISPONIBLES', width: 'w-36' },
