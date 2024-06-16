@@ -18,9 +18,11 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
     if (fields && fields.length > 0) {
       const initialFormData = {};
       fields.forEach((field) => {
-        initialFormData[field.name] = field.type === 'checkbox' ? field.checked : field.value || '';
+        if (!formValues[field.name]) {
+          initialFormData[field.name] = field.value || '';
+        }
       });
-      setFormValues(initialFormData);
+      setFormValues(prevFormValues => ({ ...prevFormValues, ...initialFormData }));
     }
 
     if (open) {
@@ -65,7 +67,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
       const reader = new FileReader();
       reader.onload = () => {
         // Verificar el tamaño del archivo antes de enviarlo
-        const maxSizeBytes = 1 * 20000 * 20000; // 1 MB en bytes
+        const maxSizeBytes = 1 * 1024 * 1024; // 1 MB en bytes
         if (file.size > maxSizeBytes) {
           setAlert(
             <Alert severity="warning" onClose={() => setAlert(null)}>
@@ -189,8 +191,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
       case "select":
         return (
           <div>
-            <InputLabel id={`${name}-label`}>{label
-            }</InputLabel>
+            <InputLabel id={`${name}-label`}>{label}</InputLabel>
             <Select
               labelId={`${name}-label`}
               id={name}
@@ -245,8 +246,8 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
             ) : (
               <label 
                 htmlFor={`dropzone-file-${name}`} 
-                className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600" 
-                style={{ width: '500px', height: '150px' }}
+                className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:border-gray-500"
+                style={{ width: '100%', height: '150px' }}
               >
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <svg 
