@@ -30,7 +30,7 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
       // Manejo de Imagen
       if (entityData.Imagen) {
         setImagePreview(`http://localhost:5000${entityData.Imagen}`);
-        setImageName('Imagen existente');
+        setImageName('Imagen existente en la base de datos');
         setImageSize('');
       }
     }
