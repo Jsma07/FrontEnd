@@ -42,7 +42,7 @@ const Insumos = () => {
       const { NombreInsumos, Cantidad, UsosDisponibles, Estado, IdCategoria } = formData;
   
       // Validación de los campos obligatorios
-      const camposObligatorios = ['NombreInsumos', 'Imagen', 'Cantidad', 'UsosDisponibles', 'Estado', 'IdCategoria'];
+      const camposObligatorios = ['NombreInsumos', 'Imagen', 'Cantidad', 'Estado', 'IdCategoria'];
       const newErrors = {};
   
       camposObligatorios.forEach((campo) => {
@@ -51,7 +51,6 @@ const Insumos = () => {
         }
       });
   
-      // Confirmación antes de agregar el insumo
       const confirmation = await window.Swal.fire({
         title: '¿Estás seguro?',
         text: '¿Quieres agregar este insumo?',
@@ -68,7 +67,6 @@ const Insumos = () => {
           headers:{
             'Content-Type': 'multipart/form-data'
           },
-          // Convertir campos numéricos a números
           Cantidad: parseInt(Cantidad),
           UsosDisponibles: parseInt(UsosDisponibles),
         });
@@ -81,7 +79,6 @@ const Insumos = () => {
     }
   };
   
-
   const handleEditInsumo = async (formData) => {
     try {
       const camposObligatorios = ['NombreInsumos', 'Imagen', 'PrecioUnitario', 'Estado', 'IdCategoria'];
@@ -91,7 +88,6 @@ const Insumos = () => {
         return;
       }
   
-      // Validar si el nombre del insumo ya existe
       const response = await axios.get('http://localhost:5000/api/insumos');
       const insumos = response.data;
       const insumoExistente = insumos.find(insumo => insumo.NombreInsumos === formData.NombreInsumos && insumo.IdInsumos !== formData.IdInsumos);
@@ -105,7 +101,6 @@ const Insumos = () => {
         return;
       }
   
-      // Confirmación antes de actualizar el insumo
       const confirmation = await window.Swal.fire({
         title: '¿Estás seguro?',
         text: '¿Quieres actualizar este insumo?',
@@ -118,22 +113,15 @@ const Insumos = () => {
       });
   
       if (confirmation.isConfirmed) {
-        // Convertir campos numéricos a números si es necesario
         const formDataWithNumbers = {
           ...formData,
-          Cantidad: parseInt(formData.Cantidad),
-          UsosDisponibles: parseInt(formData.UsosDisponibles),
         };
-  
-        // Realizar la solicitud PUT para actualizar el insumo
-        const response = await axios.put(`http://localhost:5000/api/insumos/editar/${formData.IdInsumos}`, formDataWithNumbers, {
+          const response = await axios.put(`http://localhost:5000/api/insumos/editar/${formData.IdInsumos}`, formDataWithNumbers, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         });
-  
-        // Cerrar el modal y actualizar la lista de insumos
-        handleCloseModalEditar();
+          handleCloseModalEditar();
         fetchInsumos();
         window.Swal.fire('¡Insumo actualizado!', '', 'success');
       }
@@ -142,8 +130,6 @@ const Insumos = () => {
     }
   };
   
-
-
   const handleChange = (name, value) => {
     setInsumoSeleccionado((prevInsumo) => ({
       ...prevInsumo,
@@ -190,7 +176,6 @@ const Insumos = () => {
             { name: 'Cantidad', label: 'Cantidad', type: 'number' },
             { name: 'PrecioUnitario', label: 'Precio Unitario', type: 'number' },
             { name: 'usos_unitarios', label: 'Usos Unitarios', type: 'number'},
-            { name: 'UsosDisponibles', label: 'Usos Disponibles', type: 'number'},
             { 
               name: 'IdCategoria', 
               label: 'Categoria insumo', 
