@@ -36,3 +36,10 @@ code {
     opacity: 0;
   }
 }
+<<<<<<< HEAD
+=======
+
+.swal2-container {
+  z-index: 10000; /* Ajusta este valor según sea necesario */
+}
+>>>>>>> 83221239b9bb6df3e04edf0fc6d3464f0f25499b

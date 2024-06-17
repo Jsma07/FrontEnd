@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import CancelIcon from "@mui/icons-material/Cancel";
-
+import Swal from "sweetalert2";
+import ModalDinamico from "../../components/consts/modal";
+import Table from "../../components/consts/Tabla";
 const Empleados = () => {
-  const [Empleados, setEmpleados] = useState([]);
+  const [empleados, setEmpleados] = useState([]);
+  const [empleado, setEmpleado] = useState([]);
+  const [filtro, setFiltro] = useState("");
+  const [modalData, setModalData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -13,12 +17,16 @@ const Empleados = () => {
         );
         setEmpleados(response.data);
       } catch (error) {
-        console.error("Error al obtener los datos de Empleados:", error);
+        console.error("Error al obtener los datos de empleados:", error);
       }
     };
 
     fetchData();
   }, []);
+
+  const handleOpenModal = (data) => {
+    setModalData(data);
+  };
 
   const columns = [
     { name: "FotoPerfil", label: "Foto de Perfil" },
@@ -28,99 +36,301 @@ const Empleados = () => {
     { name: "Telefono", label: "Teléfono" },
     { name: "Estado", label: "Estado" },
     { name: "IdRol", label: "ID de Rol" },
-    { name: "Acciones", label: "Acciones" },
   ];
+
+  const handleSubmit = async (formData) => {
+    try {
+      const correoExistente = empleados.some(
+        (empleado) => empleado.Correo === formData.Correo
+      );
+
+      if (correoExistente) {
+        Swal.fire({
+          icon: "error",
+          title: "Correo electrónico duplicado",
+          text: "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico.",
+        });
+      } else {
+        const result = await Swal.fire({
+          title: "¿Estás seguro?",
+          text: "¿Quieres registrar este empleado?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Sí",
+          cancelButtonText: "Cancelar",
+        });
+
+        if (result.isConfirmed) {
+          const EstadoNormalizado = formData.Estado ? 1 : 2;
+
+          const formDataNumerico = {
+            ...formData,
+            Telefono: parseInt(formData.Telefono),
+            Estado: EstadoNormalizado,
+            IdRol: parseInt(formData.IdRol),
+          };
+
+          console.log("Datos del formulario numéricos:", formDataNumerico);
+
+          await axios.post(
+            "http://localhost:5000/Jackenail/RegistrarEmpleados",
+            formDataNumerico
+          );
+
+          Swal.fire({
+            icon: "success",
+            title: "¡Registro exitoso!",
+            text: "El empleado se ha registrado correctamente.",
+          });
+
+          setModalData(null);
+
+          setEmpleados([...empleados, formDataNumerico]);
+        }
+      }
+    } catch (error) {
+      console.error("Error al registrar el empleado:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Ocurrió un error al registrar el empleado.",
+        footer: '<a href="#">Inténtelo nuevamente</a>',
+      });
+    }
+  };
+
+  const handleActualizacionSubmit = async (formData) => {
+    try {
+      const estadoNormalizado = formData.Estado ? 1 : 2;
+
+      const formDataNumerico = {
+        ...formData,
+        Telefono: parseInt(formData.Telefono),
+        Estado: estadoNormalizado,
+        IdRol: parseInt(formData.IdRol),
+      };
+
+      console.log(formDataNumerico);
+
+      const url = `http://localhost:5000/Jackenail/ActualizarEmpleados/${formDataNumerico.IdEmpleado}`;
+
+      await axios.put(url, formDataNumerico);
+
+      Swal.fire({
+        icon: "success",
+        title: "¡Actualización exitosa!",
+        text: "El empleado se ha actualizado correctamente.",
+      }).then((result) => {
+        if (result.isConfirmed || result.dismiss === Swal.DismissReason.close) {
+          setModalData(null);
+          window.location.reload(); // Recargar la página
+        }
+      });
+    } catch (error) {
+      console.error("Error al actualizar el empleado:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Ocurrió un error al actualizar el empleado.",
+        footer: '<a href="#">Inténtelo nuevamente</a>',
+      });
+    }
+  };
+
+  const empleadosFiltrados = empleados.filter((empleado) => {
+    return (
+      empleado.Nombre.toLowerCase().includes(filtro.toLowerCase()) ||
+      empleado.Apellido.toLowerCase().includes(filtro.toLowerCase()) ||
+      empleado.Correo.toLowerCase().includes(filtro.toLowerCase()) ||
+      empleado.Telefono.toString().includes(filtro) ||
+      (empleado.Estado === 1 ? "Activo" : "Inactivo")
+        .toLowerCase()
+        .includes(filtro.toLowerCase())
+    );
+  });
 
   return (
     <div
       style={{
         paddingTop: "5px",
-        width: "90vw",
         margin: "0 auto",
-        marginLeft: "-11vw",
-        borderRadius: "50% 50% 50% 50% / 40% 40% 60% 60%",
-        marginTop: "-40px",
+        borderRadius: "40px",
+        marginTop: "20px",
+        boxShadow: "0 4px 12px rgba(128, 0, 128, 0.1)",
+        position: "fixed",
+        left: "90px",
+        top: "80px",
+        width: "calc(100% - 100px)",
+        overflowY: "auto",
       }}
+      className="w-full mx-auto max-w-full"
     >
-      <div
-        className="w-full mx-auto max-w-full"
-        style={{
-          position: "fixed",
-          top: "calc(50% - 90px)",
-          left: "90px",
-          top: "80px",
-          width: "92%",
-          overflowY: "auto",
-        }}
-      >
-        <div className="w-full mx-auto max-w-full">
-          <div className="bg-white rounded-lg shadow-md p-8 border border-purple-500">
-            <h4 className="text-5xl mb-4">Gestión de empleados</h4>
+      <div className="bg-white rounded-lg shadow-md p-8 border border-purple-500">
+        <h4 className="text-5xl mb-4">Gestión de Empleados</h4>
 
-            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-              <div className="flex items-center justify-between flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900"></div>
-
-              <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                  <thead className="text-xs text-gray-700 uppercase bg-pink-100 dark:bg-pink-700 dark:text-gray-400">
-                    <tr>
-                      {columns.map((column) => (
-                        <th key={column.name} scope="col" className="px-6 py-3">
-                          {column.label}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Empleados.map((cliente, index) => (
-                      <tr
-                        key={index}
-                        className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                      >
-                        {columns.map((column) => (
-                          <td
-                            key={column.name}
-                            className="px-6 py-4 font-semibold text-gray-900 dark:text-white"
-                          >
-                            {column.name === "FotoPerfil" ? (
-                              <img
-                                src={cliente.FotoPerfil}
-                                className="w-16 h-16 md:w-24 md:h-24 object-cover rounded-full"
-                                alt={`${cliente.Nombre} ${cliente.Apellido}`}
-                              />
-                            ) : column.name === "Estado" ? (
-                              <span className="inline-flex items-center">
-                                <span
-                                  className={`h-2 w-2 rounded-full mr-1 ${
-                                    cliente[column.name] === 1
-                                      ? "bg-blue-500"
-                                      : cliente[column.name] === 2
-                                      ? "bg-green-500"
-                                      : cliente[column.name] === 3
-                                      ? "bg-red-500"
-                                      : ""
-                                  }`}
-                                ></span>{" "}
-                                {cliente[column.name] === 1
-                                  ? "En proceso"
-                                  : cliente[column.name] === 2
-                                  ? "Terminado"
-                                  : cliente[column.name] === 3
-                                  ? "Anulada"
-                                  : ""}
-                              </span>
-                            ) : (
-                              cliente[column.name]
-                            )}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+          <div className="flex items-center justify-between flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900">
+            <form onSubmit={(e) => e.preventDefault()} className="mb-4">
+              <label htmlFor="search" className="sr-only">
+                Buscar
+              </label>
+              <div className="flex justify-end">
+                <input
+                  type="text"
+                  placeholder="Buscar..."
+                  value={filtro}
+                  onChange={(e) => setFiltro(e.target.value)}
+                  className="p-2 border border-gray-300 rounded"
+                />
               </div>
-            </div>
+            </form>
           </div>
+
+          <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <Table columns={columns} data={empleadosFiltrados} />
+            {modalData && (
+              <ModalDinamico
+                open={true}
+                handleClose={() => setModalData(null)}
+                title="Registrar empleados"
+                fields={[
+                  {
+                    label: "Nombre",
+                    name: "Nombre",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Apellido",
+                    name: "Apellido",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Correo",
+                    name: "Correo",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Teléfono",
+                    name: "Telefono",
+                    type: "text",
+                    required: true,
+                  },
+
+                  {
+                    label: "Foto de Perfil",
+                    name: "FotoPerfil",
+                    type: "text",
+                    required: true,
+                  },
+
+                  {
+                    label: "Estado",
+                    name: "Estado",
+                    type: "switch",
+                    required: true,
+                    className: "col-span-6 md:col-span-3",
+                  },
+                  {
+                    label: "Rol",
+                    name: "IdRol",
+                    type: "select",
+                    required: true,
+                    options: [{ value: 3, label: "Clientes" }],
+                  },
+                ]}
+                onSubmit={handleSubmit}
+                seleccionado={modalData}
+              />
+            )}
+
+            {modalData && modalData.modo === "actualizacion" && (
+              <ModalDinamico
+                open={true}
+                handleClose={() => setModalData(null)}
+                title="Actualizar Empleado"
+                fields={[
+                  {
+                    label: "Nombre",
+                    name: "Nombre",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Apellido",
+                    name: "Apellido",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Correo",
+                    name: "Correo",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Teléfono",
+                    name: "Telefono",
+                    type: "text",
+                    required: true,
+                  },
+
+                  {
+                    label: "Foto de Perfil",
+                    name: "FotoPerfil",
+                    type: "text",
+                    required: true,
+                  },
+
+                  {
+                    label: "Rol",
+                    name: "IdRol",
+                    type: "select",
+                    required: true,
+                    options: [{ value: 3, label: "Clientes" }],
+                  },
+                  {
+                    label: "Estado",
+                    name: "Estado",
+                    type: "switch",
+                    required: true,
+                    className: "col-span-6 md:col-span-3",
+                  },
+                ]}
+                onSubmit={handleActualizacionSubmit}
+                seleccionado={modalData.seleccionado}
+              />
+            )}
+          </div>
+
+          <button
+            className="fixed bottom-4 right-4 bg-blue-500 text-white rounded-full p-3 shadow-xl hover:shadow-2xl"
+            style={{
+              right: "4rem",
+              bottom: "4rem",
+              boxShadow: "0 8px 20px rgba(0, 0, 0, 0.5)",
+            }}
+            onClick={() => handleOpenModal(empleado)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
