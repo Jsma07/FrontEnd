@@ -364,7 +364,7 @@ const Usuarios = () => {
 
   return (
     <div className="container mx-auto p-4 relative">
-      <h1 className="text-3xl font-bold mb-4">Administradores</h1>
+      <h1 className="text-3xl font-bold mb-4">Usuarios</h1>
       <div className="md:flex md:justify-between md:items-center mb-4">
         <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
           <label
@@ -394,7 +394,7 @@ const Usuarios = () => {
             open={openModal}
             handleClose={handleCloseModal}
             onSubmit={handleSubmit}
-            title={seleccionado ? "Editar Administrador" : "Crear nuevo Administrador"}
+            title={seleccionado ? "Editar Usuario" : "Crear nuevo usuario"}
             fields={[
               {
                 name: "nombre",
@@ -433,13 +433,13 @@ const Usuarios = () => {
                 label: "Rol",
                 type: "select",
                 options: roles
-                  .filter(role => role.idRol === 1) // Filtrar para mostrar solo el rol con idRol 1
+                  .filter(role => role.idRol !== 1  && role.idRol !== 2  && role.idRol !== 4) // Filtrar para mostrar solo el rol con idRol 1
                   .map(role => ({
                     value: role.idRol,
                     label: role.nombre,
                   })),
-                value: 1, // Siempre seleccionar el rol con idRol 1
-                disabled: true, // Deshabilitar el select
+               
+                disabled: false, // Deshabilitar el select
               },
               {
                 name: "contrasena",

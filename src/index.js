@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ReactDOM from 'react-dom';
 import Roles from './pages/Roles/Roles';
 import Usuarios from './pages/Usuarios/Usuarios';
+import Usuarios2 from './pages/Usuarios2/Usuarios2';
 import Ventas from './pages/Ventas/Ventas';
 import Insumos from './pages/Insumos/Insumos';
 import Categorias from './pages/Insumos/Categorias';
@@ -27,6 +28,7 @@ ReactDOM.render(
       <Route path="/" element={<App />} >
         <Route path="/configuracion/roles" element={<Roles />} />
         <Route path="/Usuarios/Administradores" element={<Usuarios />} />
+        <Route path="/Usuarios" element={<Usuarios2 />} />
         <Route path="/ventas" element={<Ventas />} />
         <Route path="/compras" element={<Compras />} />
         <Route path="/compras/Proveedores" element={<Proveedores />} />

@@ -200,6 +200,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
               variant="outlined"
               onChange={handleChange}
               onBlur={handleBlur}
+              disabled={field.disabled}
               fullWidth
               size="medium"
               value={formValues[name] || ''}
