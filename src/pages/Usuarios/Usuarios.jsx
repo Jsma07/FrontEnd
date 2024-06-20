@@ -5,6 +5,7 @@ import Table from "../../components/consts/Tabla";
 import axios from "axios";
 import LoadingScreen from "../../components/consts/pantallaCarga";
 import Fab from "@mui/material/Fab";
+import Modal  from "../../components/consts/modalContrasena"
 
 const Usuarios = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -14,6 +15,11 @@ const Usuarios = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [buscar, setBuscar] = useState("");
   const [rolesActivos, setRolesActivos] = useState([]);
+  const [openPasswordModal, setOpenPasswordModal] = useState(false); // Nuevo estado para controlar el modal de cambio de contraseña
+  const [passwordForm, setPasswordForm] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
 
 
   const [errors, setErrors] = useState({
@@ -57,19 +63,27 @@ const Usuarios = () => {
     fetchUsers();
   }, []);
   const filtrar = users.filter((user) => {
-    const { nombre, apellido, documento, correo, telefono, rolId } = user;
+    const { nombre = "", apellido = "", Documento = "", correo = "", telefono = "", rolId } = user;
+
+    // Solo mostrar usuarios con el rol de idRol 1
+    if (rolId !== 1 ) {
+      return false;
+    }
+
     const terminoABuscar = buscar.toLowerCase();
     const rol = roles.find((role) => role.idRol === rolId);
     const nombreRol = rol ? rol.nombre : "";
+
     return (
       nombre.toLowerCase().includes(terminoABuscar) ||
       apellido.toLowerCase().includes(terminoABuscar) ||
       correo.toLowerCase().includes(terminoABuscar) ||
       telefono.includes(terminoABuscar) ||
-      documento.includes(terminoABuscar) ||
+      Documento.includes(terminoABuscar) ||
       nombreRol.toLowerCase().includes(terminoABuscar)
     );
   });
+
 
   const handleToggleSwitch = async (id) => {
     const updatedUsers = users.map((user) =>
@@ -147,6 +161,65 @@ const Usuarios = () => {
 
   const handleCrearUsuarioClick = () => {
     handleOpenModal();
+  };
+  const handlePasswordModalClose = () => {
+    setOpenPasswordModal(false);
+    setPasswordForm({
+      newPassword: "",
+      confirmPassword: "",
+    });
+  };
+
+
+  const handleSubmitPasswordChange = async (newPassword, confirmPassword) => {
+    if (newPassword !== confirmPassword) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Las contraseñas no coinciden.",
+      });
+      return;
+    }
+  
+    if (newPassword.length < 8) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "La contraseña debe tener al menos 8 caracteres.",
+      });
+      return;
+    }
+  
+    try {
+      await axios.put(`http://localhost:5000/api/actualizarContrasena/${seleccionado.id}`, {
+        newPassword: newPassword,
+      });
+  
+      window.Swal.fire({
+        icon: "success",
+        title: "Contraseña actualizada",
+        text: "La contraseña del usuario ha sido actualizada correctamente.",
+      });
+      handlePasswordModalClose(); // Cerrar el modal después de actualizar la contraseña
+    } catch (error) {
+      console.error("Error al cambiar la contraseña del usuario:", error);
+      window.Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Hubo un error al cambiar la contraseña del usuario. Por favor, inténtalo de nuevo más tarde.",
+      });
+    }
+  };
+  
+  
+  const handlePasswordChangeClick = (id) => {
+    const usuarioSeleccionado = users.find((user) => user.id === id);
+    if (usuarioSeleccionado) {
+      setSeleccionado(usuarioSeleccionado);
+      setOpenPasswordModal(true);
+    } else {
+      console.error("Usuario no encontrado");
+    }
   };
 
   const handleSubmit = async (formData) => {
@@ -347,6 +420,14 @@ const Usuarios = () => {
           >
             <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
           </button>
+         
+          <button
+          onClick={() => {
+            handlePasswordChangeClick(params.row.id); // Abrir el modal de contraseña al hacer clic
+          }}
+          className="text-black-500"
+        >
+<i className='bx bx-lock'  style={{ fontSize: "24px" }}></i>        </button>
           <CustomSwitch
             active={params.row.estado === 1}
             onToggle={() => handleToggleSwitch(params.row.id)}
@@ -355,7 +436,7 @@ const Usuarios = () => {
       ),
     },
   ];
-  console.log("Roles en Usuarios:", roles); // Verifica los roles aquí antes de pasarlos a la tabla
+  // console.log("Roles en Usuarios:", roles); // Verifica los roles aquí antes de pasarlos a la tabla
 
 
   if (isLoading) {
@@ -389,6 +470,12 @@ const Usuarios = () => {
           </div>
         </div>
         <div>
+        <Modal
+  open={openPasswordModal}
+  handleClose={handlePasswordModalClose}
+  handleSubmit={handleSubmitPasswordChange}
+/>
+
           <ModalDinamico
             seleccionado={seleccionado}
             open={openModal}
@@ -446,6 +533,8 @@ const Usuarios = () => {
                 label: "Contraseña",
                 type: "password",
                 value: seleccionado ? seleccionado.contrasena : "",
+
+                hidden: seleccionado,
               },
             ]}
           />
@@ -466,6 +555,7 @@ const Usuarios = () => {
       >
         <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
       </Fab>
+    
     </div>
   );
 };

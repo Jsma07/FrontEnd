@@ -57,19 +57,27 @@ const Usuarios = () => {
     fetchUsers();
   }, []);
   const filtrar = users.filter((user) => {
-    const { nombre, apellido, documento, correo, telefono, rolId } = user;
+    const { nombre = "", apellido = "", Documento = "", correo = "", telefono = "", rolId } = user;
+
+    // Solo mostrar usuarios con el rol de idRol 1
+    if (rolId === 1 || rolId === 2 || rolId === 4) {
+      return false;
+    }
+
     const terminoABuscar = buscar.toLowerCase();
     const rol = roles.find((role) => role.idRol === rolId);
     const nombreRol = rol ? rol.nombre : "";
+
     return (
       nombre.toLowerCase().includes(terminoABuscar) ||
       apellido.toLowerCase().includes(terminoABuscar) ||
       correo.toLowerCase().includes(terminoABuscar) ||
       telefono.includes(terminoABuscar) ||
-      documento.includes(terminoABuscar) ||
+      Documento.includes(terminoABuscar) ||
       nombreRol.toLowerCase().includes(terminoABuscar)
     );
   });
+
 
   const handleToggleSwitch = async (id) => {
     const updatedUsers = users.map((user) =>
@@ -433,7 +441,7 @@ const Usuarios = () => {
                 label: "Rol",
                 type: "select",
                 options: roles
-                  .filter(role => role.idRol !== 1  && role.idRol !== 2  && role.idRol !== 4) // Filtrar para mostrar solo el rol con idRol 1
+                  .filter(role => role.idRol !== 1  && role.idRol !== 2  && role.idRol !== 4 &&role.EstadoRol !== 0) // Filtrar para mostrar solo el rol con idRol 1
                   .map(role => ({
                     value: role.idRol,
                     label: role.nombre,
