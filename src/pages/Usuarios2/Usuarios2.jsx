@@ -1,10 +1,11 @@
-import CustomSwitch from "../../components/consts/switch";
 import React, { useEffect, useState } from "react";
 import ModalDinamico from "../../components/consts/modalJ";
 import Table from "../../components/consts/Tabla";
 import axios from "axios";
 import LoadingScreen from "../../components/consts/pantallaCarga";
 import Fab from "@mui/material/Fab";
+import Modal from "../../components/consts/modalContrasena";
+import CustomSwitch from "../../components/consts/switch"
 
 const Usuarios = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -14,14 +15,19 @@ const Usuarios = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [buscar, setBuscar] = useState("");
   const [rolesActivos, setRolesActivos] = useState([]);
-
-
-  const [errors, setErrors] = useState({
+  const [openPasswordModal, setOpenPasswordModal] = useState(false); // Nuevo estado para controlar el modal de cambio de contraseña
+  const [passwordForm, setPasswordForm] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
     correo: "",
     telefono: "",
     Documento: "",
+    rolId: "",
+    contrasena: "",
   });
 
   useEffect(() => {
@@ -56,6 +62,7 @@ const Usuarios = () => {
     fetchRoles();
     fetchUsers();
   }, []);
+
   const filtrar = users.filter((user) => {
     const { nombre = "", apellido = "", Documento = "", correo = "", telefono = "", rolId } = user;
 
@@ -78,6 +85,64 @@ const Usuarios = () => {
     );
   });
 
+  const handlePasswordModalClose = () => {
+    setOpenPasswordModal(false);
+    setPasswordForm({
+      newPassword: "",
+      confirmPassword: "",
+    });
+  };
+
+  const handleSubmitPasswordChange = async (newPassword, confirmPassword) => {
+    if (newPassword !== confirmPassword) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Las contraseñas no coinciden.",
+      });
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "La contraseña debe tener al menos 8 caracteres.",
+      });
+      return;
+    }
+
+    try {
+      await axios.put(`http://localhost:5000/api/actualizarContrasena/${seleccionado.id}`, {
+        newPassword: newPassword,
+      });
+
+      window.Swal.fire({
+        icon: "success",
+        title: "Contraseña actualizada",
+        text: "La contraseña del usuario ha sido actualizada correctamente.",
+      });
+      handlePasswordModalClose(); // Cerrar el modal después de actualizar la contraseña
+    } catch (error) {
+      console.error("Error al cambiar la contraseña del usuario:", error);
+      window.Swal.fire({
+        icon: "error",
+        title: "Error",
+        text:
+          "Hubo un error al cambiar la contraseña del usuario. Por favor, inténtalo de nuevo más tarde.",
+      });
+    }
+  };
+
+  const handlePasswordChangeClick = (id) => {
+    const usuarioSeleccionado = users.find((user) => user.id === id);
+    if (usuarioSeleccionado) {
+      setSeleccionado(usuarioSeleccionado);
+      setOpenPasswordModal(true);
+    } else {
+      console.error("Usuario no encontrado");
+    }
+  };
 
   const handleToggleSwitch = async (id) => {
     const updatedUsers = users.map((user) =>
@@ -144,12 +209,14 @@ const Usuarios = () => {
   const handleCloseModal = () => {
     setOpenModal(false);
     setSeleccionado(null);
-    setErrors({
+    setFormData({
       nombre: "",
       apellido: "",
       correo: "",
       telefono: "",
       Documento: "",
+      rolId: "",
+      contrasena: "",
     });
   };
 
@@ -189,56 +256,81 @@ const Usuarios = () => {
     const validacionCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!validacionCorreo.test(formData.correo)) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        correo: "El correo ingresado tiene un formato inválido.",
-      }));
+      window.Swal.fire({
+        icon: "error",
+        title: "Correo Invalido",
+        text: "El correo no contiene el formato válido.",
+      });
       return;
     }
 
     const validacionNombreApellido = /^[a-zA-ZÀ-ÿ\s]{1,40}$/;
 
     if (!validacionNombreApellido.test(formData.nombre)) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        nombre: "El nombre ingresado tiene caracteres no válidos.",
-      }));
+      window.Swal.fire({
+        icon: "error",
+        title: "Cáracteres incorrectos",
+        text:
+          "El campo nombre no puede contener caracteres especiales ni números",
+      });
       return;
     }
 
     if (!validacionNombreApellido.test(formData.apellido)) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        apellido: "El apellido ingresado tiene caracteres no válidos.",
-      }));
+      window.Swal.fire({
+        icon: "error",
+        title: "Cáracteres incorrectos",
+        text:
+          "El campo apellido no puede contener caracteres especiales ni números",
+      });
       return;
     }
 
     const validacionDocumento = /^[0-9]{1,10}$/;
 
     if (!validacionDocumento.test(formData.Documento)) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        Documento: "El documento ingresado debe contener solo números.",
-      }));
+      window.Swal.fire({
+        icon: "error",
+        title: "Cáracteres incorrectos",
+        text: "El campo documento solo puede contener números ",
+      });
+      return;
+    }
+    if (formData.Documento > 15) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Máximo excedido",
+        text: "El campo documento excede la cantidad de números.",
+      });
+      return;
+    }
+    if (formData.Documento < 10) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Mínimo no alcanzado",
+        text: "El campo documento no contiene la cantidad minima de números.",
+      });
       return;
     }
 
     const validacionTelefono = /^[0-9]{7,15}$/;
 
     if (!validacionTelefono.test(formData.telefono)) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        telefono: "El teléfono ingresado debe contener solo números.",
-      }));
+      window.Swal.fire({
+        icon: "error",
+        title: "Télefono incorrecto",
+        text: "El campo telefono solo permite números.",
+      });
       return;
     }
+
     const rolSeleccionado = rolesActivos.find((rol) => rol.idRol === formData.rolId);
     if (!rolSeleccionado) {
       window.Swal.fire({
-        icon: 'error',
-        title: 'Rol inactivo',
-        text: 'El rol seleccionado está inactivo. Por favor selecciona un rol activo.',
+        icon: "error",
+        title: "Rol inactivo",
+        text:
+          "El rol seleccionado está inactivo. Por favor selecciona un rol activo.",
       });
       return;
     }
@@ -246,7 +338,7 @@ const Usuarios = () => {
     try {
       const result = await window.Swal.fire({
         icon: "warning",
-        title: "¿Estás seguro?",
+        title: `¿Estás seguro?`,
         text: `¿Quieres ${seleccionado ? "editar" : "crear"} el usuario?`,
         showCancelButton: true,
         confirmButtonText: "Sí",
@@ -293,7 +385,6 @@ const Usuarios = () => {
           title: "Usuario editado",
           text: "El usuario ha sido editado correctamente.",
         });
-
       } else {
         response = await axios.post(
           "http://localhost:5000/api/crearUsuario",
@@ -310,18 +401,17 @@ const Usuarios = () => {
           text: "El usuario ha sido creado correctamente.",
         });
         setUsers([...users, formData]);
-
       }
 
       console.log("Respuesta del servidor:", response.data);
       handleCloseModal();
-     
     } catch (error) {
       console.error("Error al crear/editar usuario:", error);
       window.Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Hubo un error al crear/editar el usuario. Por favor, inténtalo de nuevo más tarde.",
+        text:
+          "Hubo un error al crear/editar el usuario. Por favor, inténtalo de nuevo más tarde.",
       });
     } finally {
       setIsLoading(false);
@@ -334,14 +424,14 @@ const Usuarios = () => {
     { field: "correo", headerName: "Correo", width: "w-36" },
     { field: "telefono", headerName: "Teléfono", width: "w-36" },
     { field: "Documento", headerName: "Documento", width: "w-36" },
-    { 
-      field: 'rolId', 
-      headerName: 'Rol', 
-      width: 'w-36',
+    {
+      field: "rolId",
+      headerName: "Rol",
+      width: "w-36",
       renderCell: (params) => {
-        const rol = roles.find(role => role.id === params.value);
-        return  rol.nombre 
-      }
+        const rol = roles.find((role) => role.id === params.value);
+        return rol ? rol.nombre : "";
+      },
     },
     {
       field: "Acciones",
@@ -355,6 +445,14 @@ const Usuarios = () => {
           >
             <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
           </button>
+          <button
+            onClick={() => {
+              handlePasswordChangeClick(params.row.id); // Abrir el modal de contraseña al hacer clic
+            }}
+            className="text-black-500"
+          >
+            <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>
+          </button>
           <CustomSwitch
             active={params.row.estado === 1}
             onToggle={() => handleToggleSwitch(params.row.id)}
@@ -363,8 +461,6 @@ const Usuarios = () => {
       ),
     },
   ];
-  console.log("Roles en Usuarios:", roles); // Verifica los roles aquí antes de pasarlos a la tabla
-
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -397,6 +493,11 @@ const Usuarios = () => {
           </div>
         </div>
         <div>
+          <Modal
+            open={openPasswordModal}
+            handleClose={handlePasswordModalClose}
+            handleSubmit={handleSubmitPasswordChange}
+          />
           <ModalDinamico
             seleccionado={seleccionado}
             open={openModal}
@@ -408,25 +509,33 @@ const Usuarios = () => {
                 name: "nombre",
                 label: "Nombre",
                 type: "text",
-                value: seleccionado ? seleccionado.nombre : "",
+                value: formData.nombre,
+                onChange: (e) =>
+                  setFormData({ ...formData, nombre: e.target.value }),
               },
               {
                 name: "apellido",
                 label: "Apellido",
                 type: "text",
-                value: seleccionado ? seleccionado.apellido : "",
+                value: formData.apellido,
+                onChange: (e) =>
+                  setFormData({ ...formData, apellido: e.target.value }),
               },
               {
                 name: "correo",
                 label: "Correo",
                 type: "text",
-                value: seleccionado ? seleccionado.correo : "",
+                value: formData.correo,
+                onChange: (e) =>
+                  setFormData({ ...formData, correo: e.target.value }),
               },
               {
                 name: "telefono",
                 label: "Teléfono",
                 type: "text",
-                value: seleccionado ? seleccionado.telefono : "",
+                value: formData.telefono,
+                onChange: (e) =>
+                  setFormData({ ...formData, telefono: e.target.value }),
                 maxLength: 15,
                 minlength: 7,
               },
@@ -434,26 +543,39 @@ const Usuarios = () => {
                 name: "Documento",
                 label: "Documento",
                 type: "text",
-                value: seleccionado ? seleccionado.Documento : "",
+                value: formData.Documento,
+                onChange: (e) =>
+                  setFormData({ ...formData, Documento: e.target.value }),
               },
               {
                 name: "rolId",
                 label: "Rol",
                 type: "select",
                 options: roles
-                  .filter(role => role.idRol !== 1  && role.idRol !== 2  && role.idRol !== 4 &&role.EstadoRol !== 0) // Filtrar para mostrar solo el rol con idRol 1
-                  .map(role => ({
+                  .filter(
+                    (role) =>
+                      role.idRol !== 1 &&
+                      role.idRol !== 2 &&
+                      role.idRol !== 4 &&
+                      role.EstadoRol !== 0
+                  ) // Filtrar para mostrar solo el rol con idRol 1
+                  .map((role) => ({
                     value: role.idRol,
                     label: role.nombre,
                   })),
-               
+                value: formData.rolId,
+                onChange: (e) =>
+                  setFormData({ ...formData, rolId: e.target.value }),
                 disabled: false, // Deshabilitar el select
               },
               {
                 name: "contrasena",
                 label: "Contraseña",
                 type: "password",
-                value: seleccionado ? seleccionado.contrasena : "",
+                value: formData.contrasena,
+                hidden: seleccionado,
+                onChange: (e) =>
+                  setFormData({ ...formData, contrasena: e.target.value }),
               },
             ]}
           />
@@ -479,3 +601,4 @@ const Usuarios = () => {
 };
 
 export default Usuarios;
+
