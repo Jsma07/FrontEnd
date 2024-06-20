@@ -162,7 +162,6 @@ const Proveedores = () => {
         return;
       }
 
-      //Confirmacion de registro
       const confirmation = await window.Swal.fire({
         title: '¿Estás seguro?',
         text: '¿Quieres agregar este proveedor?',

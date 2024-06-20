@@ -83,7 +83,6 @@ const Insumos = () => {
     try {
       const camposObligatorios = ['NombreInsumos', 'Imagen', 'PrecioUnitario', 'Estado', 'IdCategoria'];
   
-      // Validar campos obligatorios excluyendo IdCategoria
       if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos del insumo.')) {
         return;
       }
