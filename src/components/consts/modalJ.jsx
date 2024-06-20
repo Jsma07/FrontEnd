@@ -16,7 +16,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
       const initialFormData = {};
       const initialErrors = {};
       fields.forEach((field) => {
-        initialFormData[field.name] = field.type === 'checkbox' ? field.checked : field.value || '';
+        initialFormData[field.name] = field.type === 'checkbox' ? field.checked || false : field.value || '';
         initialErrors[field.name] = '';
       });
       setFormValues(initialFormData);
@@ -83,7 +83,6 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
 
   const validateField = (name, value) => {
     let errorMessage = '';
-    // Implementar lógica de validación para cada campo
     switch (name) {
       case 'nombre':
       case 'apellido':
@@ -93,9 +92,9 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
         }
         break;
       case 'Documento':
-        const validacionDocumento = /^[0-9]{1,10}$/;
+        const validacionDocumento = /^[0-9]{10,17}$/; // Rango de 10 a 17 caracteres numéricos
         if (!validacionDocumento.test(value)) {
-          errorMessage = 'El campo debe contener solo números.';
+          errorMessage = 'El campo debe contener entre 10 y 17 números.';
         }
         break;
       case 'telefono':
@@ -110,10 +109,17 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
           errorMessage = 'El correo ingresado tiene un formato inválido.';
         }
         break;
+      case 'contrasena':
+        // Validar contraseña: mínimo 8 caracteres, una mayúscula y un número
+        const validacionContrasena = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+        if (!validacionContrasena.test(value)) {
+          errorMessage = 'La contraseña debe tener mínimo 8 caracteres, una mayúscula y un número.';
+        }
+        break;
       default:
         break;
     }
-
+  
     setErrores((prevErrors) => ({
       ...prevErrors,
       [name]: errorMessage,

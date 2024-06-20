@@ -10,6 +10,7 @@ const Roles = () => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedRoleId, setSelectedRoleId] = useState(null); // Estado para almacenar el ID del rol seleccionado para editar
   const [roles, setRoles] = useState([]);
+  const [openCreateModal, setOpenCreateModal] = useState(false); // Estado para controlar la apertura del modal de creación
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -66,6 +67,7 @@ const Roles = () => {
             text: "El estado del rol ha sido actualizado correctamente.",
           });
         }}
+        
     } catch (error) {
       console.error("Error al cambiar el estado del rol:", error);
       window.Swal.fire({
@@ -80,7 +82,7 @@ const Roles = () => {
   const handleEditClick = (id) => {
     console.log(`Editando rol con ID: ${id}`);
     setSelectedRoleId(id); // Almacenar el ID del rol seleccionado para editar
-    handleOpenModal();
+    setOpenCreateModal(false); // Cerrar el modal de creación si está abierto
   };
 
   const handleViewDetailsClick = (id) => {
@@ -89,11 +91,12 @@ const Roles = () => {
 
   const handleOpenModal = () => {
     setOpenModal(true);
+    setSelectedRoleId(null); // Limpiar el ID del rol seleccionado al abrir el modal de creación
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setSelectedRoleId(null); // Limpiar el ID del rol seleccionado al cerrar el modal
+    setSelectedRoleId(null); // Limpiar el ID del rol seleccionado al cerrar el modal de edición
   };
 
   const columns = [
@@ -146,7 +149,7 @@ const Roles = () => {
     <div>
       <h1>Roles</h1>
       <Table columns={columns} data={roles} />
-      <AddRoleModal open={openModal} handleClose={handleCloseModal} />
+      <AddRoleModal open={openModal && selectedRoleId === null} handleClose={handleCloseModal} />
       <Fab
         aria-label="add"
         style={{
