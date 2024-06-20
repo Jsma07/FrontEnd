@@ -296,22 +296,22 @@ const Usuarios = () => {
       });
       return;
     }
-    if (formData.Documento > 15) {
-      window.Swal.fire({
-        icon: "error",
-        title: "Máximo excedido",
-        text: "El campo documento excede la cantidad de números.",
-      });
-      return;
-    }
-    if (formData.Documento < 10) {
-      window.Swal.fire({
-        icon: "error",
-        title: "Mínimo no alcanzado",
-        text: "El campo documento no contiene la cantidad minima de números.",
-      });
-      return;
-    }
+    // if (formData.Documento > 15) {
+    //   window.Swal.fire({
+    //     icon: "error",
+    //     title: "Máximo excedido",
+    //     text: "El campo documento excede la cantidad de números.",
+    //   });
+    //   return;
+    // }
+    // if (formData.Documento < 10) {
+    //   window.Swal.fire({
+    //     icon: "error",
+    //     title: "Mínimo no alcanzado",
+    //     text: "El campo documento no contiene la cantidad minima de números.",
+    //   });
+    //   return;
+    // }
 
     const validacionTelefono = /^[0-9]{7,15}$/;
 
@@ -498,7 +498,7 @@ const Usuarios = () => {
             handleClose={handlePasswordModalClose}
             handleSubmit={handleSubmitPasswordChange}
           />
-          <ModalDinamico
+            <ModalDinamico
             seleccionado={seleccionado}
             open={openModal}
             handleClose={handleCloseModal}
@@ -509,33 +509,25 @@ const Usuarios = () => {
                 name: "nombre",
                 label: "Nombre",
                 type: "text",
-                value: formData.nombre,
-                onChange: (e) =>
-                  setFormData({ ...formData, nombre: e.target.value }),
+                value: seleccionado ? seleccionado.nombre : "",
               },
               {
                 name: "apellido",
                 label: "Apellido",
                 type: "text",
-                value: formData.apellido,
-                onChange: (e) =>
-                  setFormData({ ...formData, apellido: e.target.value }),
+                value: seleccionado ? seleccionado.apellido : "",
               },
               {
                 name: "correo",
                 label: "Correo",
                 type: "text",
-                value: formData.correo,
-                onChange: (e) =>
-                  setFormData({ ...formData, correo: e.target.value }),
+                value: seleccionado ? seleccionado.correo : "",
               },
               {
                 name: "telefono",
                 label: "Teléfono",
                 type: "text",
-                value: formData.telefono,
-                onChange: (e) =>
-                  setFormData({ ...formData, telefono: e.target.value }),
+                value: seleccionado ? seleccionado.telefono : "",
                 maxLength: 15,
                 minlength: 7,
               },
@@ -543,42 +535,30 @@ const Usuarios = () => {
                 name: "Documento",
                 label: "Documento",
                 type: "text",
-                value: formData.Documento,
-                onChange: (e) =>
-                  setFormData({ ...formData, Documento: e.target.value }),
+                value: seleccionado ? seleccionado.Documento : "",
               },
               {
                 name: "rolId",
                 label: "Rol",
                 type: "select",
                 options: roles
-                  .filter(
-                    (role) =>
-                      role.idRol !== 1 &&
-                      role.idRol !== 2 &&
-                      role.idRol !== 4 &&
-                      role.EstadoRol !== 0
-                  ) // Filtrar para mostrar solo el rol con idRol 1
-                  .map((role) => ({
+                  .filter(role => role.idRol !== 1  && role.idRol !== 2  && role.idRol !== 4 &&role.EstadoRol !== 0) // Filtrar para mostrar solo el rol con idRol 1
+                  .map(role => ({
                     value: role.idRol,
                     label: role.nombre,
                   })),
-                value: formData.rolId,
-                onChange: (e) =>
-                  setFormData({ ...formData, rolId: e.target.value }),
+                  value: seleccionado ? seleccionado.rolId : "",
                 disabled: false, // Deshabilitar el select
               },
               {
                 name: "contrasena",
                 label: "Contraseña",
                 type: "password",
-                value: formData.contrasena,
-                hidden: seleccionado,
-                onChange: (e) =>
-                  setFormData({ ...formData, contrasena: e.target.value }),
+                value: seleccionado ? seleccionado.contrasena : "",
               },
             ]}
           />
+
         </div>
       </div>
       <Table columns={columns} data={filtrar} roles={roles} />
