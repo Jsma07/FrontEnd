@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel, IconButton } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
@@ -6,15 +6,17 @@ import CloseIcon from '@mui/icons-material/Close';
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
 
-const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChange }) => {
+const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChange, entityData }) => {
   const [formValues, setFormValues] = useState({});
   const [dragging, setDragging] = useState(false);
-  const [position, setPosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({ x: 350, y: 150 });
   const [modalSize, setModalSize] = useState({ width: 0, height: 0 });
   const [extraFields, setExtraFields] = useState([]);
-  const [alertOpen, setAlertOpen] = useState(false); // Estado para controlar la visibilidad de la alerta
-  const [alertMessage, setAlertMessage] = useState(''); // Mensaje de la alerta
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [progressVisible, setProgressVisible] = useState(false); // Nuevo estado para la barra de progreso
+  const modalContainerRef = useRef(null);
+  const startPositionRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     if (fields && fields.length > 0) {
@@ -27,33 +29,43 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
       setFormValues(prevFormValues => ({ ...prevFormValues, ...initialFormData }));
     }
 
-    if (open) {
-      const modalContainer = document.getElementById('modal-container');
-      if (modalContainer) {
-        setModalSize({
-          width: modalContainer.offsetWidth,
-          height: modalContainer.offsetHeight
-        });
-      }
+    if (open && modalContainerRef.current) {
+      setModalSize({
+        width: modalContainerRef.current.offsetWidth,
+        height: modalContainerRef.current.offsetHeight
+      });
     }
   }, [fields, open]);
 
+  useEffect(() => {
+    if (entityData) {
+      setFormValues(entityData);
+    }
+  }, [entityData]);
+
   const handleMouseDown = (e) => {
-    setDragging(true);
-    setStartPosition({
-      x: e.clientX,
-      y: e.clientY
-    });
+    if (e.target.classList.contains('modal-header')) {
+      setDragging(true);
+      startPositionRef.current = {
+        x: e.clientX,
+        y: e.clientY
+      };
+    }
   };
 
   const handleMouseMove = (e) => {
     if (dragging) {
-      const maxX = window.innerWidth - modalSize.width;
-      const maxY = window.innerHeight - modalSize.height;
-      const newX = Math.max(0, Math.min(position.x + e.clientX - startPosition.x, maxX));
-      const newY = Math.max(0, Math.min(position.y + e.clientY - startPosition.y, maxY));
-      setPosition({ x: newX, y: newY });
-      setStartPosition({ x: e.clientX, y: e.clientY });
+      requestAnimationFrame(() => {
+        const maxX = window.innerWidth - modalSize.width;
+        const maxY = window.innerHeight - modalSize.height;
+        const newX = Math.max(0, Math.min(position.x + e.clientX - startPositionRef.current.x, maxX));
+        const newY = Math.max(0, Math.min(position.y + e.clientY - startPositionRef.current.y, maxY));
+        setPosition({ x: newX, y: newY });
+        startPositionRef.current = {
+          x: e.clientX,
+          y: e.clientY
+        };
+      });
     }
   };
 
@@ -68,13 +80,13 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
       const file = files[0];
       const reader = new FileReader();
       reader.onload = () => {
-        // Verificar el tamaño del archivo antes de enviarlo
-        const maxSizeBytes = 1 * 1024 * 1024; // 1 MB en bytes
+        const maxSizeBytes = 1 * 1024 * 1024; // 1 MB
         if (file.size > maxSizeBytes) {
-          setAlertOpen(true); // Mostrar alerta de tamaño de archivo excedido
+          setAlertOpen(true);
+          setAlertMessage("El tamaño del archivo excede el límite permitido (1 MB).");
           setTimeout(() => {
             setAlertOpen(false);
-            setAlertMessage('')
+            setAlertMessage('');
           }, 3000);
           return;
         }
@@ -141,23 +153,38 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
 
   const handleSubmit = async () => {
     try {
+      setProgressVisible(true); // Mostrar la barra de progreso al enviar el formulario
       if (typeof onSubmit === 'function') {
         await onSubmit(formValues);
-        handleClose();
-        setFormValues({});
-        setExtraFields([]);
       } else {
         console.error("onSubmit is not a function");
       }
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
+      setAlertOpen(true);
+      setAlertMessage("Error al enviar el formulario. Por favor, inténtelo de nuevo.");
+      setTimeout(() => {
+        setAlertOpen(false);
+        setAlertMessage('');
+      }, 3000);
+    } finally {
+      setProgressVisible(false); // Ocultar la barra de progreso al finalizar
     }
   };
 
   const handleCancel = () => {
-    handleClose();
-    setFormValues({});
+    // Limpiar formValues
+    const clearedFormValues = {};
+    Object.keys(formValues).forEach(key => {
+      clearedFormValues[key] = '';
+    });
+    setFormValues(clearedFormValues);
+  
+    // Limpiar extraFields
     setExtraFields([]);
+  
+    // Cerrar el modal
+    handleClose();
   };
 
   const renderFields = () => {
@@ -227,7 +254,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
                     width: '100%',
                     maxWidth: '10000px',
                     height: 'auto',
-                    maxHeight: '200px', // Reducir la altura máxima de la imagen
+                    maxHeight: '200px',
                     objectFit: 'contain',
                     borderRadius: '8px'
                   }}
@@ -264,8 +291,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="2"
-                      d="M13 13h3a3 3 0 0 0 0-6h-.
-                      025A5.56 5.56 0 0 0 16 6.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                      d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
                     />
                   </svg>
                   <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
@@ -292,7 +318,8 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
   return (
     <Modal open={open} onClose={handleClose}>
       <div
-        id="modal-container"
+        ref={modalContainerRef}
+        className="modal-container"
         style={{
           position: 'absolute',
           top: `${position.y}px`,
@@ -304,14 +331,11 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
           maxHeight: '80%',
           overflow: 'auto',
           padding: '1.5rem',
-          cursor: dragging ? 'grabbing' : 'grab',
-          zIndex: 9999
+          zIndex: 9999,
+          boxShadow: dragging ? '0 8px 16px rgba(0,0,0,0.5)' : 'none', // Sombreado más visible al arrastrar
+          transition: 'box-shadow 0.3s'
         }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
       >
-        {/* Alerta de tamaño de imagen excedido */}
         <Stack
           sx={{
             position: 'fixed',
@@ -323,18 +347,39 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
           }}
           spacing={2}
         >
-          <Alert severity="warning">
-            El tamaño del archivo de imagen excede el límite permitido (1 MB).
-          </Alert>
+          <Alert severity="warning">{alertMessage}</Alert>
         </Stack>
 
+        {/* Barra de progreso */}
+        {progressVisible && (
+          <div
+            style={{
+              position: 'fixed',
+              top: '0',
+              left: '0',
+              width: '100%',
+              height: '2px',
+              backgroundColor: '#29D',
+              zIndex: '99999'
+            }}
+          />
+        )}
+
         <div
+          className="modal-header"
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            cursor: 'grab'
+            cursor: dragging ? 'grabbing' : 'grab',  // Cambio de cursor aquí
+            padding: '1rem',
+            backgroundColor: dragging ? '#f0f0f0' : 'transparent',  // Cambio de color de fondo cuando se arrastra
+            boxShadow: dragging ? '0 4px 8px rgba(0,0,0,0.2)' : 'none',  // Sombra cuando se arrastra
+            transition: 'background-color 0.3s, box-shadow 0.3s, cursor 0.3s' // Transiciones ajustadas
           }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
         >
           <Typography variant="h6">{title}</Typography>
           <DragIndicatorIcon />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Typography, Grid, TextField, IconButton, Select, MenuItem, InputLabel } from '@mui/material'; // Asegúrate de importar Select, MenuItem e InputLabel aquí
+import { Button, Modal, Typography, Grid, TextField, IconButton, Select, MenuItem, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -9,12 +9,10 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
   const [imageName, setImageName] = useState('');
   const [imageSize, setImageSize] = useState('');
 
-  // useEffect para manejar ImgServicio e Imagen
   useEffect(() => {
     if (entityData) {
       setFormData(entityData);
       
-      // Manejo de ImgServicio
       if (entityData.ImgServicio) {
         setImagePreview(`http://localhost:5000${entityData.ImgServicio}`);
         setImageName('Imagen existente');
@@ -27,7 +25,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
         setImageSize('');
       }
 
-      // Manejo de Imagen
       if (entityData.Imagen) {
         setImagePreview(`http://localhost:5000${entityData.Imagen}`);
         setImageName('Imagen existente en la base de datos');
@@ -85,34 +82,34 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
             disabled={readOnly}
           />
         );
-        case "select":
-          return (
-            <div>
-              <InputLabel id={`${name}-label`}>{label}</InputLabel>
-              <Select
-                labelId={`${name}-label`}
-                id={name}
-                name={name}
-                variant="outlined"
-                onChange={handleChange}
-                fullWidth
-                size="medium"
-                value={formData[name] || ""}
-                label={label}
-                style={{ marginBottom: "0.5rem", textAlign: "center" }}
-              >
-                {options &&
-                  options.map((option, index) => (
-                    <MenuItem key={index} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </div>
-          );
+      case 'select':
+        return (
+          <div>
+            <InputLabel id={`${name}-label`}>{label}</InputLabel>
+            <Select
+              labelId={`${name}-label`}
+              id={name}
+              name={name}
+              variant="outlined"
+              onChange={handleChange}
+              fullWidth
+              size="medium"
+              value={formData[name] || ""}
+              label={label}
+              style={{ marginBottom: "0.5rem", textAlign: "center" }}
+            >
+              {options &&
+                options.map((option, index) => (
+                  <MenuItem key={index} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+            </Select>
+          </div>
+        );
       case 'file':
         return (
-          <div className="flex flex-col items-center justify-center w-full relative">
+          <div className="flex flex-col items-center justify-center w-full">
             {imagePreview ? (
               <div style={{ position: 'relative', display: 'inline-block', textAlign: 'center' }}>
                 <img 
@@ -139,18 +136,38 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
                 >
                   <CloseIcon />
                 </IconButton>
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  value={imageName}
+                  disabled
+                  style={{ marginTop: '0.5rem' }}
+                  InputProps={{
+                    style: { textAlign: 'center' },
+                  }}
+                />
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  value={imageSize}
+                  disabled
+                  style={{ marginTop: '0.5rem' }}
+                  InputProps={{
+                    style: { textAlign: 'center' },
+                  }}
+                />
               </div>
             ) : (
               <label 
                 htmlFor={`file-input-${name}`} 
                 className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-                style={{ width: '100%', height: '150px', maxWidth: '500px', textAlign: 'center' }}
+                style={{ width: '100%', height: '150px', maxWidth: '500px', textAlign: 'center', marginBottom: '0.5rem' }}
               >
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <Typography variant="body1" style={{ fontWeight: 'bold', marginBottom: '8px' }}>
-                    Click para seleccionar una imagen
-                  </Typography>
-                </div>
+                <Typography variant="body1" style={{ fontWeight: 'bold', marginBottom: '8px' }}>
+                  Click para seleccionar una imagen
+                </Typography>
                 <input 
                   id={`file-input-${name}`} 
                   type="file" 
@@ -160,16 +177,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
                   onChange={(e) => handleImageChange(e, name)}
                 />
               </label>
-            )}
-            {imageName && (
-              <Typography variant="body2" style={{ textAlign: 'center', marginTop: '0.5rem' }}>
-                Nombre de la imagen: {imageName}
-              </Typography>
-            )}
-            {imageSize && (
-              <Typography variant="body2" style={{ textAlign: 'center', marginTop: '0.25rem' }}>
-                Tamaño de la imagen: {imageSize}
-              </Typography>
             )}
           </div>
         );
