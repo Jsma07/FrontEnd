@@ -209,29 +209,28 @@ const ModalDinamico = ({
               </Grid>
             ))}
         </Grid>
-        {/* Botones de enviar y cancelar */}
         <div
           style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "1.5rem",
+            display: 'flex',
+            justifyContent: 'flex-end',
+            marginTop: '1rem'
           }}
         >
           <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-            style={{ width: "25%", marginRight: "0.5rem", fontSize: "0.8rem" }}
-          >
-            <span style={{ marginRight: "0.5rem" }}>Enviar</span>
-            <SendIcon />
-          </Button>
-          <Button
-            variant="contained"
             onClick={handleCancel}
-            style={{ width: "25%", fontSize: "0.8rem" }}
+            color="secondary"
+            variant="contained"
+            style={{ marginRight: '1rem' }}
           >
             Cancelar
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            color="primary"
+            variant="contained"
+            endIcon={<SendIcon />}
+          >
+            Enviar
           </Button>
         </div>
       </div>

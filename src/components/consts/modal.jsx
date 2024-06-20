@@ -181,10 +181,8 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
     });
     setFormValues(clearedFormValues);
   
-    // Limpiar extraFields
     setExtraFields([]);
   
-    // Cerrar el modal
     handleClose();
   };
 
@@ -333,7 +331,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
           overflow: 'auto',
           padding: '1.5rem',
           zIndex: 9999,
-          boxShadow: dragging ? '0 8px 16px rgba(0,0,0,0.5)' : 'none', // Sombreado más visible al arrastrar
+          boxShadow: dragging ? '0 8px 16px rgba(0,0,0,0.5)' : 'none', 
           transition: 'box-shadow 0.3s'
         }}
       >
@@ -351,7 +349,6 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
           <Alert severity="warning">{alertMessage}</Alert>
         </Stack>
 
-        {/* Barra de progreso */}
         {progressVisible && (
           <div
             style={{

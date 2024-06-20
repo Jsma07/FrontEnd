@@ -13,6 +13,7 @@ const Insumos = () => {
   const [insumos, setInsumos] = useState([]);
   const [categorias, setCategorias] = useState([]); 
   const [insumoSeleccionado, setInsumoSeleccionado] = useState(null);
+  const [buscar, setBuscar] = useState('')
 
   useEffect(() => {
     fetchInsumos();
@@ -37,19 +38,61 @@ const Insumos = () => {
     }
   };
 
+  const filtrar = insumos.filter(insumo => {
+    const { NombreInsumos, Cantidad, UsosDisponibles, PrecioUnitario, IdCategoria, IdInsumos, Estado } = insumo;
+    const terminoABuscar = buscar.toLowerCase();
+    
+    const IdInsumoString = IdInsumos?.toString() || '';
+    const PrecioUnitarioString = PrecioUnitario?.toString() || '';
+    const CantidadString = Cantidad?.toString() || '';
+    const UsosDisponiblesString = UsosDisponibles?.toString() || '';
+    const IdCategoriaString = IdCategoria?.toString() || '';
+  
+    const categoria = categorias.find(c => c.IdCategoria === IdCategoria);
+    const nombreCategoria = categoria ? categoria.nombre_categoria.toLowerCase() : '';
+  
+    return (
+      NombreInsumos.toLowerCase().includes(terminoABuscar) ||
+      Estado.toLowerCase().includes(terminoABuscar) ||
+      PrecioUnitarioString.includes(terminoABuscar) ||
+      CantidadString.includes(terminoABuscar) ||
+      UsosDisponiblesString.includes(terminoABuscar) ||
+      nombreCategoria.includes(terminoABuscar) ||  
+      IdInsumoString.includes(terminoABuscar)
+    );
+  });
+  
   const handleAddInsumo = async (formData) => {
     try {
-      const { NombreInsumos, Cantidad, UsosDisponibles, Estado, IdCategoria } = formData;
-  
-      // Validación de los campos obligatorios
-      const camposObligatorios = ['NombreInsumos', 'Imagen', 'Cantidad', 'Estado', 'IdCategoria'];
-      const newErrors = {};
-  
-      camposObligatorios.forEach((campo) => {
-        if (!formData[campo]) {
-          newErrors[campo] = 'Este campo es obligatorio';
-        }
-      });
+      const { NombreInsumos, Cantidad, UsosDisponibles, IdCategoria } = formData;
+      const response = await axios.get('http://localhost:5000/api/insumos');
+      const insumos = response.data;
+      const insumoExistenteNombre = insumos.find(insumo => insumo.NombreInsumos === NombreInsumos);
+
+      const camposObligatorios = ['NombreInsumos', 'Imagen', 'Cantidad', 'IdCategoria'];
+
+      if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos del proveedor.')) {
+        return;
+      }
+
+      if (insumoExistenteNombre) {
+        window.Swal.fire({
+          icon: 'warning',
+          title: 'Insumo ya registrado',
+          text: 'El Insumo ingresado ya está registrado.',
+        });
+        return;
+      }
+
+      const nombreInsumo = formData['NombreInsumos'];
+      if (!/^[a-zA-Z0-9\s]+$/.test(nombreInsumo)) {
+        window.Swal.fire({
+          icon: 'error',
+          title: 'Nombre del insumo inválido',
+          text: 'El nombre del insumo no debe contener caracteres especiales.',
+        });
+        return;
+      }
   
       const confirmation = await window.Swal.fire({
         title: '¿Estás seguro?',
@@ -81,16 +124,16 @@ const Insumos = () => {
   
   const handleEditInsumo = async (formData) => {
     try {
+      const response = await axios.get('http://localhost:5000/api/insumos');
+      const insumos = response.data;
+      const insumoExistente = insumos.find(insumo => insumo.NombreInsumos === formData.NombreInsumos && insumo.IdInsumos !== formData.IdInsumos);
+
       const camposObligatorios = ['NombreInsumos', 'Imagen', 'PrecioUnitario', 'Estado', 'IdCategoria'];
   
       if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos del insumo.')) {
         return;
       }
-  
-      const response = await axios.get('http://localhost:5000/api/insumos');
-      const insumos = response.data;
-      const insumoExistente = insumos.find(insumo => insumo.NombreInsumos === formData.NombreInsumos && insumo.IdInsumos !== formData.IdInsumos);
-  
+
       if (insumoExistente) {
         window.Swal.fire({
           icon: 'warning',
@@ -99,6 +142,16 @@ const Insumos = () => {
         });
         return;
       }
+
+      const NombreInsumos = formData['NombreInsumos'];
+        if (!/^[a-zA-Z0-9\s]+$/.test(NombreInsumos)) {
+          window.Swal.fire({
+            icon: 'error',
+            title: 'Nombre del insumo inválido',
+            text: 'El nombre del insumo no debe contener caracteres especiales.',
+          });
+          return;
+        }
   
       const confirmation = await window.Swal.fire({
         title: '¿Estás seguro?',
@@ -163,8 +216,26 @@ const Insumos = () => {
         <div className="md:flex md:justify-between md:items-center mb-4">
           <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
             <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Buscar usuario</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
+              </div>
+              <input
+                type="search"
+                id="default-search"
+                className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Buscar insumo..."
+                value={buscar}
+                onChange={(e) => setBuscar(e.target.value)}
+                required
+              />
+            </div>
           </div>
+          <div>
         </div>
+      </div>
+    </div>
+
         <ModalAgregarInsumo
           open={openModalAgregar}
           handleClose={handleCloseModalAgregar}
@@ -242,7 +313,7 @@ const Insumos = () => {
               ),
             },
           ]}
-          data={insumos} 
+          data={filtrar} 
         />
         <Fab
           aria-label="add"
@@ -259,9 +330,7 @@ const Insumos = () => {
           <i className='bx bx-plus' style={{ fontSize: '1.3rem' }}></i>
         </Fab>
       </div>
-    </div>
   );
-
 };
 
 export default Insumos;

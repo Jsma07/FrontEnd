@@ -68,6 +68,7 @@ const Proveedores = () => {
         });
         return;
       }
+      
       const nit = formData['NIT'];
       if (!/^\d+$/.test(nit)) {
         window.Swal.fire({
