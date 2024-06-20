@@ -3,6 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import ModalDinamico from "../../components/consts/modaled";
 import CustomSwitch from "../../components/consts/switch";
+import TablePrueba from "../../components/consts/Tabla";
 
 const Empleados = () => {
   const [empleados, setEmpleados] = useState([]);
@@ -42,24 +43,36 @@ const Empleados = () => {
   const handleOpenModal = (data) => {
     setModalData(data);
   };
-
   const columns = [
-    { name: "Nombre", label: "Nombre" },
-    { name: "Apellido", label: "Apellido" },
-    { name: "Correo", label: "Correo" },
-    { name: "Telefono", label: "Teléfono" },
-    { name: "Documento", label: "Documento" },
-    { name: "Direccion", label: "Direccion" },
-    { name: "Estado", label: "Estado" },
-
+    { field: "Nombre", headerName: "Nombre" },
+    { field: "Apellido", headerName: "Apellido" },
+    { field: "Correo", headerName: "Correo" },
+    { field: "Telefono", headerName: "Teléfono" },
+    { field: "Documento", headerName: "Documento" },
+    { field: "Direccion", headerName: "Dirección" },
     {
-      name: "IdRol",
-      label: "Rol",
-      width: "w-36",
-      renderCell: (params) => {
-        const rol = roles.find((role) => role.id === params.value);
-        return rol ? rol.nombre : "Desconocido";
-      },
+      field: "Acciones",
+      headerName: "Acciones",
+      width: "w-48",
+      renderCell: (params) => (
+        <div className="flex justify-center space-x-4">
+          <button
+            onClick={() =>
+              handleOpenModal({
+                ...params.row,
+                modo: "actualizacion",
+                seleccionado: params.row,
+              })
+            }
+          >
+            <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>{" "}
+          </button>
+          <CustomSwitch
+            active={params.row.Estado === 1}
+            onToggle={() => handleToggleSwitch(params.row.IdEmpleado)}
+          />
+        </div>
+      ),
     },
   ];
 
@@ -270,221 +283,140 @@ const Empleados = () => {
       }}
       className="w-full mx-auto max-w-full"
     >
-      <div className="bg-white rounded-lg shadow-md p-8 border border-purple-500">
-        <h4 className="text-5xl mb-4">Gestión de Empleados</h4>
+      <TablePrueba columns={columns} data={empleadosFiltrados} />
 
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-          <div className="flex items-center justify-between flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900">
-            <form onSubmit={(e) => e.preventDefault()} className="mb-4">
-              <label htmlFor="search" className="sr-only">
-                Buscar
-              </label>
-              <div className="flex justify-end">
-                <input
-                  type="text"
-                  placeholder="Buscar..."
-                  value={filtro}
-                  onChange={(e) => setFiltro(e.target.value)}
-                  className="p-2 border border-gray-300 rounded"
-                />
-              </div>
-            </form>
-          </div>
+      {modalData && modalData && (
+        <ModalDinamico
+          open={true}
+          handleClose={() => setModalData(null)}
+          title="Registrar empleados"
+          fields={[
+            {
+              label: "Nombre",
+              name: "Nombre",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "Apellido",
+              name: "Apellido",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "Correo",
+              name: "Correo",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "Teléfono",
+              name: "Telefono",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "Documento",
+              name: "Documento",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "Direccion",
+              name: "Direccion",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "Contraseña",
+              name: "Contrasena",
+              type: "password",
+              required: true,
+            },
+          ]}
+          onSubmit={handleSubmit}
+          seleccionado={modalData}
+        />
+      )}
 
-          <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-              <thead className="text-xs text-gray-700 uppercase bg-blue-100 dark:bg-blue-700 dark:text-gray-400">
-                <tr>
-                  {columns.map((column) => (
-                    <th key={column.name} scope="col" className="px-6 py-3">
-                      {column.label}
-                    </th>
-                  ))}
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {empleadosFiltrados.map((empleado, index) => (
-                  <tr
-                    key={index}
-                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                  >
-                    {columns.map((column) => (
-                      <td
-                        key={column.name}
-                        className="px-6 py-4 font-semibold text-gray-900 dark:text-white"
-                      >
-                        {column.name === "Estado" ? (
-                          <div className="inline-flex items-center">
-                            <CustomSwitch
-                              active={empleado.Estado === 1}
-                              onToggle={() =>
-                                handleToggleSwitch(empleado.IdEmpleado)
-                              }
-                            />
-                            <span className="ml-2">
-                              {empleado.Estado === 1 ? "Activo" : "Inactivo"}
-                            </span>
-                          </div>
-                        ) : (
-                          empleado[column.name]
-                        )}
-                      </td>
-                    ))}
+      {modalData && modalData.modo === "actualizacion" && (
+        <ModalDinamico
+          open={true}
+          handleClose={() => setModalData(null)}
+          title="Actualizar Empleado"
+          fields={[
+            {
+              label: "Nombre",
+              name: "Nombre",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "Apellido",
+              name: "Apellido",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "Correo",
+              name: "Correo",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "Teléfono",
+              name: "Telefono",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "Documento",
+              name: "Documento",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "Direccion",
+              name: "Direccion",
+              type: "text",
+              required: true,
+            },
+            {
+              label: "Contraseña",
+              name: "Contrasena",
+              type: "password",
+              required: true,
+            },
+          ]}
+          onSubmit={handleActualizacionSubmit}
+          seleccionado={modalData.seleccionado}
+        />
+      )}
 
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() =>
-                          handleOpenModal({
-                            ...empleado,
-                            modo: "actualizacion",
-                            seleccionado: empleado,
-                          })
-                        }
-                        className="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                      >
-                        <i className="bx bxs-edit"></i>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {modalData && modalData && (
-              <ModalDinamico
-                open={true}
-                handleClose={() => setModalData(null)}
-                title="Registrar empleados"
-                fields={[
-                  {
-                    label: "Nombre",
-                    name: "Nombre",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Apellido",
-                    name: "Apellido",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Correo",
-                    name: "Correo",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Teléfono",
-                    name: "Telefono",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Documento",
-                    name: "Documento",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Direccion",
-                    name: "Direccion",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Contraseña",
-                    name: "Contrasena",
-                    type: "password",
-                    required: true,
-                  },
-                ]}
-                onSubmit={handleSubmit}
-                seleccionado={modalData}
-              />
-            )}
-
-            {modalData && modalData.modo === "actualizacion" && (
-              <ModalDinamico
-                open={true}
-                handleClose={() => setModalData(null)}
-                title="Actualizar Empleado"
-                fields={[
-                  {
-                    label: "Nombre",
-                    name: "Nombre",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Apellido",
-                    name: "Apellido",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Correo",
-                    name: "Correo",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Teléfono",
-                    name: "Telefono",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Documento",
-                    name: "Documento",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Direccion",
-                    name: "Direccion",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Contraseña",
-                    name: "Contrasena",
-                    type: "password",
-                    required: true,
-                  },
-                ]}
-                onSubmit={handleActualizacionSubmit}
-                seleccionado={modalData.seleccionado}
-              />
-            )}
-          </div>
-
-          <button
-            className="fixed bottom-4 right-4 bg-blue-500 text-white rounded-full p-3 shadow-xl hover:shadow-2xl"
-            style={{
-              right: "4rem",
-              bottom: "4rem",
-              boxShadow: "0 8px 20px rgba(0, 0, 0, 0.5)",
-            }}
-            onClick={() => handleOpenModal(empleado)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
+      <button
+        className="fixed bottom-4 right-4 bg-blue-500 text-white rounded-full p-3 shadow-xl hover:shadow-2xl"
+        style={{
+          right: "4rem",
+          bottom: "4rem",
+          boxShadow: "0 8px 20px rgba(0, 0, 0, 0.5)",
+        }}
+        onClick={() => handleOpenModal(empleado)}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+      </button>
     </div>
   );
 };

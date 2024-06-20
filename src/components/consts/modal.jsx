@@ -153,6 +153,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
 
   const handleSubmit = async () => {
     try {
+      
       setProgressVisible(true); // Mostrar la barra de progreso al enviar el formulario
       if (typeof onSubmit === 'function') {
         await onSubmit(formValues);

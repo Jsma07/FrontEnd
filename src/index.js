@@ -19,6 +19,9 @@ import Servicios from './pages/Agendamiento/Servicios/Servicios';
 import Salida from './pages/Salida_Insumos/Salida';
 import Clientes from "./pages/Clientes/Clientes";
 import Empleados from "./pages/Empleados/Empleados";
+import Registrar from './pages/Ventas/Registrar'
+import InsumoDetalle from './pages/Ventas/Detalles'
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -32,7 +35,7 @@ root.render(
           <Route path="/configuracion/roles" element={<Roles />} />
           <Route path="/Usuarios/Administradores" element={<Usuarios />} />
           <Route path="/Usuarios" element={<Usuarios2 />} />
-          {/* <Route path="/ventas" element={<Ventas />} /> */}
+          <Route path="/ventas" element={<Ventas />} />
           <Route path="/compras" element={<Compras />} />
           <Route path="/compras/Proveedores" element={<Proveedores />} />
           <Route path="/compras/crearCompra" element={<CrearCompra />} />
@@ -43,6 +46,8 @@ root.render(
           <Route path="/Insumos" element={<Insumos />} />
           <Route path="/agendamiento/Servicios" element={<Servicios />} />
           <Route path="/Empleados" element={<Empleados />} />
+          <Route path="/RegistrarVentas" element={<Registrar />} />
+          <Route path="/Detalleventa/:id" element={<InsumoDetalle />} />
         </Route>
       </Routes>
     </BrowserRouter>

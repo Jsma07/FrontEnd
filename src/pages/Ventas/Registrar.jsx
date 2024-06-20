@@ -8,7 +8,6 @@ const Registrar = () => {
   const [empleados, setEmpleados] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [servicios, setServicios] = useState([]);
-  const [iva, setIva] = useState(0);
   const [subtotal, setSubtotal] = useState(0);
   const [modalData, setModalData] = useState(null);
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -16,15 +15,9 @@ const Registrar = () => {
   const [insumosSeleccionados, setInsumosSeleccionados] = useState([]);
   const [ivaValue, setIvaValue] = useState(0);
   const [cantidadInsumos, setCantidadInsumos] = useState({});
-
-  const handleCantidadChange = (event, insumoId) => {
-    const { value } = event.target;
-    setCantidadInsumos((prevCantidad) => ({
-      ...prevCantidad,
-      [insumoId]: value,
-    }));
-  };
-
+  const [iva, setIva] = useState(0);
+  const [totalGeneral, setTotalGeneral] = useState(0);
+  const [descuento, setDescuento] = useState(0);
   const abrirModal = () => {
     setModalAbierto(true);
   };
@@ -99,10 +92,15 @@ const Registrar = () => {
 
     // Recalcula los valores de subtotal, iva y total
     let subtotal = 0;
-    insumosSeleccionados.forEach((insumo) => {
-      subtotal +=
-        insumo.precio_unitario * (cantidadInsumos[insumo.IdInsumos] || 0);
-    });
+
+    // Verifica si insumosSeleccionados está definido antes de usarlo
+    if (insumosSeleccionados) {
+      insumosSeleccionados.forEach((insumo) => {
+        subtotal +=
+          insumo.PrecioUnitario * (cantidadInsumos[insumo.IdInsumos] || 0);
+      });
+    }
+
     const total = subtotal + (subtotal * iva) / 100;
 
     const ventaData = {
@@ -127,7 +125,99 @@ const Registrar = () => {
 
       console.log("Venta registrada con éxito:", ventaResponse.data);
 
-      // Muestra la alerta de SweetAlert2
+      if (insumosSeleccionados) {
+        const detallesVenta = {
+          detalles: insumosSeleccionados.map((insumo) => ({
+            Idventa: ventaResponse.data.idVentas,
+            Idinsumo: insumo.IdInsumos,
+            Usos: parseInt(cantidadInsumos[insumo.IdInsumos] || 0),
+            Precio_unitario: insumo.PrecioUnitario,
+          })),
+        };
+
+        try {
+          const detallesResponse = await axios.post(
+            "http://localhost:5000/Jackenail/Detalleregistrar",
+            detallesVenta
+          );
+
+          console.log(
+            "Detalles de venta registrados con éxito:",
+            detallesResponse.data
+          );
+        } catch (error) {
+          console.error("Error al registrar los detalles de venta:", error);
+        }
+      }
+
+      // Obtener el ID de la venta guardada
+      const ventaId = ventaResponse.data.idVentas;
+
+      // Utilizado para calcular las existencias disponibles y cantidades de los insumos después de realizar las ventas y el detalle
+      const updatedInsumos = insumosSeleccionados.map((insumo) => {
+        const cantidadVendida = cantidadInsumos[insumo.IdInsumos] || 0;
+        const usoUnitario = insumo.usos_unitarios;
+        let nuevosUsosDisponibles = insumo.UsosDisponibles;
+        let nuevaCantidadDisponible = insumo.Cantidad;
+
+        console.log("Insumo:", insumo.NombreInsumos);
+        console.log("Cantidad vendida:", cantidadVendida);
+        console.log("Usos unitarios:", usoUnitario);
+        console.log("Usos disponibles antes:", nuevosUsosDisponibles);
+        console.log("Cantidad disponible antes:", nuevaCantidadDisponible);
+
+        if (cantidadVendida > 0) {
+          const usosCompletos = Math.floor(cantidadVendida / usoUnitario);
+          const resto = cantidadVendida % usoUnitario;
+
+          nuevosUsosDisponibles -= usosCompletos * usoUnitario;
+          nuevaCantidadDisponible -= usosCompletos;
+
+          if (resto > 0) {
+            nuevosUsosDisponibles -= resto;
+          }
+
+          console.log(
+            "Usos completos utilizados:",
+            usosCompletos * usoUnitario
+          );
+          console.log("Resto utilizado:", resto);
+          console.log("Nuevos usos disponibles:", nuevosUsosDisponibles);
+          console.log("Nueva cantidad disponible:", nuevaCantidadDisponible);
+        }
+
+        return {
+          idInsumo: insumo.IdInsumos,
+          usosDisponibles: nuevosUsosDisponibles,
+          cantidad: nuevaCantidadDisponible,
+        };
+      });
+
+      await Promise.all(
+        updatedInsumos.map(async (insumo) => {
+          await axios.put(
+            `http://localhost:5000/api/existenciainsumos/editar/${insumo.idInsumo}`,
+            {
+              UsosDisponibles: insumo.usosDisponibles,
+              Cantidad: insumo.cantidad,
+            }
+          );
+        })
+      );
+
+      // Enviar una solicitud para actualizar las existencias según los datos del detalle y el cálculo utilizando el método put
+      await Promise.all(
+        updatedInsumos.map(async (insumo) => {
+          await axios.put(
+            `http://localhost:5000/api/existenciainsumos/editar/${insumo.idInsumo}`,
+            {
+              UsosDisponibles: insumo.usosDisponibles,
+              Cantidad: insumo.cantidad,
+            }
+          );
+        })
+      );
+
       Swal.fire({
         position: "bottom-end",
         icon: "success",
@@ -135,34 +225,13 @@ const Registrar = () => {
         showConfirmButton: false,
         timer: 1500,
       });
-
-      const detallesVenta = insumosSeleccionados.map((insumo) => {
-        const cantidad = cantidadInsumos[insumo.IdInsumos] || 0;
-        return {
-          Idventa: ventaResponse.data.idVentas,
-          Idinsumo: insumo.IdInsumos,
-          Usos: parseInt(cantidad),
-
-          Precio_unitario: insumo.precio_unitario,
-        };
-      });
-
-      console.log(detallesVenta);
-
-      const detallesResponse = await axios.post(
-        "http://localhost:5000/Jackenail/Detalleregistrar",
-        detallesVenta
-      );
-
-      console.log(
-        "Detalles de venta registrados con éxito:",
-        detallesResponse.data
-      );
+      window.location.href = "http://localhost:3000/ventas";
     } catch (error) {
       console.error("Error al registrar la venta:", error);
     }
   };
 
+  //solicutd para traer todos los insumos y ponerlos en un modal para utilizarlo en el detalle de las ventas
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -184,13 +253,76 @@ const Registrar = () => {
     setInsumosSeleccionados([...insumosSeleccionados, insumoSeleccionado]);
   };
 
-  let totalGeneral = 0;
-  insumosSeleccionados.forEach((insumo) => {
-    const subtotal =
-      insumo.precio_unitario * (cantidadInsumos[insumo.IdInsumos] || 0);
-    const iva = subtotal * (0.19 / 100);
-    totalGeneral += subtotal + iva;
-  });
+  useEffect(() => {
+    let total = 0;
+
+    insumosSeleccionados.forEach((insumo) => {
+      const cantidadVendida = cantidadInsumos[insumo.IdInsumos] || 0;
+      const usoUnitario = insumo.usos_unitarios;
+      let subtotal = 0;
+
+      if (cantidadVendida > 0) {
+        const usosCompletos = Math.floor(cantidadVendida / usoUnitario);
+        const resto = cantidadVendida % usoUnitario;
+
+        subtotal = insumo.PrecioUnitario * usosCompletos;
+
+        if (resto > 0) {
+          subtotal += insumo.PrecioUnitario; // Sumar el precio unitario por el resto
+        }
+      }
+
+      const ivaCalculado = subtotal * (0.19 / 100);
+      total += subtotal + ivaCalculado;
+    });
+
+    const descuentoAplicado = total * (descuento / 100);
+    const totalConDescuento = total - descuentoAplicado;
+
+    setTotalGeneral(totalConDescuento); // Actualizar el total general considerando el descuento
+    setIva(total * (0.19 / 100)); // Actualizar el estado del IVA
+  }, [cantidadInsumos, insumosSeleccionados, descuento]);
+
+  const handleCantidadChange = (e, idInsumo) => {
+    const { value } = e.target;
+    let cantidad = parseInt(value);
+
+    // Validar que la cantidad no sea negativa
+    if (cantidad < 0 || isNaN(cantidad)) {
+      cantidad = 0; // Establecer la cantidad a cero si es negativa o no es un número
+      // Mostrar alerta de SweetAlert
+      Swal.fire({
+        icon: "warning",
+        title: "Cantidad inválida",
+        text: "La cantidad no puede ser negativa",
+        position: "center",
+      });
+    }
+
+    // Validar que la cantidad no sea mayor que los usos disponibles
+    const usosDisponibles = insumosSeleccionados.find(
+      (insumo) => insumo.IdInsumos === idInsumo
+    ).UsosDisponibles;
+
+    if (cantidad > usosDisponibles) {
+      // Mostrar alerta de SweetAlert
+      Swal.fire({
+        icon: "warning",
+        title: "Cantidad inválida",
+        text: "La cantidad no puede ser mayor que los usos disponibles",
+        position: "center",
+      });
+
+      // Establecer la cantidad en los usos disponibles
+      setCantidadInsumos({
+        ...cantidadInsumos,
+        [idInsumo]: usosDisponibles,
+      });
+    } else {
+      // Si la cantidad es válida, actualizar el estado cantidadInsumos
+      setCantidadInsumos({ ...cantidadInsumos, [idInsumo]: cantidad });
+    }
+  };
 
   return (
     <div className="content-wrapper">
@@ -303,12 +435,12 @@ const Registrar = () => {
                       Iva
                     </label>
                     <input
-                      type="text"
-                      id="iva"
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder="Iva"
+                      type="number"
                       name="iva"
-                      required
+                      id="iva"
+                      value={iva.toFixed(2)}
+                      onChange={(e) => setIva(parseFloat(e.target.value))}
+                      placeholder="IVA"
                     />
                   </div>
 
@@ -331,11 +463,15 @@ const Registrar = () => {
                         Descuento
                       </label>
                       <input
-                        type="text"
+                        type="number"
                         id="Descuento"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         placeholder="Descuento"
                         name="Descuento"
+                        value={descuento}
+                        onChange={(e) =>
+                          setDescuento(parseFloat(e.target.value))
+                        }
                         required
                       />
                     </div>
@@ -393,7 +529,9 @@ const Registrar = () => {
                         <tr>
                           <th>Opciones</th>
                           <th>Insumo</th>
-                          <th>usos</th>
+                          <th>Precio unitario</th>
+                          <th>usos disponibles </th>
+                          <th>Unidades</th>
                           <th>Categorías</th>
                           <th>Subtotal</th>
                           <th>Cantidad</th>
@@ -401,17 +539,13 @@ const Registrar = () => {
                       </thead>
                       <tbody>
                         {insumosSeleccionados.map((insumo) => {
-                          const subtotal =
-                            insumo.precio_unitario *
-                            (cantidadInsumos[insumo.IdInsumos] || 0);
-                          const iva = subtotal * (0.19 / 100);
-                          const total = subtotal + iva;
-
                           return (
                             <tr key={insumo.IdInsumos}>
                               <td>Opciones</td>
                               <td>{insumo.NombreInsumos}</td>
+                              <td>{insumo.PrecioUnitario}</td>
                               <td>{insumo.UsosDisponibles}</td>
+                              <td>{insumo.Cantidad}</td>
                               <td>{insumo.nombre_categoria}</td>
                               <td>{subtotal.toFixed(2)}</td>
                               <td>
@@ -434,6 +568,12 @@ const Registrar = () => {
                               TOTAL
                             </th>
                             <th colSpan="2">{totalGeneral.toFixed(2)}</th>
+                          </tr>
+                          <tr>
+                            <th colSpan="4" style={{ paddingRight: "20px" }}>
+                              Descuento aplicado
+                            </th>
+                            <th colSpan="2">{descuento.toFixed(2)}</th>
                           </tr>
                         </tfoot>
                       </tbody>
