@@ -1,8 +1,8 @@
 import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
 import App from './App';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ReactDOM from 'react-dom';
 import Roles from './pages/Roles/Roles';
 import Usuarios from './pages/Usuarios/Usuarios';
 import Usuarios2 from './pages/Usuarios2/Usuarios2';
@@ -20,28 +20,31 @@ import Salida from './pages/Salida_Insumos/Salida';
 import Clientes from "./pages/Clientes/Clientes";
 import Empleados from "./pages/Empleados/Empleados";
 
-ReactDOM.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/iniciarSesion" element={<Login />} />
-      <Route path="/Registrar" element={<CrearCuenta />} />
-      <Route path="/" element={<App />} >
-        <Route path="/configuracion/roles" element={<Roles />} />
-        <Route path="/Usuarios/Administradores" element={<Usuarios />} />
-        <Route path="/Usuarios" element={<Usuarios2 />} />
-        <Route path="/ventas" element={<Ventas />} />
-        <Route path="/compras" element={<Compras />} />
-        <Route path="/compras/Proveedores" element={<Proveedores />} />
-        <Route path="/compras/crearCompra" element={<CrearCompra />}/>
-        <Route path="/Insumos/Categorias" element={<Categorias />} />
-        <Route path="/agendamiento" element={<Agenda />} /> 
-        <Route path="/Salida_Insumos" element={<Salida />} />
-        <Route path="/Clientes" element={<Clientes />} />
-        <Route path="/Insumos" element={<Insumos />} />
-        <Route path="/agendamiento/Servicios" element={<Servicios/>} />
-        <Route path="/Empleados" element={<Empleados />} />
-      </Route>
-    </Routes>
-  </BrowserRouter>,
-  document.getElementById('root')
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+root.render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/iniciarSesion" element={<Login />} />
+        <Route path="/Registrar" element={<CrearCuenta />} />
+        <Route path="/" element={<App />}>
+          <Route path="/configuracion/roles" element={<Roles />} />
+          <Route path="/Usuarios/Administradores" element={<Usuarios />} />
+          <Route path="/Usuarios" element={<Usuarios2 />} />
+          {/* <Route path="/ventas" element={<Ventas />} /> */}
+          <Route path="/compras" element={<Compras />} />
+          <Route path="/compras/Proveedores" element={<Proveedores />} />
+          <Route path="/compras/crearCompra" element={<CrearCompra />} />
+          <Route path="/Insumos/Categorias" element={<Categorias />} />
+          <Route path="/agendamiento" element={<Agenda />} />
+          <Route path="/Salida_Insumos" element={<Salida />} />
+          <Route path="/Clientes" element={<Clientes />} />
+          <Route path="/Insumos" element={<Insumos />} />
+          <Route path="/agendamiento/Servicios" element={<Servicios />} />
+          <Route path="/Empleados" element={<Empleados />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  </React.StrictMode>,
 );

@@ -21,7 +21,7 @@ const TablePrueba = ({ columns, data, roles }) => {
     setCheckedItems(updatedCheckedItems);
   };
 
-  console.log('Props en TablePrueba:', columns, data, roles); // Verifica aquí que los roles y datos se estén pasando correctamente
+  // console.log('Props en TablePrueba:', columns, data, roles); // Verifica aquí que los roles y datos se estén pasando correctamente
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900 py-3 sm:py-5">
@@ -30,14 +30,14 @@ const TablePrueba = ({ columns, data, roles }) => {
           <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
             {/* Encabezados */}
             <div className="flex items-center flex-1 space-x-4">
-              <h5>
+              {/* <h5>
                 <span className="text-gray-500">All Products:</span>
                 <span className="dark:text-white">123456</span>
               </h5>
               <h5>
                 <span className="text-gray-500">Total sales:</span>
                 <span className="dark:text-white">$88.4k</span>
-              </h5>
+              </h5> */}
             </div>
             {/* Botones de acción */}
             <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">

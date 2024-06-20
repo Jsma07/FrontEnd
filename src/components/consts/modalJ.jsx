@@ -168,7 +168,9 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
   };
 
   const renderFieldByType = (field) => {
-    const { name, label, type, options } = field;
+    const { name, label, type, options, hidden } = field;
+
+    if (hidden) return null; // Si el campo está oculto, no renderizar
 
     switch (type) {
       case "text":
