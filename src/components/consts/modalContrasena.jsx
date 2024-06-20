@@ -11,19 +11,19 @@ const ModalContrasena = ({ open, handleClose, handleSubmit }) => {
     e.preventDefault();
     handleSubmit(newPassword, confirmPassword);
     setNewPassword(""); // Vacía el estado de nueva contraseña
-    setConfirmPassword(""); 
+    setConfirmPassword("");
   };
 
   const handleChangeNewPassword = (e) => {
     const value = e.target.value;
     setNewPassword(value);
   };
-  
+
   const handleChangeConfirmPassword = (e) => {
     const value = e.target.value;
     setConfirmPassword(value);
   };
-  
+
   return (
     <Modal open={open} onClose={handleClose}>
       <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
@@ -62,21 +62,24 @@ const ModalContrasena = ({ open, handleClose, handleSubmit }) => {
               </Grid>
             </Grid>
             <div style={{ display: "flex", justifyContent: "center", marginTop: "1.5rem" }}>
+
+              <Button
+                color="secondary"
+                variant="contained"
+                onClick={handleClose}
+                style={{ width: "45%", marginRight: "10px" }}
+              >
+                Cancelar
+              </Button>
               <Button
                 variant="contained"
                 color="primary"
                 type="submit"
-                style={{ width: "45%", marginRight: "10px" }}
+                style={{ width: "45%" }}
+
                 startIcon={<SendIcon />}
               >
                 Enviar
-              </Button>
-              <Button
-                variant="contained"
-                onClick={handleClose}
-                style={{ width: "45%" }}
-              >
-                Cancelar
               </Button>
             </div>
           </form>
