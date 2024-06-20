@@ -4,6 +4,7 @@ import SendIcon from '@mui/icons-material/Send';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import CloseIcon from '@mui/icons-material/Close';
 import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
 
 const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChange }) => {
   const [formValues, setFormValues] = useState({});
@@ -12,7 +13,8 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
   const [modalSize, setModalSize] = useState({ width: 0, height: 0 });
   const [extraFields, setExtraFields] = useState([]);
-  const [alert, setAlert] = useState(null);
+  const [alertOpen, setAlertOpen] = useState(false); // Estado para controlar la visibilidad de la alerta
+  const [alertMessage, setAlertMessage] = useState(''); // Mensaje de la alerta
 
   useEffect(() => {
     if (fields && fields.length > 0) {
@@ -38,7 +40,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
 
   const handleMouseDown = (e) => {
     setDragging(true);
-    setStartPosition({ 
+    setStartPosition({
       x: e.clientX,
       y: e.clientY
     });
@@ -61,7 +63,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
 
   const handleChange = (e) => {
     const { name, files } = e.target;
-  
+
     if (e.target.type === 'file' && e.target.accept.includes('image/*')) {
       const file = files[0];
       const reader = new FileReader();
@@ -69,14 +71,14 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
         // Verificar el tamaño del archivo antes de enviarlo
         const maxSizeBytes = 1 * 1024 * 1024; // 1 MB en bytes
         if (file.size > maxSizeBytes) {
-          setAlert(
-            <Alert severity="warning" onClose={() => setAlert(null)}>
-              El tamaño del archivo de imagen excede el límite permitido (1 MB).
-            </Alert>
-          );
+          setAlertOpen(true); // Mostrar alerta de tamaño de archivo excedido
+          setTimeout(() => {
+            setAlertOpen(false);
+            setAlertMessage('')
+          }, 3000);
           return;
         }
-  
+
         setFormValues((prevFormValues) => ({
           ...prevFormValues,
           [name]: file,
@@ -84,7 +86,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
           [`${name}_name`]: file.name,
           [`${name}_size`]: (file.size / 1024).toFixed(2) + ' KB'
         }));
-  
+
         const extraFieldsData = [
           {
             name: `${name}_name`,
@@ -101,7 +103,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
             disabled: true
           }
         ];
-  
+
         setExtraFields((prevExtraFields) => [
           ...prevExtraFields,
           ...extraFieldsData
@@ -114,7 +116,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
         [name]: e.target.type === 'file' ? files[0] : e.target.value,
       }));
     }
-  
+
     if (onChange) {
       onChange(name, e.target.type === 'file' ? files[0] : e.target.value);
     }
@@ -218,17 +220,17 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
           <div className="flex items-center justify-center w-full relative">
             {formValues[`${name}_preview`] ? (
               <div style={{ position: 'relative', display: 'inline-block' }}>
-                <img 
-                  src={formValues[`${name}_preview`]} 
-                  alt="Preview" 
-                  style={{ 
-                    width: '100%',  
-                    maxWidth: '10000px', 
-                    height: 'auto', 
+                <img
+                  src={formValues[`${name}_preview`]}
+                  alt="Preview"
+                  style={{
+                    width: '100%',
+                    maxWidth: '10000px',
+                    height: 'auto',
                     maxHeight: '200px', // Reducir la altura máxima de la imagen
-                    objectFit: 'contain', 
-                    borderRadius: '8px' 
-                  }} 
+                    objectFit: 'contain',
+                    borderRadius: '8px'
+                  }}
                 />
                 <IconButton
                   size="small"
@@ -244,34 +246,35 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
                 </IconButton>
               </div>
             ) : (
-              <label 
-                htmlFor={`dropzone-file-${name}`} 
+              <label
+                htmlFor={`dropzone-file-${name}`}
                 className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:border-gray-500"
                 style={{ width: '100%', height: '150px' }}
               >
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <svg 
-                    className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" 
-                    aria-hidden="true" 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" 
+                  <svg
+                    className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
                     viewBox="0 0 20 16"
                   >
-                    <path 
-                      stroke="currentColor" 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth="2" 
-                      d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 13h3a3 3 0 0 0 0-6h-.
+                      025A5.56 5.56 0 0 0 16 6.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
                     />
                   </svg>
                   <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                    <span className="font-semibold">Click Imagen</span> 
+                    <span className="font-semibold">Click para elegir imagen</span>
                   </p>
                 </div>
-                <input 
-                  id={`dropzone-file-${name}`} 
-                  type="file" 
+                <input
+                  id={`dropzone-file-${name}`}
+                  type="file"
                   name={name}
                   accept="image/*"
                   className="hidden"
@@ -287,74 +290,84 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
   };
 
   return (
-    <>
-      {alert && (
-        <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999 }}>
-          {alert}
-        </div>
-      )}
-      <Modal open={open} onClose={handleClose}>
-        <div 
-          id="modal-container"
-          style={{ 
-            position: 'absolute', 
-            top: `${position.y}px`, 
-            left: `${position.x}px`, 
-            backgroundColor: 'white', 
-            borderRadius: '0.375rem', 
-            width: '80%', 
-            maxWidth: '50rem', 
-            maxHeight: '80%', 
-            overflow: 'auto', 
-            padding: '1.5rem', 
-            cursor: dragging ? 'grabbing' : 'grab',
-            zIndex: 9999
+    <Modal open={open} onClose={handleClose}>
+      <div
+        id="modal-container"
+        style={{
+          position: 'absolute',
+          top: `${position.y}px`,
+          left: `${position.x}px`,
+          backgroundColor: 'white',
+          borderRadius: '0.375rem',
+          width: '80%',
+          maxWidth: '50rem',
+          maxHeight: '80%',
+          overflow: 'auto',
+          padding: '1.5rem',
+          cursor: dragging ? 'grabbing' : 'grab',
+          zIndex: 9999
+        }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+      >
+        {/* Alerta de tamaño de imagen excedido */}
+        <Stack
+          sx={{
+            position: 'fixed',
+            top: '1rem',
+            width: '100%',
+            display: alertOpen ? 'flex' : 'none',
+            justifyContent: 'center',
+            zIndex: 10000
           }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
+          spacing={2}
         >
-          <div 
-            style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              cursor: 'grab' 
-            }}
-          >
-            <Typography variant="h6">{title}</Typography>
-            <DragIndicatorIcon />
-          </div>
-          <Grid container spacing={2} style={{ marginTop: '1rem' }}>
-            {renderFields()}
-          </Grid>
-          <div 
-            style={{ 
-              display: 'flex', 
-              justifyContent: 'flex-end', 
-              marginTop: '1rem' 
-            }}
-          >
-            <Button 
-              onClick={handleCancel} 
-              color="secondary" 
-              variant="contained" 
-              style={{ marginRight: '1rem' }}
-            >
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleSubmit} 
-              color="primary" 
-              variant="contained" 
-              endIcon={<SendIcon />}
-            >
-              Enviar
-            </Button>
-          </div>
+          <Alert severity="warning">
+            El tamaño del archivo de imagen excede el límite permitido (1 MB).
+          </Alert>
+        </Stack>
+
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            cursor: 'grab'
+          }}
+        >
+          <Typography variant="h6">{title}</Typography>
+          <DragIndicatorIcon />
         </div>
-      </Modal>
-    </>
+        <Grid container spacing={2} style={{ marginTop: '1rem' }}>
+          {renderFields()}
+        </Grid>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            marginTop: '1rem'
+          }}
+        >
+          <Button
+            onClick={handleCancel}
+            color="secondary"
+            variant="contained"
+            style={{ marginRight: '1rem' }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            color="primary"
+            variant="contained"
+            endIcon={<SendIcon />}
+          >
+            Enviar
+          </Button>
+        </div>
+      </div>
+    </Modal>
   );
 };
 
