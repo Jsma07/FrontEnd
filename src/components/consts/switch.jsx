@@ -1,11 +1,11 @@
 import * as React from 'react';
-
 import Switch from '@mui/material/Switch';
 
- function CustomSwitch({active, onToggle}) {
-    const handleClick = () => {
-        onToggle(!active); 
-      };
+function CustomSwitch({ active, onToggle }) {
+  const handleClick = () => {
+    onToggle(!active);  // Este evento cambia el estado cuando se hace clic en el Switch
+  };
+
   return (
     <Switch
       checked={active}
@@ -14,4 +14,5 @@ import Switch from '@mui/material/Switch';
     />
   );
 }
-export default CustomSwitch
+
+export default CustomSwitch;

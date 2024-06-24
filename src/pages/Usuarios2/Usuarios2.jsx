@@ -6,6 +6,7 @@ import LoadingScreen from "../../components/consts/pantallaCarga";
 import Fab from "@mui/material/Fab";
 import Modal from "../../components/consts/modalContrasena";
 import CustomSwitch from "../../components/consts/switch"
+import { Hidden } from "@mui/material";
 
 const Usuarios = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -555,6 +556,7 @@ const Usuarios = () => {
                 label: "Contraseña",
                 type: "password",
                 value: seleccionado ? seleccionado.contrasena : "",
+                hidden: seleccionado,
               },
             ]}
           />

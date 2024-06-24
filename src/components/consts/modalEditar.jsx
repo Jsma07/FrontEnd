@@ -12,7 +12,8 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
   useEffect(() => {
     if (entityData) {
       setFormData(entityData);
-      
+
+      // Actualizar la vista previa de la imagen si existe en los datos de la entidad
       if (entityData.ImgServicio) {
         setImagePreview(`http://localhost:5000${entityData.ImgServicio}`);
         setImageName('Imagen existente');
@@ -25,6 +26,7 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
         setImageSize('');
       }
 
+      // También manejar otra propiedad de imagen si existe
       if (entityData.Imagen) {
         setImagePreview(`http://localhost:5000${entityData.Imagen}`);
         setImageName('Imagen existente en la base de datos');
@@ -33,6 +35,7 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     }
   }, [entityData]);
 
+  // Función para manejar cambios en los campos del formulario
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
     const newValue = type === 'checkbox' ? checked : value;
@@ -40,18 +43,21 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
       ...prevData,
       [name]: newValue,
     }));
-    onChange(name, newValue);
+    onChange(name, newValue); // Llamar a la función onChange pasada por props
   };
 
+  // Función para manejar el envío del formulario
   const handleSubmit = () => {
-    onSubmit(formData);
-    handleClose();
+    onSubmit(formData); // Llamar a la función onSubmit pasada por props con los datos del formulario
+    handleClose(); // Cerrar el modal después de enviar
   };
 
+  // Función para cancelar y cerrar el modal
   const handleCancel = () => {
     handleClose();
   };
 
+  // Función para renderizar los campos del formulario basado en su tipo
   const renderFields = () => {
     return fields.map((field, index) => (
       <Grid item xs={12} sm={6} key={index}>
@@ -60,6 +66,7 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     ));
   };
 
+  // Función para renderizar un campo específico según su tipo
   const renderFieldByType = (field) => {
     const { name, label, type, readOnly, options } = field;
 
@@ -185,6 +192,7 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     }
   };
 
+  // Función para manejar el cambio de imagen seleccionada
   const handleImageChange = (e, name) => {
     const file = e.target.files[0];
     if (file) {
@@ -203,6 +211,7 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     }
   };
 
+  // Función para eliminar la imagen seleccionada
   const handleImageRemoval = (name) => {
     setFormData((prevData) => ({
       ...prevData,

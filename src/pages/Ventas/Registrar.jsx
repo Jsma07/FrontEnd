@@ -193,17 +193,17 @@ const Registrar = () => {
         };
       });
 
-      await Promise.all(
-        updatedInsumos.map(async (insumo) => {
-          await axios.put(
-            `http://localhost:5000/api/existenciainsumos/editar/${insumo.idInsumo}`,
-            {
-              UsosDisponibles: insumo.usosDisponibles,
-              Cantidad: insumo.cantidad,
-            }
-          );
-        })
-      );
+      // await Promise.all(
+      //   updatedInsumos.map(async (insumo) => {
+      //     await axios.put(
+      //       `http://localhost:5000/api/existenciainsumos/editar/${insumo.idInsumo}`,
+      //       {
+      //         UsosDisponibles: insumo.usosDisponibles,
+      //         Cantidad: insumo.cantidad,
+      //       }
+      //     );
+      //   })
+      // );
 
       // Enviar una solicitud para actualizar las existencias según los datos del detalle y el cálculo utilizando el método put
       await Promise.all(

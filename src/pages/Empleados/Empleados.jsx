@@ -115,7 +115,7 @@ const Empleados = () => {
             ...formData,
             Telefono: parseInt(formData.Telefono),
             Estado: 1,
-            IdRol: 3,
+            IdRol: 2,
           };
 
           console.log("Datos del formulario numéricos:", formDataNumerico);
