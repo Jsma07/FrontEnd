@@ -45,7 +45,7 @@ root.render(
           <Route path="/Clientes" element={<Clientes />} />
           <Route path="/Insumos" element={<Insumos />} />
           <Route path="/agendamiento/Servicios" element={<Servicios />} />
-          <Route path="/Empleados" element={<Empleados />} />
+          <Route path="/Empleados" element={<Usuarios2 />} />
           <Route path="/RegistrarVentas" element={<Registrar />} />
           <Route path="/Detalleventa/:id" element={<InsumoDetalle />} />
         </Route>

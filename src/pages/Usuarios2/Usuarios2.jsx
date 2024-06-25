@@ -6,7 +6,6 @@ import LoadingScreen from "../../components/consts/pantallaCarga";
 import Fab from "@mui/material/Fab";
 import Modal from "../../components/consts/modalContrasena";
 import CustomSwitch from "../../components/consts/switch"
-import { Hidden } from "@mui/material";
 
 const Usuarios = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -68,7 +67,7 @@ const Usuarios = () => {
     const { nombre = "", apellido = "", Documento = "", correo = "", telefono = "", rolId } = user;
 
     // Solo mostrar usuarios con el rol de idRol 1
-    if (rolId === 1 || rolId === 2 || rolId === 4) {
+    if (rolId === 1 || rolId === 4) {
       return false;
     }
 
@@ -238,11 +237,19 @@ const Usuarios = () => {
 
     const emptyFields = mandatoryFields.filter((field) => {
       const value = formData[field];
+    
       if (field === "rolId") {
-        return value === undefined || value.toString().trim() === "";
+        return value === undefined || `${value}`.trim() === "";
       }
-      return typeof value !== "string" || value.trim() === "";
+    
+      // Verificar si value es undefined o no es una cadena de texto
+      if (typeof value !== "string" || value.trim() === "") {
+        return true;
+      }
+    
+      return false;
     });
+    
 
     if (emptyFields.length > 0) {
       window.Swal.fire({
@@ -340,7 +347,7 @@ const Usuarios = () => {
       const result = await window.Swal.fire({
         icon: "warning",
         title: `¿Estás seguro?`,
-        text: `¿Quieres ${seleccionado ? "editar" : "crear"} el usuario?`,
+        text: `¿Quieres ${seleccionado ? "editar" : "crear"} el empleado?`,
         showCancelButton: true,
         confirmButtonText: "Sí",
         cancelButtonText: "Cancelar",
@@ -420,11 +427,13 @@ const Usuarios = () => {
   };
 
   const columns = [
+    { field: "tipoDocumento", headerName: "Documento", width: "w-36" },
+
+    { field: "Documento", headerName: "Documento", width: "w-36" },
     { field: "nombre", headerName: "Nombre", width: "w-36" },
     { field: "apellido", headerName: "Apellido", width: "w-36" },
     { field: "correo", headerName: "Correo", width: "w-36" },
     { field: "telefono", headerName: "Teléfono", width: "w-36" },
-    { field: "Documento", headerName: "Documento", width: "w-36" },
     {
       field: "rolId",
       headerName: "Rol",
@@ -469,30 +478,8 @@ const Usuarios = () => {
 
   return (
     <div className="container mx-auto p-4 relative">
-      <h1 className="text-3xl font-bold mb-4">Usuarios</h1>
       <div className="md:flex md:justify-between md:items-center mb-4">
-        <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
-          <label
-            htmlFor="default-search"
-            className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
-          >
-            Buscar usuario
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
-            </div>
-            <input
-              type="search"
-              id="default-search"
-              className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Buscar usuario..."
-              value={buscar}
-              onChange={(e) => setBuscar(e.target.value)}
-              required
-            />
-          </div>
-        </div>
+        
         <div>
           <Modal
             open={openPasswordModal}
@@ -504,8 +491,26 @@ const Usuarios = () => {
             open={openModal}
             handleClose={handleCloseModal}
             onSubmit={handleSubmit}
-            title={seleccionado ? "Editar Usuario" : "Crear nuevo usuario"}
+            title={seleccionado ? "Editar empleado" : "Crear nuevo empleado"}
             fields={[
+              {
+                name: "tipoDocumento",
+                type: "select",
+                options: [
+                  { value: "T.I", label: "Tarjeta de Identidad (T.I)" },
+                  { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
+                  { value: "T.E", label: "Tarjeta de extranjería (T.E)" },
+                  { value: "C.E", label: "Cédula de extranjería (C.E)" },
+                ],
+                value: seleccionado ? seleccionado.tipoDocumento : "C.C", 
+                disabled: false, 
+              },
+              {
+                name: "Documento",
+                label: "Documento",
+                type: "text",
+                value: seleccionado ? seleccionado.Documento : "",
+              },
               {
                 name: "nombre",
                 label: "Nombre",
@@ -532,18 +537,13 @@ const Usuarios = () => {
                 maxLength: 15,
                 minlength: 7,
               },
-              {
-                name: "Documento",
-                label: "Documento",
-                type: "text",
-                value: seleccionado ? seleccionado.Documento : "",
-              },
+              
               {
                 name: "rolId",
                 label: "Rol",
                 type: "select",
                 options: roles
-                  .filter(role => role.idRol !== 1  && role.idRol !== 2  && role.idRol !== 4 &&role.EstadoRol !== 0) // Filtrar para mostrar solo el rol con idRol 1
+                  .filter(role => role.idRol !== 1  && role.idRol !== 4 &&role.EstadoRol !== 0) // Filtrar para mostrar solo el rol con idRol 1
                   .map(role => ({
                     value: role.idRol,
                     label: role.nombre,
@@ -563,7 +563,7 @@ const Usuarios = () => {
 
         </div>
       </div>
-      <Table columns={columns} data={filtrar} roles={roles} />
+      <Table title="Gestion de empleados" columns={columns} data={filtrar} roles={roles} />
       <Fab
         aria-label="add"
         style={{

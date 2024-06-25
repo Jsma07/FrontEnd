@@ -90,7 +90,6 @@ const Registrar = () => {
     const fecha = event.target.fecha.value;
     const descuento = event.target.Descuento.value;
 
-    // Recalcula los valores de subtotal, iva y total
     let subtotal = 0;
 
     // Verifica si insumosSeleccionados está definido antes de usarlo
@@ -115,7 +114,7 @@ const Registrar = () => {
       Estado: 2,
     };
 
-    console.log(ventaData);
+    console.log("Datos de la venta:", ventaData);
 
     try {
       const ventaResponse = await axios.post(
@@ -205,7 +204,6 @@ const Registrar = () => {
         })
       );
 
-     
       Swal.fire({
         position: "bottom-end",
         icon: "success",
@@ -293,11 +291,11 @@ const Registrar = () => {
     ).UsosDisponibles;
 
     if (cantidad > usosDisponibles) {
-      // Mostrar alerta de SweetAlert
+      // Mostrar alerta de SweetAlert con usos disponibles
       Swal.fire({
         icon: "warning",
         title: "Cantidad inválida",
-        text: "La cantidad no puede ser mayor que los usos disponibles",
+        text: `La cantidad no puede ser mayor que los usos disponibles. Usos disponibles: ${usosDisponibles}`,
         position: "center",
       });
 
@@ -311,7 +309,6 @@ const Registrar = () => {
       setCantidadInsumos({ ...cantidadInsumos, [idInsumo]: cantidad });
     }
   };
-
   return (
     <div className="content-wrapper">
       <section className="content">
@@ -518,7 +515,6 @@ const Registrar = () => {
                           <th>Opciones</th>
                           <th>Insumo</th>
                           <th>Precio unitario</th>
-                          <th>usos disponibles </th>
                           <th>Unidades</th>
                           <th>Categorías</th>
                           <th>Subtotal</th>
@@ -532,7 +528,7 @@ const Registrar = () => {
                               <td>Opciones</td>
                               <td>{insumo.NombreInsumos}</td>
                               <td>{insumo.PrecioUnitario}</td>
-                              <td>{insumo.UsosDisponibles}</td>
+
                               <td>{insumo.Cantidad}</td>
                               <td>{insumo.nombre_categoria}</td>
                               <td>{subtotal.toFixed(2)}</td>

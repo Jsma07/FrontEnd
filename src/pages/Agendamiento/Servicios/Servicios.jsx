@@ -38,18 +38,16 @@ const Servicios = () => {
     );
   });
 
+    
   const handleAddServicio = async (formData) => {
     try {
-      const { Nombre_Servicio, ImgServicio } = formData;
-
-      if (ImgServicio && ImgServicio.size > 5 * 1024 * 1024) {
-        // 5 MB en bytes
-        window.alert(
-          "El tamaño del archivo de imagen excede el límite permitido (5 MB)."
-        );
+      const { Nombre_Servicio, Precio_Servicio, ImgServicio } = formData;
+  
+      if (ImgServicio && ImgServicio.size > 5 * 1024 * 1024) { 
+        window.alert("El tamaño del archivo de imagen excede el límite permitido (5 MB).");
         return;
       }
-
+  
       const response = await axios.get("http://localhost:5000/api/servicios");
       const servicios = response.data;
       const servicioExistente = servicios.find(
@@ -57,7 +55,7 @@ const Servicios = () => {
           servicio.Nombre_Servicio === Nombre_Servicio &&
           servicio.IdServicio !== formData.IdServicio
       );
-
+      
       const camposObligatorios = [
         "ImgServicio",
         "Nombre_Servicio",
@@ -73,9 +71,9 @@ const Servicios = () => {
       ) {
         return;
       }
-
-      const precio = formData["Precio_Servicio"];
-      if (!/^\d+$/.test(precio)) {
+  
+      const precio = Number(formData["Precio_Servicio"]);
+      if (isNaN(precio)) {
         window.Swal.fire({
           icon: "error",
           title: "Precio inválido",
@@ -83,16 +81,25 @@ const Servicios = () => {
         });
         return;
       }
-
-      if (servicioExistente) {
+  
+      if (precio <= 20000) {
         window.Swal.fire({
-          icon: "warning",
-          title: "Servicio ya registrada",
-          text: "El servicio ingresada ya está registrada.",
+          icon: "error",
+          title: "Precio inválido",
+          text: "Por favor, ingresa un precio mínimo de $20.000.",
         });
         return;
       }
-
+  
+      if (servicioExistente) {
+        window.Swal.fire({
+          icon: "warning",
+          title: "Servicio ya registrado",
+          text: "El servicio ingresado ya está registrado.",
+        });
+        return;
+      }
+  
       const confirmation = await window.Swal.fire({
         title: "¿Estás seguro?",
         text: "¿Quieres agregar este servicio?",
@@ -103,20 +110,20 @@ const Servicios = () => {
         confirmButtonText: "Sí, agregar",
         cancelButtonText: "Cancelar",
       });
-
+  
       if (confirmation.isConfirmed) {
         const formDataObj = new FormData();
         for (const key in formData) {
           formDataObj.append(key, formData[key]);
         }
-        formDataObj.append("EstadoServicio", 1);
+        formDataObj.append('EstadoServicio', 1);
         await axios.post(
           "http://localhost:5000/api/servicios/guardarServicio",
           formDataObj,
           {
             headers: {
-              "Content-Type": "multipart/form-data",
-            },
+              'Content-Type': 'multipart/form-data',
+            }
           }
         );
         handleCloseModalAgregar();
@@ -358,49 +365,41 @@ const Servicios = () => {
         entityData={servicioSeleccionado}
       />
 
-      <TablePrueba
-        columns={[
-          {
-            field: "ImgServicio",
-            headerName: "IMAGEN",
-            width: "w-32",
-            renderCell: (params) => (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-                <img
-                  src={`http://localhost:5000${params.row.ImgServicio}`} // Ajustar la URL según la configuración del servidor
-                  alt="ImgServicio"
-                  style={{
-                    maxWidth: "100%",
-                    height: "auto",
-                    width: "3rem",
-                    height: "3rem",
-                    borderRadius: "50%",
-                  }}
-                />
-              </div>
-            ),
-          },
-          { field: "Nombre_Servicio", headerName: "NOMBRE", width: "w-36" },
-          { field: "Tiempo_Servicio", headerName: "TIEMPO", width: "w-36" },
-          { field: "Precio_Servicio", headerName: "PRECIO", width: "w-36" },
-          {
-            field: "Acciones",
-            headerName: "ACCIONES",
-            width: "w-48",
-            renderCell: (params) => (
-              <div className="flex justify-center space-x-4">
-                {params.row.EstadoServicio === 1 && (
-                  <button
-                    onClick={() => handleEditClick(params.row)}
-                    className="text-yellow-500"
-                  >
+<TablePrueba
+          columns={[
+            {
+              field: "ImgServicio",
+              headerName: "IMAGEN",
+              width: "w-32",
+              renderCell: (params) => (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                  <img
+                    src={`http://localhost:5000${params.row.ImgServicio}`} // Ajustar la URL según la configuración del servidor
+                    alt="ImgServicio"
+                    style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
+                  />
+                </div>
+              )
+            },
+            { field: 'Nombre_Servicio', headerName: 'NOMBRE', width: 'w-36' },
+            { field: 'Tiempo_Servicio', headerName: 'TIEMPO', width: 'w-36' },
+            {
+              field: 'Precio_Servicio',
+              headerName: 'PRECIO',
+              width: 'w-36',
+              renderCell: (params) => (
+                <div>{`$${params.row.Precio_Servicio}`}</div>
+              ),
+            },
+            
+            {
+              field: 'Acciones',
+              headerName: 'ACCIONES',
+              width: 'w-48',
+              renderCell: (params) => (
+                <div className="flex justify-center space-x-4">
+                  {params.row.EstadoServicio === 1 && (
+                  <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
                     <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
                   </button>
                 )}
@@ -409,11 +408,11 @@ const Servicios = () => {
                   onToggle={() => handleToggleSwitch(params.row.IdServicio)}
                 />
               </div>
-            ),
-          },
-        ]}
-        data={filtrar}
-      />
+              ),
+            },
+          ]}
+          data={filtrar}
+        />
     </div>
   );
 };

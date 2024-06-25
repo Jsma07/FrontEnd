@@ -509,8 +509,8 @@ const Usuarios = () => {
                   { value: "T.E", label: "Tarjeta de extranjería (T.E)" },
                   { value: "C.E", label: "Cédula de extranjería (C.E)" },
                 ],
-                value: seleccionado ? seleccionado.tipoDocumento : "C.C", // Valor por defecto seleccionado
-                disabled: false, // Si deseas que inicialmente esté deshabilitado, cambia a true
+                value: seleccionado ? seleccionado.tipoDocumento : "C.C", 
+                disabled: false, 
               },
               {
                 name: "Documento",
@@ -570,7 +570,7 @@ const Usuarios = () => {
           />
         
       </div>
-      <Table columns={columns} data={filtrar} roles={roles} />
+      <Table title="Gestion de administradores" columns={columns} data={filtrar} roles={roles} />
       <Fab
         aria-label="add"
         style={{

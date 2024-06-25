@@ -171,7 +171,7 @@ const Roles = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
+      {/* <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">Gestión de roles</h1>
         <div className="relative md:w-64 md:mr-4">
           <label
@@ -195,9 +195,9 @@ const Roles = () => {
             />
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <Table columns={columns} data={filtrar} />
+      <Table title="Gestion de Roles" columns={columns} data={filtrar} />
       <AddRoleModal
         open={openModal && selectedRoleId === null}
         handleClose={handleCloseModal}
