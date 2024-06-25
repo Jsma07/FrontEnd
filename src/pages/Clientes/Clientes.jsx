@@ -67,7 +67,7 @@ const Usuarios = () => {
     const { nombre = "", apellido = "", Documento = "", correo = "", telefono = "", rolId } = user;
 
     // Solo mostrar usuarios con el rol de idRol 1
-    if (rolId === 1 || rolId === 4) {
+    if (rolId !== 4) {
       return false;
     }
 
@@ -543,13 +543,13 @@ const Usuarios = () => {
                 label: "Rol",
                 type: "select",
                 options: roles
-                  .filter(role => role.idRol !== 1  && role.idRol !== 4 &&role.EstadoRol !== 0) // Filtrar para mostrar solo el rol con idRol 1
+                  .filter(role => role.idRol === 4 ) // Filtrar para mostrar solo el rol con idRol 1
                   .map(role => ({
                     value: role.idRol,
                     label: role.nombre,
                   })),
-                  value: seleccionado ? seleccionado.rolId : "",
-                disabled: false, // Deshabilitar el select
+                  value: seleccionado ? seleccionado.rolId : 4,
+                disabled: true, // Deshabilitar el select
               },
               {
                 name: "contrasena",
@@ -563,7 +563,7 @@ const Usuarios = () => {
 
         </div>
       </div>
-      <Table title="Gestion de empleados" columns={columns} data={filtrar} roles={roles} />
+      <Table title="Gestion de clientes" columns={columns} data={filtrar} roles={roles} />
       <Fab
         aria-label="add"
         style={{
