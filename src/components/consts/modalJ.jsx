@@ -6,7 +6,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChange }) => {
   const [formValues, setFormValues] = useState({});
   const [dragging, setDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({ x: 350, y: 150 });
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
   const [modalSize, setModalSize] = useState({ width: 0, height: 0 });
   const [errores, setErrores] = useState({});

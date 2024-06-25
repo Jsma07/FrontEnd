@@ -52,7 +52,6 @@ const Categorias = () => {
         return;
       }
   
-      // Validación del nombre de la categoría: no debe contener números ni caracteres especiales
       const nombreCategoria = formData['nombre_categoria'];
       if (!/^[a-zA-Z\s]+$/.test(nombreCategoria)) {
         window.Swal.fire({
