@@ -268,6 +268,20 @@
       setOpenModalEditar(true);
     };
 
+    const opcionesTiempoServicio = [
+      { value: '1:00', label: '1:00 hora(s)' },
+      { value: '1:30', label: '1:30 hora(s)' },
+      { value: '2:00', label: '2:00 horas' },
+      { value: '2:30', label: '2:30 horas' },
+      { value: '3:00', label: '3:00 horas' },
+      { value: '3:30', label: '3:30 horas' },
+      { value: '4:00', label: '4:00 horas' },
+      { value: '4:30', label: '4:30 horas' },
+      { value: '5:00', label: '5:00 horas' },
+      { value: '5:30', label: '5:30 horas' },
+      { value: '6:00', label: '6:00 horas' },
+    ];
+
     return (
       <div>
         <div className="container mx-auto p-4 relative">
@@ -317,7 +331,7 @@
     fields={[
       
       { name: "Nombre_Servicio", label: "Nombre", type: "text" },
-      { name: "Tiempo_Servicio", label: "Tiempo", type: "text" },
+      { name: "Tiempo_Servicio", label: "Tiempo", type: "select", options: opcionesTiempoServicio },
       { name: "Precio_Servicio", label: "Precio", type: "number" },
       { name: "ImgServicio", label: "Imagen", type: "file" },
     ]}
@@ -337,7 +351,7 @@
         readOnly: true,
       },
       { name: "Nombre_Servicio", label: "Nombre", type: "text" },
-      { name: "Tiempo_Servicio", label: "Tiempo", type: "text" },
+      { name: "Tiempo_Servicio", label: "Tiempo", type: "select", options: opcionesTiempoServicio },
       { name: "Precio_Servicio", label: "Precio", type: "number" },
       { name: "ImgServicio", label: "Imagen", type: "file" },
 
@@ -346,48 +360,55 @@
     entityData={servicioSeleccionado}
   />
 
-        <TablePrueba
-          columns={[
-            {
-              field: "ImgServicio",
-              headerName: "IMAGEN",
-              width: "w-32",
-              renderCell: (params) => (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                  <img
-                    src={`http://localhost:5000${params.row.ImgServicio}`} // Ajustar la URL según la configuración del servidor
-                    alt="ImgServicio"
-                    style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
-                  />
-                </div>
-              )
-            },
-            { field: 'Nombre_Servicio', headerName: 'NOMBRE', width: 'w-36' },
-            { field: 'Tiempo_Servicio', headerName: 'TIEMPO', width: 'w-36' },
-            { field: 'Precio_Servicio', headerName: 'PRECIO', width: 'w-36' },
-            {
-              field: 'Acciones',
-              headerName: 'ACCIONES',
-              width: 'w-48',
-              renderCell: (params) => (
-                <div className="flex justify-center space-x-4">
-                  {params.row.EstadoServicio === 1 && (
-                  <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
-                    <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
-                  </button>
-                )}
-                <CustomSwitch
-                  active={params.row.EstadoServicio === 1}
-                  onToggle={() => handleToggleSwitch(params.row.IdServicio)}
+<TablePrueba
+        columns={[
+          {
+            field: 'ImgServicio',
+            headerName: 'IMAGEN',
+            width: 'w-32',
+            renderCell: (params) => (
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                <img
+                  src={`http://localhost:5000${params.row.ImgServicio}`} // Ajustar la URL según la configuración del servidor
+                  alt="ImgServicio"
+                  style={{ maxWidth: '100%', height: 'auto', width: '3rem', height: '3rem', borderRadius: '50%' }}
                 />
               </div>
-              ),
-            },
-          ]}
-          data={filtrar}
-        />
-      </div>
-    );
-  };
+            ),
+          },
+          { field: 'Nombre_Servicio', headerName: 'NOMBRE', width: 'w-36' },
+          // {
+          //   field: 'Tiempo_Servicio',
+          //   headerName: 'TIEMPO',
+          //   width: 'w-36',
+          //   renderCell: (params) => (
+          //     <span>{opcionesTiempoServicio.find((opcion) => opcion.value === params.value)?.label || params.value}</span>
+          //   ),
+          // },
+          { field: 'Tiempo_Servicio', headerName: 'PRECIO', width: 'w-36' },
 
-  export default Servicios;
+          { field: 'Precio_Servicio', headerName: 'PRECIO', width: 'w-36' },
+          {
+            field: 'Acciones',
+            headerName: 'ACCIONES',
+            width: 'w-48',
+            renderCell: (params) => (
+              <div className="flex justify-center space-x-4">
+                {params.row.EstadoServicio === 1 && (
+                  <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
+                    <i className="bx bx-edit" style={{ fontSize: '24px' }}></i>
+                  </button>
+                )}
+                {/* Supongo que CustomSwitch es un componente personalizado para el cambio de estado */}
+                <CustomSwitch active={params.row.EstadoServicio === 1} onToggle={() => handleToggleSwitch(params.row.IdServicio)} />
+              </div>
+            ),
+          },
+        ]}
+        data={filtrar}
+      />
+    </div>
+  );
+};
+
+export default Servicios;

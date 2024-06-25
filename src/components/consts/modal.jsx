@@ -15,6 +15,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [progressVisible, setProgressVisible] = useState(false); // Nuevo estado para la barra de progreso
+  const [errors, setErrors] = useState({});
   const modalContainerRef = useRef(null);
   const startPositionRef = useRef({ x: 0, y: 0 });
 
@@ -74,9 +75,18 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
   };
 
   const handleChange = (e) => {
-    const { name, files } = e.target;
+    const { name, files, value, type } = e.target;
+    
+    if (type === 'text' && value.includes('  ')) {
+      const trimmedValue = value.replace(/ {2,}/g, ' ');
+      setFormValues((prevFormValues) => ({
+        ...prevFormValues,
+        [name]: trimmedValue,
+      }));
+      return; // Salir de la función después de corregir el valor
+    }
 
-    if (e.target.type === 'file' && e.target.accept.includes('image/*')) {
+    if (type === 'file' && e.target.accept.includes('image/*')) {
       const file = files[0];
       const reader = new FileReader();
       reader.onload = () => {
@@ -90,6 +100,14 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
           }, 3000);
           return;
         }
+        if (type === 'text' && value.includes('  ')) {
+    const trimmedValue = value.replace(/ {2,}/g, ' ');
+    setFormValues((prevFormValues) => ({
+      ...prevFormValues,
+      [name]: trimmedValue,
+    }));
+    return; // Salir de la función después de corregir el valor
+  }
 
         setFormValues((prevFormValues) => ({
           ...prevFormValues,
@@ -125,13 +143,18 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
     } else {
       setFormValues((prevFormValues) => ({
         ...prevFormValues,
-        [name]: e.target.type === 'file' ? files[0] : e.target.value,
+        [name]: type === 'file' ? files[0] : value,
       }));
     }
 
     if (onChange) {
-      onChange(name, e.target.type === 'file' ? files[0] : e.target.value);
+      onChange(name, type === 'file' ? files[0] : value);
     }
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: '',
+    }));
   };
 
   const handleRemoveImage = (name) => {
@@ -151,11 +174,63 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
     );
   };
 
+  const validateField = (name, value, type) => {
+    let error = '';
+
+    switch (type) {
+      case 'text':
+        if (!/^[a-zA-Z\s]*$/.test(value)) {
+          error = 'El campo solo puede contener letras y espacios.';
+        }
+        break;
+      case 'number':
+        if (isNaN(value) || Number(value) <= 0) {
+          error = 'El campo debe ser un número positivo.';
+        }
+        break;
+      case 'price':
+        if (isNaN(value) || Number(value) <= 0) {
+          error = 'El precio debe ser un número positivo.';
+        }
+        break;
+      default:
+        break;
+    }
+
+    return error;
+  };
+
+  const handleBlur = (e) => {
+    const { name, value, type } = e.target;
+    const error = validateField(name, value, type);
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: error,
+    }));
+  };
+
   const handleSubmit = async () => {
     try {
-      
       setProgressVisible(true); // Mostrar la barra de progreso al enviar el formulario
       if (typeof onSubmit === 'function') {
+        let hasErrors = false;
+
+        const newErrors = {};
+        fields.forEach((field) => {
+          const error = validateField(field.name, formValues[field.name], field.type);
+          if (error) {
+            hasErrors = true;
+            newErrors[field.name] = error;
+          }
+        });
+
+        if (hasErrors) {
+          setErrors(newErrors);
+          setProgressVisible(false);
+          return;
+        }
+
         await onSubmit(formValues);
       } else {
         console.error("onSubmit is not a function");
@@ -180,9 +255,9 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
       clearedFormValues[key] = '';
     });
     setFormValues(clearedFormValues);
-  
+
     setExtraFields([]);
-  
+
     handleClose();
   };
 
@@ -208,39 +283,43 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
             label={label}
             variant="outlined"
             onChange={handleChange}
+            onBlur={handleBlur}
             fullWidth
             size="medium"
             type={type}
             style={{ marginBottom: '0.5rem', textAlign: 'center' }}
             value={formValues[name] || ''}
+            error={!!errors[name]}
+            helperText={errors[name]}
             disabled={disabled}
           />
         );
-      case "select":
-        return (
-          <div>
-            <InputLabel id={`${name}-label`}>{label}</InputLabel>
-            <Select
-              labelId={`${name}-label`}
-              id={name}
-              name={name}
-              variant="outlined"
-              onChange={handleChange}
-              fullWidth
-              size="medium"
-              value={formValues[name] || ''}
-              label={label}
-              style={{ marginBottom: "0.5rem", textAlign: "center" }}
-            >
-              {options &&
-                options.map((option, index) => (
-                  <MenuItem key={index} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-            </Select>
-          </div>
-        );
+        case "select":
+          return (
+            <div>
+              <InputLabel id={`${name}-label`}>{label}</InputLabel>
+              <Select
+                labelId={`${name}-label`}
+                id={name}
+                name={name}
+                variant="outlined"
+                onChange={handleChange}
+                fullWidth
+                size="medium"
+                value={formValues[name] || ''}
+                label={label}
+                style={{ marginBottom: "0.5rem", textAlign: "center" }}
+              >
+                {options &&
+                  options.map((option, index) => (
+                    <MenuItem key={index} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </div>
+          );
+    
       case "file":
         return (
           <div className="flex items-center justify-center w-full relative">
