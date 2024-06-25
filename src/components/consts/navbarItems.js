@@ -19,7 +19,7 @@ export const NavbarItems =[
         icon: <SettingsSuggestIcon/>,
         label: 'Configuración',
         subitems: [
-            { label: 'Roles', route: '/configuracion/roles', icon: <PeopleIcon /> },
+            { label: 'Roles', route: '/configuracion/roles', icon:<i class='bx bx-shield-quarter' style={{ fontSize: "24px" }}></i> },
           
           ],
     },
@@ -28,9 +28,8 @@ export const NavbarItems =[
         icon: <PeopleIcon />,
         label: 'Usuarios',
         subitems: [
-          { label: 'Usuarios', route: '/Usuarios', icon: <PeopleIcon /> },
-          { label: 'Administradores', route: '/usuarios/administradores', icon: <PeopleIcon /> },
-          { label: 'Empleados', route: '/Empleados', icon: <PeopleIcon /> },
+          { label: 'Administradores', route: '/usuarios/administradores', icon: <i class='bx bxs-user-circle' style={{ fontSize: "24px" }}></i> },
+          { label: 'Empleados', route: '/Empleados', icon: <i class='bx bxs-user-badge' style={{ fontSize: "24px" }}></i> },
           { label: 'Clientes', route: '/Clientes',icon: <PeopleIcon /> },
           
 

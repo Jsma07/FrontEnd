@@ -174,42 +174,6 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
     );
   };
 
-  const validateField = (name, value, type) => {
-    let error = '';
-
-    switch (type) {
-      case 'text':
-        if (!/^[a-zA-Z\s]*$/.test(value)) {
-          error = 'El campo solo puede contener letras y espacios.';
-        }
-        break;
-      case 'number':
-        if (isNaN(value) || Number(value) <= 0) {
-          error = 'El campo debe ser un número positivo.';
-        }
-        break;
-      case 'price':
-        if (isNaN(value) || Number(value) <= 0) {
-          error = 'El precio debe ser un número positivo.';
-        }
-        break;
-      default:
-        break;
-    }
-
-    return error;
-  };
-
-  const handleBlur = (e) => {
-    const { name, value, type } = e.target;
-    const error = validateField(name, value, type);
-
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [name]: error,
-    }));
-  };
-
   const handleSubmit = async () => {
     try {
       setProgressVisible(true); // Mostrar la barra de progreso al enviar el formulario

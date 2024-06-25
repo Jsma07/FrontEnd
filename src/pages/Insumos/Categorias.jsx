@@ -52,9 +52,8 @@ const Categorias = () => {
         return;
       }
   
-      // Validación del nombre de la categoría: no debe contener números ni caracteres especiales
       const nombreCategoria = formData['nombre_categoria'];
-      if (!/^[a-zA-Z\s]+$/.test(nombreCategoria)) {
+      if (!/^[a-zA-ZñÑ\s]+$/.test(nombreCategoria)) {
         window.Swal.fire({
           icon: 'error',
           title: 'Nombre de categoría inválido',
@@ -62,7 +61,7 @@ const Categorias = () => {
         });
         return;
       }
-  
+
       // Verificar si la categoría ya está registrada
       if (categoriaExistente) {
         window.Swal.fire({

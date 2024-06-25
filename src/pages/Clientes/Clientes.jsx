@@ -1,460 +1,586 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import ModalDinamico from "../../components/consts/modalJ";
+import Table from "../../components/consts/Tabla";
 import axios from "axios";
-import Swal from "sweetalert2";
-import ModalDinamico from "../../components/consts/modaled";
-import CustomSwitch from "../../components/consts/switch";
+import LoadingScreen from "../../components/consts/pantallaCarga";
+import Fab from "@mui/material/Fab";
+import Modal from "../../components/consts/modalContrasena";
+import CustomSwitch from "../../components/consts/switch"
 
-const Clientes = () => {
-  const [clientes, setClientes] = useState([]);
-  const [cliente, setCliente] = useState([]);
-  const [modalData, setModalData] = useState(null);
+const Usuarios = () => {
+  const [openModal, setOpenModal] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [roles, setRoles] = useState([]);
+  const [seleccionado, setSeleccionado] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [buscar, setBuscar] = useState("");
+  const [rolesActivos, setRolesActivos] = useState([]);
+  const [openPasswordModal, setOpenPasswordModal] = useState(false); // Nuevo estado para controlar el modal de cambio de contraseña
+  const [passwordForm, setPasswordForm] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [formData, setFormData] = useState({
+    nombre: "",
+    apellido: "",
+    correo: "",
+    telefono: "",
+    Documento: "",
+    rolId: "",
+    contrasena: "",
+  });
 
   useEffect(() => {
-    const fetchData = async () => {
+    // Filtrar roles activos
+    const rolesFiltrados = roles.filter((rol) => rol.EstadoRol === 1);
+    setRolesActivos(rolesFiltrados);
+  }, [roles]);
+
+  useEffect(() => {
+    const fetchRoles = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/jackenail/Listar_Clientes"
-        );
-        setClientes(response.data);
+        const response = await axios.get("http://localhost:5000/api/roles");
+        console.log("Roles response:", response.data);
+        setRoles(response.data);
       } catch (error) {
-        console.error("Error al obtener los datos de clientes:", error);
+        console.error("Error fetching roles:", error);
+        setRoles([]);
       }
     };
 
-    fetchData();
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/users");
+        setUsers(response.data.usuarios);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchRoles();
+    fetchUsers();
   }, []);
 
-  const handleOpenModal = (data) => {
-    setModalData(data);
+  const filtrar = users.filter((user) => {
+    const { nombre = "", apellido = "", Documento = "", correo = "", telefono = "", rolId } = user;
+
+    // Solo mostrar usuarios con el rol de idRol 1
+    if (rolId !== 4) {
+      return false;
+    }
+
+    const terminoABuscar = buscar.toLowerCase();
+    const rol = roles.find((role) => role.idRol === rolId);
+    const nombreRol = rol ? rol.nombre : "";
+
+    return (
+      nombre.toLowerCase().includes(terminoABuscar) ||
+      apellido.toLowerCase().includes(terminoABuscar) ||
+      correo.toLowerCase().includes(terminoABuscar) ||
+      telefono.includes(terminoABuscar) ||
+      Documento.includes(terminoABuscar) ||
+      nombreRol.toLowerCase().includes(terminoABuscar)
+    );
+  });
+
+  const handlePasswordModalClose = () => {
+    setOpenPasswordModal(false);
+    setPasswordForm({
+      newPassword: "",
+      confirmPassword: "",
+    });
   };
 
-  const columns = [
-    { name: "Nombre", label: "Nombre" },
-    { name: "Apellido", label: "Apellido" },
-    { name: "Correo", label: "Correo" },
-    { name: "Telefono", label: "Teléfono" },
-    { name: "Documento", label: "Documento" },
-    { name: "Direccion", label: "Direccion" },
-    { name: "Estado", label: "Estado" },
-  ];
-  const handleSubmit = async (formData) => {
-    try {
-      // Verificar si el correo electrónico o el documento están siendo utilizados por otro cliente
-      const correoExistente = clientes.some(
-        (cliente) => cliente.Correo === formData.Correo
-      );
-
-      const documentoExistente = clientes.some(
-        (cliente) => cliente.Documento === formData.Documento
-      );
-
-      if (correoExistente) {
-        Swal.fire({
-          icon: "error",
-          title: "Correo electrónico duplicado",
-          text: "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico.",
-        });
-      } else if (documentoExistente) {
-        Swal.fire({
-          icon: "error",
-          title: "Documento duplicado",
-          text: "El documento ingresado ya está registrado. Por favor, elija otro documento.",
-        });
-      } else {
-        // Continuar con el registro del cliente si el correo y el documento no están duplicados
-        const result = await Swal.fire({
-          title: "¿Estás seguro?",
-          text: "¿Quieres registrar este cliente?",
-          icon: "question",
-          showCancelButton: true,
-          confirmButtonText: "Sí",
-          cancelButtonText: "Cancelar",
-        });
-
-        if (result.isConfirmed) {
-          const EstadoNormalizado = 1;
-          // Convertir campos de texto a números si es necesario
-          const formDataNumerico = {
-            ...formData,
-            Telefono: parseInt(formData.Telefono),
-            Estado: EstadoNormalizado,
-            IdRol: 2,
-          };
-
-          console.log("Datos del formulario numéricos:", formDataNumerico);
-
-          await axios.post(
-            "http://localhost:5000/Jackenail/RegistrarClientes",
-            formDataNumerico
-          );
-
-          // Mostrar una alerta de éxito si el registro es exitoso
-          Swal.fire({
-            icon: "success",
-            title: "¡Registro exitoso!",
-            text: "El cliente se ha registrado correctamente.",
-          });
-
-          // Cerrar el modal después de enviar el formulario
-          setModalData(null);
-
-          // Agregar el nuevo cliente a la lista de clientes
-          setClientes([...clientes, formDataNumerico]);
-        }
-      }
-    } catch (error) {
-      console.error("Error al registrar el cliente:", error);
-
-      // Mostrar una alerta de error si ocurre algún problema durante el registro
-      Swal.fire({
+  const handleSubmitPasswordChange = async (newPassword, confirmPassword) => {
+    if (newPassword !== confirmPassword) {
+      window.Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: "Ocurrió un error al registrar el cliente.",
-        footer: '<a href="#">Inténtelo nuevamente</a>',
+        title: "Error",
+        text: "Las contraseñas no coinciden.",
+      });
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "La contraseña debe tener al menos 8 caracteres.",
+      });
+      return;
+    }
+
+    try {
+      await axios.put(`http://localhost:5000/api/actualizarContrasena/${seleccionado.id}`, {
+        newPassword: newPassword,
+      });
+
+      window.Swal.fire({
+        icon: "success",
+        title: "Contraseña actualizada",
+        text: "La contraseña del usuario ha sido actualizada correctamente.",
+      });
+      handlePasswordModalClose(); // Cerrar el modal después de actualizar la contraseña
+    } catch (error) {
+      console.error("Error al cambiar la contraseña del usuario:", error);
+      window.Swal.fire({
+        icon: "error",
+        title: "Error",
+        text:
+          "Hubo un error al cambiar la contraseña del usuario. Por favor, inténtalo de nuevo más tarde.",
       });
     }
   };
 
+  const handlePasswordChangeClick = (id) => {
+    const usuarioSeleccionado = users.find((user) => user.id === id);
+    if (usuarioSeleccionado) {
+      setSeleccionado(usuarioSeleccionado);
+      setOpenPasswordModal(true);
+    } else {
+      console.error("Usuario no encontrado");
+    }
+  };
+
   const handleToggleSwitch = async (id) => {
-    const updatedClientes = clientes.map((cliente) => {
-      if (cliente.IdCliente === id) {
-        const newEstado = cliente.Estado === 1 ? 0 : 1;
-        return { ...cliente, Estado: newEstado };
-      }
-      return cliente;
-    });
+    const updatedUsers = users.map((user) =>
+      user.id === id ? { ...user, estado: user.estado === 1 ? 0 : 1 } : user
+    );
 
     try {
-      const updatedCliente = updatedClientes.find(
-        (cliente) => cliente.IdCliente === id
-      );
-      if (!updatedCliente) {
-        console.error("No se encontró el cliente actualizado");
+      const updatedUser = updatedUsers.find((user) => user.id === id);
+      if (!updatedUser) {
+        console.error("No se encontró el usuario actualizado");
         return;
       }
 
-      const result = await Swal.fire({
+      const result = await window.Swal.fire({
         icon: "warning",
         title: "¿Estás seguro?",
-        text: "¿Quieres cambiar el estado del cliente?",
+        text: "¿Quieres cambiar el estado del usuario?",
         showCancelButton: true,
         confirmButtonText: "Sí",
         cancelButtonText: "Cancelar",
       });
 
       if (result.isConfirmed) {
-        await axios.put(`http://localhost:5000/Jackenail/CambiarEstado/${id}`, {
-          Estado: updatedCliente.Estado,
+        await axios.put(`http://localhost:5000/api/editarUsuario/${id}`, {
+          estado: updatedUser.estado,
         });
-        setClientes(updatedClientes);
-        Swal.fire({
+        setUsers(updatedUsers);
+        window.Swal.fire({
           icon: "success",
           title: "Estado actualizado",
-          text: "El estado del cliente ha sido actualizado correctamente.",
+          text: "El estado del usuario ha sido actualizado correctamente.",
         });
       }
     } catch (error) {
-      console.error("Error al cambiar el estado del cliente:", error);
-      Swal.fire({
+      console.error("Error al cambiar el estado del usuario:", error);
+      window.Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Hubo un error al cambiar el estado del cliente. Por favor, inténtalo de nuevo más tarde.",
+        text:
+          "Hubo un error al cambiar el estado del usuario. Por favor, inténtalo de nuevo más tarde.",
       });
     }
   };
 
-  const handleActualizacionSubmit = async (formData) => {
+  const handleEditClick = (id) => {
+    if (users.length === 0) {
+      return;
+    }
+
+    const usuarioEditar = users.find((user) => user.id === id);
+    if (!usuarioEditar) {
+      console.log("Usuario no encontrado");
+      return;
+    }
+
+    setSeleccionado(usuarioEditar);
+    setOpenModal(true);
+  };
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setSeleccionado(null);
+    setFormData({
+      nombre: "",
+      apellido: "",
+      correo: "",
+      telefono: "",
+      Documento: "",
+      rolId: "",
+      contrasena: "",
+    });
+  };
+
+  const handleCrearUsuarioClick = () => {
+    handleOpenModal();
+  };
+
+  const handleSubmit = async (formData) => {
+    const mandatoryFields = [
+      "nombre",
+      "correo",
+      "apellido",
+      "telefono",
+      "rolId",
+      "contrasena",
+      "Documento",
+    ];
+
+    const emptyFields = mandatoryFields.filter((field) => {
+      const value = formData[field];
+    
+      if (field === "rolId") {
+        return value === undefined || `${value}`.trim() === "";
+      }
+    
+      // Verificar si value es undefined o no es una cadena de texto
+      if (typeof value !== "string" || value.trim() === "") {
+        return true;
+      }
+    
+      return false;
+    });
+    
+
+    if (emptyFields.length > 0) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Campos obligatorios vacíos",
+        text:
+          "Por favor, completa todos los campos obligatorios antes de continuar.",
+      });
+      return;
+    }
+
+    const validacionCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!validacionCorreo.test(formData.correo)) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Correo Invalido",
+        text: "El correo no contiene el formato válido.",
+      });
+      return;
+    }
+
+    const validacionNombreApellido = /^[a-zA-ZÀ-ÿ\s]{1,40}$/;
+
+    if (!validacionNombreApellido.test(formData.nombre)) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Cáracteres incorrectos",
+        text:
+          "El campo nombre no puede contener caracteres especiales ni números",
+      });
+      return;
+    }
+
+    if (!validacionNombreApellido.test(formData.apellido)) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Cáracteres incorrectos",
+        text:
+          "El campo apellido no puede contener caracteres especiales ni números",
+      });
+      return;
+    }
+
+    const validacionDocumento = /^[0-9]{1,10}$/;
+
+    if (!validacionDocumento.test(formData.Documento)) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Cáracteres incorrectos",
+        text: "El campo documento solo puede contener números ",
+      });
+      return;
+    }
+    // if (formData.Documento > 15) {
+    //   window.Swal.fire({
+    //     icon: "error",
+    //     title: "Máximo excedido",
+    //     text: "El campo documento excede la cantidad de números.",
+    //   });
+    //   return;
+    // }
+    // if (formData.Documento < 10) {
+    //   window.Swal.fire({
+    //     icon: "error",
+    //     title: "Mínimo no alcanzado",
+    //     text: "El campo documento no contiene la cantidad minima de números.",
+    //   });
+    //   return;
+    // }
+
+    const validacionTelefono = /^[0-9]{7,15}$/;
+
+    if (!validacionTelefono.test(formData.telefono)) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Télefono incorrecto",
+        text: "El campo telefono solo permite números.",
+      });
+      return;
+    }
+
+    const rolSeleccionado = rolesActivos.find((rol) => rol.idRol === formData.rolId);
+    if (!rolSeleccionado) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Rol inactivo",
+        text:
+          "El rol seleccionado está inactivo. Por favor selecciona un rol activo.",
+      });
+      return;
+    }
+
     try {
-      // Verificar si el correo electrónico o el documento están siendo utilizados por otro cliente
-      const correoExistente = clientes.some(
-        (cliente) =>
-          cliente.Correo === formData.Correo &&
-          cliente.IdCliente !== formData.IdCliente
+      const result = await window.Swal.fire({
+        icon: "warning",
+        title: `¿Estás seguro?`,
+        text: `¿Quieres ${seleccionado ? "editar" : "crear"} el empleado?`,
+        showCancelButton: true,
+        confirmButtonText: "Sí",
+        cancelButtonText: "Cancelar",
+      });
+
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      // Verificar si el Documento ya existe
+      const DocumentoExiste = users.some(
+        (user) =>
+          user.Documento === formData.Documento && user.id !== seleccionado?.id
       );
 
-      const documentoExistente = clientes.some(
-        (cliente) =>
-          cliente.Documento === formData.Documento &&
-          cliente.IdCliente !== formData.IdCliente
-      );
-
-      if (correoExistente) {
-        Swal.fire({
+      if (DocumentoExiste) {
+        window.Swal.fire({
           icon: "error",
-          title: "Correo electrónico duplicado",
-          text: "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico.",
+          title: "Documento existente",
+          text:
+            "El Documento ingresado ya está en uso. Por favor, utiliza otro Documento.",
         });
-      } else if (documentoExistente) {
-        Swal.fire({
-          icon: "error",
-          title: "Documento duplicado",
-          text: "El documento ingresado ya está registrado. Por favor, elija otro documento.",
+        return;
+      }
+
+      let response;
+      if (seleccionado) {
+        response = await axios.put(
+          `http://localhost:5000/api/editarUsuario/${seleccionado.id}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const updatedUsers = users.map((user) =>
+          user.id === seleccionado.id ? { ...user, ...formData } : user
+        );
+        setUsers(updatedUsers);
+        window.Swal.fire({
+          icon: "success",
+          title: "Usuario editado",
+          text: "El usuario ha sido editado correctamente.",
         });
       } else {
-        // Convertir campos de texto a números si es necesario
-        const formDataNumerico = {
-          ...formData,
-          Telefono: parseInt(formData.Telefono),
-          IdRol: 2, // Rol por defecto
-        };
-
-        console.log(formDataNumerico);
-        console.log(formDataNumerico.IdCliente);
-
-        // Determinar la URL de la API para actualizar el cliente
-        const url = `http://localhost:5000/Jackenail/Actualizar/${formDataNumerico.IdCliente}`;
-
-        // Realizar la solicitud de actualización a la API utilizando axios.put
-        await axios.put(url, formDataNumerico);
-
-        Swal.fire({
-          icon: "success",
-          title: "¡Actualización exitosa!",
-          text: "El cliente se ha actualizado correctamente.",
-        }).then((result) => {
-          if (
-            result.isConfirmed ||
-            result.dismiss === Swal.DismissReason.close
-          ) {
-            setModalData(null);
-            window.location.reload();
+        response = await axios.post(
+          "http://localhost:5000/api/crearUsuario",
+          formData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
           }
+        );
+        window.Swal.fire({
+          icon: "success",
+          title: "Usuario creado",
+          text: "El usuario ha sido creado correctamente.",
         });
+        setUsers([...users, formData]);
       }
-    } catch (error) {
-      console.error("Error al actualizar el cliente:", error);
 
-      // Mostrar una alerta de error si ocurre algún problema durante la actualización
-      Swal.fire({
+      console.log("Respuesta del servidor:", response.data);
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error al crear/editar usuario:", error);
+      window.Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: "Ocurrió un error al actualizar el cliente.",
-        footer: '<a href="#">Inténtelo nuevamente</a>',
+        title: "Error",
+        text:
+          "Hubo un error al crear/editar el usuario. Por favor, inténtalo de nuevo más tarde.",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return (
-    <div
-      style={{
-        paddingTop: "5px",
-        margin: "0 auto",
-        borderRadius: "40px",
-        marginTop: "20px",
-        boxShadow: "0 4px 12px rgba(128, 0, 128, 0.1)",
-        position: "fixed",
-        left: "90px",
-        top: "80px",
-        width: "calc(100% - 100px)",
-        overflowY: "auto", // Agregar scrollbar vertical
-      }}
-      className="w-full mx-auto max-w-full"
-    >
-      <div className="bg-white rounded-lg shadow-md p-8 border border-purple-500">
-        <h4 className="text-5xl mb-4">Gestión de Clientes</h4>
+  const columns = [
+    { field: "tipoDocumento", headerName: "Documento", width: "w-36" },
 
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-          <div className="flex items-center justify-between flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900"></div>
-
-          <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-              <thead className="text-xs text-gray-700 uppercase bg-blue-100 dark:bg-blue-700 dark:text-gray-400">
-                <tr>
-                  {columns.map((column) => (
-                    <th key={column.name} scope="col" className="px-6 py-3">
-                      {column.label}
-                    </th>
-                  ))}
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {clientes.map((cliente, index) => (
-                  <tr
-                    key={index}
-                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                  >
-                    {columns.map((column) => (
-                      <td
-                        key={column.name}
-                        className="px-6 py-4 font-semibold text-gray-900 dark:text-white"
-                      >
-                        {column.name === "Estado" ? (
-                          <div className="inline-flex items-center">
-                            <CustomSwitch
-                              active={cliente[column.name] === 1}
-                              onToggle={() =>
-                                handleToggleSwitch(cliente.IdCliente)
-                              }
-                            />
-                            {/* Se muestra el estado del cliente */}
-                            <span className="ml-2">
-                              {cliente[column.name] === 1
-                                ? "Activo"
-                                : "Inactivo"}
-                            </span>
-                          </div>
-                        ) : (
-                          cliente[column.name]
-                        )}
-                      </td>
-                    ))}
-
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() =>
-                          handleOpenModal({
-                            ...cliente,
-                            modo: "actualizacion",
-                            seleccionado: cliente,
-                          })
-                        }
-                        className="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                      >
-                        <i className="bx bxs-edit"></i>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {modalData && (
-              <ModalDinamico
-                open={true}
-                handleClose={() => setModalData(null)}
-                title="Registrar clientes"
-                fields={[
-                  {
-                    label: "Nombre",
-                    name: "Nombre", // Nombre ajustado a "Nombre"
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Apellido",
-                    name: "Apellido", // Nombre ajustado a "Apellido"
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Correo",
-                    name: "Correo", // Nombre ajustado a "Correo"
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Teléfono",
-                    name: "Telefono", // Nombre ajustado a "Telefono"
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Documento",
-                    name: "Documento",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Direccion",
-                    name: "Direccion",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Contraseña",
-                    name: "Contrasena",
-                    type: "password",
-                    required: true,
-                  },
-                ]}
-                onSubmit={handleSubmit}
-                seleccionado={modalData}
-              />
-            )}
-
-            {modalData && modalData.modo === "actualizacion" && (
-              <ModalDinamico
-                open={true}
-                handleClose={() => setModalData(null)}
-                title="Actualizar Empleado"
-                fields={[
-                  {
-                    label: "Nombre",
-                    name: "Nombre", // Nombre ajustado a "Nombre"
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Apellido",
-                    name: "Apellido", // Nombre ajustado a "Apellido"
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Correo",
-                    name: "Correo", // Nombre ajustado a "Correo"
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Teléfono",
-                    name: "Telefono", // Nombre ajustado a "Telefono"
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Documento",
-                    name: "Documento",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Direccion",
-                    name: "Direccion",
-                    type: "text",
-                    required: true,
-                  },
-                  {
-                    label: "Contraseña",
-                    name: "Contrasena",
-                    type: "password",
-                    required: true,
-                  },
-                ]}
-                onSubmit={handleActualizacionSubmit}
-                seleccionado={modalData.seleccionado}
-              />
-            )}
-          </div>
-
+    { field: "Documento", headerName: "Documento", width: "w-36" },
+    { field: "nombre", headerName: "Nombre", width: "w-36" },
+    { field: "apellido", headerName: "Apellido", width: "w-36" },
+    { field: "correo", headerName: "Correo", width: "w-36" },
+    { field: "telefono", headerName: "Teléfono", width: "w-36" },
+    {
+      field: "rolId",
+      headerName: "Rol",
+      width: "w-36",
+      renderCell: (params) => {
+        const rol = roles.find((role) => role.id === params.value);
+        return rol ? rol.nombre : "";
+      },
+    },
+    {
+      field: "Acciones",
+      headerName: "Acciones",
+      width: "w-48",
+      renderCell: (params) => (
+        <div className="flex justify-center space-x-4">
           <button
-            className="fixed bottom-4 right-4 bg-blue-500 text-white rounded-full p-3 shadow-xl hover:shadow-2xl"
-            style={{
-              right: "4rem",
-              bottom: "4rem",
-              boxShadow: "0 8px 20px rgba(0, 0, 0, 0.5)", // Sombra negra más pronunciada
-            }}
-            onClick={() => handleOpenModal(cliente)}
+            onClick={() => handleEditClick(params.row.id)}
+            className="text-yellow-500"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
+            <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
           </button>
+          <button
+            onClick={() => {
+              handlePasswordChangeClick(params.row.id); // Abrir el modal de contraseña al hacer clic
+            }}
+            className="text-black-500"
+          >
+            <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>
+          </button>
+          <CustomSwitch
+            active={params.row.estado === 1}
+            onToggle={() => handleToggleSwitch(params.row.id)}
+          />
+        </div>
+      ),
+    },
+  ];
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
+  return (
+    <div className="container mx-auto p-4 relative">
+      <div className="md:flex md:justify-between md:items-center mb-4">
+        
+        <div>
+          <Modal
+            open={openPasswordModal}
+            handleClose={handlePasswordModalClose}
+            handleSubmit={handleSubmitPasswordChange}
+          />
+            <ModalDinamico
+            seleccionado={seleccionado}
+            open={openModal}
+            handleClose={handleCloseModal}
+            onSubmit={handleSubmit}
+            title={seleccionado ? "Editar empleado" : "Crear nuevo empleado"}
+            fields={[
+              {
+                name: "tipoDocumento",
+                type: "select",
+                options: [
+                  { value: "T.I", label: "Tarjeta de Identidad (T.I)" },
+                  { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
+                  { value: "T.E", label: "Tarjeta de extranjería (T.E)" },
+                  { value: "C.E", label: "Cédula de extranjería (C.E)" },
+                ],
+                value: seleccionado ? seleccionado.tipoDocumento : "C.C", 
+                disabled: false, 
+              },
+              {
+                name: "Documento",
+                label: "Documento",
+                type: "text",
+                value: seleccionado ? seleccionado.Documento : "",
+              },
+              {
+                name: "nombre",
+                label: "Nombre",
+                type: "text",
+                value: seleccionado ? seleccionado.nombre : "",
+              },
+              {
+                name: "apellido",
+                label: "Apellido",
+                type: "text",
+                value: seleccionado ? seleccionado.apellido : "",
+              },
+              {
+                name: "correo",
+                label: "Correo",
+                type: "text",
+                value: seleccionado ? seleccionado.correo : "",
+              },
+              {
+                name: "telefono",
+                label: "Teléfono",
+                type: "text",
+                value: seleccionado ? seleccionado.telefono : "",
+                maxLength: 15,
+                minlength: 7,
+              },
+              
+              {
+                name: "rolId",
+                label: "Rol",
+                type: "select",
+                options: roles
+                  .filter(role => role.idRol === 4 ) // Filtrar para mostrar solo el rol con idRol 1
+                  .map(role => ({
+                    value: role.idRol,
+                    label: role.nombre,
+                  })),
+                  value: seleccionado ? seleccionado.rolId : 4,
+                disabled: true, // Deshabilitar el select
+              },
+              {
+                name: "contrasena",
+                label: "Contraseña",
+                type: "password",
+                value: seleccionado ? seleccionado.contrasena : "",
+                hidden: seleccionado,
+              },
+            ]}
+          />
+
         </div>
       </div>
+      <Table title="Gestion de clientes" columns={columns} data={filtrar} roles={roles} />
+      <Fab
+        aria-label="add"
+        style={{
+          border: "0.5px solid grey",
+          backgroundColor: "#94CEF2",
+          position: "fixed",
+          bottom: "16px",
+          right: "16px",
+          zIndex: 1000,
+        }}
+        onClick={handleCrearUsuarioClick}
+      >
+        <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
+      </Fab>
     </div>
   );
 };
 
-export default Clientes;
+export default Usuarios;
+

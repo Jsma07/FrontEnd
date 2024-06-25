@@ -2,37 +2,41 @@ import React, { useState, useEffect } from "react";
 import ModalDinamico from "../../components/consts/modalJ";
 import axios from "axios";
 
-const ModalEditar = ({ open, handleClose, roleId }) => {
+const ModalEditar = ({ open, handleClose, roleId, setRoles }) => {
   const [rol, setRol] = useState("");
   const [permisosSeleccionados, setPermisosSeleccionados] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const [formValues, setFormValues] = useState({});
- const [roles, setRoles] = useState([])
+  const [rolesLocal, setRolesLocal] = useState([]);
+
   useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/roles'); 
-        if (response.data && Array.isArray(response.data)) {
-          const rolesWithPermissions = response.data.map(role => ({
-            ...role,
-            permisos: role.permisos || [] // Asegurar que permisos siempre sea un array
-          }));
-          setRoles(rolesWithPermissions);
-        } else {
-          console.error('Data received is empty or malformed:', response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching roles:', error);
-      }
-    };
     fetchRoles();
   }, []);
+
   useEffect(() => {
     if (open && roleId) {
       fetchRoleData();
       fetchPermisos();
     }
   }, [open, roleId]);
+
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/roles");
+      if (response.data && Array.isArray(response.data)) {
+        const rolesWithPermissions = response.data.map((role) => ({
+          ...role,
+          permisos: role.permisos || [], // Asegurar que permisos siempre sea un array
+        }));
+        setRoles(rolesWithPermissions);
+        setRolesLocal(rolesWithPermissions); // Actualizar rolesLocal con los roles obtenidos
+      } else {
+        console.error("Data received is empty or malformed:", response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
 
   const fetchRoleData = async () => {
     try {
@@ -83,26 +87,22 @@ const ModalEditar = ({ open, handleClose, roleId }) => {
           : prevPermisos.filter((id) => id !== idPermiso)
       );
     }
-
-    console.log(`Field ${name} changed to ${value}`); // Depuración
   };
 
-  const handleEditRole = async (Data) => {
-    if (!Data.nombre.trim()){
-      console.log("campo nombre del rol vacio");
+  const handleEditRole = async (formData) => {
+    if (!formData.nombre.trim()) {
       window.Swal.fire({
         icon: "error",
         title: "Nombre del rol vacío",
         text: "Por favor, ingresa el nombre del rol.",
       });
-        return;
+      return;
     }
-    const RolExiste = roles.some(
-      (rol) =>
-        rol.nombre === Data.nombre && rol.idRol !== roleId
-    );
 
-    if (RolExiste) {
+    // Verificar si el nuevo nombre del rol ya existe en la lista actual de roles
+    const rolExistente = rolesLocal.some((rol) => rol.nombre === formData.nombre && rol.idRol !== roleId);
+
+    if (rolExistente) {
       window.Swal.fire({
         icon: "error",
         title: "Rol existente",
@@ -110,45 +110,27 @@ const ModalEditar = ({ open, handleClose, roleId }) => {
       });
       return;
     }
-    const permisosSeleccionados = Object.keys(Data)
-    .filter(key => key !== "nombre" && Data[key])
-    .map(Number);
-    
-  console.log("Permisos seleccionados antes de enviar:", permisosSeleccionados);
-  console.log("Submitting form data:", {
-    nombre: Data.nombre,
-    permisos: permisosSeleccionados
-  });
-  // se verifica que al menos se seleccione un permiso antes de mandar la peticion
-    if (permisosSeleccionados.length === 0) {
-      console.log("Debes seleccionar al menos un permiso");
-      window.Swal.fire({
-        icon: "error",
-        title: "Permiso sin seleccionar",
-        text: "Por favor, selecciona al menos un permiso.",
-      });      return;
-    }
-    try {
-    
 
+    try {
       const response = await axios.put(
         `http://localhost:5000/api/editarRol/${roleId}`,
         {
-          nombre: rol,
+          nombre: formData.nombre,
           permisos: permisosSeleccionados,
         }
       );
 
-      console.log("Request body:", {
-        nombre: rol,
-        permisos: permisosSeleccionados,
-      });
-
-      if (
-        response.data &&
-        response.data.mensaje === "Rol actualizado correctamente"
-      ) {
-        console.log("Respuesta:", response.data);
+      if (response.data && response.data.mensaje === "Rol actualizado correctamente") {
+        window.Swal.fire({
+          icon: "success",
+          title: "Éxito",
+          text: "El rol ha sido actualizado correctamente.",
+        });
+        setRoles((prevRoles) =>
+          prevRoles.map((rol) =>
+            rol.idRol === roleId ? { ...rol, nombre: formData.nombre } : rol
+          )
+        );
         handleClose();
       } else {
         console.error("Error al editar el rol:", response.data);

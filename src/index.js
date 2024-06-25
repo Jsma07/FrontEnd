@@ -34,7 +34,7 @@ root.render(
         <Route path="/" element={<App />}>
           <Route path="/configuracion/roles" element={<Roles />} />
           <Route path="/Usuarios/Administradores" element={<Admin />} />
-          <Route path="/Usuarios" element={<Usuarios2 />} />
+          {/* <Route path="/Usuarios" element={<Usuarios2 />} /> */}
           <Route path="/ventas" element={<Ventas />} />
           <Route path="/compras" element={<Compras />} />
           <Route path="/compras/Proveedores" element={<Proveedores />} />
@@ -45,7 +45,7 @@ root.render(
           <Route path="/Clientes" element={<Clientes />} />
           <Route path="/Insumos" element={<Insumos />} />
           <Route path="/agendamiento/Servicios" element={<Servicios />} />
-          <Route path="/Empleados" element={<Empleados />} />
+          <Route path="/Empleados" element={<Usuarios2 />} />
           <Route path="/RegistrarVentas" element={<Registrar />} />
           <Route path="/Detalleventa/:id" element={<InsumoDetalle />} />
         </Route>

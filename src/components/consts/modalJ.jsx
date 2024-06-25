@@ -6,7 +6,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChange }) => {
   const [formValues, setFormValues] = useState({});
   const [dragging, setDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({ x: 350, y: 150 });
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
   const [modalSize, setModalSize] = useState({ width: 0, height: 0 });
   const [errores, setErrores] = useState({});
@@ -78,8 +78,11 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
 
   const handleBlur = (e) => {
     const { name, value } = e.target;
-    validateField(name, value);
+    const trimmedValue = typeof value === 'string' ? value.trim() : value; // Verificar si es una cadena de texto antes de llamar a trim()
+    validateField(name, trimmedValue); // Llamar a validateField con el valor limpio
   };
+  
+  
 
   const validateField = (name, value) => {
     let errorMessage = '';
