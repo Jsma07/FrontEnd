@@ -2,18 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Typography, Grid, TextField, IconButton, Select, MenuItem, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
+import Swal from 'sweetalert2'; // Asegúrate de importar SweetAlert2
 
 const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityData, onChange }) => {
   const [formData, setFormData] = useState({});
   const [imagePreview, setImagePreview] = useState(null);
   const [imageName, setImageName] = useState('');
   const [imageSize, setImageSize] = useState('');
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (entityData) {
       setFormData(entityData);
 
-      // Actualizar la vista previa de la imagen si existe en los datos de la entidad
       if (entityData.ImgServicio) {
         setImagePreview(`http://localhost:5000${entityData.ImgServicio}`);
         setImageName('Imagen existente');
@@ -26,7 +27,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
         setImageSize('');
       }
 
-      // También manejar otra propiedad de imagen si existe
       if (entityData.Imagen) {
         setImagePreview(`http://localhost:5000${entityData.Imagen}`);
         setImageName('Imagen existente en la base de datos');
@@ -35,7 +35,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     }
   }, [entityData]);
 
-  // Función para manejar cambios en los campos del formulario
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
     const newValue = type === 'checkbox' ? checked : value;
@@ -43,21 +42,93 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
       ...prevData,
       [name]: newValue,
     }));
-    onChange(name, newValue); // Llamar a la función onChange pasada por props
+
+    if (onChange) {
+      onChange(name, newValue);
+    }
+
+    const error = validateField(name, newValue, type);
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: error,
+    }));
   };
 
-  // Función para manejar el envío del formulario
+  const handleBlur = (e) => {
+    const { name, value, type } = e.target;
+    const error = validateField(name, value, type);
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: error,
+    }));
+  };
+
   const handleSubmit = () => {
-    onSubmit(formData); // Llamar a la función onSubmit pasada por props con los datos del formulario
-    handleClose(); // Cerrar el modal después de enviar
+    let hasErrors = false;
+    const newErrors = {};
+    fields.forEach((field) => {
+      const error = validateField(field.name, formData[field.name], field.type);
+      if (error) {
+        hasErrors = true;
+        newErrors[field.name] = error;
+      }
+    });
+
+    if (hasErrors) {
+      setErrors(newErrors);
+      return;
+    }
+
+    onSubmit(formData);
+    handleClose();
   };
 
-  // Función para cancelar y cerrar el modal
   const handleCancel = () => {
     handleClose();
   };
 
-  // Función para renderizar los campos del formulario basado en su tipo
+  const validateField = (name, value, type) => {
+    let error = '';
+
+    if (name === 'correo_proveedor') {
+      if (!/^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value)) {
+        error = 'El correo electrónico no es válido.';
+      }
+    } else if (name === 'telefono_proveedor') {
+      if (!/^[0-9+\s]*$/.test(value)) {
+        error = 'El número de teléfono solo puede contener números y el signo +.';
+      }
+    } else if (name === 'direccion_proveedor') {
+      if (!/^[a-zA-ZñÑ0-9\s#-]*$/.test(value)) {
+        error = 'La dirección solo puede contener letras, números, espacios, # y -.';
+      }
+    } else if (name === 'NIT') {
+        if (!/^[a-zA-ZñÑ0-9\s#-]*$/.test(value)) {
+          error = 'El NIT de la empresa solo puede contener números.';
+      }
+    } else if (name === 'Precio_Servicio') {
+          if (value <= 20000) {
+            error = 'El precio debe ser minimo de $20.000.';
+          }
+      }else {
+      switch (type) {
+        case 'text':
+          if (!/^[a-zA-ZñÑ\s]*$/.test(value)) {
+            error = 'El campo solo puede contener letras y espacios.';
+          }
+          break;
+        case 'number':
+          if (isNaN(value) || Number(value) <= 0) {
+            error = 'El campo debe ser un número positivo.';
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    return error;
+  };
+
   const renderFields = () => {
     return fields.map((field, index) => (
       <Grid item xs={12} sm={6} key={index}>
@@ -66,7 +137,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     ));
   };
 
-  // Función para renderizar un campo específico según su tipo
   const renderFieldByType = (field) => {
     const { name, label, type, readOnly, options } = field;
 
@@ -81,11 +151,14 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
             label={label}
             variant="outlined"
             onChange={handleChange}
+            onBlur={handleBlur}
             fullWidth
             size="medium"
             type={type}
             style={{ marginBottom: '0.5rem', textAlign: 'center' }}
             value={formData[name] || ''}
+            error={!!errors[name]}
+            helperText={errors[name]}
             disabled={readOnly}
           />
         );
@@ -104,6 +177,7 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
               value={formData[name] || ""}
               label={label}
               style={{ marginBottom: "0.5rem", textAlign: "center" }}
+              error={!!errors[name]}
             >
               {options &&
                 options.map((option, index) => (
@@ -126,7 +200,7 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
                     width: '100%',  
                     maxWidth: '500px', 
                     height: 'auto', 
-                    maxHeight: '200px', // Reducir la altura máxima de la imagen
+                    maxHeight: '200px', 
                     objectFit: 'contain', 
                     borderRadius: '8px' 
                   }} 
@@ -192,7 +266,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     }
   };
 
-  // Función para manejar el cambio de imagen seleccionada
   const handleImageChange = (e, name) => {
     const file = e.target.files[0];
     if (file) {
@@ -211,7 +284,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     }
   };
 
-  // Función para eliminar la imagen seleccionada
   const handleImageRemoval = (name) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -253,25 +325,25 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
         <div
           style={{
             display: 'flex',
-            justifyContent: 'center',
+            justifyContent: 'flex-end',
             marginTop: '1.5rem',
           }}
         >
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-            style={{ width: '25%', marginRight: '0.5rem', fontSize: '0.8rem' }}
-          >
-            <span style={{ marginRight: '0.5rem' }}>Enviar</span>
-            <SendIcon />
-          </Button>
-          <Button
-            variant="contained"
+         <Button
             onClick={handleCancel}
-            style={{ width: '25%', fontSize: '0.8rem' }}
+            color="secondary"
+            variant="contained"
+            style={{ marginRight: '1rem' }}
           >
             Cancelar
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            color="primary"
+            variant="contained"
+            endIcon={<SendIcon />}
+          >
+            Enviar
           </Button>
         </div>
       </div>
