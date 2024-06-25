@@ -83,7 +83,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
         ...prevFormValues,
         [name]: trimmedValue,
       }));
-      return; 
+      return; // Salir de la función después de corregir el valor
     }
 
     if (type === 'file' && e.target.accept.includes('image/*')) {
