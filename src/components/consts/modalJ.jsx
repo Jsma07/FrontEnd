@@ -78,7 +78,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
 
   const handleBlur = (e) => {
     const { name, value } = e.target;
-    validateField(name, value);
+    validateField(name, value.trim()); // Eliminar espacios en blanco al inicio y al final
   };
 
   const validateField = (name, value) => {

@@ -2,52 +2,54 @@ import React, { useState, useEffect } from 'react';
 import ModalDinamico from "../../components/consts/modalJ"; // Ajusta la ruta según la ubicación real de ModalDinamico
 import axios from "axios";
 
-const AddRoleModal = ({ open, handleClose }) => {
+const AddRoleModal = ({ open, handleClose, setRoles }) => {
   const [rol, setRol] = useState(""); // Estado para el nombre del rol
   const [permisos, setPermisos] = useState([]);
-  const [roles, setRoles] = useState([]);
+  const [rolesLocal, setRolesLocal] = useState([]); // Utiliza rolesLocal para mantener una copia local actualizada
 
   useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/roles');
-        if (response.data && Array.isArray(response.data)) {
-          const rolesWithPermissions = response.data.map(role => ({
-            ...role,
-            permisos: role.permisos || [] // Asegurar que permisos siempre sea un array
-          }));
-          setRoles(rolesWithPermissions);
-        } else {
-          console.error('Data received is empty or malformed:', response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching roles:', error);
-      }
-    };
     fetchRoles();
   }, []);
 
   useEffect(() => {
-    const fetchPermisos = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/permisos");
-        if (response.data) {
-          const permisosFromApi = response.data.map(permiso => ({
-            ...permiso,
-            selected: false
-          }));
-          console.log("Permisos fetched from API:", permisosFromApi); // Depuración
-          setPermisos(permisosFromApi);
-        } else {
-          console.error("Error: No se obtuvieron datos de permisos");
-        }
-      } catch (error) {
-        console.error("Error al obtener permisos:", error);
-      }
-    };
-
     fetchPermisos();
   }, []);
+
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/roles');
+      if (response.data && Array.isArray(response.data)) {
+        const rolesWithPermissions = response.data.map(role => ({
+          ...role,
+          permisos: role.permisos || [] // Asegurar que permisos siempre sea un array
+        }));
+        setRolesLocal(rolesWithPermissions); // Actualiza rolesLocal con la lista de roles desde el servidor
+        setRoles(rolesWithPermissions); // También actualiza setRoles con la lista de roles desde el servidor
+      } else {
+        console.error('Data received is empty or malformed:', response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching roles:', error);
+    }
+  };
+
+  const fetchPermisos = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/permisos");
+      if (response.data) {
+        const permisosFromApi = response.data.map(permiso => ({
+          ...permiso,
+          selected: false
+        }));
+        console.log("Permisos fetched from API:", permisosFromApi); // Depuración
+        setPermisos(permisosFromApi);
+      } else {
+        console.error("Error: No se obtuvieron datos de permisos");
+      }
+    } catch (error) {
+      console.error("Error al obtener permisos:", error);
+    }
+  };
 
   const handleChange = (e) => {
     const { value } = e.target;
@@ -74,9 +76,17 @@ const AddRoleModal = ({ open, handleClose }) => {
       });
       return;
     }
+    if (!formData.nombre !== formData.nombre.trim()) {
+      window.Swal.fire({
+        icon: "error",
+        title: "Nombre del rol con espacios",
+        text: "El nombre del rol no puede contener espacios al inicio ni al final.",
+      });
+      return;
+    }
 
     // Verificar si el rol ya existe en la lista actual de roles
-    const rolExiste = roles.some((rol) => rol.nombre === formData.nombre);
+    const rolExiste = rolesLocal.some((rol) => rol.nombre === formData.nombre);
 
     if (rolExiste) {
       window.Swal.fire({
@@ -111,18 +121,19 @@ const AddRoleModal = ({ open, handleClose }) => {
       });
 
       // Manejar la respuesta del backend
-      if (response.data && response.data.mensaje === 'Rol creado exitosamente') {
-        console.log('Rol creado exitosamente:', response.data);
+      if (response.data && response.data.mensaje === "Rol creado exitosamente") {
+        window.Swal.fire({
+          icon: "success",
+          title: "Éxito",
+          text: "El rol ha sido creado correctamente.",
+        });
 
-        // Actualizar la lista de roles en el estado local
-        const newRole = {
-          idRol: response.data.idRol, // Asegúrate de tener el ID del rol desde la respuesta del servidor
-          nombre: formData.nombre,
-          permisos: permisos.filter(permiso => permisosSeleccionados.includes(permiso.idPermiso))
-        };
+        // Actualiza rolesLocal con el nuevo rol creado
+        const nuevoRol = { id: response.data.id, nombre: formData.nombre, permisos: permisosSeleccionados };
+        setRolesLocal((prevRoles) => [...prevRoles, nuevoRol]);
+        setRoles((prevRoles) => [...prevRoles, nuevoRol]);
 
-        setRoles([...roles, newRole]); // Agregar el nuevo rol al estado local de roles
-        handleClose(); // Cerrar el modal después de agregar el rol
+        handleClose();
       } else {
         console.error('Error al crear el rol:', response.data);
       }
