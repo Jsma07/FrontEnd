@@ -174,6 +174,58 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
     );
   };
 
+  const validateField = (name, value, type) => {
+    let error = '';
+
+    if (name === 'correo_proveedor') {
+      if (!/^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value)) {
+        error = 'El correo electrónico no es válido.';
+      }
+    } else if (name === 'telefono_proveedor') {
+      if (!/^[0-9+\s]*$/.test(value)) {
+        error = 'El número de teléfono solo puede contener números y el signo +.';
+      }
+    } else if (name === 'direccion_proveedor') {
+      if (!/^[a-zA-ZñÑ0-9\s#-]*$/.test(value)) {
+        error = 'La dirección solo puede contener letras, números, espacios, # y -.';
+      }
+    } else if (name === 'NIT') {
+        if (!/^[a-zA-ZñÑ0-9\s#-]*$/.test(value)) {
+          error = 'El NIT de la empresa solo puede contener números.';
+        }
+    } else if (name === 'Precio_Servicio') {
+      if (value <= 20000) {
+        error = 'El precio debe ser minimo de $20.000.';
+      }
+  }else {
+      switch (type) {
+        case 'text':
+          if (!/^[a-zA-ZñÑ\s]*$/.test(value)) {
+            error = 'El campo solo puede contener letras y espacios.';
+          }
+          break;
+        case 'number':
+          if (isNaN(value) || Number(value) <= 0) {
+            error = 'El campo debe ser un número positivo.';
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    return error;
+  };
+
+  const handleBlur = (e) => {
+    const { name, value, type } = e.target;
+    const error = validateField(name, value, type);
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: error,
+    }));
+  };
+
   const handleSubmit = async () => {
     try {
       setProgressVisible(true); // Mostrar la barra de progreso al enviar el formulario
@@ -258,32 +310,31 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
             disabled={disabled}
           />
         );
-        case "select":
-          return (
-            <div>
-              <InputLabel id={`${name}-label`}>{label}</InputLabel>
-              <Select
-                labelId={`${name}-label`}
-                id={name}
-                name={name}
-                variant="outlined"
-                onChange={handleChange}
-                fullWidth
-                size="medium"
-                value={formValues[name] || ''}
-                label={label}
-                style={{ marginBottom: "0.5rem", textAlign: "center" }}
-              >
-                {options &&
-                  options.map((option, index) => (
-                    <MenuItem key={index} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </div>
-          );
-    
+      case "select":
+        return (
+          <div>
+            <InputLabel id={`${name}-label`}>{label}</InputLabel>
+            <Select
+              labelId={`${name}-label`}
+              id={name}
+              name={name}
+              variant="outlined"
+              onChange={handleChange}
+              fullWidth
+              size="medium"
+              value={formValues[name] || ''}
+              label={label}
+              style={{ marginBottom: "0.5rem", textAlign: "center" }}
+            >
+              {options &&
+                options.map((option, index) => (
+                  <MenuItem key={index} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+            </Select>
+          </div>
+        );
       case "file":
         return (
           <div className="flex items-center justify-center w-full relative">
