@@ -273,10 +273,24 @@ const Servicios = () => {
     setServicioSeleccionado(null);
   };
 
-  const handleEditClick = (servicio) => {
-    setServicioSeleccionado(servicio);
-    setOpenModalEditar(true);
-  };
+    const handleEditClick = (servicio) => {
+      setServicioSeleccionado(servicio);
+      setOpenModalEditar(true);
+    };
+
+    const opcionesTiempoServicio = [
+      { value: '1:00', label: '1:00 hora(s)' },
+      { value: '1:30', label: '1:30 hora(s)' },
+      { value: '2:00', label: '2:00 horas' },
+      { value: '2:30', label: '2:30 horas' },
+      { value: '3:00', label: '3:00 horas' },
+      { value: '3:30', label: '3:30 horas' },
+      { value: '4:00', label: '4:00 horas' },
+      { value: '4:30', label: '4:30 horas' },
+      { value: '5:00', label: '5:00 horas' },
+      { value: '5:30', label: '5:30 horas' },
+      { value: '6:00', label: '6:00 horas' },
+    ];
 
   return (
     <div>
@@ -326,63 +340,62 @@ const Servicios = () => {
         </div>
       </div>
 
-      <ModalAgregarServicio
-        open={openModalAgregar}
-        handleClose={handleCloseModalAgregar}
-        onSubmit={handleAddServicio}
-        title="Crear Nuevo Servicio!"
-        fields={[
-          { name: "Nombre_Servicio", label: "Nombre", type: "text" },
-          {
-            name: "Tiempo_Servicio",
-            label: "Tiempo Estimado del Servicio",
-            type: "time",
-          },
-          { name: "Precio_Servicio", label: "Precio", type: "number" },
-          { name: "ImgServicio", label: "Imagen", type: "file" },
-        ]}
-        onChange={handleChange}
-      />
+        <ModalAgregarServicio
+    open={openModalAgregar}
+    handleClose={handleCloseModalAgregar}
+    onSubmit={handleAddServicio}
+    title="Crear Nuevo Servicio!"
+    fields={[
+      
+      { name: "Nombre_Servicio", label: "Nombre", type: "text" },
+      { name: "Tiempo_Servicio", label: "Tiempo", type: "select", options: opcionesTiempoServicio },
+      { name: "Precio_Servicio", label: "Precio", type: "number" },
+      { name: "ImgServicio", label: "Imagen", type: "file" },
+    ]}
+    onChange={handleChange}
+  />
 
-      <ModalEditarServicio
-        open={openModalEditar}
-        handleClose={handleCloseModalEditar}
-        onSubmit={handleEditServicio}
-        title="Editar Servicio"
-        fields={[
-          {
-            name: "IdServicio",
-            label: "Identificador",
-            type: "text",
-            readOnly: true,
-          },
-          { name: "Nombre_Servicio", label: "Nombre", type: "text" },
-          { name: "Tiempo_Servicio", label: "Tiempo", type: "text" },
-          { name: "Precio_Servicio", label: "Precio", type: "number" },
-          { name: "ImgServicio", label: "Imagen", type: "file" },
-        ]}
-        onChange={handleChange}
-        entityData={servicioSeleccionado}
-      />
+  <ModalEditarServicio
+    open={openModalEditar}
+    handleClose={handleCloseModalEditar}
+    onSubmit={handleEditServicio}
+    title="Editar Servicio"
+    fields={[
+      {
+        name: "IdServicio",
+        label: "Identificador",
+        type: "text",
+        readOnly: true,
+      },
+      { name: "Nombre_Servicio", label: "Nombre", type: "text" },
+      { name: "Tiempo_Servicio", label: "Tiempo", type: "select", options: opcionesTiempoServicio },
+      { name: "Precio_Servicio", label: "Precio", type: "number" },
+      { name: "ImgServicio", label: "Imagen", type: "file" },
 
-<TablePrueba
+    ]}
+    onChange={handleChange}
+    entityData={servicioSeleccionado}
+  />
+
+        <TablePrueba
           columns={[
             {
-              field: "ImgServicio",
-              headerName: "IMAGEN",
-              width: "w-32",
+              field: 'ImgServicio',
+              headerName: 'IMAGEN',
+              width: 'w-32',
               renderCell: (params) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                   <img
                     src={`http://localhost:5000${params.row.ImgServicio}`} // Ajustar la URL según la configuración del servidor
                     alt="ImgServicio"
-                    style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
+                    style={{ maxWidth: '100%', height: 'auto', width: '3rem', height: '3rem', borderRadius: '50%' }}
                   />
                 </div>
-              )
+              ),
             },
             { field: 'Nombre_Servicio', headerName: 'NOMBRE', width: 'w-36' },
             { field: 'Tiempo_Servicio', headerName: 'TIEMPO', width: 'w-36' },
+
             {
               field: 'Precio_Servicio',
               headerName: 'PRECIO',
@@ -390,9 +403,7 @@ const Servicios = () => {
               renderCell: (params) => (
                 <div>{`$${params.row.Precio_Servicio}`}</div>
               ),
-            },
-            
-            {
+            },            {
               field: 'Acciones',
               headerName: 'ACCIONES',
               width: 'w-48',
@@ -400,21 +411,19 @@ const Servicios = () => {
                 <div className="flex justify-center space-x-4">
                   {params.row.EstadoServicio === 1 && (
                   <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
-                    <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
+                    <i className="bx bx-edit" style={{ fontSize: '24px' }}></i>
                   </button>
                 )}
-                <CustomSwitch
-                  active={params.row.EstadoServicio === 1}
-                  onToggle={() => handleToggleSwitch(params.row.IdServicio)}
-                />
+                {/* Supongo que CustomSwitch es un componente personalizado para el cambio de estado */}
+                <CustomSwitch active={params.row.EstadoServicio === 1} onToggle={() => handleToggleSwitch(params.row.IdServicio)} />
               </div>
               ),
             },
           ]}
           data={filtrar}
         />
-    </div>
-  );
-};
+      </div>
+    );
+  };
 
-export default Servicios;
+  export default Servicios;
