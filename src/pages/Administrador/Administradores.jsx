@@ -5,7 +5,7 @@ import Table from "../../components/consts/Tabla";
 import axios from "axios";
 import LoadingScreen from "../../components/consts/pantallaCarga";
 import Fab from "@mui/material/Fab";
-import Modal  from "../../components/consts/modalContrasena"
+import Modal from "../../components/consts/modalContrasena";
 
 const Usuarios = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -20,7 +20,6 @@ const Usuarios = () => {
     newPassword: "",
     confirmPassword: "",
   });
-
 
   const [errors, setErrors] = useState({
     nombre: "",
@@ -63,10 +62,18 @@ const Usuarios = () => {
     fetchUsers();
   }, []);
   const filtrar = users.filter((user) => {
-    const { nombre = "", apellido = "", Documento = "", correo = "", telefono = "", rolId } = user;
+    const {
+      nombre = "",
+      apellido = "",
+      Documento = "",
+      tipoDocumento = "",
+      correo = "",
+      telefono = "",
+      rolId,
+    } = user;
 
     // Solo mostrar usuarios con el rol de idRol 1
-    if (rolId !== 1 ) {
+    if (rolId !== 1) {
       return false;
     }
 
@@ -80,10 +87,11 @@ const Usuarios = () => {
       correo.toLowerCase().includes(terminoABuscar) ||
       telefono.includes(terminoABuscar) ||
       Documento.includes(terminoABuscar) ||
+      tipoDocumento.toLowerCase().includes(terminoABuscar) || // Filtrar por tipoDocumento
+
       nombreRol.toLowerCase().includes(terminoABuscar)
     );
   });
-
 
   const handleToggleSwitch = async (id) => {
     const updatedUsers = users.map((user) =>
@@ -122,8 +130,7 @@ const Usuarios = () => {
       window.Swal.fire({
         icon: "error",
         title: "Error",
-        text:
-          "Hubo un error al cambiar el estado del usuario. Por favor, inténtalo de nuevo más tarde.",
+        text: "Hubo un error al cambiar el estado del usuario. Por favor, inténtalo de nuevo más tarde.",
       });
     }
   };
@@ -170,7 +177,6 @@ const Usuarios = () => {
     });
   };
 
-
   const handleSubmitPasswordChange = async (newPassword, confirmPassword) => {
     if (newPassword !== confirmPassword) {
       window.Swal.fire({
@@ -180,7 +186,7 @@ const Usuarios = () => {
       });
       return;
     }
-  
+
     if (newPassword.length < 8) {
       window.Swal.fire({
         icon: "error",
@@ -189,12 +195,15 @@ const Usuarios = () => {
       });
       return;
     }
-  
+
     try {
-      await axios.put(`http://localhost:5000/api/actualizarContrasena/${seleccionado.id}`, {
-        newPassword: newPassword,
-      });
-  
+      await axios.put(
+        `http://localhost:5000/api/actualizarContrasena/${seleccionado.id}`,
+        {
+          newPassword: newPassword,
+        }
+      );
+
       window.Swal.fire({
         icon: "success",
         title: "Contraseña actualizada",
@@ -210,8 +219,7 @@ const Usuarios = () => {
       });
     }
   };
-  
-  
+
   const handlePasswordChangeClick = (id) => {
     const usuarioSeleccionado = users.find((user) => user.id === id);
     if (usuarioSeleccionado) {
@@ -245,8 +253,7 @@ const Usuarios = () => {
       window.Swal.fire({
         icon: "error",
         title: "Campos obligatorios vacíos",
-        text:
-          "Por favor, completa todos los campos obligatorios antes de continuar.",
+        text: "Por favor, completa todos los campos obligatorios antes de continuar.",
       });
       return;
     }
@@ -298,12 +305,15 @@ const Usuarios = () => {
       }));
       return;
     }
-    const rolSeleccionado = rolesActivos.find((rol) => rol.idRol === formData.rolId);
+    
+    const rolSeleccionado = rolesActivos.find(
+      (rol) => rol.idRol === formData.rolId
+    );
     if (!rolSeleccionado) {
       window.Swal.fire({
-        icon: 'error',
-        title: 'Rol inactivo',
-        text: 'El rol seleccionado está inactivo. Por favor selecciona un rol activo.',
+        icon: "error",
+        title: "Rol inactivo",
+        text: "El rol seleccionado está inactivo. Por favor selecciona un rol activo.",
       });
       return;
     }
@@ -332,8 +342,7 @@ const Usuarios = () => {
         window.Swal.fire({
           icon: "error",
           title: "Documento existente",
-          text:
-            "El Documento ingresado ya está en uso. Por favor, utiliza otro Documento.",
+          text: "El Documento ingresado ya está en uso. Por favor, utiliza otro Documento.",
         });
         return;
       }
@@ -358,7 +367,6 @@ const Usuarios = () => {
           title: "Usuario editado",
           text: "El usuario ha sido editado correctamente.",
         });
-
       } else {
         response = await axios.post(
           "http://localhost:5000/api/crearUsuario",
@@ -375,12 +383,10 @@ const Usuarios = () => {
           text: "El usuario ha sido creado correctamente.",
         });
         setUsers([...users, formData]);
-
       }
 
       console.log("Respuesta del servidor:", response.data);
       handleCloseModal();
-     
     } catch (error) {
       console.error("Error al crear/editar usuario:", error);
       window.Swal.fire({
@@ -394,19 +400,22 @@ const Usuarios = () => {
   };
 
   const columns = [
-    { field: "nombre", headerName: "Nombre", width: "w-36" },
-    { field: "apellido", headerName: "Apellido", width: "w-36" },
-    { field: "correo", headerName: "Correo", width: "w-36" },
-    { field: "telefono", headerName: "Teléfono", width: "w-36" },
-    { field: "Documento", headerName: "Documento", width: "w-36" },
-    { 
-      field: 'rolId', 
-      headerName: 'Rol', 
-      width: 'w-36',
+    { field: "tipoDocumento", headerName: "Tipo de documento", width: "w-60" },
+
+    { field: "Documento", headerName: "Documento", width: "w-50" },
+
+    { field: "nombre", headerName: "Nombre", width: "w-50" },
+    { field: "apellido", headerName: "Apellido", width: "w-50" },
+    { field: "correo", headerName: "Correo", width: "w-50" },
+    { field: "telefono", headerName: "Teléfono", width: "w-50" },
+    {
+      field: "rolId",
+      headerName: "Rol",
+      width: "w-36",
       renderCell: (params) => {
-        const rol = roles.find(role => role.id === params.value);
-        return  rol.nombre 
-      }
+        const rol = roles.find((role) => role.id === params.value);
+        return rol.nombre;
+      },
     },
     {
       field: "Acciones",
@@ -414,20 +423,24 @@ const Usuarios = () => {
       width: "w-48",
       renderCell: (params) => (
         <div className="flex justify-center space-x-4">
+          {params.row.estado === 1 && (
           <button
             onClick={() => handleEditClick(params.row.id)}
             className="text-yellow-500"
           >
             <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
           </button>
-         
+          )}
+          {params.row.estado === 1 && (
           <button
-          onClick={() => {
-            handlePasswordChangeClick(params.row.id); // Abrir el modal de contraseña al hacer clic
-          }}
-          className="text-black-500"
-        >
-<i className='bx bx-lock'  style={{ fontSize: "24px" }}></i>        </button>
+            onClick={() => {
+              handlePasswordChangeClick(params.row.id); // Abrir el modal de contraseña al hacer clic
+            }}
+            className="text-black-500"
+          >
+            <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>{" "}
+          </button>
+          )}
           <CustomSwitch
             active={params.row.estado === 1}
             onToggle={() => handleToggleSwitch(params.row.id)}
@@ -438,51 +451,73 @@ const Usuarios = () => {
   ];
   // console.log("Roles en Usuarios:", roles); // Verifica los roles aquí antes de pasarlos a la tabla
 
-
   if (isLoading) {
     return <LoadingScreen />;
   }
 
   return (
     <div className="container mx-auto p-4 relative">
-      <h1 className="text-3xl font-bold mb-4">Administradores</h1>
-      <div className="md:flex md:justify-between md:items-center mb-4">
-        <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
-          <label
-            htmlFor="default-search"
-            className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
-          >
-            Buscar usuario
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
-            </div>
-            <input
-              type="search"
-              id="default-search"
-              className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Buscar usuario..."
-              value={buscar}
-              onChange={(e) => setBuscar(e.target.value)}
-              required
-            />
-          </div>
-        </div>
+       <div className="flex items-center justify-between mb-4">
+  <h1 className="text-2xl font-bold">Gestión de administradores</h1>
+  <div className="relative md:w-64 md:mr-4">
+    <label
+      htmlFor="default-search"
+      className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
+    >
+      Buscar usuario
+    </label>
+    <div className="relative">
+      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
+      </div>
+      <input
+        type="search"
+        id="default-search"
+        className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="Buscar usuario..."
+        value={buscar}
+        onChange={(e) => setBuscar(e.target.value)}
+        required
+      />
+    </div>
+  </div>
+</div>
         <div>
-        <Modal
-  open={openPasswordModal}
-  handleClose={handlePasswordModalClose}
-  handleSubmit={handleSubmitPasswordChange}
-/>
+          <Modal
+            open={openPasswordModal}
+            handleClose={handlePasswordModalClose}
+            handleSubmit={handleSubmitPasswordChange}
+          />
 
           <ModalDinamico
             seleccionado={seleccionado}
             open={openModal}
             handleClose={handleCloseModal}
             onSubmit={handleSubmit}
-            title={seleccionado ? "Editar Administrador" : "Crear nuevo Administrador"}
+            title={
+              seleccionado
+                ? "Editar Administrador"
+                : "Crear nuevo Administrador"
+            }
             fields={[
+              {
+                name: "tipoDocumento",
+                type: "select",
+                options: [
+                  { value: "T.I", label: "Tarjeta de Identidad (T.I)" },
+                  { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
+                  { value: "T.E", label: "Tarjeta de extranjería (T.E)" },
+                  { value: "C.E", label: "Cédula de extranjería (C.E)" },
+                ],
+                value: seleccionado ? seleccionado.tipoDocumento : "C.C", // Valor por defecto seleccionado
+                disabled: false, // Si deseas que inicialmente esté deshabilitado, cambia a true
+              },
+              {
+                name: "Documento",
+                label: "Tipo de Documento",
+                type: "text",
+                value: seleccionado ? seleccionado.Documento : "",
+              },
               {
                 name: "nombre",
                 label: "Nombre",
@@ -509,19 +544,14 @@ const Usuarios = () => {
                 maxLength: 15,
                 minlength: 7,
               },
-              {
-                name: "Documento",
-                label: "Documento",
-                type: "text",
-                value: seleccionado ? seleccionado.Documento : "",
-              },
+              
               {
                 name: "rolId",
-                label: "Rol",
+                // label: "Rol",
                 type: "select",
                 options: roles
-                  .filter(role => role.idRol === 1) // Filtrar para mostrar solo el rol con idRol 1
-                  .map(role => ({
+                  .filter((role) => role.idRol === 1) // Filtrar para mostrar solo el rol con idRol 1
+                  .map((role) => ({
                     value: role.idRol,
                     label: role.nombre,
                   })),
@@ -538,7 +568,7 @@ const Usuarios = () => {
               },
             ]}
           />
-        </div>
+        
       </div>
       <Table columns={columns} data={filtrar} roles={roles} />
       <Fab
@@ -555,7 +585,6 @@ const Usuarios = () => {
       >
         <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
       </Fab>
-    
     </div>
   );
 };
