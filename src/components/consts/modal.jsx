@@ -177,26 +177,42 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
   const validateField = (name, value, type) => {
     let error = '';
 
-    switch (type) {
-      case 'text':
-        if (!/^[a-zA-Z\s]*$/.test(value)) {
-          error = 'El campo solo puede contener letras y espacios.';
+    if (name === 'correo_proveedor') {
+      if (!/^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value)) {
+        error = 'El correo electrónico no es válido.';
+      }
+    } else if (name === 'telefono_proveedor') {
+      if (!/^[0-9+\s]*$/.test(value)) {
+        error = 'El número de teléfono solo puede contener números y el signo +.';
+      }
+    } else if (name === 'direccion_proveedor') {
+      if (!/^[a-zA-ZñÑ0-9\s#-]*$/.test(value)) {
+        error = 'La dirección solo puede contener letras, números, espacios, # y -.';
+      }
+    } else if (name === 'NIT') {
+        if (!/^[a-zA-ZñÑ0-9\s#-]*$/.test(value)) {
+          error = 'El NIT de la empresa solo puede contener números.';
         }
-        break;
-      case 'number':
-        if (isNaN(value) || Number(value) <= 0) {
-          error = 'El campo debe ser un número positivo.';
-        }
-        break;
-      case 'price':
-        if (isNaN(value) || Number(value) <= 0) {
-          error = 'El precio debe ser un número positivo.';
-        }
-        break;
-      default:
-        break;
+    } else if (name === 'Precio_Servicio') {
+      if (value <= 20000) {
+        error = 'El precio debe ser minimo de $20.000.';
+      }
+  }else {
+      switch (type) {
+        case 'text':
+          if (!/^[a-zA-ZñÑ\s]*$/.test(value)) {
+            error = 'El campo solo puede contener letras y espacios.';
+          }
+          break;
+        case 'number':
+          if (isNaN(value) || Number(value) <= 0) {
+            error = 'El campo debe ser un número positivo.';
+          }
+          break;
+        default:
+          break;
+      }
     }
-
     return error;
   };
 
