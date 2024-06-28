@@ -111,7 +111,7 @@ const Registrar = () => {
       Fecha: fecha,
       Descuento: descuento,
       Total: total.toFixed(2),
-      Estado: 2,
+      Estado: 1,
     };
 
     console.log("Datos de la venta:", ventaData);

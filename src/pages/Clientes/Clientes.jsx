@@ -449,12 +449,17 @@ const Usuarios = () => {
       width: "w-48",
       renderCell: (params) => (
         <div className="flex justify-center space-x-4">
+                    {params.row.estado === 1 && (
+
           <button
             onClick={() => handleEditClick(params.row.id)}
             className="text-yellow-500"
           >
             <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
           </button>
+                    )}
+                              {params.row.estado === 1 && (
+
           <button
             onClick={() => {
               handlePasswordChangeClick(params.row.id); // Abrir el modal de contraseña al hacer clic
@@ -463,6 +468,7 @@ const Usuarios = () => {
           >
             <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>
           </button>
+                              )}
           <CustomSwitch
             active={params.row.estado === 1}
             onToggle={() => handleToggleSwitch(params.row.id)}
@@ -491,15 +497,13 @@ const Usuarios = () => {
             open={openModal}
             handleClose={handleCloseModal}
             onSubmit={handleSubmit}
-            title={seleccionado ? "Editar empleado" : "Crear nuevo empleado"}
+            title={seleccionado ? "Editar cliente" : "Crear nuevo cliente"}
             fields={[
               {
                 name: "tipoDocumento",
                 type: "select",
                 options: [
-                  { value: "T.I", label: "Tarjeta de Identidad (T.I)" },
                   { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
-                  { value: "T.E", label: "Tarjeta de extranjería (T.E)" },
                   { value: "C.E", label: "Cédula de extranjería (C.E)" },
                 ],
                 value: seleccionado ? seleccionado.tipoDocumento : "C.C", 

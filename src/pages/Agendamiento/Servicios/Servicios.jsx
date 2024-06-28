@@ -295,32 +295,7 @@ const Servicios = () => {
   return (
     <div>
       <div className="container mx-auto p-4 relative">
-        <center>
-          <h1 className="text-3xl font-bold mb-4">Gestion De Servicios</h1>
-        </center>
         <div className="md:flex md:justify-between md:items-center mb-4">
-          <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
-            <label
-              htmlFor="default-search"
-              className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
-            >
-              Buscar servicio
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
-              </div>
-              <input
-                type="search"
-                id="default-search"
-                className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Buscar Servicio..."
-                value={buscar}
-                onChange={(e) => setBuscar(e.target.value)}
-                required
-              />
-            </div>
-          </div>
           <div>
             <Fab
               aria-label="add"
@@ -364,7 +339,7 @@ const Servicios = () => {
       {
         name: "IdServicio",
         label: "Identificador",
-        type: "text",
+        type: "number",
         readOnly: true,
       },
       { name: "Nombre_Servicio", label: "Nombre", type: "text" },
@@ -377,51 +352,60 @@ const Servicios = () => {
     entityData={servicioSeleccionado}
   />
 
-        <TablePrueba
-          columns={[
-            {
-              field: 'ImgServicio',
-              headerName: 'IMAGEN',
-              width: 'w-32',
-              renderCell: (params) => (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                  <img
-                    src={`http://localhost:5000${params.row.ImgServicio}`} // Ajustar la URL según la configuración del servidor
-                    alt="ImgServicio"
-                    style={{ maxWidth: '100%', height: 'auto', width: '3rem', height: '3rem', borderRadius: '50%' }}
-                  />
-                </div>
-              ),
-            },
-            { field: 'Nombre_Servicio', headerName: 'NOMBRE', width: 'w-36' },
-            { field: 'Tiempo_Servicio', headerName: 'TIEMPO', width: 'w-36' },
+<TablePrueba
+  columns={[
+    {
+      field: "Imagen",
+      headerName: "IMAGEN",
+      width: "w-32",
+      renderCell: (params) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <img
+            src={`http://localhost:5000${params.row.ImgServicio}`}  
+            alt="Imagen"
+            style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
+          />
+        </div>
+      ),
+    },
+    
+    { field: 'Nombre_Servicio', headerName: 'NOMBRE', width: 'w-36' },
+    { field: 'Tiempo_Servicio', headerName: 'TIEMPO EN HORAS', width: 'w-36' },
+    {
+      field: 'Precio_Servicio',
+      headerName: 'PRECIO',
+      width: 'w-36',
+      renderCell: (params) => <div>{`$${params.row.Precio_Servicio}`}</div>,
+    },
+    {
+      field: 'Acciones',
+      headerName: 'ACCIONES',
+      width: 'w-48',
+      renderCell: (params) => (
+        <div className="flex justify-center space-x-4">
+          {params.row.EstadoServicio === 1 && (
+            <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
+              <i className="bx bx-edit" style={{ fontSize: '24px' }}></i>
+            </button>
+          )}
+          {/* Supongo que CustomSwitch es un componente personalizado para el cambio de estado */}
+          <CustomSwitch active={params.row.EstadoServicio === 1} onToggle={() => handleToggleSwitch(params.row.IdServicio)} />
+        </div>
+      ),
+    },
+  ]}
+  data={filtrar}
+  title={'Gestion de Servicios'}
 
-            {
-              field: 'Precio_Servicio',
-              headerName: 'PRECIO',
-              width: 'w-36',
-              renderCell: (params) => (
-                <div>{`$${params.row.Precio_Servicio}`}</div>
-              ),
-            },            {
-              field: 'Acciones',
-              headerName: 'ACCIONES',
-              width: 'w-48',
-              renderCell: (params) => (
-                <div className="flex justify-center space-x-4">
-                  {params.row.EstadoServicio === 1 && (
-                  <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
-                    <i className="bx bx-edit" style={{ fontSize: '24px' }}></i>
-                  </button>
-                )}
-                {/* Supongo que CustomSwitch es un componente personalizado para el cambio de estado */}
-                <CustomSwitch active={params.row.EstadoServicio === 1} onToggle={() => handleToggleSwitch(params.row.IdServicio)} />
-              </div>
-              ),
-            },
-          ]}
-          data={filtrar}
-        />
+/>
+
       </div>
     );
   };

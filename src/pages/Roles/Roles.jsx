@@ -9,9 +9,8 @@ import ModalPermisos from "./modalPermisos";
 
 const Roles = () => {
   const [openModal, setOpenModal] = useState(false);
-  const [selectedRoleId, setSelectedRoleId] = useState(null); // Estado para almacenar el ID del rol seleccionado para editar
+  const [selectedRoleId, setSelectedRoleId] = useState(null);
   const [roles, setRoles] = useState([]);
-  const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openPermisosModal, setOpenPermisosModal] = useState(false);
   const [selectedPermisos, setSelectedPermisos] = useState([]);
   const [buscar, setBuscar] = useState("");
@@ -22,7 +21,7 @@ const Roles = () => {
       if (response.data && Array.isArray(response.data)) {
         const rolesWithPermissions = response.data.map((role) => ({
           ...role,
-          permisos: role.permisos || [], // Asegurar que permisos siempre sea un array
+          permisos: role.permisos || [],
         }));
         setRoles(rolesWithPermissions);
       } else {
@@ -88,15 +87,14 @@ const Roles = () => {
       });
     }
   };
+
   const filtrar = roles.filter((rol) => {
     const { nombre = "", permisos = [] } = rol;
 
-    // Filtrar por nombre del rol
     const nombreRol = nombre.toLowerCase().includes(buscar.toLowerCase());
 
-    // Filtrar por permisos asociados al rol
-    const permisosAsociados = permisos.some((p) =>
-      p.nombre.toLowerCase().includes(buscar.toLowerCase())
+    const permisosAsociados = permisos && permisos.some((p) =>
+      p.nombre && p.nombre.toLowerCase().includes(buscar.toLowerCase())
     );
 
     return nombreRol || permisosAsociados;
@@ -104,30 +102,38 @@ const Roles = () => {
 
   const handleEditClick = (id) => {
     console.log(`Editando rol con ID: ${id}`);
-    setSelectedRoleId(id); // Almacenar el ID del rol seleccionado para editar
-    setOpenCreateModal(false); // Cerrar el modal de creación si está abierto
+    setSelectedRoleId(id);
   };
 
   const handleViewDetailsClick = (permisos) => {
     setSelectedPermisos(permisos);
     setOpenPermisosModal(true);
   };
+
   const handleClosePermisosModal = () => {
     setOpenPermisosModal(false);
   };
 
   const handleOpenModal = () => {
     setOpenModal(true);
-    setSelectedRoleId(null); // Limpiar el ID del rol seleccionado al abrir el modal de creación
+    setSelectedRoleId(null);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setSelectedRoleId(null); // Limpiar el ID del rol seleccionado al cerrar el modal de edición
+    setSelectedRoleId(null);
+  };
+
+  // Función para agregar un nuevo rol, siempre activo
+  const handleAddRole = (newRole) => {
+    // Asignar un ID único al nuevo rol y EstadoRol a 1
+    const newRoleWithDefaults = { ...newRole, idRol: roles.length + 1, EstadoRol: 1 };
+    setRoles([...roles, newRoleWithDefaults]);
+    setOpenModal(false); // Cerrar el modal de creación
   };
 
   const columns = [
-    { field: "idRol", headerName: "ID", width: "w-16" }, // Asegúrate de usar el campo correcto para el ID del rol
+    { field: "idRol", headerName: "ID", width: "w-16" },
     { field: "nombre", headerName: "Nombre", width: "w-36" },
     {
       field: "permisos",
@@ -139,8 +145,7 @@ const Roles = () => {
             onClick={() => handleViewDetailsClick(params.row.permisos)}
             className="text-blue-500"
           >
-            {" "}
-            <i class="bx bx-show-alt" style={{ fontSize: "24px" }}></i>{" "}
+            <i class="bx bx-show-alt" style={{ fontSize: "24px" }}></i>
           </button>
         </ul>
       ),
@@ -171,37 +176,12 @@ const Roles = () => {
 
   return (
     <div>
-      {/* <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">Gestión de roles</h1>
-        <div className="relative md:w-64 md:mr-4">
-          <label
-            htmlFor="default-search"
-            className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
-          >
-            Buscar usuario
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
-            </div>
-            <input
-              type="search"
-              id="default-search"
-              className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Buscar usuario..."
-              value={buscar}
-              onChange={(e) => setBuscar(e.target.value)}
-              required
-            />
-          </div>
-        </div>
-      </div> */}
-
       <Table title="Gestion de Roles" columns={columns} data={filtrar} />
       <AddRoleModal
         open={openModal && selectedRoleId === null}
         handleClose={handleCloseModal}
         setRoles={setRoles}
+        onAddRole={handleAddRole} // Pasar la función para agregar rol
       />
       <Fab
         aria-label="add"
@@ -218,9 +198,8 @@ const Roles = () => {
         <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
       </Fab>
 
-      {/* Modal de edición */}
       <ModalEditar
-        open={selectedRoleId !== null} // Abrir el modal si selectedRoleId tiene un valor
+        open={selectedRoleId !== null}
         handleClose={handleCloseModal}
         roleId={selectedRoleId}
         setRoles={setRoles}

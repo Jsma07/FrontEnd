@@ -430,6 +430,7 @@ return (
           },
         ]}
         data={filtrar}
+        title={'Gestion de Proveedores'}
       />
       <Fab
         aria-label="add"

@@ -201,10 +201,7 @@ const handleToggleSwitch = async (id) => {
 
 return (
   <div>
-    <div className="container mx-auto p-4 relative">
-      <center><h1 className="text-3xl font-bold mb-4">Gestion De Categorias</h1></center>
-     
-  </div>
+    
       <ModalAgregarCategoria
         open={openModalAgregar}
         handleClose={handleCloseModalAgregar}

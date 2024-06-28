@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ModalDinamico from "../../components/consts/modalJ"; // Ajusta la ruta según la ubicación real de ModalDinamico
+import ModalDinamico from "../../components/consts/modalJ";
 import axios from "axios";
 
 const AddRoleModal = ({ open, handleClose, setRoles }) => {
@@ -76,7 +76,8 @@ const AddRoleModal = ({ open, handleClose, setRoles }) => {
       });
       return;
     }
-    if (!formData.nombre !== formData.nombre.trim()) {
+
+    if (formData.nombre.trim() !== formData.nombre) {
       window.Swal.fire({
         icon: "error",
         title: "Nombre del rol con espacios",
@@ -117,7 +118,8 @@ const AddRoleModal = ({ open, handleClose, setRoles }) => {
       // Realizar la petición POST al backend para crear el rol
       const response = await axios.post("http://localhost:5000/api/roles/crearRol", {
         nombre: formData.nombre,
-        permisos: permisosSeleccionados
+        permisos: permisosSeleccionados,
+        EstadoRol: 1 // Siempre crear el rol con EstadoRol activo (1)
       });
 
       // Manejar la respuesta del backend
@@ -129,7 +131,7 @@ const AddRoleModal = ({ open, handleClose, setRoles }) => {
         });
 
         // Actualiza rolesLocal con el nuevo rol creado
-        const nuevoRol = { id: response.data.id, nombre: formData.nombre, permisos: permisosSeleccionados };
+        const nuevoRol = { idRol: response.data.id, nombre: formData.nombre, permisos: permisosSeleccionados, EstadoRol: 1 };
         setRolesLocal((prevRoles) => [...prevRoles, nuevoRol]);
         setRoles((prevRoles) => [...prevRoles, nuevoRol]);
 

@@ -504,9 +504,7 @@ const Usuarios = () => {
                 name: "tipoDocumento",
                 type: "select",
                 options: [
-                  { value: "T.I", label: "Tarjeta de Identidad (T.I)" },
                   { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
-                  { value: "T.E", label: "Tarjeta de extranjería (T.E)" },
                   { value: "C.E", label: "Cédula de extranjería (C.E)" },
                 ],
                 value: seleccionado ? seleccionado.tipoDocumento : "C.C", 

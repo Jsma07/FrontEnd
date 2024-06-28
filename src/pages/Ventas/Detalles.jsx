@@ -137,7 +137,7 @@ const InsumoDetalle = () => {
               <div className="overflow-hidden rounded-full mx-auto mt-4 w-24 h-24">
                 <img
                   className="object-cover w-full h-full"
-                  src={insumo.Imagen}
+                  src={`http://localhost:5000${insumo.imagen}`}
                   alt={insumo.NombreInsumos}
                 />
               </div>
