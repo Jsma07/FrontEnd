@@ -22,7 +22,7 @@ const TablePrueba = ({ title, columns, data, roles }) => {
   }
 
   return (
-    <section className="bg-gray-50 dark:bg-gray-900 py-3 sm:py-5">
+    <section>
       <div
         style={{
           paddingTop: "5px",
@@ -35,7 +35,7 @@ const TablePrueba = ({ title, columns, data, roles }) => {
           top: "80px",
           width: "calc(100% - 100px)",
         }}
-        className="w-full mx-auto max-w-full"
+      
       >
         <div className="bg-white rounded-lg shadow-md p-8 border border-purple-500">
           <div className="flex justify-between items-center mb-4">
