@@ -32,7 +32,7 @@ const Login = () => {
     <div className="container mx-auto my-auto p-4 flex flex-col items-center justify-center">
       <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
         <img className="w-20 h-20 mr-2" src="Jacke.png" alt="logo" />
-        Jacke Nail    
+        Jake Nails
       </a>
       <div className="border border-gray-900 rounded-lg shadow-xl p-8 bg-red-100 max-w-md dark:bg-gray-800 dark:border-gray-700">
         <div className="p-8 space-y-4 md:space-y-6 sm:p-8 bg-red-100">
