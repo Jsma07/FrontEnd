@@ -138,7 +138,7 @@ export default function MiniDrawer() {
             style={{ width: "48px", height: "48px", marginRight: "16px" }}
           />
           <Typography variant="h6" noWrap component="div">
-            Jacke Nail
+            Jacke Nails
           </Typography>
           <div style={{ marginLeft: "auto" }}></div>
           <Notifications
