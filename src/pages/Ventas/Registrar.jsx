@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ModalInsumos from "../../components/consts/Modalventas";
 import Swal from "sweetalert2";
-import  ServicioSeleccionado from '../../components/consts/SeleccionServicios'
+import ServicioSeleccionado from '../../components/consts/SeleccionServicios'
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import Fab from "@mui/material/Fab";
+import { Select, MenuItem } from '@mui/material';
+
 
 const Registrar = () => {
   const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
@@ -338,77 +342,240 @@ const Registrar = () => {
   }, []);
 
   return (
-      <section className="content">
-        <ServicioSeleccionado/>
+    <section className="content">
+     <div
+  style={{
+    paddingTop: "40px", // Ajuste el padding superior para dar espacio al título
+    margin: "0 auto",
+    borderRadius: "30px",
+    marginTop: "20px",
+    boxShadow: "0 4px 12px rgba(128, 0, 128, 0.25)",
+    position: "fixed",
+    top: "80px",
+    left: "100px",
+    width: "calc(38% - 100px)",
+    padding: "20px",
+  }}
+>
+  <h1 className="text-2xl font-bold mb-6">Gestión de Ventas</h1> {/* Título en negrita y grande */}
+  
+  <div className="form-group mb-4">
+    <label htmlFor="Servicios" className="block text-sm font-medium text-gray-700">
+      Servicios
+    </label>
+    <div className="relative">
+      <input
+        type="hidden"
+        name="idventa"
+        id="idventa"
+      />
+      <select
+        name="Servicios"
+        id="Servicios"
+        className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+        required
+      >
+        <option value="">Seleccione un servicio</option>
+        {servicios.map((servicio) => (
+          <option
+            key={servicio.IdServicio}
+            value={servicio.IdServicio}
+          >
+            {servicio.Nombre_Servicio}
+          </option>
+        ))}
+      </select>
+      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+        <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+  </div>
 
-        
-        <div 
-          style={{
-            paddingTop: "10px",
-            margin: "0 auto",
-            borderRadius: "30px",
-            marginTop: "20px",
-            boxShadow: "0 4px 12px rgba(128, 0, 128, 0.1)",
-            position: "fixed",
-            right: "20px",  // Alineado a la derecha
-            top: "80px",
-            width: "calc(65% - 100px)",
-            padding: "20px",  // Agregado espacio interior para separar los elementos
-          }}
+  <div className="form-group mb-4">
+    <label htmlFor="Empleado">Empleado</label>
+    <select
+      name="Empleado"
+      id="Empleado"
+      className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+      required
+    >
+      <option value="">Seleccione un Empleado</option>
+      {empleados.map((empleado) => (
+        <option
+          key={empleado.IdEmpleado}
+          value={empleado.IdEmpleado}
         >
+          {empleado.Nombre} {empleado.Apellido}
+        </option>
+      ))}
+    </select>
+  </div>
 
-          <div style={{ textAlign: "left", marginBottom: "20px" }}>
-            <h3 style={{ textAlign: "left", fontSize: "23px", fontWeight: "bold" }}>Factura Electronica </h3>
-          </div>
+  <div className="form-group mb-4">
+    <label htmlFor="Cliente">Cliente</label>
+    <select
+      name="Cliente"
+      id="Cliente"
+      className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+      required
+    >
+      <option value="">Seleccione un Cliente</option>
+      {clientes.map((cliente) => (
+        <option
+          key={cliente.IdCliente}
+          value={cliente.IdCliente}
+        >
+          {cliente.Nombre} {cliente.Apellido}
+        </option>
+      ))}
+    </select>
+  </div>
 
-          <div style={{ textAlign: "right", marginBottom: "20px" }}>
-            <p>Fecha: {fechaFactura}</p>
-          </div>
+  <div className="form-group mb-4">
+    <label htmlFor="iva" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+      IVA
+    </label>
+    <input
+      type="number"
+      name="iva"
+      id="iva"
+      value={iva.toFixed(2)}
+      onChange={(e) => setIva(parseFloat(e.target.value))}
+      className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+      placeholder="IVA"
+    />
+  </div>
 
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "bold" }}>
-            <div>Nombre</div>
-            <div>Precio Unitario</div>
-            <div>Cantidad</div>
-            <div>Subtotal</div>
-            <div>Cantidad</div> 
-          </div>
+  <div className="form-group grid grid-cols-2 gap-4 mb-4">
+    <div>
+      <label htmlFor="fecha">Fecha</label>
+      <input
+        type="date"
+        id="fecha"
+        name="fecha"
+        className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+        required
+      />
+    </div>
+    <div>
+      <label htmlFor="Descuento" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        Descuento
+      </label>
+      <input
+        type="number"
+        id="Descuento"
+        className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+        placeholder="Descuento"
+        name="Descuento"
+        value={descuento}
+        onChange={(e) => setDescuento(parseFloat(e.target.value))}
+        required
+      />
+    </div>
+  </div>
+</div>
 
-          {insumosSeleccionados.map((insumo) => (
-            <div key={insumo.IdInsumos} style={{ marginBottom: "10px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <div>{insumo.NombreInsumos}</div>
-                <div>{insumo.PrecioUnitario}</div>
-                <div>{insumo.Cantidad}</div>
-                <div>{subtotal.toFixed(2)}</div>
-                <div>
-                  <input
-                    type="number"
-                    value={cantidadInsumos[insumo.IdInsumos] || ""}
-                    onChange={(e) =>
-                      handleCantidadChange(e, insumo.IdInsumos)
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
+      <div
+        style={{
+          paddingTop: "10px",
+          margin: "0 auto",
+          borderRadius: "30px",
+          marginTop: "20px",
+          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.3)",
+          position: "fixed",
+          right: "20px",  // Alineado a la derecha
+          top: "80px",
+          width: "calc(65% - 100px)",
+          padding: "20px",  // Agregado espacio interior para separar los elementos
+        }}
+      >
+
+        <div style={{ textAlign: "left", marginBottom: "20px" }}>
+          <h3 style={{ textAlign: "left", fontSize: "23px", fontWeight: "bold" }}>Factura Electronica </h3>
         </div>
+
+        <div style={{ textAlign: "right", marginBottom: "20px" }}>
+          <p>Fecha: {fechaFactura}</p>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "bold", marginBottom: "10px" }}>
+  <div>Nombre</div>
+  <div>Precio Unitario</div>
+  <div>Cantidad</div>
+  <div>Subtotal</div>
+  <div>Cantidad</div>
+</div>
+
+{insumosSeleccionados.map((insumo) => (
+  <div key={insumo.IdInsumos} style={{ marginBottom: "10px" }}>
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div>{insumo.NombreInsumos}</div>
+      <div>{insumo.PrecioUnitario}</div>
+      <div>{insumo.Cantidad}</div>
+      <div>{subtotal.toFixed(2)}</div>
+      <div>
+        <input
+          type="number"
+          value={cantidadInsumos[insumo.IdInsumos] || ""}
+          onChange={(e) => handleCantidadChange(e, insumo.IdInsumos)}
+        />
+      </div>
+    </div>
+  </div>
+))}
+
 
         <div style={{ marginTop: "40px", borderTop: "1px solid #ccc", paddingTop: "20px" }}>
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "10px" }}>
             <div style={{ fontWeight: "bold", marginRight: "20px" }}>TOTAL:</div>
-              <div>{totalGeneral.toFixed(2)}</div>
+            <div>{totalGeneral.toFixed(2)}</div>
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <div style={{ fontWeight: "bold", marginRight: "20px" }}>Descuento aplicado:</div>
-              <div>{descuento.toFixed(2)}</div>
+            <div>{descuento.toFixed(2)}</div>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "flex-start", marginTop: "20px" }}>
+          <div className="form-group col-lg-3 col-md-3 col-sm-6 col-xs-12 mt-2 mb-3 mx-2">
+            <button
+              type="button"
+              className="bg-pink-200 hover:bg-black-300 focus:ring-4 focus:outline-none focus:ring-black-300 dark:focus:ring-black-800 shadow-lg shadow-black-500/50 dark:shadow-lg dark:shadow-black-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+              onClick={abrirModal}
+              style={{ alignSelf: "flex-end", display: "flex", alignItems: "center" }}
+            >
+              <ShoppingCartIcon />    </button>
           </div>
         </div>
 
       </div>
+      <ModalInsumos
+                    open={modalAbierto}
+                    handleClose={cerrarModal}
+                    title="Agregar adiciones"
+                    onSubmit={handleSubmit}
+                    seleccionado={modalData}
+                    insumos={insumos}
+                    insumosSeleccionados={insumosSeleccionados}
+                    setInsumosSeleccionados={setInsumosSeleccionados}
+                  />
 
-      </section>
-  ); 
+      <Fab
+        aria-label="add"
+        style={{
+          border: "0.5px solid grey",
+          backgroundColor: "#94CEF2",
+          position: "fixed",
+          bottom: "16px",
+          right: "16px",
+          zIndex: 1000,
+        }}
+      >
+       <i class='bx bxs-save' style={{ fontSize: "1.8rem" }}></i>
+      </Fab>
+    </section>
+  );
 };
 export default Registrar;

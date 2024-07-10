@@ -68,19 +68,24 @@ const ServicioSeleccionado = ({ servicios }) => {
         )}
       </div>
 
-      <div 
-        style={{
-          padding: "10px",
-          borderRadius: "10px",
-          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.1)",
-          position: "fixed",    
-          top: "120px", 
-          left: "100px",
-          width: "95%",
-          maxWidth: "420px",
-        }}
-        className="form-group"
-      >
+
+
+
+      <div
+       style={{
+        paddingTop: "10px",
+        margin: "0 auto",
+        borderRadius: "30px",
+        marginTop: "20px",
+        boxShadow: "0 4px 12px rgba(128, 0, 128, 0.25)",
+        position: "fixed",
+        top: "500px",
+        left: "100px",
+        width: "calc(38% - 100px)",
+        padding: "20px", 
+      }} 
+       
+        >
         <label htmlFor="Servicios">Seleccione un servicio:</label>
         <select
           name="Servicios"
@@ -99,41 +104,11 @@ const ServicioSeleccionado = ({ servicios }) => {
         </select>
       </div>
 
-
-
-      <div 
-        style={{
-          padding: "10px",
-          borderRadius: "10px",
-          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.1)",
-          position: "fixed",    
-          top: "270px", 
-          left: "100px",
-          width: "95%",
-          maxWidth: "420px",
-        }}
-        className="form-group"
-      >
-        <label htmlFor="Servicios">Seleccione un servicio:</label>
-        <select
-          name="Servicios"
-          id="Servicios"
-          className="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:border-gray-200 dark:text-gray-400 dark:border-gray-700"
-          data-live-search="true"
-          onChange={handleServicioChange}
-          required
-        >
-          <option value="">Seleccione un servicio</option>
-          {serviciosDisponibles.map(servicio => (
-            <option key={servicio.IdServicio} value={servicio.IdServicio}>
-              {servicio.Nombre_Servicio}
-            </option>
-          ))}
-        </select>
-      </div>
+     
 
     </section>
   );
 };
 
 export default ServicioSeleccionado;
+
