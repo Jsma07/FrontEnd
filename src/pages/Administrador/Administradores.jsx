@@ -1,20 +1,20 @@
-import CustomSwitch from "../../components/consts/switch";
+import CustomSwitch from "../../components/consts/switch"; // se importa el componente del switch
 import React, { useEffect, useState } from "react";
-import ModalDinamico from "../../components/consts/modalJ";
-import Table from "../../components/consts/Tabla";
+import ModalDinamico from "../../components/consts/modalJ"; // se importa el componente del modal
+import Table from "../../components/consts/Tabla"; // se importa el componente de la tabla
 import axios from "axios";
 import LoadingScreen from "../../components/consts/pantallaCarga";
 import Fab from "@mui/material/Fab";
-import Modal from "../../components/consts/modalContrasena";
+import Modal from "../../components/consts/modalContrasena";  // se importa el componente del modal para la contraseña
 
 const Usuarios = () => {
-  const [openModal, setOpenModal] = useState(false);
-  const [users, setUsers] = useState([]);
-  const [roles, setRoles] = useState([]);
-  const [seleccionado, setSeleccionado] = useState(null);
+  const [openModal, setOpenModal] = useState(false); // Estado para controlar el modal para crear y editar un usuario administrador
+  const [users, setUsers] = useState([]); // hook donde se guardan los usuarios traidos de la api
+  const [roles, setRoles] = useState([]);// hook donde se guardan los roles traidos de la api
+  const [seleccionado, setSeleccionado] = useState(null); // hook para verificar si se esta editando un usuario y posteriormente traer su informacion
   const [isLoading, setIsLoading] = useState(true);
-  const [buscar, setBuscar] = useState("");
-  const [rolesActivos, setRolesActivos] = useState([]);
+  const [buscar, setBuscar] = useState(""); // hook para controlar lo que ingresa el usuario para se buscado por ciertos criterios
+  const [rolesActivos, setRolesActivos] = useState([]); // hook para guardar unicamente los roles activos 
   const [openPasswordModal, setOpenPasswordModal] = useState(false); // Nuevo estado para controlar el modal de cambio de contraseña
   const [passwordForm, setPasswordForm] = useState({
     newPassword: "",
@@ -36,6 +36,7 @@ const Usuarios = () => {
   }, [roles]);
 
   useEffect(() => {
+    //Traer los roles desde la api
     const fetchRoles = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/roles");
@@ -46,7 +47,7 @@ const Usuarios = () => {
         setRoles([]);
       }
     };
-
+    // trear los usuarios desde la api
     const fetchUsers = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/users");
@@ -77,7 +78,7 @@ const Usuarios = () => {
       return false;
     }
 
-    const terminoABuscar = buscar.toLowerCase();
+    const terminoABuscar = buscar.toLowerCase(); //variable donde se almacena el termino ingresado por el usuario para posteriormente ser buscado
     const rol = roles.find((role) => role.idRol === rolId);
     const nombreRol = rol ? rol.nombre : "";
 
@@ -93,6 +94,7 @@ const Usuarios = () => {
     );
   });
 
+  //maneja el switch para cambiar el estado del usuario ya sea activo(1) o inactivo(0)
   const handleToggleSwitch = async (id) => {
     const updatedUsers = users.map((user) =>
       user.id === id ? { ...user, estado: user.estado === 1 ? 0 : 1 } : user
@@ -113,7 +115,7 @@ const Usuarios = () => {
         confirmButtonText: "Sí",
         cancelButtonText: "Cancelar",
       });
-
+      // si se confirma se procede a enviar la peticion a la api para cambiar el estado del usuario
       if (result.isConfirmed) {
         await axios.put(`http://localhost:5000/api/editarUsuario/${id}`, {
           estado: updatedUser.estado,
@@ -140,6 +142,7 @@ const Usuarios = () => {
       return;
     }
 
+    // se verifica que el usuario este en el hook users donde se cargan todos los usuarios
     const usuarioEditar = users.find((user) => user.id === id);
     if (!usuarioEditar) {
       console.log("Usuario no encontrado");
@@ -154,6 +157,7 @@ const Usuarios = () => {
     setOpenModal(true);
   };
 
+  //procedimiento para cerrar el modal y restablecer los valores de los errores
   const handleCloseModal = () => {
     setOpenModal(false);
     setSeleccionado(null);
@@ -169,6 +173,7 @@ const Usuarios = () => {
   const handleCrearUsuarioClick = () => {
     handleOpenModal();
   };
+  //procedimiento para cerrar el modal de restablecimiento de contraseña
   const handlePasswordModalClose = () => {
     setOpenPasswordModal(false);
     setPasswordForm({
@@ -177,6 +182,7 @@ const Usuarios = () => {
     });
   };
 
+  //metodo para enviar la nueva contraseña a la api
   const handleSubmitPasswordChange = async (newPassword, confirmPassword) => {
     if (newPassword !== confirmPassword) {
       window.Swal.fire({
@@ -197,6 +203,7 @@ const Usuarios = () => {
     }
 
     try {
+      //peticion put para actualizar la contraseña del usuario seleccionado
       await axios.put(
         `http://localhost:5000/api/actualizarContrasena/${seleccionado.id}`,
         {
@@ -220,6 +227,7 @@ const Usuarios = () => {
     }
   };
 
+  //Trae el id del usuario seleccionado para editar su contrasela y abrir el modal
   const handlePasswordChangeClick = (id) => {
     const usuarioSeleccionado = users.find((user) => user.id === id);
     if (usuarioSeleccionado) {
@@ -230,6 +238,7 @@ const Usuarios = () => {
     }
   };
 
+  //metodo para enviar los datos del usuario ya sea editarlo o crearlo
   const handleSubmit = async (formData) => {
     const mandatoryFields = [
       "nombre",
@@ -399,6 +408,7 @@ const Usuarios = () => {
     }
   };
 
+  // columnas para ser pasadas como props al componente de la tabla
   const columns = [
     { field: "tipoDocumento", headerName: "Tipo de documento", width: "w-60" },
 
@@ -457,43 +467,19 @@ const Usuarios = () => {
 
   return (
     <div className="container mx-auto p-4 relative">
-       <div className="flex items-center justify-between mb-4">
-  <h1 className="text-2xl font-bold">Gestión de administradores</h1>
-  <div className="relative md:w-64 md:mr-4">
-    <label
-      htmlFor="default-search"
-      className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
-    >
-      Buscar usuario
-    </label>
-    <div className="relative">
-      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-        <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
-      </div>
-      <input
-        type="search"
-        id="default-search"
-        className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-        placeholder="Buscar usuario..."
-        value={buscar}
-        onChange={(e) => setBuscar(e.target.value)}
-        required
-      />
-    </div>
-  </div>
-</div>
+      
         <div>
           <Modal
             open={openPasswordModal}
             handleClose={handlePasswordModalClose}
             handleSubmit={handleSubmitPasswordChange}
           />
-
           <ModalDinamico
             seleccionado={seleccionado}
             open={openModal}
             handleClose={handleCloseModal}
             onSubmit={handleSubmit}
+            
             title={
               seleccionado
                 ? "Editar Administrador"
@@ -586,5 +572,4 @@ const Usuarios = () => {
     </div>
   );
 };
-
 export default Usuarios;
