@@ -50,6 +50,10 @@ const Usuarios = () => {
     // trear los usuarios desde la api
     const fetchUsers = async () => {
       try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        }
         const response = await axios.get("http://localhost:5000/api/users");
         setUsers(response.data.usuarios);
         setIsLoading(false);
@@ -62,6 +66,38 @@ const Usuarios = () => {
     fetchRoles();
     fetchUsers();
   }, []);
+
+  // useEffect(() => {
+  //   const fetchRoles = async () => {
+  //     try {
+  //       const response = await axios.get("http://localhost:5000/api/roles");
+  //       console.log("Roles response:", response.data);
+  //       setRoles(response.data);
+  //     } catch (error) {
+  //       console.error("Error fetching roles:", error);
+  //       setRoles([]);
+  //     }
+  //   };
+  
+  //   const fetchUsers = async () => {
+  //     try {
+  //       const token = localStorage.getItem('token');
+  //       if (token) {
+  //         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  //       }
+  //       const response = await axios.get("http://localhost:5000/api/users");
+  //       setUsers(response.data.usuarios);
+  //       setIsLoading(false);
+  //     } catch (error) {
+  //       console.error("Error fetching users:", error);
+  //       setIsLoading(false);
+  //     }
+  //   };
+  
+  //   fetchRoles();
+  //   fetchUsers();
+  // }, []);
+  
   const filtrar = users.filter((user) => {
     const {
       nombre = "",
