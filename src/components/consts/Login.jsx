@@ -1,4 +1,4 @@
-import React,{ useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 const Login = () => {
@@ -9,25 +9,26 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
-  
-  try {
-    const response = await axios.post('http://localhost:5000/api/iniciarSesion', {
-      correo,
-      contrasena,
-    });
 
+    try {
+      const response = await axios.post('http://localhost:5000/api/iniciarSesion', {
+        correo,
+        contrasena,
+      });
 
-    const token = response.data.token;
+      const token = response.data.token;
       localStorage.setItem('token', token);
-      console.log('Token:', token);
 
-    window.location.href = '/';
-  }catch (error) {
-    console.error('Error en el inicio de sesión:', error.response?.data?.mensaje || 'Error en el servidor');
-    setError(error.response?.data?.mensaje || 'Error en el servidor');
-  }
-}
+      // Configurar el token en los headers de Axios para futuras peticiones
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
+      // Redireccionar a la página principal después del inicio de sesión
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Error en el inicio de sesión:', error.response?.data?.mensaje || 'Error en el servidor');
+      setError(error.response?.data?.mensaje || 'Error en el servidor');
+    }
+  };
   return (
     <div className="container mx-auto my-auto p-4 flex flex-col items-center justify-center">
       <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
