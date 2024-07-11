@@ -39,7 +39,8 @@ const TablePrueba = ({ title, columns, data, roles }) => {
       >
         <div className="bg-white rounded-lg shadow-md p-8 border border-purple-500">
           <div className="flex justify-between items-center mb-4">
-            <h4 className="text-3xl">{title}</h4>
+            <h4 style={{ textAlign: "left", fontSize: "23px", fontWeight: "bold" }} className="text-3xl">{title}</h4>
+
 
             <div className="relative w-80">
               {" "}
@@ -91,31 +92,10 @@ const TablePrueba = ({ title, columns, data, roles }) => {
 
           <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
             <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
-              {/* Botones de acción */}
               <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
-                {/* <button
-                  type="button"
-                  className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
-                >
-                  <svg
-                    className="h-3.5 w-3.5 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <path
-                      clipRule="evenodd"
-                      fillRule="evenodd"
-                      d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                    />
-                  </svg>
-                  Add new product
-                </button> */}
-                {/* Otros botones... */}
+                
               </div>
             </div>
-            {/* Tabla de datos */}
             <div className="w-full overflow-x-auto">
               <table className="w-full table-auto text-sm text-center text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

@@ -96,7 +96,6 @@ const Registrar = () => {
     const descuento = event.target.Descuento.value;
 
     let subtotal = 0;
-
     // Verifica si insumosSeleccionados está definido antes de usarlo
     if (insumosSeleccionados) {
       insumosSeleccionados.forEach((insumo) => {
@@ -259,17 +258,17 @@ const Registrar = () => {
         subtotal = insumo.PrecioUnitario * usosCompletos;
 
         if (resto > 0) {
-          subtotal += insumo.PrecioUnitario; // Sumar el precio unitario por el resto
+          subtotal += insumo.PrecioUnitario;
         }
       }
-      const ivaCalculado = subtotal * (0.19 / 100);
+      const ivaCalculado = subtotal * 0.19;
       total += subtotal + ivaCalculado;
     });
     const descuentoAplicado = total * (descuento / 100);
     const totalConDescuento = total - descuentoAplicado;
 
-    setTotalGeneral(totalConDescuento); // Actualizar el total general considerando el descuento
-    setIva(total * (0.19 / 100)); // Actualizar el estado del IVA
+    setTotalGeneral(totalConDescuento);
+    setIva(total * (0.19 / 100));
   }, [cantidadInsumos, insumosSeleccionados, descuento]);
 
   const handleCantidadChange = (e, idInsumo) => {
@@ -343,139 +342,166 @@ const Registrar = () => {
 
   return (
     <section className="content">
-     <div
-  style={{
-    paddingTop: "40px", // Ajuste el padding superior para dar espacio al título
-    margin: "0 auto",
-    borderRadius: "30px",
-    marginTop: "20px",
-    boxShadow: "0 4px 12px rgba(128, 0, 128, 0.25)",
-    position: "fixed",
-    top: "80px",
-    left: "100px",
-    width: "calc(38% - 100px)",
-    padding: "20px",
-  }}
->
-  <h1 className="text-2xl font-bold mb-6">Gestión de Ventas</h1> {/* Título en negrita y grande */}
-  
-  <div className="form-group mb-4">
-    <label htmlFor="Servicios" className="block text-sm font-medium text-gray-700">
-      Servicios
-    </label>
-    <div className="relative">
-      <input
-        type="hidden"
-        name="idventa"
-        id="idventa"
-      />
-      <select
-        name="Servicios"
-        id="Servicios"
-        className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-        required
+      <div
+        style={{
+          paddingTop: "40px", // Ajuste el padding superior para dar espacio al título
+          margin: "0 auto",
+          borderRadius: "30px",
+          marginTop: "20px",
+          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.25)",
+          position: "fixed",
+          top: "80px",
+          left: "100px",
+          width: "calc(38% - 100px)",
+          padding: "20px",
+        }}
       >
-        <option value="">Seleccione un servicio</option>
-        {servicios.map((servicio) => (
-          <option
-            key={servicio.IdServicio}
-            value={servicio.IdServicio}
-          >
-            {servicio.Nombre_Servicio}
-          </option>
-        ))}
-      </select>
-      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-        <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-        </svg>
+        <h1 className="text-2xl font-bold mb-6">Gestión de Ventas</h1>
+        <form
+          action=""
+          name="formulario"
+          id="formulario"
+          method="POST"
+          onSubmit={handleSubmit}
+        >
+
+          <div className="form-group mb-4">
+            <label htmlFor="Servicios" className="block text-sm font-medium text-gray-700">
+              Servicios
+            </label>
+            <div className="relative">
+              <input
+                type="hidden"
+                name="idventa"
+                id="idventa"
+              />
+              <select
+                name="Servicios"
+                id="Servicios"
+                className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+                required
+              >
+                <option value="">Seleccione un servicio</option>
+                {servicios.map((servicio) => (
+                  <option
+                    key={servicio.IdServicio}
+                    value={servicio.IdServicio}
+                  >
+                    {servicio.Nombre_Servicio}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-group mb-4">
+            <label htmlFor="Empleado">Empleado</label>
+            <select
+              name="Empleado"
+              id="Empleado"
+              className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+              required
+            >
+              <option value="">Seleccione un Empleado</option>
+              {empleados.map((empleado) => (
+                <option
+                  key={empleado.IdEmpleado}
+                  value={empleado.IdEmpleado}
+                >
+                  {empleado.Nombre} {empleado.Apellido}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group mb-4">
+            <label htmlFor="Cliente">Cliente</label>
+            <select
+              name="Cliente"
+              id="Cliente"
+              className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+              required
+            >
+              <option value="">Seleccione un Cliente</option>
+              {clientes.map((cliente) => (
+                <option
+                  key={cliente.IdCliente}
+                  value={cliente.IdCliente}
+                >
+                  {cliente.Nombre} {cliente.Apellido}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group mb-4">
+            <label htmlFor="iva" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              IVA
+            </label>
+            <input
+              type="number"
+              name="iva"
+              id="iva"
+              value={iva.toFixed(2)}
+              onChange={(e) => setIva(parseFloat(e.target.value))}
+              className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+              placeholder="IVA"
+            />
+          </div>
+
+          <div className="form-group grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label htmlFor="fecha">Fecha</label>
+              <input
+                type="date"
+                id="fecha"
+                name="fecha"
+                className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="Descuento" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Descuento
+              </label>
+              <input
+                type="number"
+                id="Descuento"
+                className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+                placeholder="Descuento"
+                name="Descuento"
+                value={descuento}
+                onChange={(e) => setDescuento(parseFloat(e.target.value))}
+                required
+              />
+            </div>
+          </div>
+
+
+          <Fab
+        aria-label="add"
+        style={{
+          border: "0.5px solid grey",
+          backgroundColor: "#94CEF2",
+          position: "fixed",
+          bottom: "16px",
+          right: "16px",
+          zIndex: 1000,
+          cursor: "pointer", 
+        }}
+        type="submit" 
+      >
+        <i className='bx bxs-save' style={{ fontSize: "1.8rem" }}></i>
+      </Fab>
+        </form>
       </div>
-    </div>
-  </div>
+      
 
-  <div className="form-group mb-4">
-    <label htmlFor="Empleado">Empleado</label>
-    <select
-      name="Empleado"
-      id="Empleado"
-      className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-      required
-    >
-      <option value="">Seleccione un Empleado</option>
-      {empleados.map((empleado) => (
-        <option
-          key={empleado.IdEmpleado}
-          value={empleado.IdEmpleado}
-        >
-          {empleado.Nombre} {empleado.Apellido}
-        </option>
-      ))}
-    </select>
-  </div>
-
-  <div className="form-group mb-4">
-    <label htmlFor="Cliente">Cliente</label>
-    <select
-      name="Cliente"
-      id="Cliente"
-      className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-      required
-    >
-      <option value="">Seleccione un Cliente</option>
-      {clientes.map((cliente) => (
-        <option
-          key={cliente.IdCliente}
-          value={cliente.IdCliente}
-        >
-          {cliente.Nombre} {cliente.Apellido}
-        </option>
-      ))}
-    </select>
-  </div>
-
-  <div className="form-group mb-4">
-    <label htmlFor="iva" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-      IVA
-    </label>
-    <input
-      type="number"
-      name="iva"
-      id="iva"
-      value={iva.toFixed(2)}
-      onChange={(e) => setIva(parseFloat(e.target.value))}
-      className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-      placeholder="IVA"
-    />
-  </div>
-
-  <div className="form-group grid grid-cols-2 gap-4 mb-4">
-    <div>
-      <label htmlFor="fecha">Fecha</label>
-      <input
-        type="date"
-        id="fecha"
-        name="fecha"
-        className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-        required
-      />
-    </div>
-    <div>
-      <label htmlFor="Descuento" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-        Descuento
-      </label>
-      <input
-        type="number"
-        id="Descuento"
-        className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-        placeholder="Descuento"
-        name="Descuento"
-        value={descuento}
-        onChange={(e) => setDescuento(parseFloat(e.target.value))}
-        required
-      />
-    </div>
-  </div>
-</div>
 
       <div
         style={{
@@ -493,7 +519,7 @@ const Registrar = () => {
       >
 
         <div style={{ textAlign: "left", marginBottom: "20px" }}>
-          <h3 style={{ textAlign: "left", fontSize: "23px", fontWeight: "bold" }}>Factura Electronica </h3>
+          <h3 style={{ textAlign: "left", fontSize: "23px", fontWeight: "bold" }}>Factura de venta </h3>
         </div>
 
         <div style={{ textAlign: "right", marginBottom: "20px" }}>
@@ -501,30 +527,29 @@ const Registrar = () => {
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "bold", marginBottom: "10px" }}>
-  <div>Nombre</div>
-  <div>Precio Unitario</div>
-  <div>Cantidad</div>
-  <div>Subtotal</div>
-  <div>Cantidad</div>
-</div>
+          <div>Nombre</div>
+          <div>Precio Unitario</div>
+          <div>Cantidad</div>
+          <div>Cantidad</div>
+        </div>
 
-{insumosSeleccionados.map((insumo) => (
-  <div key={insumo.IdInsumos} style={{ marginBottom: "10px" }}>
-    <div style={{ display: "flex", justifyContent: "space-between" }}>
-      <div>{insumo.NombreInsumos}</div>
-      <div>{insumo.PrecioUnitario}</div>
-      <div>{insumo.Cantidad}</div>
-      <div>{subtotal.toFixed(2)}</div>
-      <div>
-        <input
-          type="number"
-          value={cantidadInsumos[insumo.IdInsumos] || ""}
-          onChange={(e) => handleCantidadChange(e, insumo.IdInsumos)}
-        />
-      </div>
-    </div>
-  </div>
-))}
+
+        {insumosSeleccionados.map((insumo) => (
+          <div key={insumo.IdInsumos} style={{ marginBottom: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div>{insumo.NombreInsumos}</div>
+              <div>{insumo.PrecioUnitario}</div>
+              <div>{insumo.Cantidad}</div>
+              <div>
+                <input
+                  type="number"
+                  value={cantidadInsumos[insumo.IdInsumos] || ""}
+                  onChange={(e) => handleCantidadChange(e, insumo.IdInsumos)}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
 
 
         <div style={{ marginTop: "40px", borderTop: "1px solid #ccc", paddingTop: "20px" }}>
@@ -551,31 +576,22 @@ const Registrar = () => {
         </div>
 
       </div>
-      <ModalInsumos
-                    open={modalAbierto}
-                    handleClose={cerrarModal}
-                    title="Agregar adiciones"
-                    onSubmit={handleSubmit}
-                    seleccionado={modalData}
-                    insumos={insumos}
-                    insumosSeleccionados={insumosSeleccionados}
-                    setInsumosSeleccionados={setInsumosSeleccionados}
-                  />
 
-      <Fab
-        aria-label="add"
-        style={{
-          border: "0.5px solid grey",
-          backgroundColor: "#94CEF2",
-          position: "fixed",
-          bottom: "16px",
-          right: "16px",
-          zIndex: 1000,
-        }}
-      >
-       <i class='bx bxs-save' style={{ fontSize: "1.8rem" }}></i>
-      </Fab>
+      <ModalInsumos
+        open={modalAbierto}
+        handleClose={cerrarModal}
+        title="Agregar adiciones"
+        onSubmit={handleSubmit}
+        seleccionado={modalData}
+        insumos={insumos}
+        insumosSeleccionados={insumosSeleccionados}
+        setInsumosSeleccionados={setInsumosSeleccionados}
+      />
+
+    
+
     </section>
+
   );
 };
 export default Registrar;

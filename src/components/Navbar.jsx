@@ -144,7 +144,7 @@ export default function MiniDrawer() {
           <Notifications
             sx={{
               backgroundColor: "#FFE0E3",
-              padding: "20px", // Ajusta el valor de padding según tus preferencias
+              padding: "20px", 
               borderRadius: "10px",
               color: "black",
               fontSize: "40px",

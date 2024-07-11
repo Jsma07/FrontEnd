@@ -19,6 +19,8 @@
     "axios": "^1.6.8",
     "dayjs": "^1.11.11",
     "flowbite": "^2.3.0",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-rnd": "^10.4.11",
