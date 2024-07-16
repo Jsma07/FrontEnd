@@ -21,12 +21,13 @@ import Clientes from "./pages/Clientes/Clientes";
 import Empleados from "./pages/Empleados/Empleados";
 import Registrar from './pages/Ventas/Registrar'
 import InsumoDetalle from './pages/Ventas/Detalles'
-
+import { UserProvider } from './context/ContextoUsuario';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <React.StrictMode>
+<UserProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/iniciarSesion" element={<Login />} />
@@ -51,5 +52,6 @@ root.render(
         </Route>
       </Routes>
     </BrowserRouter>
+    </UserProvider>
   </React.StrictMode>,
 );

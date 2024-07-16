@@ -427,7 +427,7 @@ const Usuarios = () => {
   };
 
   const columns = [
-    { field: "tipoDocumento", headerName: "Documento", width: "w-36" },
+    { field: "tipoDocumento", headerName: "Tipo de documento", width: "w-36" },
 
     { field: "Documento", headerName: "Documento", width: "w-36" },
     { field: "nombre", headerName: "Nombre", width: "w-36" },

@@ -14,7 +14,7 @@ const TablePrueba = ({ title, columns, data, roles }) => {
     setSelectedRole(event.target.value);
   };
 
-  console.log("Props en TablePrueba:", columns, data, roles);
+  // console.log("Props en TablePrueba:", columns, data, roles);
 
   // Verificar si roles está definido
   if (!roles) {
