@@ -201,7 +201,6 @@ const handleToggleSwitch = async (id) => {
 
 return (
   <div>
-    
       <ModalAgregarCategoria
         open={openModalAgregar}
         handleClose={handleCloseModalAgregar}
@@ -251,7 +250,8 @@ return (
           },
         ]}
         data={filtrar}
-        title={'Gestion de categorias'}
+        title="Gestion de Categorias"
+
       />
       <Fab
         aria-label="add"

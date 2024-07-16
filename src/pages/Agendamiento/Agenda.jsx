@@ -1,108 +1,167 @@
-import React, { useState } from "react";
-import TablePrueba from "../../components/consts/Tabla"; // Asegúrate de importar correctamente el archivo
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import TablePrueba from "../../components/consts/Tabla";
+import CustomSwitch from "../../components/consts/switch"; // Si lo necesitas
 
-const Agenda = () => {
-  const [rows, setRows] = useState([
-    {
-      
-      Servicio: "https://i.pinimg.com/736x/62/37/42/623742355124564336d097be9016b3b7.jpg",
-      Nombre: "Uñas Permanentes",
-      FechaHora: "2022-04-27 10:00 AM",
-      Empleado: "Jacke",
-      Cliente: "Estefania",
-      Estado: "Terminado",
-      isActive: false,
-    },
-    {
-     
-      Servicio: "https://i.pinimg.com/474x/24/8b/d9/248bd907c3bcd7ed17557c23d32298e0.jpg",
-      Nombre: "Uñas Esculpidas",
-      FechaHora: "2022-04-28 11:30 AM",
-      Empleado: "Monica",
-      Cliente: "Yurani",
-      Estado: "Cancelado",
-      isActive: false,
-    },
-    {
-      
-      Servicio: "https://i.pinimg.com/236x/34/3e/3d/343e3d8931ffe5269742f51cc915daa6.jpg",
-      Nombre: "Uñas 3D",
-      FechaHora: "2022-04-28 12:30 PM",
-      Empleado: "Monica",
-      Cliente: "Coraline",
-      Estado: "En Proceso",
-      isActive: false,
-    },
-    // Agrega más filas según sea necesario
-  ]);
+const Agendamientos = () => {
+  const [agendamientos, setAgendamientos] = useState([]);
+  const [clientes, setClientes] = useState([]);
+  const [servicios, setServicios] = useState([]);
+  const [empleados, setEmpleados] = useState([]);
+  const [buscar, setBuscar] = useState("");
 
-  const handleEditClick = (id) => {
-    console.log(`Editando rol con ID: ${id}`);
-    // Aquí puedes agregar la lógica para editar el rol directamente sin abrir un modal
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const [agendasRes, clientesRes, serviciosRes, empleadosRes] = await Promise.all([
+        axios.get("http://localhost:5000/api/agendas"),
+        axios.get("http://localhost:5000/jackenail/Listar_Clientes"),
+        axios.get("http://localhost:5000/api/servicios"),
+        axios.get("http://localhost:5000/jackenail/Listar_Empleados")
+      ]);
+
+      setAgendamientos(agendasRes.data);
+      setClientes(clientesRes.data);
+      setServicios(serviciosRes.data);
+      setEmpleados(empleadosRes.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
-  const columns = [
-    
-    {
-      field: "Servicio",
-      headerName: "Servicio",
-      width: "w-32",
-      renderCell: (params) => (
-        <img
-          src={params.row.Servicio}
-          alt="Servicio"
-          style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
-        />
-      )
-    },
-    { field: "Nombre", headerName: "Nombre", width: "w-32" },
-    { field: "FechaHora", headerName: "Fecha/Hora", width: "w-32" },
-    { field: "Empleado", headerName: "Empleado", width: "w-32" },
-    { field: "Cliente", headerName: "Cliente", width: "w-32" },
-    { field: "Estado", headerName: "Estado", width: "w-55",
-      renderCell: (params) => (
-        <div>
-          {params.row.Estado === "En Proceso" && (
-            <span className="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
-              En Proceso
-            </span>
-          )}
-          {params.row.Estado === "Cancelado" && (
-            <span className="bg-red-100 text-red-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
-              Cancelado
-            </span>
-          )}
-          {params.row.Estado === "Terminado" && (
-            <span className="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
-              Terminado
-            </span>
-          )}
-        </div>
-      )
-    },
-    {
-      field: "Acciones",
-      headerName: "Acciones",
-      width: "w-32",
-      renderCell: (params) => (
-        <div className="flex justify-center space-x-4">
-          <button onClick={() => handleEditClick(params.row.id)} className="text-yellow-500">
-            <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
-          </button>
-          <button onClick={() => handleEditClick(params.row.id)} className="text-red-500">
-            <i className="bx bx-trash" style={{ fontSize: "24px" }}></i>
-          </button>
-        </div>
-      ),
-    },
-  ];
+  const getNombreCliente = (id) => {
+    const cliente = clientes.find((cliente) => cliente.IdCliente === id);
+    return cliente ? cliente.NombreCliente : "Desconocido";
+  };
+
+  const getNombreServicio = (id) => {
+    const servicio = servicios.find((servicio) => servicio.IdServicio === id);
+    return servicio ? servicio.Nombre_Servicio : "Desconocido";
+  };
+
+  const getNombreEmpleado = (id) => {
+    const empleado = empleados.find((empleado) => empleado.IdEmpleado === id);
+    return empleado ? empleado.NombreEmpleado : "Desconocido";
+  };
+
+  const filtrar = agendamientos.filter((agendamiento) => {
+    const { IdCliente, IdServicio, IdEmpleado, EstadoAgenda } = agendamiento;
+    const FechaHora = agendamiento["Fecha/Hora"];
+    const terminoABuscar = buscar.toLowerCase();
+
+    const nombreCliente = getNombreCliente(IdCliente);
+    const nombreServicio = getNombreServicio(IdServicio);
+    const nombreEmpleado = getNombreEmpleado(IdEmpleado);
+    const fechaHora = FechaHora ? FechaHora.toLowerCase() : "";
+
+    return (
+      (nombreCliente && nombreCliente.toLowerCase().includes(terminoABuscar)) ||
+      (nombreServicio && nombreServicio.toLowerCase().includes(terminoABuscar)) ||
+      (fechaHora && fechaHora.includes(terminoABuscar)) ||
+      (nombreEmpleado && nombreEmpleado.toLowerCase().includes(terminoABuscar)) ||
+      EstadoAgenda.toString().includes(terminoABuscar)
+    );
+  });
+
+  const handleToggleSwitch = async (id) => {
+    const agendamiento = agendamientos.find((agendamiento) => agendamiento.IdAgendamiento === id);
+    if (!agendamiento) {
+      console.error("Agendamiento no encontrado");
+      return;
+    }
+
+    const newEstado = agendamiento.EstadoAgenda === 1 ? 0 : 1;
+
+    const result = await window.Swal.fire({
+      icon: "warning",
+      title: "¿Estás seguro?",
+      text: "¿Quieres cambiar el estado del agendamiento?",
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axios.put(`http://localhost:5000/api/agendas/editar/${id}`, {
+          EstadoAgenda: newEstado,
+        });
+        fetchData();
+        window.Swal.fire({
+          icon: "success",
+          title: "Estado actualizado",
+          text: "El estado del agendamiento ha sido actualizado correctamente.",
+        });
+      } catch (error) {
+        console.error("Error al cambiar el estado del agendamiento:", error);
+        window.Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Hubo un error al cambiar el estado del agendamiento. Por favor, inténtalo de nuevo más tarde.",
+        });
+      }
+    }
+  };
 
   return (
     <div>
-      <h1>Agenda</h1>
-      <TablePrueba columns={columns} data={rows} />
+      <input
+        type="text"
+        placeholder="Buscar..."
+        value={buscar}
+        onChange={(e) => setBuscar(e.target.value)}
+      />
+      <TablePrueba
+        columns={[
+          {
+            field: "IdCliente",
+            headerName: "CLIENTE",
+            width: "w-36",
+            renderCell: (params) => <div>{getNombreCliente(params.row.IdCliente)}</div>,
+          },
+          {
+            field: "IdServicio",
+            headerName: "SERVICIO",
+            width: "w-36",
+            renderCell: (params) => <div>{getNombreServicio(params.row.IdServicio)}</div>,
+          },
+          { field: "FechaHora", headerName: "FECHA/HORA", width: "w-36" },
+          {
+            field: "IdEmpleado",
+            headerName: "EMPLEADO",
+            width: "w-36",
+            renderCell: (params) => <div>{getNombreEmpleado(params.row.IdEmpleado)}</div>,
+          },
+          {
+            field: "EstadoAgenda",
+            headerName: "ESTADO",
+            width: "w-36",
+            renderCell: (params) => (
+              <div>{params.row.EstadoAgenda === 1 ? "En Proceso" : "Inactivo"}</div>
+            ),
+          },
+          {
+            field: "Acciones",
+            headerName: "ACCIONES",
+            width: "w-48",
+            renderCell: (params) => (
+              <div className="flex justify-center space-x-4">
+                <CustomSwitch
+                  active={params.row.EstadoAgenda === 1}
+                  onToggle={() => handleToggleSwitch(params.row.IdAgendamiento)}
+                />
+              </div>
+            ),
+          },
+        ]}
+        data={filtrar}
+        title={"Gestión de Agendamientos"}
+      />
     </div>
   );
 };
 
-export default Agenda;
+export default Agendamientos;
