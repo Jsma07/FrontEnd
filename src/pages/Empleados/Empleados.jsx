@@ -553,13 +553,11 @@ const Empleados = () => {
           seleccionado={modalData.seleccionado}
         />
       )}
-
       <Modal
         open={openPasswordModal}
         handleClose={handlePasswordModalClose}
         handleSubmit={handleSubmitPasswordChange}
       />
-
       <button
         className="fixed bottom-4 right-4 bg-blue-500 text-white rounded-full p-3 shadow-xl hover:shadow-2xl"
         style={{

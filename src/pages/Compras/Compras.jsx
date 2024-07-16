@@ -50,28 +50,6 @@ const detail = (id) => {
 
   return (
     <div>
-      <div className="container mx-auto p-4 relative">
-        <center><h1 className="text-3xl font-bold mb-4">Gestion De Compras</h1></center>
-        <div className="md:flex md:justify-between md:items-center mb-4">
-          <div className="relative md:w-64 md:mr-4 mb-4 md:mb-0">
-            <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Buscar proveedor</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <i className="bx bx-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
-              </div>
-              <input
-                type="search"
-                id="default-search"
-                className="block w-full p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Buscar proveedor..."
-                value={buscar}
-                onChange={(e) => setBuscar(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-        </div>
-      </div>
       <Table
         columns={[
           { field: 'fecha_compra', headerName: 'FECHA', width: 'w-36' },
@@ -99,6 +77,8 @@ const detail = (id) => {
           
         ]}
         data={filtrar}
+        title={'Gestion de compras'}
+
       />
       <Fab
         aria-label="add"
