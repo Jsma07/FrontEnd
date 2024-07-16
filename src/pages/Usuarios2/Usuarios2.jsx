@@ -5,7 +5,7 @@ import axios from "axios";
 import LoadingScreen from "../../components/consts/pantallaCarga";
 import Fab from "@mui/material/Fab";
 import Modal from "../../components/consts/modalContrasena";
-import CustomSwitch from "../../components/consts/switch"
+import CustomSwitch from "../../components/consts/switch";
 
 const Usuarios = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -64,7 +64,14 @@ const Usuarios = () => {
   }, []);
 
   const filtrar = users.filter((user) => {
-    const { nombre = "", apellido = "", Documento = "", correo = "", telefono = "", rolId } = user;
+    const {
+      nombre = "",
+      apellido = "",
+      Documento = "",
+      correo = "",
+      telefono = "",
+      rolId,
+    } = user;
 
     // Solo mostrar usuarios con el rol de idRol 1
     if (rolId === 1 || rolId === 4) {
@@ -113,9 +120,12 @@ const Usuarios = () => {
     }
 
     try {
-      await axios.put(`http://localhost:5000/api/actualizarContrasena/${seleccionado.id}`, {
-        newPassword: newPassword,
-      });
+      await axios.put(
+        `http://localhost:5000/api/actualizarContrasena/${seleccionado.id}`,
+        {
+          newPassword: newPassword,
+        }
+      );
 
       window.Swal.fire({
         icon: "success",
@@ -128,8 +138,7 @@ const Usuarios = () => {
       window.Swal.fire({
         icon: "error",
         title: "Error",
-        text:
-          "Hubo un error al cambiar la contraseña del usuario. Por favor, inténtalo de nuevo más tarde.",
+        text: "Hubo un error al cambiar la contraseña del usuario. Por favor, inténtalo de nuevo más tarde.",
       });
     }
   };
@@ -181,8 +190,7 @@ const Usuarios = () => {
       window.Swal.fire({
         icon: "error",
         title: "Error",
-        text:
-          "Hubo un error al cambiar el estado del usuario. Por favor, inténtalo de nuevo más tarde.",
+        text: "Hubo un error al cambiar el estado del usuario. Por favor, inténtalo de nuevo más tarde.",
       });
     }
   };
@@ -237,26 +245,24 @@ const Usuarios = () => {
 
     const emptyFields = mandatoryFields.filter((field) => {
       const value = formData[field];
-    
+
       if (field === "rolId") {
         return value === undefined || `${value}`.trim() === "";
       }
-    
+
       // Verificar si value es undefined o no es una cadena de texto
       if (typeof value !== "string" || value.trim() === "") {
         return true;
       }
-    
+
       return false;
     });
-    
 
     if (emptyFields.length > 0) {
       window.Swal.fire({
         icon: "error",
         title: "Campos obligatorios vacíos",
-        text:
-          "Por favor, completa todos los campos obligatorios antes de continuar.",
+        text: "Por favor, completa todos los campos obligatorios antes de continuar.",
       });
       return;
     }
@@ -278,8 +284,7 @@ const Usuarios = () => {
       window.Swal.fire({
         icon: "error",
         title: "Cáracteres incorrectos",
-        text:
-          "El campo nombre no puede contener caracteres especiales ni números",
+        text: "El campo nombre no puede contener caracteres especiales ni números",
       });
       return;
     }
@@ -288,8 +293,7 @@ const Usuarios = () => {
       window.Swal.fire({
         icon: "error",
         title: "Cáracteres incorrectos",
-        text:
-          "El campo apellido no puede contener caracteres especiales ni números",
+        text: "El campo apellido no puede contener caracteres especiales ni números",
       });
       return;
     }
@@ -332,13 +336,14 @@ const Usuarios = () => {
       return;
     }
 
-    const rolSeleccionado = rolesActivos.find((rol) => rol.idRol === formData.rolId);
+    const rolSeleccionado = rolesActivos.find(
+      (rol) => rol.idRol === formData.rolId
+    );
     if (!rolSeleccionado) {
       window.Swal.fire({
         icon: "error",
         title: "Rol inactivo",
-        text:
-          "El rol seleccionado está inactivo. Por favor selecciona un rol activo.",
+        text: "El rol seleccionado está inactivo. Por favor selecciona un rol activo.",
       });
       return;
     }
@@ -367,8 +372,7 @@ const Usuarios = () => {
         window.Swal.fire({
           icon: "error",
           title: "Documento existente",
-          text:
-            "El Documento ingresado ya está en uso. Por favor, utiliza otro Documento.",
+          text: "El Documento ingresado ya está en uso. Por favor, utiliza otro Documento.",
         });
         return;
       }
@@ -418,8 +422,7 @@ const Usuarios = () => {
       window.Swal.fire({
         icon: "error",
         title: "Error",
-        text:
-          "Hubo un error al crear/editar el usuario. Por favor, inténtalo de nuevo más tarde.",
+        text: "Hubo un error al crear/editar el usuario. Por favor, inténtalo de nuevo más tarde.",
       });
     } finally {
       setIsLoading(false);
@@ -449,26 +452,24 @@ const Usuarios = () => {
       width: "w-48",
       renderCell: (params) => (
         <div className="flex justify-center space-x-4">
-                    {params.row.estado === 1 && (
-
-          <button
-            onClick={() => handleEditClick(params.row.id)}
-            className="text-yellow-500"
-          >
-            <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
-          </button>
-                    )}
-                              {params.row.estado === 1 && (
-
-          <button
-            onClick={() => {
-              handlePasswordChangeClick(params.row.id); // Abrir el modal de contraseña al hacer clic
-            }}
-            className="text-black-500"
-          >
-            <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>
-          </button>
-                              )}
+          {params.row.estado === 1 && (
+            <button
+              onClick={() => handleEditClick(params.row.id)}
+              className="text-yellow-500"
+            >
+              <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
+            </button>
+          )}
+          {params.row.estado === 1 && (
+            <button
+              onClick={() => {
+                handlePasswordChangeClick(params.row.id); // Abrir el modal de contraseña al hacer clic
+              }}
+              className="text-black-500"
+            >
+              <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>
+            </button>
+          )}
           <CustomSwitch
             active={params.row.estado === 1}
             onToggle={() => handleToggleSwitch(params.row.id)}
@@ -485,14 +486,13 @@ const Usuarios = () => {
   return (
     <div className="container mx-auto p-4 relative">
       <div className="md:flex md:justify-between md:items-center mb-4">
-        
         <div>
           <Modal
             open={openPasswordModal}
             handleClose={handlePasswordModalClose}
             handleSubmit={handleSubmitPasswordChange}
           />
-            <ModalDinamico
+          <ModalDinamico
             seleccionado={seleccionado}
             open={openModal}
             handleClose={handleCloseModal}
@@ -506,8 +506,8 @@ const Usuarios = () => {
                   { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
                   { value: "C.E", label: "Cédula de extranjería (C.E)" },
                 ],
-                value: seleccionado ? seleccionado.tipoDocumento : "C.C", 
-                disabled: false, 
+                value: seleccionado ? seleccionado.tipoDocumento : "C.C",
+                disabled: false,
               },
               {
                 name: "Documento",
@@ -541,18 +541,23 @@ const Usuarios = () => {
                 maxLength: 15,
                 minlength: 7,
               },
-              
+
               {
                 name: "rolId",
                 label: "Rol",
                 type: "select",
                 options: roles
-                  .filter(role => role.idRol !== 1  && role.idRol !== 4 &&role.EstadoRol !== 0) // Filtrar para mostrar solo el rol con idRol 1
-                  .map(role => ({
+                  .filter(
+                    (role) =>
+                      role.idRol !== 1 &&
+                      role.idRol !== 4 &&
+                      role.EstadoRol !== 0
+                  ) // Filtrar para mostrar solo el rol con idRol 1
+                  .map((role) => ({
                     value: role.idRol,
                     label: role.nombre,
                   })),
-                  value: seleccionado ? seleccionado.rolId : "",
+                value: seleccionado ? seleccionado.rolId : "",
                 disabled: false, // Deshabilitar el select
               },
               {
@@ -564,10 +569,14 @@ const Usuarios = () => {
               },
             ]}
           />
-
         </div>
       </div>
-      <Table title="Gestion de empleados" columns={columns} data={filtrar} roles={roles} />
+      <Table
+        title="Gestion de empleados"
+        columns={columns}
+        data={filtrar}
+        roles={roles}
+      />
       <Fab
         aria-label="add"
         style={{
@@ -587,4 +596,3 @@ const Usuarios = () => {
 };
 
 export default Usuarios;
-

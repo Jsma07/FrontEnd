@@ -20,7 +20,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { useNavigate } from "react-router-dom";
 import SettingsMenu from "./consts/sesion";
 import Notifications from "@mui/icons-material/NotificationsNone";
-
+import { UserContext } from "../context/ContextoUsuario";
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -97,6 +97,7 @@ export default function MiniDrawer() {
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
   const [openCategory, setOpenCategory] = React.useState(null);
+  const { user, permissions } = React.useContext(UserContext); // Usa el contexto del usuario
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -109,6 +110,13 @@ export default function MiniDrawer() {
   const handleCategoryClick = (categoryId) => {
     setOpenCategory(openCategory === categoryId ? null : categoryId);
   };
+   const hasAnyPermission = (requiredPermissions) =>
+    requiredPermissions.some((perm) => permissions.includes(perm));
+
+  // Filtra los elementos del Navbar según los permisos del usuario
+  const filteredNavbarItems = NavbarItems.filter(
+    (item) => !item.requiredPermissions || hasAnyPermission(item.requiredPermissions)
+  );
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -138,13 +146,13 @@ export default function MiniDrawer() {
             style={{ width: "48px", height: "48px", marginRight: "16px" }}
           />
           <Typography variant="h6" noWrap component="div">
-            Jacke Nail
+            Jake Nails
           </Typography>
           <div style={{ marginLeft: "auto" }}></div>
           <Notifications
             sx={{
               backgroundColor: "#FFE0E3",
-              padding: "20px", // Ajusta el valor de padding según tus preferencias
+              padding: "20px", 
               borderRadius: "10px",
               color: "black",
               fontSize: "40px",
@@ -175,7 +183,7 @@ export default function MiniDrawer() {
         </DrawerHeader>
 
         <List>
-          {NavbarItems.map((item) => (
+          {filteredNavbarItems.map((item) => (
             <React.Fragment key={item.id}>
               <ListItem
                 button
@@ -204,7 +212,8 @@ export default function MiniDrawer() {
               </ListItem>
               {openCategory === item.id && item.subitems && (
                 <List sx={{ pl: 1, paddingRight: "10px" }}>
-                  {item.subitems.map((subitem) => (
+                  {item.subitems.filter(subitem => subitem.requiredPermissions.some(perm => permissions.includes(perm)))
+                    .map((subitem, index) => (
                     <ListItem
                       key={subitem.id}
                       button
