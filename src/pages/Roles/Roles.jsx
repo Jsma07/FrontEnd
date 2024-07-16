@@ -6,6 +6,8 @@ import Table from "../../components/consts/Tabla";
 import axios from "axios";
 import { Fab } from "@mui/material";
 import ModalPermisos from "./modalPermisos";
+import { toast, ToastContainer } from "react-toastify";
+
 
 const Roles = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -71,19 +73,17 @@ const Roles = () => {
 
         if (response.status === 200) {
           setRoles(updatedRoles);
-          window.Swal.fire({
-            icon: "success",
-            title: "Estado actualizado",
-            text: "El estado del rol ha sido actualizado correctamente.",
+          toast.success("El estado del rol ha sido actualizado.", {
+            position: "bottom-right",
+            autoClose: 3000, // Cierra automáticamente después de 3 segundos
           });
         }
       }
     } catch (error) {
       console.error("Error al cambiar el estado del rol:", error);
-      window.Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Hubo un error al cambiar el estado del rol. Por favor, inténtalo de nuevo más tarde.",
+      toast.error("Hubo un error al cambiar el estado del rol. Por favor, inténtalo de nuevo más tarde.", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
     }
   };
@@ -209,6 +209,7 @@ const Roles = () => {
         handleClose={handleClosePermisosModal}
         permisos={selectedPermisos}
       />
+      
     </div>
   );
 };
