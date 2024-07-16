@@ -264,8 +264,6 @@ const Insumos = () => {
 
   return (
     <div className="container mx-auto p-4 relative">
-    
-     
       <ModalAgregarInsumo
         open={openModalAgregar}
         handleClose={handleCloseModalAgregar}
@@ -410,6 +408,8 @@ const Insumos = () => {
           },
         ]}
         data={filtrar}
+        title="Gestion de Insumos"
+
       />
       <Fab
         aria-label="add"
