@@ -108,12 +108,7 @@ const Agendamientos = () => {
 
   return (
     <div>
-      <input
-        type="text"
-        placeholder="Buscar..."
-        value={buscar}
-        onChange={(e) => setBuscar(e.target.value)}
-      />
+      
       <TablePrueba
         columns={[
           {
