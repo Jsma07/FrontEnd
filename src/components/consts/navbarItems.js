@@ -13,67 +13,125 @@ import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory';
 
-export const NavbarItems =[
-    {
-        id: 0,
-        icon: <SettingsSuggestIcon/>,
-        label: 'Configuración',
-        subitems: [
-            { label: 'Roles', route: '/configuracion/roles', icon:<i class='bx bx-shield-quarter' style={{ fontSize: "24px" }}></i> },
-          
-          ],
-    },
-    {
-        id: 1,
-        icon: <PeopleIcon />,
-        label: 'Usuarios',
-        subitems: [
-          { label: 'Administradores', route: '/usuarios/administradores', icon: <i class='bx bxs-user-circle' style={{ fontSize: "24px" }}></i> },
-          { label: 'Empleados', route: '/Empleados', icon: <i class='bx bxs-user-badge' style={{ fontSize: "24px" }}></i> },
-          { label: 'Clientes', route: '/Clientes',icon: <PeopleIcon /> },
-          
-
-        ],
+export const NavbarItems = [
+  {
+    id: 0,
+    icon: <SettingsSuggestIcon />,
+    label: 'Configuración',
+    requiredPermissions: ['Configuracion'],
+    subitems: [
+      { 
+        label: 'Roles', 
+        route: '/configuracion/roles', 
+        icon: <i className='bx bx-shield-quarter' style={{ fontSize: "24px" }}></i>, 
+        requiredPermissions: ['Configuracion'],
       },
-    {
-        id: 2,
-        icon: <Shopping/>,
-        label: 'Ventas',
-        subitems: [
-            { label: 'Ventas', route: '/ventas', icon: <StoreIcon /> },
-            { label: 'Sallida insumos', route: '/Salida_Insumos', icon: <ExitToAppIcon /> },
-          
-          ],
-    },
-   
-    {
-        id: 3,
-        icon: <BusinessIcon/>,
-        label: 'Compras',
-        subitems: [
-            { label: 'Compras', route: '/compras', icon: <ShoppingBagIcon/> },
-            { label: 'Proveedores', route: '/compras/proveedores', icon: <Diversity2 /> },
-          ],
-    },
-
-    {
-        id: 4,
-        icon: <Calendar/>,
-        label: 'Agendamiento',
-        subitems: [
-            { label: 'Agenda', route: '/agendamiento', icon: <AccessTimeFilledIcon /> },
-            { label: 'Servicios', route: '/agendamiento/Servicios', icon: <BathtubIcon /> },
-          ],
-    },
-
-    {
-      id: 5,
-      icon: <InventoryIcon/>,
-      label: 'Insumos',
-      subitems: [
-          { label: 'Insumos', route: '/Insumos', icon: <CleanHandsIcon /> },
-          { label: 'Categorias', route: '/Insumos/Categorias', icon: <CategoryIcon /> },
-
-        ],
-     },
-]
+    ],
+  },
+  {
+    id: 1,
+    icon: <PeopleIcon />,
+    label: 'Usuarios',
+    requiredPermissions: ['Usuarios','Clientes','Empleados'],
+    subitems: [
+      { 
+        label: 'Administradores', 
+        route: '/usuarios/administradores', 
+        icon: <i className='bx bxs-user-circle' style={{ fontSize: "24px" }}></i>,
+        requiredPermissions: ['Usuarios'],
+      },
+      { 
+        label: 'Empleados', 
+        route: '/Empleados', 
+        icon: <i className='bx bxs-user-badge' style={{ fontSize: "24px" }}></i>,
+        requiredPermissions: ['Empleados'],
+      },
+      { 
+        label: 'Clientes', 
+        route: '/Clientes',
+        icon: <PeopleIcon />,
+        requiredPermissions: ['Clientes'],
+      },
+    ],
+  },
+  {
+    id: 2,
+    icon: <Shopping />,
+    label: 'Ventas',
+    requiredPermissions: ['Ventas'],
+    subitems: [
+      { 
+        label: 'Ventas', 
+        route: '/ventas', 
+        icon: <StoreIcon />,
+        requiredPermissions: ['Ventas'],
+      },
+      { 
+        label: 'Sallida insumos', 
+        route: '/Salida_Insumos', 
+        icon: <ExitToAppIcon />,
+        requiredPermissions: ['SalidaInsumos'],
+      },
+    ],
+  },
+  {
+    id: 3,
+    icon: <BusinessIcon />,
+    label: 'Compras',
+    requiredPermissions: ['Compras'],
+    subitems: [
+      { 
+        label: 'Compras', 
+        route: '/compras', 
+        icon: <ShoppingBagIcon />,
+        requiredPermissions: ['Compras'],
+      },
+      { 
+        label: 'Proveedores', 
+        route: '/compras/proveedores', 
+        icon: <Diversity2 />,
+        requiredPermissions: ['Proveedores'],
+      },
+    ],
+  },
+  {
+    id: 4,
+    icon: <Calendar />,
+    label: 'Agendamiento',
+    requiredPermissions: ['Agenda'],
+    subitems: [
+      { 
+        label: 'Agenda', 
+        route: '/agendamiento', 
+        icon: <AccessTimeFilledIcon />,
+        requiredPermissions: ['Agenda'],
+      },
+      { 
+        label: 'Servicios', 
+        route: '/agendamiento/Servicios', 
+        icon: <BathtubIcon />,
+        requiredPermissions: ['Servicios'],
+      },
+    ],
+  },
+  {
+    id: 5,
+    icon: <InventoryIcon />,
+    label: 'Insumos',
+    requiredPermissions: ['Insumos'],
+    subitems: [
+      { 
+        label: 'Insumos', 
+        route: '/Insumos', 
+        icon: <CleanHandsIcon />,
+        requiredPermissions: ['Insumos'],
+      },
+      { 
+        label: 'Categorias', 
+        route: '/Insumos/Categorias', 
+        icon: <CategoryIcon />,
+        requiredPermissions: ['Categorias'],
+      },
+    ],
+  },
+];

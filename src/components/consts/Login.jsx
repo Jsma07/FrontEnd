@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
-
+import { UserContext } from '../../context/ContextoUsuario';
 const Login = () => {
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [error, setError] = useState('');
+  const { login } = useContext(UserContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -17,8 +18,11 @@ const Login = () => {
       });
 
       const token = response.data.token;
-      localStorage.setItem('token', token);
-      console.log("token de usuario: ", token);
+      const userData = {
+        ...response.data.user, // Suponiendo que la respuesta incluye un objeto `user` con los datos del usuario
+        token
+      };
+      login(userData);
 
       // Configurar el token en los headers de Axios para futuras peticiones
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
