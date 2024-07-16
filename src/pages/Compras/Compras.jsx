@@ -77,8 +77,7 @@ const detail = (id) => {
           
         ]}
         data={filtrar}
-        title={'Gestion de compras'}
-
+        title="Gestion de Compras"
       />
       <Fab
         aria-label="add"
