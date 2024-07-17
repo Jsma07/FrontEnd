@@ -7,6 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import EditIcon from "@mui/icons-material/Edit";
 import Swal from "sweetalert2";
 
 const Ventas = () => {
@@ -48,6 +49,17 @@ const Ventas = () => {
                   >
                     <RemoveRedEyeIcon />
                   </Link>
+
+                  {venta.Estado === 2 && (
+                    <Fab
+                      size="small"
+                      aria-label="edit"
+                      className="flex items-center justify-center w-10 h-10 rounded-full bg-green-700 text-white"
+                    >
+                      <EditIcon />
+                    </Fab>
+                  )}
+
                   <Fab
                     size="small"
                     aria-label="delete"
@@ -60,7 +72,7 @@ const Ventas = () => {
               )}
             </div>
           ),
-          estiloFila: venta.Estado === "Anulado" ? "bg-gray-200" : "", // Aplicar estilo gris si el estado es "Anulado"
+          estiloFila: venta.Estado === "Anulado" ? "bg-gray-200" : "",
         }));
         setVentas(ventasConDetalles);
         toast.success("Ventas cargadas exitosamente");
@@ -140,7 +152,6 @@ const Ventas = () => {
         `http://localhost:5000/Jackenail/CambiarEstado/${ventaId}`,
         { Estado: nuevoEstado }
       );
-
       // Actualizar el estado local de la venta
       setVentas((prevVentas) =>
         prevVentas.map((venta) =>
@@ -160,7 +171,6 @@ const Ventas = () => {
       });
     }
   };
-
   const handleOpenAlert = (ventaId) => {
     setVentaIdToDelete(ventaId);
 
