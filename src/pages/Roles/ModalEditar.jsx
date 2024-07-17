@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import ModalDinamico from "../../components/consts/modalJ";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+
 
 const ModalEditar = ({ open, handleClose, roleId, setRoles }) => {
   const [rol, setRol] = useState("");
@@ -103,10 +105,9 @@ const ModalEditar = ({ open, handleClose, roleId, setRoles }) => {
     const rolExistente = rolesLocal.some((rol) => rol.nombre === formData.nombre && rol.idRol !== roleId);
 
     if (rolExistente) {
-      window.Swal.fire({
-        icon: "error",
-        title: "Rol existente",
-        text: "El Rol ingresado ya está creado. Por favor, utiliza otro nombre.",
+      toast.error("El Rol ingresado ya está creado. Por favor, utiliza otro nombre.", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
       return;
     }
@@ -121,10 +122,9 @@ const ModalEditar = ({ open, handleClose, roleId, setRoles }) => {
       );
 
       if (response.data && response.data.mensaje === "Rol actualizado correctamente") {
-        window.Swal.fire({
-          icon: "success",
-          title: "Éxito",
-          text: "El rol ha sido actualizado correctamente.",
+        toast.success("El rol se ha actualizado correctamente.", {
+          position: "bottom-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
         setRoles((prevRoles) =>
           prevRoles.map((rol) =>

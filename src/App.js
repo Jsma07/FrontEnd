@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import { Grid } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './components/consts/theme';
+import { toast, ToastContainer } from "react-toastify";
 
 import LoadingScreen from './components/consts/pantallaCarga'; // Importa tu componente de pantalla de carga
 
@@ -28,6 +29,17 @@ function App() {
         {!isLoading && (
           <>
             <Navbar />
+            <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
             <Grid
               container
               alignItems="center"
