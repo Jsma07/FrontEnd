@@ -19,7 +19,7 @@ const Login = () => {
 
       const token = response.data.token;
       const userData = {
-        ...response.data.user, // Suponiendo que la respuesta incluye un objeto `user` con los datos del usuario
+        ...response.data.user, 
         token
       };
       login(userData);
@@ -30,8 +30,13 @@ const Login = () => {
       // Redireccionar a la página principal después del inicio de sesión
       window.location.href = '/';
     } catch (error) {
+      if (error.response){
+        setError(error.response.data.mensaje);
+      }
+      else{
       console.error('Error en el inicio de sesión:', error.response?.data?.mensaje || 'Error en el servidor');
       setError(error.response?.data?.mensaje || 'Error en el servidor');
+      }
     }
   };
 

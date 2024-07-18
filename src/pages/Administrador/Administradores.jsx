@@ -438,6 +438,7 @@ const Usuarios = () => {
       headerName: "Acciones",
       width: "w-48",
       renderCell: (params) => (
+         
         <div className="flex justify-center space-x-4">
           {params.row.estado === 1 && (
           <button
@@ -447,7 +448,7 @@ const Usuarios = () => {
             <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
           </button>
           )}
-          {params.row.estado === 1 && (
+          {params.row.estado === 1  && (
           <button
             onClick={() => {
               handlePasswordChangeClick(params.row.id); // Abrir el modal de contraseña al hacer clic
