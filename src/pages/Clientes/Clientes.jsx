@@ -57,14 +57,14 @@ const Clientes = () => {
               <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
             </button>
           )}
-          {params.row.Estado === 1 && (
+          {/* {params.row.Estado === 1 && (
             <button
               // onClick={() => handlePasswordChangeClick(params.row.IdCliente)}
               className="text-black-500"
             >
               <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>
             </button>
-          )}
+          )} */}
           <CustomSwitch
             active={params.row.Estado === 1}
             onToggle={() => handleToggleSwitch(params.row.IdCliente)}

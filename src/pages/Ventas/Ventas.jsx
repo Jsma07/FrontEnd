@@ -216,6 +216,7 @@ const Ventas = () => {
   };
 
   const columns = [
+    
     { field: "idServicio", headerName: "Servicio" },
     { field: "IdCliente", headerName: "Cliente" },
     { field: "idEmpleado", headerName: "Empleado" },
