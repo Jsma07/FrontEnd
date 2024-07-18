@@ -15,7 +15,7 @@ function Register() {
         </div>
         <div className="flex justify-center self-center z-10">
           <div className="p-12 bg-white mx-auto rounded-3xl w-96">
-            <div className="mb-7">
+            <div className="mb-7 text-center">
               <h3 className="font-semibold text-2xl text-gray-800">Regístrate</h3>
             </div>
             
@@ -43,7 +43,7 @@ function Register() {
                   Registrarse
                 </button>
               </div>
-              <p className="text-gray-400">¿Ya tienes una cuenta? <a href="/iniciarSesion" className="text-sm text-purple-700 hover:text-purple-700">Inicia sesión</a></p>
+              <p className="text-gray-400 text-center">¿Ya tienes una cuenta? <a href="/iniciarSesion" className="text-sm text-purple-700 hover:text-purple-700">Inicia sesión</a></p>
             </div>
           </div>
         </div>
