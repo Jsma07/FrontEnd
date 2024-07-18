@@ -48,15 +48,121 @@ const Login = () => {
         </div>
         <div className="flex-col flex self-center lg:px-14 sm:max-w-4xl xl:max-w-md z-10">
           <div className="self-start hidden lg:flex flex-col text-gray-300">
-            <h1 className="my-7 font-semibold text-4xl">Jake Nails</h1>
-            <p className="pr-3 text-sm opacity-75">Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups</p>
+            {/* Burbuja 1 */}
+           <img
+  src="/burbuja.png"
+  alt="Burbuja"
+  className="h-20 animate-bounce"
+  style={{
+    position: 'absolute',
+    top: '10%',
+    left: '10%',
+    animationDelay: '0.5s' // comienza a animarse después de 0.5 segundos
+  }}
+/>
+{/* Burbuja 2 */}
+<img
+  src="/burbuja.png"
+  alt="Burbuja"
+  className="h-16 animate-bounce"
+  style={{
+    position: 'absolute',
+    top: '50%',
+    left: '5%',
+    animationDelay: '1s' // comienza a animarse después de 1 segundo
+  }}
+/>
+
+<img
+  src="/burbuja.png"
+  alt="Burbuja"
+  className="h-20 animate-bounce"
+  style={{
+    position: 'absolute',
+    top: '80%',
+    left: '20%',
+    animationDelay: '1s' // comienza a animarse después de 1 segundo
+  }}
+/>
+{/* Burbuja 3 */}
+<img
+  src="/burbuja.png"
+  alt="Burbuja"
+  className="h-12 animate-bounce"
+  style={{
+    position: 'absolute',
+    top: '30%',
+    left: '30%',
+    animationDelay: '1.5s' // comienza a animarse después de 1.5 segundos
+  }}
+/>
+{/* Burbuja 4 */}
+<img
+  src="/burbuja.png"
+  alt="Burbuja"
+  className="h-24 animate-bounce"
+  style={{
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    animationDelay: '2s' // comienza a animarse después de 2 segundos
+  }}
+/>
+{/* Burbuja 5 */}
+<img
+  src="/burbuja.png"
+  alt="Burbuja"
+  className="h-12 animate-bounce"
+  style={{
+    position: 'absolute',
+    top: '70%',
+    left: '70%',
+    animationDelay: '2.5s' // comienza a animarse después de 2.5 segundos
+  }}
+/>
+{/* Burbuja 6 */}
+<img
+  src="/burbuja.png"
+  alt="Burbuja"
+  className="h-20 animate-bounce"
+  style={{
+    position: 'absolute',
+    top: '20%',
+    left: '80%',
+    animationDelay: '3s' // comienza a animarse después de 3 segundos
+  }}
+/>
+<img
+  src="/burbuja.png"
+  alt="Burbuja"
+  className="h-20 animate-bounce"
+  style={{
+    position: 'absolute',
+    top: '90%',
+    left: '50%',
+    animationDelay: '3.5s' // comienza a animarse después de 3.5 segundos
+  }}
+/>
+<img
+  src="/burbuja.png"
+  alt="Burbuja"
+  className="h-16 animate-bounce"
+  style={{
+    position: 'absolute',
+    top: '90%',
+    left: '90%',
+    
+    animationDelay: '4s' // comienza a animarse después de 4 segundos
+  }}
+/>
+
           </div>
         </div>
         <div className="flex justify-center self-center z-10">
           <div className="p-12 bg-white mx-auto rounded-3xl w-96">
-            <div className="mb-7">
-              <h3 className="font-semibold text-2xl text-gray-800">Iniciar sesión</h3>
-            </div>
+          <div className="mb-7 text-center">
+  <h3 className="font-semibold text-2xl text-gray-800">Iniciar sesión</h3>
+</div>
             <form onSubmit={handleLogin}>
             <div className="space-y-6">
 
@@ -74,7 +180,10 @@ const Login = () => {
                 onChange={(e) => setContrasena(e.target.value)}
 
                 />
-                {error && <p className="text-red-500">{error}</p>}
+                          <div className="mb-7 text-center">
+                          {error && <p className="text-red-500">{error}</p>}
+
+</div>
 
               <div className="flex items-center justify-between">
 
@@ -85,7 +194,7 @@ const Login = () => {
                 </button>
               </div>
               
-              <p className="text-gray-400">¿No tienes una cuenta? <a href="/registrar" className="text-sm text-purple-700 hover:text-purple-700"> Registrate</a></p>
+              <p className="text-gray-400 text-center">¿No tienes una cuenta? <a href="/registrar" className="text-sm text-purple-700 hover:text-purple-700"> Registrate</a></p>
             </div>
             </form>
           </div>
