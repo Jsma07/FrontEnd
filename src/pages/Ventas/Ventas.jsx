@@ -5,6 +5,9 @@ import Tabla from "../../components/consts/Tabla";
 import Fab from "@mui/material/Fab";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import EditIcon from "@mui/icons-material/Edit";
 import Swal from "sweetalert2";
 
 const Ventas = () => {
@@ -21,7 +24,7 @@ const Ventas = () => {
           id: venta.idVentas,
           idServicio: (
             <img
-            src={`http://localhost:5000${venta.servicio.ImgServicio}`}  
+              src={`http://localhost:5000${venta.servicio.ImgServicio}`}
               alt={venta.servicio.Nombre_Servicio}
               className="w-16 h-16 md:w-24 md:h-24 object-cover rounded-full"
             />
@@ -31,7 +34,11 @@ const Ventas = () => {
           Fecha: venta.Fecha,
           Total: venta.Total,
           Subtotal: venta.Subtotal,
-          Estado: convertirEstado(venta.Estado),
+          Estado: (
+            <div className="flex space-x-2">
+              {renderEstadoButton(venta.Estado, venta.idVentas)}
+            </div>
+          ),
           Acciones: (
             <div className="flex space-x-2">
               {venta.Estado !== 3 && (
@@ -42,6 +49,17 @@ const Ventas = () => {
                   >
                     <RemoveRedEyeIcon />
                   </Link>
+
+                  {venta.Estado === 2 && (
+                    <Fab
+                      size="small"
+                      aria-label="edit"
+                      className="flex items-center justify-center w-10 h-10 rounded-full bg-green-700 text-white"
+                    >
+                      <EditIcon />
+                    </Fab>
+                  )}
+
                   <Fab
                     size="small"
                     aria-label="delete"
@@ -54,44 +72,122 @@ const Ventas = () => {
               )}
             </div>
           ),
-          estiloFila: venta.Estado === 3 ? "bg-gray-200" : "", // Aplicar estilo gris si el estado es "Anulado"
+          estiloFila: venta.Estado === "Anulado" ? "bg-gray-200" : "",
         }));
         setVentas(ventasConDetalles);
+        toast.success("Ventas cargadas exitosamente");
       } catch (error) {
         console.error("Error al obtener los datos de ventas:", error);
+        toast.error("Error al cargar las ventas");
       }
     };
 
     fetchVentas();
   }, []);
 
-  const convertirEstado = (estado) => {
+  const renderEstadoButton = (estado, ventaId) => {
+    let buttonClass, estadoTexto;
+
     switch (estado) {
-      case 1:
-        return "Vendido";
-      case 2:
-        return "En proceso";
-      case 3:
-        return "Anulado";
+      case 1: // Vendido
+        buttonClass = "bg-green-500";
+        estadoTexto = "Vendido";
+        break;
+      case 2: // En Preparación
+        buttonClass = "bg-purple-500";
+        estadoTexto = "En Preparación";
+        break;
+      case 3: // Anulado
+        buttonClass = "bg-red-500";
+        estadoTexto = "Anulado";
+        break;
       default:
-        return "Desconocido";
+        buttonClass = "bg-gray-500";
+        estadoTexto = "Desconocido";
+    }
+
+    return (
+      <button
+        className={`px-3 py-1.5 text-white text-sm font-medium rounded-lg shadow-md focus:outline-none ${buttonClass}`}
+        onClick={() => handleEstadoClick(ventaId, estado)}
+      >
+        {estadoTexto}
+      </button>
+    );
+  };
+
+  const handleEstadoClick = async (ventaId, estadoActual) => {
+    // Validaciones de cambio de estado
+    if (estadoActual === 2) {
+      // Desde En Preparación se puede cambiar a Vendido
+      const confirmacion = await Swal.fire({
+        title: "¿Estás seguro de cambiar el estado a Vendido?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí, cambiar estado",
+        cancelButtonText: "Cancelar",
+      });
+
+      if (confirmacion.isConfirmed) {
+        cambiarEstadoVenta(ventaId, 1); // Cambiar a Vendido
+      }
+    } else if (estadoActual === 1) {
+      // Desde Vendido no se puede cambiar a En Proceso
+      toast.warn("la Venta  finalizada, no se permite cambiar el estado", {
+        position: "top-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
+      });
+    } else {
+      // Otros casos (Anulado o Desconocido)
+      toast.info("Venta anulada, no se permite cambiar su estado", {
+        position: "top-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
+      });
     }
   };
 
+  const cambiarEstadoVenta = async (ventaId, nuevoEstado) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/Jackenail/CambiarEstado/${ventaId}`,
+        { Estado: nuevoEstado }
+      );
+      // Actualizar el estado local de la venta
+      setVentas((prevVentas) =>
+        prevVentas.map((venta) =>
+          venta.id === ventaId ? { ...venta, Estado: nuevoEstado } : venta
+        )
+      );
+      console.log("Estado cambiado con éxito:", response.data);
+      toast.success("Estado cambiado con éxito", {
+        position: "top-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
+      });
+    } catch (error) {
+      console.error("Error al cambiar el estado:", error);
+      toast.error("Hubo un problema al cambiar el estado", {
+        position: "top-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
+      });
+    }
+  };
   const handleOpenAlert = (ventaId) => {
     setVentaIdToDelete(ventaId);
+
+    // Mostrar SweetAlert 2 para confirmar la anulación
     Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¡No podrás revertir esto!",
+      title: "¿Estás seguro de anular esta venta?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Sí, anular venta!",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Anular Venta",
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
         handleAnularVenta(ventaId);
+      } else {
+        setVentaIdToDelete(null);
       }
     });
   };
@@ -102,20 +198,20 @@ const Ventas = () => {
         `http://localhost:5000/Jackenail/CambiarEstado/${ventaId}`,
         { Estado: 3 }
       );
-      console.log("Venta anulada con éxito:", response.data);
-      Swal.fire("Anulada!", "La venta ha sido anulada.", "success");
 
       // Actualizar el estado local de la venta
       setVentas((prevVentas) =>
         prevVentas.map((venta) =>
           venta.id === ventaId
-            ? { ...venta, Estado: convertirEstado(3), Acciones: null } // Remover Acciones si el estado es Anulado
+            ? { ...venta, Estado: renderEstadoButton(3), Acciones: null } // Remover Acciones si el estado es Anulado
             : venta
         )
       );
+      console.log("Venta anulada con éxito:", response.data);
+      toast.success("Venta anulada con éxito");
     } catch (error) {
       console.error("Error al anular la venta:", error);
-      Swal.fire("Error!", "Hubo un problema al anular la venta.", "error");
+      toast.error("Hubo un problema al anular la venta");
     }
   };
 
@@ -154,6 +250,18 @@ const Ventas = () => {
           <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
         </Fab>
       </Link>
+
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };
