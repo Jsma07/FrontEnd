@@ -6,7 +6,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from './components/consts/theme';
 import { toast, ToastContainer } from "react-toastify";
 
-import LoadingScreen from './components/consts/pantallaCarga'; // Importa tu componente de pantalla de carga
+import LoadingScreen from './components/consts/pantallaCarga'; 
 
 function App() {
   const [isLoading, setIsLoading] = React.useState(true);
