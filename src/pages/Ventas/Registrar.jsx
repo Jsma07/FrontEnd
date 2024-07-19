@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ModalInsumos from "../../components/consts/Modalventas";
 import Swal from "sweetalert2";
-import ServicioSeleccionado from '../../components/consts/SeleccionServicios'
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import ServicioSeleccionado from "../../components/consts/SeleccionServicios";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Fab from "@mui/material/Fab";
-import { Select, MenuItem } from '@mui/material';
-
+import { Select, MenuItem } from "@mui/material";
 
 const Registrar = () => {
   const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
@@ -312,20 +311,20 @@ const Registrar = () => {
     }
   };
 
-  const [fechaFactura, setFechaFactura] = useState('');
+  const [fechaFactura, setFechaFactura] = useState("");
 
   useEffect(() => {
     const obtenerFechaActual = () => {
       const fecha = new Date();
       const options = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric'
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
       };
-      const fechaFormateada = fecha.toLocaleDateString('es-ES', options);
+      const fechaFormateada = fecha.toLocaleDateString("es-ES", options);
       setFechaFactura(fechaFormateada);
     };
 
@@ -364,17 +363,15 @@ const Registrar = () => {
           method="POST"
           onSubmit={handleSubmit}
         >
-
           <div className="form-group mb-4">
-            <label htmlFor="Servicios" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="Servicios"
+              className="block text-sm font-medium text-gray-700"
+            >
               Servicios
             </label>
             <div className="relative">
-              <input
-                type="hidden"
-                name="idventa"
-                id="idventa"
-              />
+              <input type="hidden" name="idventa" id="idventa" />
               <select
                 name="Servicios"
                 id="Servicios"
@@ -383,17 +380,24 @@ const Registrar = () => {
               >
                 <option value="">Seleccione un servicio</option>
                 {servicios.map((servicio) => (
-                  <option
-                    key={servicio.IdServicio}
-                    value={servicio.IdServicio}
-                  >
+                  <option key={servicio.IdServicio} value={servicio.IdServicio}>
                     {servicio.Nombre_Servicio}
                   </option>
                 ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                <svg
+                  className="h-4 w-4 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </div>
             </div>
@@ -409,10 +413,7 @@ const Registrar = () => {
             >
               <option value="">Seleccione un Empleado</option>
               {empleados.map((empleado) => (
-                <option
-                  key={empleado.IdEmpleado}
-                  value={empleado.IdEmpleado}
-                >
+                <option key={empleado.IdEmpleado} value={empleado.IdEmpleado}>
                   {empleado.Nombre} {empleado.Apellido}
                 </option>
               ))}
@@ -429,10 +430,7 @@ const Registrar = () => {
             >
               <option value="">Seleccione un Cliente</option>
               {clientes.map((cliente) => (
-                <option
-                  key={cliente.IdCliente}
-                  value={cliente.IdCliente}
-                >
+                <option key={cliente.IdCliente} value={cliente.IdCliente}>
                   {cliente.Nombre} {cliente.Apellido}
                 </option>
               ))}
@@ -440,7 +438,10 @@ const Registrar = () => {
           </div>
 
           <div className="form-group mb-4">
-            <label htmlFor="iva" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            <label
+              htmlFor="iva"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
               IVA
             </label>
             <input
@@ -466,7 +467,10 @@ const Registrar = () => {
               />
             </div>
             <div>
-              <label htmlFor="Descuento" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              <label
+                htmlFor="Descuento"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
                 Descuento
               </label>
               <input
@@ -482,26 +486,23 @@ const Registrar = () => {
             </div>
           </div>
 
-
           <Fab
-        aria-label="add"
-        style={{
-          border: "0.5px solid grey",
-          backgroundColor: "#94CEF2",
-          position: "fixed",
-          bottom: "16px",
-          right: "16px",
-          zIndex: 1000,
-          cursor: "pointer", 
-        }}
-        type="submit" 
-      >
-        <i className='bx bxs-save' style={{ fontSize: "1.8rem" }}></i>
-      </Fab>
+            aria-label="add"
+            style={{
+              border: "0.5px solid grey",
+              backgroundColor: "#94CEF2",
+              position: "fixed",
+              bottom: "16px",
+              right: "16px",
+              zIndex: 1000,
+              cursor: "pointer",
+            }}
+            type="submit"
+          >
+            <i className="bx bxs-save" style={{ fontSize: "1.8rem" }}></i>
+          </Fab>
         </form>
       </div>
-      
-
 
       <div
         style={{
@@ -511,28 +512,37 @@ const Registrar = () => {
           marginTop: "20px",
           boxShadow: "0 4px 12px rgba(128, 0, 128, 0.3)",
           position: "fixed",
-          right: "20px",  // Alineado a la derecha
+          right: "20px", // Alineado a la derecha
           top: "80px",
           width: "calc(65% - 100px)",
-          padding: "20px",  // Agregado espacio interior para separar los elementos
+          padding: "20px", // Agregado espacio interior para separar los elementos
         }}
       >
-
         <div style={{ textAlign: "left", marginBottom: "20px" }}>
-          <h3 style={{ textAlign: "left", fontSize: "23px", fontWeight: "bold" }}>Factura de venta </h3>
+          <h3
+            style={{ textAlign: "left", fontSize: "23px", fontWeight: "bold" }}
+          >
+            Factura de venta{" "}
+          </h3>
         </div>
 
         <div style={{ textAlign: "right", marginBottom: "20px" }}>
           <p>Fecha: {fechaFactura}</p>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "bold", marginBottom: "10px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            fontWeight: "bold",
+            marginBottom: "10px",
+          }}
+        >
           <div>Nombre</div>
           <div>Precio Unitario</div>
           <div>Cantidad</div>
-          <div>Cantidad</div>
+          
         </div>
-
 
         {insumosSeleccionados.map((insumo) => (
           <div key={insumo.IdInsumos} style={{ marginBottom: "10px" }}>
@@ -551,30 +561,55 @@ const Registrar = () => {
           </div>
         ))}
 
-
-        <div style={{ marginTop: "40px", borderTop: "1px solid #ccc", paddingTop: "20px" }}>
-          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "10px" }}>
-            <div style={{ fontWeight: "bold", marginRight: "20px" }}>TOTAL:</div>
+        <div
+          style={{
+            marginTop: "40px",
+            borderTop: "1px solid #ccc",
+            paddingTop: "20px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginBottom: "10px",
+            }}
+          >
+            <div style={{ fontWeight: "bold", marginRight: "20px" }}>
+              TOTAL:
+            </div>
             <div>{totalGeneral.toFixed(2)}</div>
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <div style={{ fontWeight: "bold", marginRight: "20px" }}>Descuento aplicado:</div>
+            <div style={{ fontWeight: "bold", marginRight: "20px" }}>
+              Descuento aplicado:
+            </div>
             <div>{descuento.toFixed(2)}</div>
           </div>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "flex-start", marginTop: "20px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            marginTop: "20px",
+          }}
+        >
           <div className="form-group col-lg-3 col-md-3 col-sm-6 col-xs-12 mt-2 mb-3 mx-2">
             <button
               type="button"
               className="bg-pink-200 hover:bg-black-300 focus:ring-4 focus:outline-none focus:ring-black-300 dark:focus:ring-black-800 shadow-lg shadow-black-500/50 dark:shadow-lg dark:shadow-black-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
               onClick={abrirModal}
-              style={{ alignSelf: "flex-end", display: "flex", alignItems: "center" }}
+              style={{
+                alignSelf: "flex-end",
+                display: "flex",
+                alignItems: "center",
+              }}
             >
-              <ShoppingCartIcon />    </button>
+              <ShoppingCartIcon />{" "}
+            </button>
           </div>
         </div>
-
       </div>
 
       <ModalInsumos
@@ -587,11 +622,7 @@ const Registrar = () => {
         insumosSeleccionados={insumosSeleccionados}
         setInsumosSeleccionados={setInsumosSeleccionados}
       />
-
-    
-
     </section>
-
   );
 };
 export default Registrar;

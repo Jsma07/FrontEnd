@@ -6,6 +6,8 @@ import axios from "axios";
 import LoadingScreen from "../../components/consts/pantallaCarga";
 import Fab from "@mui/material/Fab";
 import Modal from "../../components/consts/modalContrasena";  // se importa el componente del modal para la contraseña
+import { toast} from "react-toastify";
+
 
 const Usuarios = () => {
   const [openModal, setOpenModal] = useState(false); // Estado para controlar el modal para crear y editar un usuario administrador
@@ -67,37 +69,6 @@ const Usuarios = () => {
     fetchUsers();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchRoles = async () => {
-  //     try {
-  //       const response = await axios.get("http://localhost:5000/api/roles");
-  //       console.log("Roles response:", response.data);
-  //       setRoles(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching roles:", error);
-  //       setRoles([]);
-  //     }
-  //   };
-  
-  //   const fetchUsers = async () => {
-  //     try {
-  //       const token = localStorage.getItem('token');
-  //       if (token) {
-  //         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  //       }
-  //       const response = await axios.get("http://localhost:5000/api/users");
-  //       setUsers(response.data.usuarios);
-  //       setIsLoading(false);
-  //     } catch (error) {
-  //       console.error("Error fetching users:", error);
-  //       setIsLoading(false);
-  //     }
-  //   };
-  
-  //   fetchRoles();
-  //   fetchUsers();
-  // }, []);
-  
   const filtrar = users.filter((user) => {
     const {
       nombre = "",
@@ -157,18 +128,16 @@ const Usuarios = () => {
           estado: updatedUser.estado,
         });
         setUsers(updatedUsers);
-        window.Swal.fire({
-          icon: "success",
-          title: "Estado actualizado",
-          text: "El estado del usuario ha sido actualizado correctamente.",
+        toast.success("El estado del usuario fue cambiado exitosamente.", {
+          position: "top-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
       }
     } catch (error) {
       console.error("Error al cambiar el estado del usuario:", error);
-      window.Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Hubo un error al cambiar el estado del usuario. Por favor, inténtalo de nuevo más tarde.",
+      toast.error("Hubo un error al cambiar el estado del usuario. Por favor, inténtalo de nuevo más tarde.", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
     }
   };
@@ -221,19 +190,17 @@ const Usuarios = () => {
   //metodo para enviar la nueva contraseña a la api
   const handleSubmitPasswordChange = async (newPassword, confirmPassword) => {
     if (newPassword !== confirmPassword) {
-      window.Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Las contraseñas no coinciden.",
+      toast.error("Las contraseñas no coinciden.", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
       return;
     }
 
     if (newPassword.length < 8) {
-      window.Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "La contraseña debe tener al menos 8 caracteres.",
+      toast.error("La contraseña debe tener al menos 8 caracteres", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
       return;
     }
@@ -246,19 +213,16 @@ const Usuarios = () => {
           newPassword: newPassword,
         }
       );
-
-      window.Swal.fire({
-        icon: "success",
-        title: "Contraseña actualizada",
-        text: "La contraseña del usuario ha sido actualizada correctamente.",
+      toast.error("La contraseña del usuario ha sido actualizada correctamente.", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
       handlePasswordModalClose(); // Cerrar el modal después de actualizar la contraseña
     } catch (error) {
       console.error("Error al cambiar la contraseña del usuario:", error);
-      window.Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Hubo un error al cambiar la contraseña del usuario. Por favor, inténtalo de nuevo más tarde.",
+      toast.error("Hubo un error al cambiar la contraseña del usuario. Por favor, inténtalo de nuevo más tarde.", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
     }
   };
@@ -355,10 +319,9 @@ const Usuarios = () => {
       (rol) => rol.idRol === formData.rolId
     );
     if (!rolSeleccionado) {
-      window.Swal.fire({
-        icon: "error",
-        title: "Rol inactivo",
-        text: "El rol seleccionado está inactivo. Por favor selecciona un rol activo.",
+      toast.error("El rol seleccionado está inactivo. Por favor selecciona un rol activo.", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
       return;
     }
@@ -384,10 +347,9 @@ const Usuarios = () => {
       );
 
       if (DocumentoExiste) {
-        window.Swal.fire({
-          icon: "error",
-          title: "Documento existente",
-          text: "El Documento ingresado ya está en uso. Por favor, utiliza otro Documento.",
+        toast.error("El Documento ingresado ya está en uso. Por favor, utiliza otro Documento.", {
+          position: "bottom-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
         return;
       }
@@ -407,12 +369,12 @@ const Usuarios = () => {
           user.id === seleccionado.id ? { ...user, ...formData } : user
         );
         setUsers(updatedUsers);
-        window.Swal.fire({
-          icon: "success",
-          title: "Usuario editado",
-          text: "El usuario ha sido editado correctamente.",
+        toast.error("El usuario ha sido editado correctamente.", {
+          position: "bottom-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
       } else {
+        formData.estado = 1;
         response = await axios.post(
           "http://localhost:5000/api/crearUsuario",
           formData,
@@ -422,10 +384,9 @@ const Usuarios = () => {
             },
           }
         );
-        window.Swal.fire({
-          icon: "success",
-          title: "Usuario creado",
-          text: "El usuario ha sido creado correctamente.",
+        toast.error("El usuario ha sido creado correctamente.", {
+          position: "bottom-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
         setUsers([...users, formData]);
       }
@@ -434,10 +395,9 @@ const Usuarios = () => {
       handleCloseModal();
     } catch (error) {
       console.error("Error al crear/editar usuario:", error);
-      window.Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Hubo un error al crear/editar el usuario. Por favor, inténtalo de nuevo más tarde.",
+      toast.error("Hubo un error al crear/editar el usuario. Por favor, inténtalo de nuevo más tarde.", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
     } finally {
       setIsLoading(false);
@@ -468,6 +428,7 @@ const Usuarios = () => {
       headerName: "Acciones",
       width: "w-48",
       renderCell: (params) => (
+         
         <div className="flex justify-center space-x-4">
           {params.row.estado === 1 && (
           <button
@@ -477,7 +438,7 @@ const Usuarios = () => {
             <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
           </button>
           )}
-          {params.row.estado === 1 && (
+          {params.row.estado === 1  && (
           <button
             onClick={() => {
               handlePasswordChangeClick(params.row.id); // Abrir el modal de contraseña al hacer clic
