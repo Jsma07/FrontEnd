@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import jsPDF from "jspdf";
 import { useParams } from "react-router-dom";
-import "jspdf-autotable"; 
+import "jspdf-autotable";
 const InsumoDetalle = () => {
   const { id } = useParams();
   const [venta, setVenta] = useState(null);
@@ -94,7 +94,6 @@ const InsumoDetalle = () => {
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
-
   return (
     <div className="container mx-auto p-4 pt-6 md:p-6">
       {venta && (
@@ -158,7 +157,7 @@ const InsumoDetalle = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {venta.insumos.map((insumo, index) => (
+            {venta.adiciones.map((Adiciones, index) => (
               <div
                 key={index}
                 className="max-w-xs bg-white border-2 border-gray-300 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700"
@@ -166,16 +165,16 @@ const InsumoDetalle = () => {
                 <div className="overflow-hidden rounded-full mx-auto mt-4 w-24 h-24">
                   <img
                     className="object-cover w-full h-full"
-                    src={`http://localhost:5000${insumo.imagen}`}
-                    alt={insumo.NombreInsumos}
+                    src={`http://localhost:5000${Adiciones.Img}`}
+                    alt={Adiciones.NombreAdiciones}
                   />
                 </div>
                 <div className="p-4 text-center">
                   <h5 className="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-                    {insumo.NombreInsumos}
+                    {Adiciones.NombreAdiciones}
                   </h5>
                   <p className="text-gray-700 dark:text-gray-400">
-                    Precio unitario: ${insumo.PrecioUnitario.toFixed(2)}
+                    Precio unitario: ${Adiciones.Precio.toFixed(2)}
                   </p>
                 </div>
               </div>

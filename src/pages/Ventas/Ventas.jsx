@@ -23,7 +23,7 @@ const Ventas = () => {
           id: venta.idVentas,
           idServicio: (
             <img
-              src={`http://localhost:5000${venta.servicio.ImgServicio}`}
+              src={`http://localhost:5000${venta.servicio.ImgServicio}}`}
               alt={venta.servicio.Nombre_Servicio}
               className="w-16 h-16 md:w-24 md:h-24 object-cover rounded-full"
             />

@@ -59,7 +59,7 @@ const Clientes = () => {
           )}
           {params.row.Estado === 1 && (
             <button
-              onClick={() => handlePasswordChangeClick(params.row.IdCliente)}
+              //onClick={() => handlePasswordChangeClick(params.row.IdCliente)}
               className="text-black-500"
             >
               <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>
