@@ -21,6 +21,7 @@ import Clientes from "./pages/Clientes/Clientes";
 import Empleados from "./pages/Empleados/Empleados";
 import Registrar from './pages/Ventas/Registrar'
 import InsumoDetalle from './pages/Ventas/Detalles'
+import DetalleCompra from './pages/Compras/DetalleCompra';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -39,6 +40,7 @@ root.render(
           <Route path="/compras" element={<Compras />} />
           <Route path="/compras/Proveedores" element={<Proveedores />} />
           <Route path="/compras/crearCompra" element={<CrearCompra />} />
+          <Route path="/compras/DetalleCompra/:id" element={<DetalleCompra />} />
           <Route path="/Insumos/Categorias" element={<Categorias />} />
           <Route path="/agendamiento" element={<Agenda />} />
           <Route path="/Salida_Insumos" element={<Salida />} />

@@ -46,7 +46,7 @@ const Ventas = () => {
                     size="small"
                     aria-label="delete"
                     onClick={() => handleOpenAlert(venta.idVentas)}
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-red-500 text-white"
+                    className="flex items-center justif y-center w-10 h-10 rounded-full bg-red-500 text-white"
                   >
                     <DeleteIcon />
                   </Fab>
