@@ -105,7 +105,7 @@ const DetalleCompra = () => {
           }}
         >
           <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Resumen de la compra</h2>
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">Resumen de la Compra</h2>
             <div className="flow-root">
               <ul className="divide-y divide-gray-200">
                 {detalleCompra.map((compra, index) => (
