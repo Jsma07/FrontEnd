@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom"; 
 import * as Swal from 'sweetalert2';
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
 const CrearCompra = () => {
   const [selectedRows, setSelectedRows] = useState([]);
@@ -68,20 +69,20 @@ const [totalValorInsumos, settotalValorInsumos] = useState('');
     const cantidad = parseInt(cantidad_insumo);
     const precio = parseFloat(precio_unitario);
     const total = parseFloat(totalValorInsumos);
-    const idProveedor = parseInt(IdProveedor);
+    // const idProveedor = parseInt(IdProveedor);
     const idCategoria = parseInt(IdCategoria);
 
-    const proveedorSeleccionado = proveedores.find(prov => prov.IdProveedor === idProveedor);
+    // const proveedorSeleccionado = proveedores.find(prov => prov.IdProveedor === idProveedor);
     const categoriaSeleccionada = categorias.find(cat => cat.IdCategoria === idCategoria);
 
-    if (!idProveedor || !idCategoria || !precio || !cantidad || !total) {
+    if (!idCategoria || !precio || !cantidad || !total) {
         alert('Por favor complete todos los campos obligatorios.');
         return;
     }
 
     const nuevoDetalleCompra = {
         Dimagen_insumo,
-        IdProveedor: idProveedor, 
+        // IdProveedor: idProveedor, 
         IdCategoria: idCategoria, 
         Dnombre_insumo,
         cantidad_insumo: cantidad,
@@ -91,7 +92,7 @@ const [totalValorInsumos, settotalValorInsumos] = useState('');
 
     setDetallesCompra([...detallesCompra, nuevoDetalleCompra]);
 
-    setProveedorInsumo('');
+    // setProveedorInsumo('');
     setImagenInsumo('');
     setCategoriaInsumo('');
     setNombreInsumo('');
@@ -136,48 +137,114 @@ const [totalValorInsumos, settotalValorInsumos] = useState('');
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      <center>
-        <h2 style={{ marginTop: '30px', fontSize: '24px', fontWeight: 'bold' }}>Registrar Compra</h2>
-      </center>
-      <br />
-      <div className="col-md-12">
-        <div className="border border-gray-300 p-4 relative mx-auto" style={{ maxWidth: '1100px' }}>
-          <label className="absolute top-0 bg-white px-2" style={{ top: '-15px' }}>Información de la compra</label>
-          <div className="grid grid-cols-5 gap-4">
-            <div className="mb-4">
-              <label htmlFor="fecha_compra" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha:</label>
-                <input type="date" id="fecha_compra" value={fecha_compra} onChange={(e) => setFechaCompra(e.target.value)} className="w-full pl-2 pr-2 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-            </div>
+  <section className="content">
+  <div
+    style={{
+      paddingTop: "20px", // Ajuste el padding superior para dar espacio al título
+      margin: "0 auto",
+      borderRadius: "30px",
+      marginTop: "20px",
+      boxShadow: "0 4px 12px rgba(128, 0, 128, 0.25)",
+      position: "fixed",
+      top: "80px",
+      left: "100px",
+      width: "calc(38% - 100px)",
+      padding: "20px",
+    }}
+  >
+    <center>
+      <h2 style={{ marginTop: '15px', fontSize: '24px', fontWeight: 'bold' }}>Registrar Compra</h2>
+    </center>
+    <br />
+    <div className="col-md-12">
+      <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="form-group mb-2">
+            <label htmlFor="fecha_compra" className="block text-sm font-medium text-gray-900 dark:text-white">Fecha:</label>
+            <input
+              type="date"
+              id="fecha_compra"
+              value={fecha_compra}
+              onChange={(e) => setFechaCompra(e.target.value)}
+              className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+            />
+          </div>
 
-            <div className="mb-4">
-              <label htmlFor="descuento_compra" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Descuento:</label>
-              <input type="number" id="descuento_compra" value={descuento_compra} onChange={(e) => setDescuentoCompra(e.target.value)} className="w-full pl-2 pr-2 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Descuento"/>
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor="iva_compra" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">IVA:</label>
-              <input type="number" id="iva_compra" value={iva_compra} onChange={(e) => setIvaCompra(e.target.value)} className="w-full pl-2 pr-2 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Iva" />
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor="estado_compra" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Estado:</label>
-              <select id="estado_compra" value={estado_compra} onChange={(e) => setEstadoCompra(e.target.value)} className="w-full pl-2 pr-8 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                  <option value="">Seleccione el estado</option>
-                  <option value="Pendiente">Pendiente</option>
-                  <option value="Cancelada">Cancelada</option>
-                  <option value="Terminada">Terminada</option>
-              </select>
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor="subtotal_compra" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Subtotal:</label>
-              <input type="number" id="subtotal_compra" value={subtotal_compra} onChange={(e) => setSubtotalCompra(e.target.value)} className="w-full pl-2 pr-2 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Subtotal"/>
-            </div>
+          <div className="form-group mb-2">
+            <label htmlFor="descuento_compra" className="block text-sm font-medium text-gray-900 dark:text-white">Descuento:</label>
+            <input
+              type="number"
+              id="descuento_compra"
+              value={descuento_compra}
+              onChange={(e) => setDescuentoCompra(e.target.value)}
+              className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+              placeholder="Descuento"
+            />
           </div>
         </div>
+
+        <div className="form-group mb-2">
+          <label htmlFor="iva_compra" className="block text-sm font-medium text-gray-900 dark:text-white">IVA:</label>
+          <input
+            type="number"
+            id="iva_compra"
+            value={iva_compra}
+            onChange={(e) => setIvaCompra(e.target.value)}
+            className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+            placeholder="IVA"
+          />
+        </div>
+
+        <div className="form-group mb-2">
+          <label htmlFor="estado_compra" className="block text-sm font-medium text-gray-900 dark:text-white">Estado:</label>
+          <select
+            id="estado_compra"
+            value={estado_compra}
+            onChange={(e) => setEstadoCompra(e.target.value)}
+            className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+          >
+            <option value="">Seleccione el estado</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Cancelada">Cancelada</option>
+            <option value="Terminada">Terminada</option>
+          </select>
+        </div>
+        {/* <div className="form-group mb-2">
+          <label htmlFor="subtotal_compra" className="block text-sm font-medium text-gray-900 dark:text-white">Subtotal:</label>
+          <input
+            type="number"
+            id="subtotal_compra"
+            value={subtotal_compra}
+            onChange={(e) => setSubtotalCompra(e.target.value)}
+            className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+            placeholder="Subtotal"
+          />
+        </div>  */}
+        <div className="form-group col-lg-3 col-md-3 col-sm-6 col-xs-12 mt-2 mb-3 mx-2 flex justify-center gap-4">
+          <button
+            type="button"
+            className="bg-pink-200 hover:bg-black-300 focus:ring-4 focus:outline-none focus:ring-black-300 dark:focus:ring-black-800 shadow-lg shadow-black-500/50 dark:shadow-lg dark:shadow-black-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 flex items-center"
+            // onClick={abrirModal}
+          >
+            <ShoppingCartIcon />{" "}
+          </button>
+          <button
+            type="button"
+            className="bg-pink-200 hover:bg-black-300 focus:ring-4 focus:outline-none focus:ring-black-300 dark:focus:ring-black-800 shadow-lg shadow-black-500/50 dark:shadow-lg dark:shadow-black-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 flex items-center"
+            // onClick={abrirModal}
+          >
+            <ShoppingCartIcon />{" "}
+          </button>
+        </div>
       </div>
-      <br></br>
-      <div className="flex">
+    </div>
+  </div>
+</section>
+
+
+<br></br>
+
+      {/* <div className="flex">
         <div className="w-2/3 border border-gray-300 p-4 relative" style={{ marginLeft: '-80px' }}>
         <label className="absolute top-0 bg-white px-2" style={{ top: '-15px' }}>Información del insumo</label>
         <div className="flex flex-wrap -mx-4">
@@ -198,11 +265,11 @@ const [totalValorInsumos, settotalValorInsumos] = useState('');
         <div className="flex flex-wrap -mx-4">
           <div className="w-1/2 px-2 mb-4">
               <label htmlFor="IdProveedor" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Proveedor:</label>
-              <select id="IdProveedor" value={IdProveedor} onChange={(e) => setProveedorInsumo(e.target.value)} className="w-full pl-2 pr-8 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <select id="IdProveedor" className="w-full pl-2 pr-8 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                   <option value="">Seleccione un proveedor</option>
-                  {proveedores.map(proveedor => (
-                      <option key={proveedor.IdProveedor} value={proveedor.IdProveedor}>{proveedor.nombre_proveedor}</option>
-                  ))}
+                      <option> 
+
+                      </option>
               </select>
           </div>
             <div className="w-1/2 px-2 mb-4">
@@ -224,9 +291,6 @@ const [totalValorInsumos, settotalValorInsumos] = useState('');
             <div className="w-1/2 px-2 mb-4">
                 <label htmlFor="Total" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Total:</label>
                 <input type="number" id="totalValorInsumos" value={totalValorInsumos} onChange={(e) => settotalValorInsumos(e.target.value)} className="w-full pl-2 pr-2 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Total" />
-            </div>
-            <div className="w-1/2 px-2 mb-4">
-                
             </div>
         </div>
         <div className="flex flex-wrap -mx-4">
@@ -251,7 +315,7 @@ const [totalValorInsumos, settotalValorInsumos] = useState('');
             </div>
         </div>
     </div>
-    <div className="w-1/3 p-4">
+    {/* <div className="w-1/3 p-4">
     <div className="border border-gray-300" style={{ overflowX: 'auto', width: 'calc(100% + 90px)' }}>
         <table className="w-full text-center" style={{ fontSize: '0.8rem', borderCollapse: 'collapse' }}>
             <thead className="bg-gray-200">
@@ -283,8 +347,8 @@ const [totalValorInsumos, settotalValorInsumos] = useState('');
             </tbody>
         </table>
     </div>
-</div>
-</div>
+</div> */}
+{/* </div>  */}
 </div>
 
     );
