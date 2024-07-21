@@ -3,19 +3,32 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom"; 
 import * as Swal from 'sweetalert2';
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import ModalInsumos from "../../components/consts/Modalventas";
+import Fab from '@mui/material/Fab';
 
 const CrearCompra = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const navigate = useNavigate(); 
   const [compras, setCompras] = useState([]);
   const [buscar, setBuscar] = useState('');
-  const [proveedores, setProveedores] = useState([]);
+  const [insumos, setInsumos] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [fecha_compra, setFechaCompra] = useState('');
   const [descuento_compra, setDescuentoCompra] = useState('');
   const [iva_compra, setIvaCompra] = useState('');
   const [subtotal_compra, setSubtotalCompra] = useState('');
   const [estado_compra, setEstadoCompra] = useState('');
+  const [modalData, setModalData] = useState(null);
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const abrirModal = () => {
+    setModalAbierto(true);
+  };
+  
+  const cerrarModal = () => {
+    setModalAbierto(false);
+  };
   const [isFieldDisabled, setIsFieldDisabled] = useState({
     fecha_compra: false,
     descuento_compra: false,
@@ -25,17 +38,15 @@ const CrearCompra = () => {
   });
 
 const [detallesCompra, setDetallesCompra] = useState([]);
-const [Dimagen_insumo, setImagenInsumo] = useState('');
 const [IdCategoria, setCategoriaInsumo] = useState('');
-const [IdProveedor, setProveedorInsumo] = useState('');
-const [Dnombre_insumo, setNombreInsumo] = useState('');
+const [IdInsumo, setInsumosDetalle] = useState('');
 const [cantidad_insumo, setCantidadInsumo] = useState('');
 const [precio_unitario, setPrecioUnitarioInsumo] = useState('');
 const [totalValorInsumos, settotalValorInsumos] = useState('');
 
   useEffect(() => {
     fetchCompras();
-    fetchProveedores();
+    fetchInsumos();
     fetchCategorias();
   }, []);
 
@@ -47,12 +58,12 @@ const [totalValorInsumos, settotalValorInsumos] = useState('');
       console.error('Error fetching Compras:', error);
     }
   };
-  const fetchProveedores = async () => {
+  const fetchInsumos = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/proveedores');
-      setProveedores(response.data);
+      const response = await axios.get('http://localhost:5000/api/insumos');
+      setInsumos(response.data);
     } catch (error) {
-      console.error('Error fetching Proveedores:', error);
+      console.error('Error fetching Insumos:', error);
     }
   };
 
@@ -69,22 +80,19 @@ const [totalValorInsumos, settotalValorInsumos] = useState('');
     const cantidad = parseInt(cantidad_insumo);
     const precio = parseFloat(precio_unitario);
     const total = parseFloat(totalValorInsumos);
-    // const idProveedor = parseInt(IdProveedor);
+    const idInsumos = parseInt(IdInsumo);
     const idCategoria = parseInt(IdCategoria);
 
-    // const proveedorSeleccionado = proveedores.find(prov => prov.IdProveedor === idProveedor);
+    const insumoSeleccionado = insumos.find(insu => insu.IdInsumos === idInsumos);
     const categoriaSeleccionada = categorias.find(cat => cat.IdCategoria === idCategoria);
 
-    if (!idCategoria || !precio || !cantidad || !total) {
+    if (!idCategoria || !precio || !cantidad || !total || !idInsumos) {
         alert('Por favor complete todos los campos obligatorios.');
         return;
     }
 
     const nuevoDetalleCompra = {
-        Dimagen_insumo,
-        // IdProveedor: idProveedor, 
         IdCategoria: idCategoria, 
-        Dnombre_insumo,
         cantidad_insumo: cantidad,
         precio_unitario: precio,
         totalValorInsumos: total
@@ -92,10 +100,8 @@ const [totalValorInsumos, settotalValorInsumos] = useState('');
 
     setDetallesCompra([...detallesCompra, nuevoDetalleCompra]);
 
-    // setProveedorInsumo('');
-    setImagenInsumo('');
+    setInsumosDetalle('');
     setCategoriaInsumo('');
-    setNombreInsumo('');
     setCantidadInsumo('');
     setPrecioUnitarioInsumo('');
     settotalValorInsumos('');
@@ -137,13 +143,13 @@ const [totalValorInsumos, settotalValorInsumos] = useState('');
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-  <section className="content">
+   <section className="content">
   <div
     style={{
       paddingTop: "20px", // Ajuste el padding superior para dar espacio al título
       margin: "0 auto",
       borderRadius: "30px",
-      marginTop: "20px",
+      marginTop: "150px",
       boxShadow: "0 4px 12px rgba(128, 0, 128, 0.25)",
       position: "fixed",
       top: "80px",
@@ -209,148 +215,141 @@ const [totalValorInsumos, settotalValorInsumos] = useState('');
             <option value="Terminada">Terminada</option>
           </select>
         </div>
-        {/* <div className="form-group mb-2">
-          <label htmlFor="subtotal_compra" className="block text-sm font-medium text-gray-900 dark:text-white">Subtotal:</label>
-          <input
-            type="number"
-            id="subtotal_compra"
-            value={subtotal_compra}
-            onChange={(e) => setSubtotalCompra(e.target.value)}
-            className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-            placeholder="Subtotal"
-          />
-        </div>  */}
         <div className="form-group col-lg-3 col-md-3 col-sm-6 col-xs-12 mt-2 mb-3 mx-2 flex justify-center gap-4">
           <button
             type="button"
             className="bg-pink-200 hover:bg-black-300 focus:ring-4 focus:outline-none focus:ring-black-300 dark:focus:ring-black-800 shadow-lg shadow-black-500/50 dark:shadow-lg dark:shadow-black-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 flex items-center"
             // onClick={abrirModal}
           >
-            <ShoppingCartIcon />{" "}
+            <GroupAddIcon />{" "}
           </button>
           <button
             type="button"
             className="bg-pink-200 hover:bg-black-300 focus:ring-4 focus:outline-none focus:ring-black-300 dark:focus:ring-black-800 shadow-lg shadow-black-500/50 dark:shadow-lg dark:shadow-black-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 flex items-center"
             // onClick={abrirModal}
           >
-            <ShoppingCartIcon />{" "}
+            <AddShoppingCartIcon />{" "}
           </button>
         </div>
       </div>
     </div>
   </div>
+
+  <div
+        style={{
+          paddingTop: "10px",
+          margin: "0 auto",
+          borderRadius: "30px",
+          marginTop: "20px",
+          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.3)",
+          position: "fixed",
+          right: "20px", 
+          top: "80px",
+          width: "calc(65% - 100px)",
+          padding: "20px", 
+        }}
+      >
+        <div style={{ textAlign: "left", marginBottom: "20px" }}>
+          <h3
+            style={{ textAlign: "left", fontSize: "23px", fontWeight: "bold" }}
+          >
+            Detalle de Compra{" "}
+          </h3>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            fontWeight: "bold",
+            marginBottom: "10px",
+          }}
+        >
+          <div>Imagen</div>
+          <div>Categoria</div>
+          <div>Insumo</div>
+          <div>Proveedor</div>
+          <div>Cantidad</div>
+          <div>Precio Unitario</div>
+        </div>
+
+        <div
+          style={{
+            marginTop: "40px",
+            borderTop: "1px solid #ccc",
+            paddingTop: "20px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginBottom: "10px",
+            }}
+          >
+            <div style={{ fontWeight: "bold", marginRight: "20px" }}>
+              TOTAL:
+            </div>
+            <div></div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div style={{ fontWeight: "bold", marginRight: "20px" }}>
+              Descuento aplicado:
+            </div>
+            <div></div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            marginTop: "20px",
+          }}
+        >
+          <div className="form-group col-lg-3 col-md-3 col-sm-6 col-xs-12 mt-2 mb-3 mx-2">
+            <button
+              type="button"
+              className="bg-pink-200 hover:bg-black-300 focus:ring-4 focus:outline-none focus:ring-black-300 dark:focus:ring-black-800 shadow-lg shadow-black-500/50 dark:shadow-lg dark:shadow-black-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+              onClick={abrirModal}
+              style={{
+                alignSelf: "flex-end",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <ShoppingCartIcon />{" "}
+            </button>
+          </div>
+        </div>
+
+      <Fab
+        aria-label="add"
+        style={{
+          border: '0.5px solid grey',
+          backgroundColor: '#94CEF2',
+          position: 'fixed',
+          bottom: '16px',
+          right: '16px',
+          zIndex: 1000, 
+        }}
+        onClick={() => handleAddCompra(true)}
+      >
+        <i className='bx bx-save' style={{ fontSize: '1.3rem' }}></i>
+      </Fab>
+      </div>
+      <ModalInsumos
+        open={modalAbierto}
+        handleClose={cerrarModal}
+        title="Agregar adiciones"
+        // onSubmit={handleSubmit}
+        seleccionado={modalData}
+        insumos={insumos}
+        // insumosSeleccionados={insumosSeleccionados}
+        // setInsumosSeleccionados={setInsumosSeleccionados}
+      />
+
 </section>
-
-
-<br></br>
-
-      {/* <div className="flex">
-        <div className="w-2/3 border border-gray-300 p-4 relative" style={{ marginLeft: '-80px' }}>
-        <label className="absolute top-0 bg-white px-2" style={{ top: '-15px' }}>Información del insumo</label>
-        <div className="flex flex-wrap -mx-4">
-            <div className="w-1/2 px-2 mb-4">
-                <label htmlFor="ImagenInsumo" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Imagen:</label>
-                <input   type="text" id="Dimagen_insumo" value={Dimagen_insumo} onChange={(e) => setImagenInsumo(e.target.value)} className="w-full pl-2 pr-2 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Imagen" />
-            </div>
-            <div className="w-1/2 px-2 mb-4">
-              <label htmlFor="CategoriaInsumo" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Categoria:</label>
-              <select id="IdCategoria" value={IdCategoria} onChange={(e) => setCategoriaInsumo(e.target.value)} className="w-full pl-2 pr-8 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                  <option value="">Seleccione una categoría</option>
-                  {categorias.map(categoria => (
-                      <option key={categoria.IdCategoria} value={categoria.IdCategoria}>{categoria.nombre_categoria}</option>
-                  ))}
-              </select>
-          </div>
-        </div>
-        <div className="flex flex-wrap -mx-4">
-          <div className="w-1/2 px-2 mb-4">
-              <label htmlFor="IdProveedor" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Proveedor:</label>
-              <select id="IdProveedor" className="w-full pl-2 pr-8 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                  <option value="">Seleccione un proveedor</option>
-                      <option> 
-
-                      </option>
-              </select>
-          </div>
-            <div className="w-1/2 px-2 mb-4">
-                <label htmlFor="NombreInsumo" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre:</label>
-                <input type="text" id="Dnombre_insumo" value={Dnombre_insumo} onChange={(e) => setNombreInsumo(e.target.value)} className="w-full pl-2 pr-2 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Nombre" />
-            </div>
-        </div>
-        <div className="flex flex-wrap -mx-4">
-            <div className="w-1/2 px-2 mb-4">
-                <label htmlFor="PrecioUnitarioInsumo" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Precio unitario:</label>
-                <input type="number" id="precio_unitario" value={precio_unitario} onChange={(e) => setPrecioUnitarioInsumo(e.target.value)} className="w-full pl-2 pr-2 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Precio unitario" />
-            </div>
-            <div className="w-1/2 px-2 mb-4">
-                <label htmlFor="CantidadInsumo" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cantidad:</label>
-                <input type="number" id="cantidad_insumo" value={cantidad_insumo} onChange={(e) => setCantidadInsumo(e.target.value)} className="w-full pl-2 pr-2 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Cantidad" />
-            </div>
-        </div>
-        <div className="flex flex-wrap -mx-4">
-            <div className="w-1/2 px-2 mb-4">
-                <label htmlFor="Total" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Total:</label>
-                <input type="number" id="totalValorInsumos" value={totalValorInsumos} onChange={(e) => settotalValorInsumos(e.target.value)} className="w-full pl-2 pr-2 rounded-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 text-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Total" />
-            </div>
-        </div>
-        <div className="flex flex-wrap -mx-4">
-            <div className="w-1/2 px-2 mb-4">
-                <button type="button" class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
-                onClick={handleAgregarDetalleCompra}>
-                  <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
-                    Agregar
-                  </span>
-                </button>
-            </div>
-            <div className="w-1/2 px-2 mb-4">
-              <button
-                type="button"
-                className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-teal-300 to-lime-300 group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-lime-200 dark:focus:ring-lime-800"
-                onClick={handleAddCompra}
-                >
-                <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
-                    Registrar
-                </span>
-              </button>
-            </div>
-        </div>
-    </div>
-    {/* <div className="w-1/3 p-4">
-    <div className="border border-gray-300" style={{ overflowX: 'auto', width: 'calc(100% + 90px)' }}>
-        <table className="w-full text-center" style={{ fontSize: '0.8rem', borderCollapse: 'collapse' }}>
-            <thead className="bg-gray-200">
-                <tr>
-                    <th className="px-4 py-2">Imagen</th>
-                    <th className="px-4 py-2">Categoría</th>
-                    <th className="px-4 py-2">Proveedor</th>
-                    <th className="px-4 py-2">Nombre</th>
-                    <th className="px-4 py-2">Cantidad</th>
-                    <th className="px-4 py-2">Precio unitario</th>
-                </tr>
-            </thead>
-            <tbody>
-                {detallesCompra.map((detalle, index) => {
-                    const proveedor = proveedores.find(prov => prov.IdProveedor === detalle.IdProveedor);
-                    const categoria = categorias.find(cat => cat.IdCategoria === detalle.IdCategoria);
-
-                    return (
-                        <tr key={index}>
-                            <td className="border border-gray-300 px-4 py-2">{detalle.Dimagen_insumo}</td>
-                            <td className="border border-gray-300 px-4 py-2">{categoria ? categoria.nombre_categoria : 'N/A'}</td>
-                            <td className="border border-gray-300 px-4 py-2">{proveedor ? proveedor.nombre_proveedor : 'N/A'}</td>
-                            <td className="border border-gray-300 px-4 py-2">{detalle.Dnombre_insumo}</td>
-                            <td className="border border-gray-300 px-4 py-2">{detalle.cantidad_insumo}</td>
-                            <td className="border border-gray-300 px-4 py-2">{detalle.precio_unitario}</td>
-                        </tr>
-                    );
-                })}
-            </tbody>
-        </table>
-    </div>
-</div> */}
-{/* </div>  */}
 </div>
-
     );
 }
 

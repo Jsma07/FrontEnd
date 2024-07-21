@@ -324,49 +324,39 @@ const Insumos = () => {
       <Table
         columns={[
           { field: "nombre_categoria", headerName: "CATEGORIA", width: "w-36" },
-          {
-            field: "Imagen",
-            headerName: "IMAGEN",
-            width: "w-32",
-            renderCell: (params) => (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-                <div>
-                {insumos.map((insumo) => (
-                  <div key={insumo.IdInsumos}>
-                    {console.log(`http://localhost:5000${insumo.imagen}`)}
-                    <img
-                      src={`http://localhost:5000${insumo.imagen}`}  
-                      alt="Imagen" style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
-                    />
-                  </div>
-                ))}
-                </div>
-              </div>
-            ),
-          },
+          // {
+          //   field: "Imagen",
+          //   headerName: "IMAGEN",
+          //   width: "w-32",
+          //   renderCell: (params) => (
+          //     <div
+          //       style={{
+          //         display: "flex",
+          //         justifyContent: "center",
+          //         alignItems: "center",
+          //         height: "100%",
+          //       }}
+          //     >
+          //       <div>
+          //       {insumos.map((insumo) => (
+          //         <div key={insumo.IdInsumos}>
+          //           {console.log(`http://localhost:5000${insumo.imagen}`)}
+          //           <img
+          //             src={`http://localhost:5000${insumo.imagen}`}  
+          //             alt="Imagen" style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
+          //           />
+          //         </div>
+          //       ))}
+          //       </div>
+          //     </div>
+          //   ),
+          // },
           {
             field: "NombreInsumos",
             headerName: "NOMBRE INSUMO",
             width: "w-36",
           },
           { field: "Cantidad", headerName: "CANTIDAD", width: "w-36" },
-          {
-            field: "usos_unitarios",
-            headerName: "USOS UNITARIOS",
-            width: "w-36",
-          },
-          {
-            field: "UsosDisponibles",
-            headerName: "USOS DISPONIBLES",
-            width: "w-36",
-          },
           {
             field: "PrecioUnitario",
             headerName: "PRECIO UNITARIO",
