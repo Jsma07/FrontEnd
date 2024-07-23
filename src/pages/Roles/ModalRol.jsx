@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ModalDinamico from "../../components/consts/modalJ";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+
 
 const AddRoleModal = ({ open, handleClose, setRoles }) => {
   const [rol, setRol] = useState(""); // Estado para el nombre del rol
@@ -124,10 +126,9 @@ const AddRoleModal = ({ open, handleClose, setRoles }) => {
 
       // Manejar la respuesta del backend
       if (response.data && response.data.mensaje === "Rol creado exitosamente") {
-        window.Swal.fire({
-          icon: "success",
-          title: "Éxito",
-          text: "El rol ha sido creado correctamente.",
+        toast.warn("El rol ha sido creado correctamenet", {
+          position: "bottom-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
 
         // Actualiza rolesLocal con el nuevo rol creado

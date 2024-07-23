@@ -264,8 +264,7 @@ const Insumos = () => {
 
   return (
     <div className="container mx-auto p-4 relative">
-    
-     
+
       <ModalAgregarInsumo
         open={openModalAgregar}
         handleClose={handleCloseModalAgregar}
@@ -325,49 +324,39 @@ const Insumos = () => {
       <Table
         columns={[
           { field: "nombre_categoria", headerName: "CATEGORIA", width: "w-36" },
-          {
-            field: "Imagen",
-            headerName: "IMAGEN",
-            width: "w-32",
-            renderCell: (params) => (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-                <div>
-                {insumos.map((insumo) => (
-                  <div key={insumo.IdInsumos}>
-                    {console.log(`http://localhost:5000${insumo.imagen}`)}
-                    <img
-                      src={`http://localhost:5000${insumo.imagen}`}  
-                      alt="Imagen" style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
-                    />
-                  </div>
-                ))}
-                </div>
-              </div>
-            ),
-          },
+          // {
+          //   field: "Imagen",
+          //   headerName: "IMAGEN",
+          //   width: "w-32",
+          //   renderCell: (params) => (
+          //     <div
+          //       style={{
+          //         display: "flex",
+          //         justifyContent: "center",
+          //         alignItems: "center",
+          //         height: "100%",
+          //       }}
+          //     >
+          //       <div>
+          //       {insumos.map((insumo) => (
+          //         <div key={insumo.IdInsumos}>
+          //           {console.log(`http://localhost:5000${insumo.imagen}`)}
+          //           <img
+          //             src={`http://localhost:5000${insumo.imagen}`}  
+          //             alt="Imagen" style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
+          //           />
+          //         </div>
+          //       ))}
+          //       </div>
+          //     </div>
+          //   ),
+          // },
           {
             field: "NombreInsumos",
             headerName: "NOMBRE INSUMO",
             width: "w-36",
           },
           { field: "Cantidad", headerName: "CANTIDAD", width: "w-36" },
-          {
-            field: "usos_unitarios",
-            headerName: "USOS UNITARIOS",
-            width: "w-36",
-          },
-          {
-            field: "UsosDisponibles",
-            headerName: "USOS DISPONIBLES",
-            width: "w-36",
-          },
           {
             field: "PrecioUnitario",
             headerName: "PRECIO UNITARIO",
@@ -410,6 +399,8 @@ const Insumos = () => {
           },
         ]}
         data={filtrar}
+        title={'Gestion de insumos'}
+
       />
       <Fab
         aria-label="add"
@@ -426,7 +417,6 @@ const Insumos = () => {
         <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
       </Fab>
     </div>
-    
   );
 };
 

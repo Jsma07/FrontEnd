@@ -20,8 +20,11 @@ import Salida from './pages/Salida_Insumos/Salida';
 import Clientes from "./pages/Clientes/Clientes";
 import Empleados from "./pages/Empleados/Empleados";
 import Registrar from './pages/Ventas/Registrar'
-import InsumoDetalle from './pages/Ventas/Detalles'
+import InsumoDetalle from './pages/Ventas/Detalles';
+import DetalleCompra from './pages/Compras/DetalleCompra';
 import { UserProvider } from './context/ContextoUsuario';
+import Navbarclient from './components/consts/VIewClients/Navbarclient'
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -32,6 +35,7 @@ root.render(
       <Routes>
         <Route path="/iniciarSesion" element={<Login />} />
         <Route path="/Registrar" element={<CrearCuenta />} />
+        <Route path="/Catalogo" element={<Navbarclient />} />
         <Route path="/" element={<App />}>
           <Route path="/configuracion/roles" element={<Roles />} />
           <Route path="/Usuarios/Administradores" element={<Admin />} />
@@ -40,6 +44,7 @@ root.render(
           <Route path="/compras" element={<Compras />} />
           <Route path="/compras/Proveedores" element={<Proveedores />} />
           <Route path="/compras/crearCompra" element={<CrearCompra />} />
+          <Route path="/compras/DetalleCompra/:id" element={<DetalleCompra />} />
           <Route path="/Insumos/Categorias" element={<Categorias />} />
           <Route path="/agendamiento" element={<Agenda />} />
           <Route path="/Salida_Insumos" element={<Salida />} />
@@ -49,6 +54,7 @@ root.render(
           <Route path="/Empleados" element={<Usuarios2 />} />
           <Route path="/RegistrarVentas" element={<Registrar />} />
           <Route path="/Detalleventa/:id" element={<InsumoDetalle />} />
+
         </Route>
       </Routes>
     </BrowserRouter>

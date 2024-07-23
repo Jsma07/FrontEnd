@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ModalInsumos from "../../components/consts/Modalventas";
@@ -541,7 +542,7 @@ const Registrar = () => {
           <div>Nombre</div>
           <div>Precio Unitario</div>
           <div>Cantidad</div>
-          <div>Cantidad</div>
+          
         </div>
 
         {insumosSeleccionados.map((insumo) => (
