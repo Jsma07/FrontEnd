@@ -155,6 +155,7 @@ const Clientes = () => {
   };
 
   const handleToggleSwitch = async (id) => {
+    // Actualizar el estado local de los clientes
     const updatedClientes = clientes.map((cliente) => {
       if (cliente.IdCliente === id) {
         const newEstado = cliente.Estado === 1 ? 0 : 1;
@@ -163,15 +164,16 @@ const Clientes = () => {
       return cliente;
     });
 
-    try {
-      const updatedCliente = updatedClientes.find(
-        (cliente) => cliente.IdCliente === id
-      );
-      if (!updatedCliente) {
-        console.error("No se encontró el cliente actualizado");
-        return;
-      }
+    const updatedCliente = updatedClientes.find(
+      (cliente) => cliente.IdCliente === id
+    );
 
+    if (!updatedCliente) {
+      console.error("No se encontró el cliente actualizado");
+      return;
+    }
+
+    try {
       const result = await Swal.fire({
         icon: "warning",
         title: "¿Estás seguro?",
@@ -182,13 +184,17 @@ const Clientes = () => {
       });
 
       if (result.isConfirmed) {
+        // Realizar la solicitud PUT para actualizar el estado en el backend
         await axios.put(
-          `http://localhost:5000/Jackenail/CambiarEstadoo/${id}`,
+          `http://localhost:5000/Jackenail/CambiarEstadocliente/${id}`,
           {
             Estado: updatedCliente.Estado,
           }
         );
+
+        // Actualizar el estado en el frontend si la solicitud PUT tiene éxito
         setClientes(updatedClientes);
+
         Swal.fire({
           icon: "success",
           title: "Estado actualizado",
@@ -233,11 +239,10 @@ const Clientes = () => {
           text: "El documento ingresado ya está registrado. Por favor, elija otro documento.",
         });
       } else {
-        // Convertir campos de texto a números si es necesario
         const formDataNumerico = {
           ...formData,
           Telefono: parseInt(formData.Telefono),
-          IdRol: 2, // Rol por defecto
+          IdRol: 2,
         };
 
         console.log(formDataNumerico);
