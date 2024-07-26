@@ -5,6 +5,7 @@ import ModalDinamico from "../../components/consts/modaled";
 import CustomSwitch from "../../components/consts/switch";
 import TablePrueba from "../../components/consts/Tabla";
 import Modal from "../../components/consts/modalContrasena";
+import { toast } from "react-toastify";
 
 const Empleados = () => {
   const [empleados, setEmpleados] = useState([]);
@@ -24,7 +25,7 @@ const Empleados = () => {
       (empleado) => empleado.IdEmpleado === IdEmpleado
     );
     if (empleadoSeleccionado) {
-      setSeleccionado(empleadoSeleccionado); // Establecer el empleado seleccionado
+      setSeleccionado(empleadoSeleccionado);
       setOpenPasswordModal(true);
     } else {
       console.error("Empleado no encontrado");
@@ -100,7 +101,6 @@ const Empleados = () => {
             </button>
           )}
 
-          {/* con este boton se puede  Cambiar Contraseña */}
           {params.row.Estado === 1 && (
             <button
               onClick={() => handlePasswordChangeClick(params.row.IdEmpleado)}
@@ -232,11 +232,14 @@ const Empleados = () => {
           }
         );
         setEmpleados(updatedEmpleados);
-        Swal.fire({
-          icon: "success",
-          title: "Estado actualizado",
-          text: "El estado del empleado ha sido actualizado correctamente.",
-        });
+
+        toast.success(
+          "El estado del empleado ha sido actualizado correctamente.",
+          {
+            position: "bottom-right",
+            autoClose: 3000, // Cierra automáticamente después de 3 segundos
+          }
+        );
       }
     } catch (error) {
       console.error("Error al cambiar el estado del empleado:", error);

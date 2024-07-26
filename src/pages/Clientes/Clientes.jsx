@@ -2,13 +2,44 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import ModalDinamico from "../../components/consts/modaled";
+import Modal from "../../components/consts/modalContrasena";
 import CustomSwitch from "../../components/consts/switch";
+import { toast } from "react-toastify";
 
 const Clientes = () => {
   const [clientes, setClientes] = useState([]);
   const [cliente, setCliente] = useState([]);
   const [modalData, setModalData] = useState(null);
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [openPasswordModal, setOpenPasswordModal] = useState(false);
+
+  const [seleccionado, setSeleccionado] = useState(null);
+
+  const [passwordForm, setPasswordForm] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const handlePasswordChangeClick = (IdCliente) => {
+    const clienteseleccionado = clientes.find(
+      (Clientess) => Clientess.IdCliente === IdCliente
+    );
+    if (clienteseleccionado) {
+      setSeleccionado(clienteseleccionado);
+      setOpenPasswordModal(true);
+    } else {
+      console.error("Cliente no encontrado");
+    }
+  };
+
+  const handlePasswordModalClose = () => {
+    setOpenPasswordModal(false);
+    setPasswordForm({
+      newPassword: "",
+      confirmPassword: "",
+    });
+    setSeleccionado(null); // Limpiar el Cliente seleccionado al cerrar el modal
+  };
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -37,7 +68,6 @@ const Clientes = () => {
     { field: "Correo", headerName: "Correo" },
     { field: "Telefono", headerName: "Teléfono" },
     { field: "Documento", headerName: "Documento" },
-    { field: "Direccion", headerName: "Dirección" },
     {
       field: "Acciones",
       headerName: "Acciones",
@@ -46,6 +76,7 @@ const Clientes = () => {
         <div className="flex justify-center space-x-4">
           {params.row.Estado === 1 && (
             <button
+              className="text-yellow-500"
               onClick={() =>
                 handleOpenModal({
                   ...params.row,
@@ -57,14 +88,14 @@ const Clientes = () => {
               <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
             </button>
           )}
-          {/* {params.row.Estado === 1 && (
+          {params.row.Estado === 1 && (
             <button
-              //onClick={() => handlePasswordChangeClick(params.row.IdCliente)}
+              onClick={() => handlePasswordChangeClick(params.row.IdCliente)}
               className="text-black-500"
             >
-              <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>
+              <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>{" "}
             </button>
-          )} */}
+          )}
           <CustomSwitch
             active={params.row.Estado === 1}
             onToggle={() => handleToggleSwitch(params.row.IdCliente)}
@@ -76,87 +107,70 @@ const Clientes = () => {
 
   const handleSubmit = async (formData) => {
     try {
-      // Verificar si el correo electrónico o el documento están siendo utilizados por otro cliente
-      const correoExistente = clientes.some(
-        (cliente) => cliente.Correo === formData.Correo
-      );
+      // Continuar con el registro del cliente si el correo y el documento no están duplicados
+      const result = await Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¿Quieres registrar este cliente?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí",
+        cancelButtonText: "Cancelar",
+      });
 
-      const documentoExistente = clientes.some(
-        (cliente) => cliente.Documento === formData.Documento
-      );
+      if (result.isConfirmed) {
+        const formDataNumerico = {
+          Nombre: formData.Nombre,
+          Apellido: formData.Apellido,
+          Correo: formData.Correo,
+          Telefono: formData.Telefono,
+          Estado: 1,
+          IdRol: 4,
+          Documento: formData.Documento,
+          Tip_Documento: formData.Tip_Documento,
+          Contrasena: formData.Contrasena,
+        };
 
-      if (correoExistente) {
-        Swal.fire({
-          icon: "error",
-          title: "Correo electrónico duplicado",
-          text: "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico.",
+        console.log("Datos del formulario numéricos:", formDataNumerico);
+
+        const response = await axios.post(
+          "http://localhost:5000/Jackenail/RegistrarClientes",
+          formDataNumerico
+        );
+
+        // Mostrar una alerta de éxito si el registro es exitoso
+        toast.success("El cliente se ha registrado correctamente..", {
+          position: "top-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
-      } else if (documentoExistente) {
-        Swal.fire({
-          icon: "error",
-          title: "Documento duplicado",
-          text: "El documento ingresado ya está registrado. Por favor, elija otro documento.",
-        });
-      } else {
-        // Continuar con el registro del cliente si el correo y el documento no están duplicados
-        const result = await Swal.fire({
-          title: "¿Estás seguro?",
-          text: "¿Quieres registrar este cliente?",
-          icon: "question",
-          showCancelButton: true,
-          confirmButtonText: "Sí",
-          cancelButtonText: "Cancelar",
-        });
 
-        if (result.isConfirmed) {
-          const formDataNumerico = {
-            Nombre: formData.Nombre,
-            Apellido: formData.Apellido,
-            Correo: formData.Correo,
-            Telefono: formData.Telefono,
-            Estado: 1,
-            IdRol: 4,
-            Documento: formData.Documento,
-            Direccion: formData.Direccion,
-            Tip_Documento: formData.Tip_Documento,
-            Contrasena: formData.Contrasena,
-          };
+        // Cerrar el modal después de enviar el formulario
+        setModalData(null);
 
-          console.log("Datos del formulario numéricos:", formDataNumerico);
-
-          await axios.post(
-            "http://localhost:5000/Jackenail/RegistrarClientes",
-            formDataNumerico
-          );
-
-          // Mostrar una alerta de éxito si el registro es exitoso
-          Swal.fire({
-            icon: "success",
-            title: "¡Registro exitoso!",
-            text: "El cliente se ha registrado correctamente.",
-          });
-
-          // Cerrar el modal después de enviar el formulario
-          setModalData(null);
-
-          // Agregar el nuevo cliente a la lista de clientes
-          setClientes([...clientes, formDataNumerico]);
-        }
+        // Agregar el nuevo cliente a la lista de clientes
+        setClientes([...clientes, formDataNumerico]);
       }
     } catch (error) {
-      console.error("Error al registrar el cliente:", error);
+      if (error.response && error.response.status === 400) {
+        // Mostrar una alerta de error si ocurre algún problema durante el registro
+        Swal.fire({
+          icon: "error",
+          title: "Error de registro",
+          text: error.response.data.mensaje,
+        });
+      } else {
+        console.error("Error al registrar el cliente:", error);
 
-      // Mostrar una alerta de error si ocurre algún problema durante el registro
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Ocurrió un error al registrar el cliente.",
-        footer: '<a href="#">Inténtelo nuevamente</a>',
-      });
+        // Mostrar una alerta de error si ocurre algún problema durante el registro
+        toast.error("Ocurrió un error al registrar el cliente.", {
+          position: "bottom-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+        });
+      }
     }
   };
 
   const handleToggleSwitch = async (id) => {
+    // Actualizar el estado local de los clientes
     const updatedClientes = clientes.map((cliente) => {
       if (cliente.IdCliente === id) {
         const newEstado = cliente.Estado === 1 ? 0 : 1;
@@ -165,15 +179,16 @@ const Clientes = () => {
       return cliente;
     });
 
-    try {
-      const updatedCliente = updatedClientes.find(
-        (cliente) => cliente.IdCliente === id
-      );
-      if (!updatedCliente) {
-        console.error("No se encontró el cliente actualizado");
-        return;
-      }
+    const updatedCliente = updatedClientes.find(
+      (cliente) => cliente.IdCliente === id
+    );
 
+    if (!updatedCliente) {
+      console.error("No se encontró el cliente actualizado");
+      return;
+    }
+
+    try {
       const result = await Swal.fire({
         icon: "warning",
         title: "¿Estás seguro?",
@@ -184,26 +199,31 @@ const Clientes = () => {
       });
 
       if (result.isConfirmed) {
+        // Realizar la solicitud PUT para actualizar el estado en el backend
         await axios.put(
-          `http://localhost:5000/Jackenail/CambiarEstadoo/${id}`,
+          `http://localhost:5000/Jackenail/CambiarEstadocliente/${id}`,
           {
             Estado: updatedCliente.Estado,
           }
         );
+
+        // Actualizar el estado en el frontend si la solicitud PUT tiene éxito
         setClientes(updatedClientes);
-        Swal.fire({
-          icon: "success",
-          title: "Estado actualizado",
-          text: "El estado del cliente ha sido actualizado correctamente.",
+
+        toast.info("El estado del cliente ha sido actualizado correctamente.", {
+          position: "bottom-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
       }
     } catch (error) {
       console.error("Error al cambiar el estado del cliente:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Hubo un error al cambiar el estado del cliente. Por favor, inténtalo de nuevo más tarde.",
-      });
+      toast.error(
+        "Hubo un error al cambiar el estado del cliente. Por favor, inténtalo de nuevo más tarde.",
+        {
+          position: "bottom-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+        }
+      );
     }
   };
 
@@ -223,23 +243,26 @@ const Clientes = () => {
       );
 
       if (correoExistente) {
-        Swal.fire({
-          icon: "error",
-          title: "Correo electrónico duplicado",
-          text: "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico.",
-        });
+        toast.error(
+          "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico.",
+          {
+            position: "bottom-right",
+            autoClose: 3000, // Cierra automáticamente después de 3 segundos
+          }
+        );
       } else if (documentoExistente) {
-        Swal.fire({
-          icon: "error",
-          title: "Documento duplicado",
-          text: "El documento ingresado ya está registrado. Por favor, elija otro documento.",
-        });
+        toast.error(
+          "El documento ingresado ya está registrado. Por favor, elija otro documento.",
+          {
+            position: "bottom-right",
+            autoClose: 3000, // Cierra automáticamente después de 3 segundos
+          }
+        );
       } else {
-        // Convertir campos de texto a números si es necesario
         const formDataNumerico = {
           ...formData,
           Telefono: parseInt(formData.Telefono),
-          IdRol: 2, // Rol por defecto
+          IdRol: 2,
         };
 
         console.log(formDataNumerico);
@@ -251,29 +274,102 @@ const Clientes = () => {
         // Realizar la solicitud de actualización a la API utilizando axios.put
         await axios.put(url, formDataNumerico);
 
-        Swal.fire({
-          icon: "success",
-          title: "¡Actualización exitosa!",
-          text: "El cliente se ha actualizado correctamente.",
-        }).then((result) => {
-          if (
-            result.isConfirmed ||
-            result.dismiss === Swal.DismissReason.close
-          ) {
-            setModalData(null);
-            window.location.reload();
-          }
+        // Actualizar el estado local de clientes
+        const updatedClientes = clientes.map((cliente) =>
+          cliente.IdCliente === formDataNumerico.IdCliente
+            ? { ...cliente, ...formDataNumerico }
+            : cliente
+        );
+
+        setClientes(updatedClientes);
+
+        toast.success("El cliente se ha actualizado correctamente.", {
+          position: "top-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
+
+        // Acciones adicionales después de la actualización
+        setModalData(null);
       }
     } catch (error) {
       console.error("Error al actualizar el cliente:", error);
+      toast.error(
+        "Ocurrió un error al actualizar el cliente. Inténtelo nuevamente.",
+        {
+          position: "top-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+        }
+      );
+    }
+  };
 
-      // Mostrar una alerta de error si ocurre algún problema durante la actualización
+  const handleSubmitPasswordChange = async (newPassword, confirmPassword) => {
+    // Paso 1: Validar que las contraseñas coincidan
+    if (newPassword !== confirmPassword) {
+      console.error(
+        "Las contraseñas no coinciden:",
+        newPassword,
+        confirmPassword
+      );
       Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: "Ocurrió un error al actualizar el cliente.",
-        footer: '<a href="#">Inténtelo nuevamente</a>',
+        title: "Error",
+        text: "Las contraseñas no coinciden.",
+      });
+      return;
+    }
+
+    // Paso 2: Validar que la contraseña tenga al menos 8 caracteres
+    if (newPassword.length < 8) {
+      console.error("La contraseña es demasiado corta:", newPassword);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "La contraseña debe tener al menos 8 caracteres.",
+      });
+      return;
+    }
+
+    try {
+      // Paso 3: Realizar la solicitud PUT para actualizar la contraseña
+      console.log("Datos a enviar al servidor:", {
+        IdCliente: seleccionado.IdCliente,
+        newPassword: newPassword,
+      });
+
+      const response = await axios.put(
+        `http://localhost:5000/Jackenail/CambiarContrasena/${seleccionado.IdCliente}`,
+        {
+          nuevaContrasena: newPassword,
+        }
+      );
+
+      // Verificar la respuesta de la solicitud PUT
+      console.log("Respuesta de la API:", response);
+
+      if (response.status === 200) {
+        // La solicitud PUT fue exitosa
+        console.log("Contraseña actualizada correctamente");
+        Swal.fire({
+          icon: "success",
+          title: "Contraseña actualizada",
+          text: "La contraseña del Cliente ha sido actualizada correctamente.",
+        });
+
+        // Cerrar el modal después de actualizar la contraseña
+        handlePasswordModalClose();
+      } else {
+        // Manejar un caso donde la solicitud no tenga éxito
+        console.error("Error en la solicitud PUT:", response);
+        throw new Error("Error al actualizar la contraseña del Cliente");
+      }
+    } catch (error) {
+      // Manejar errores capturados durante la solicitud PUT
+      console.error("Error al cambiar la contraseña del empleado:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Hubo un error al cambiar la contraseña del Cliente. Por favor, inténtalo de nuevo más tarde.",
       });
     }
   };
@@ -294,7 +390,7 @@ const Clientes = () => {
         }}
         className="w-full mx-auto max-w-full"
       >
-        <div className="bg-white rounded-lg shadow-md p-8 border border-purple-500">
+        <div className="bg-white rounded-lg shadow-md p-8">
           <div className="flex justify-between items-center mb-4">
             <h4 className="text-3xl">Gestion de Clientes</h4>
 
@@ -412,27 +508,13 @@ const Clientes = () => {
                       type: "select",
                       required: true,
                       options: [
-                        { value: "DNI", label: "DNI" },
-                        {
-                          value: "Cedula Ciudadania",
-                          label: "Cedula Ciudadania",
-                        },
-
-                        {
-                          value: "Tarjeta de Identidad",
-                          label: "Tarjeta de Identidad",
-                        },
-
-                        { value: "Pasaporte", label: "Pasaporte" },
-                        {
-                          value: "Carné de extranjería",
-                          label: "Carné de extranjería",
-                        },
+                        { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
+                        { value: "C.E", label: "Cédula de extranjería (C.E)" },
                       ],
                     },
                     {
                       label: "Nombre",
-                      name: "Nombre", // Nombre ajustado a "Nombre"
+                      name: "Nombre",
                       type: "text",
                       required: true,
                     },
@@ -460,12 +542,7 @@ const Clientes = () => {
                       type: "text",
                       required: true,
                     },
-                    {
-                      label: "Direccion",
-                      name: "Direccion",
-                      type: "text",
-                      required: true,
-                    },
+
                     {
                       label: "Contraseña",
                       name: "Contrasena",
@@ -482,7 +559,7 @@ const Clientes = () => {
                 <ModalDinamico
                   open={true}
                   handleClose={() => setModalData(null)}
-                  title="Actualizar Empleado"
+                  title="Actualizar Cliente"
                   fields={[
                     {
                       label: "Tip_Documento",
@@ -538,18 +615,6 @@ const Clientes = () => {
                       type: "text",
                       required: true,
                     },
-                    {
-                      label: "Direccion",
-                      name: "Direccion",
-                      type: "text",
-                      required: true,
-                    },
-                    {
-                      label: "Contraseña",
-                      name: "Contrasena",
-                      type: "password",
-                      required: true,
-                    },
                   ]}
                   onSubmit={handleActualizacionSubmit}
                   seleccionado={modalData.seleccionado}
@@ -584,6 +649,11 @@ const Clientes = () => {
           </div>
         </div>
       </div>
+      <Modal
+        open={openPasswordModal}
+        handleClose={handlePasswordModalClose}
+        handleSubmit={handleSubmitPasswordChange}
+      />
     </section>
   );
 };

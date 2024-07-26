@@ -18,7 +18,7 @@ const TablePrueba = ({ title, columns, data, roles }) => {
 
   // Verificar si roles está definido
   if (!roles) {
-    roles = []; // Inicializar roles como un arreglo vacío si no está definido
+    roles = [];
   }
 
   return (
@@ -36,7 +36,7 @@ const TablePrueba = ({ title, columns, data, roles }) => {
           width: "calc(100% - 100px)",
         }}
       >
-        <div className="bg-white rounded-lg shadow-md p-8 border border-purple-500">
+        <div className="bg-white rounded-lg shadow-md p-8 ">
           <div className="flex justify-between items-center mb-4">
             <h4
               style={{
