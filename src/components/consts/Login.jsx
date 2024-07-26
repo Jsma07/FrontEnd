@@ -5,11 +5,21 @@ const Login = () => {
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [error, setError] = useState('');
+  const [passwordTouched, setPasswordTouched] = useState(false);
+
   const { login } = useContext(UserContext);
+
+const validacionContrasena = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!validacionContrasena.test(contrasena)) {
+      setError('La contraseña debe tener mínimo 8 caracteres, una mayúscula y un número.');
+      return;
+    }
+
 
     try {
       const response = await axios.post('http://localhost:5000/api/iniciarSesion', {
@@ -27,6 +37,7 @@ const Login = () => {
       // Configurar el token en los headers de Axios para futuras peticiones
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
+      
       // Redireccionar a la página principal después del inicio de sesión
       window.location.href = '/';
     } catch (error) {
@@ -39,6 +50,19 @@ const Login = () => {
       }
     }
   };
+  const validatePassword = (password) => {
+    const conditions = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      number: /\d/.test(password),
+    };
+
+    return conditions;
+  };
+
+  const condicionesContrasena = validatePassword(contrasena);
+  const todasCondicionesCumplidas = Object.values(condicionesContrasena).every(Boolean);
+
 
   return (
     <div className="bg-purple-900 absolute top-0 left-0 bg-gradient-to-b from-gray-900 via-gray-900 to-purple-800 bottom-0 leading-5 h-full w-full overflow-hidden">
@@ -172,14 +196,30 @@ const Login = () => {
               placeholder="Correo Electrónico"
               value={correo}
               onChange={(e) => setCorreo(e.target.value)}
+              required
                />
               <input className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
                type="password"
                 placeholder="Contraseña" 
                 value={contrasena}
                 onChange={(e) => setContrasena(e.target.value)}
+                onFocus={() => setPasswordTouched(true)}
+                required
 
                 />
+                 {passwordTouched && !todasCondicionesCumplidas && (
+            <div>
+              <p style={{ color: condicionesContrasena.length ? 'green' : 'red' }}>
+                Mínimo 8 caracteres
+              </p>
+              <p style={{ color: condicionesContrasena.uppercase ? 'green' : 'red' }}>
+                Al menos una mayúscula
+              </p>
+              <p style={{ color: condicionesContrasena.number ? 'green' : 'red' }}>
+                Al menos un número
+              </p>
+            </div>
+          )}
                           <div className="mb-7 text-center">
                           {error && <p className="text-red-500">{error}</p>}
 

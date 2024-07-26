@@ -24,7 +24,7 @@ import InsumoDetalle from './pages/Ventas/Detalles';
 import DetalleCompra from './pages/Compras/DetalleCompra';
 import { UserProvider } from './context/ContextoUsuario';
 import Navbarclient from './components/consts/VIewClients/Navbarclient'
-
+import RecuperarContrasena from './components/consts/recuperarContrasena';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -34,6 +34,8 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="/iniciarSesion" element={<Login />} />
+        <Route path="/recuperarContrasena" element={<RecuperarContrasena />} />
+
         <Route path="/Registrar" element={<CrearCuenta />} />
         <Route path="/Catalogo" element={<Navbarclient />} />
         <Route path="/" element={<App />}>
