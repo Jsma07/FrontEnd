@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import ModalInsumos from "../../components/consts/Modalventas";
+import ModalAdiciones from "../../components/consts/Modalventas";
 import Swal from "sweetalert2";
 import ServicioSeleccionado from "../../components/consts/SeleccionServicios";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -15,13 +15,16 @@ const Registrar = () => {
   const [subtotal, setSubtotal] = useState(0);
   const [modalData, setModalData] = useState(null);
   const [modalAbierto, setModalAbierto] = useState(false);
-  const [insumos, setInsumos] = useState([]);
-  const [insumosSeleccionados, setInsumosSeleccionados] = useState([]);
-  const [ivaValue, setIvaValue] = useState(0);
-  const [cantidadInsumos, setCantidadInsumos] = useState({});
+  const [adicionSeleccionada, setAdicionSeleccionada] = useState([]);
+  const [adiciones, setAdiciones] = useState([]);
+  const [ivaValue, setIvaValue] = useState(0.19); // IVA del 19%
   const [iva, setIva] = useState(0);
   const [totalGeneral, setTotalGeneral] = useState(0);
   const [descuento, setDescuento] = useState(0);
+  const [fechaFactura, setFechaFactura] = useState("");
+  const ivaRate = 0.19; // IVA del 19%
+  const [servicioSeleccionado, setServicioSeleccionado] = useState(null);
+
   const abrirModal = () => {
     setModalAbierto(true);
   };
@@ -73,6 +76,21 @@ const Registrar = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const fetchAdiciones = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/Jackenail/Listarventas/adiciones"
+        );
+        setAdiciones(response.data);
+      } catch (error) {
+        console.error("Error al obtener las adiciones:", error);
+      }
+    };
+
+    fetchAdiciones();
+  }, []);
+
   const handleImagenSeleccionada = (event) => {
     const file = event.target.files[0];
     const reader = new FileReader();
@@ -83,130 +101,125 @@ const Registrar = () => {
 
     reader.readAsDataURL(file);
   };
+  useEffect(() => {
+    const calcularTotal = () => {
+      const precioServicio = servicioSeleccionado
+        ? parseFloat(servicioSeleccionado.Precio_Servicio)
+        : 0; // Convert to number and handle null
 
+      const subtotalAdiciones = adicionSeleccionada.reduce(
+        (acc, item) => acc + parseFloat(item.Precio), // Convert to number
+        0
+      );
+
+      const subtotalCalculado = subtotalAdiciones + precioServicio;
+      const totalConDescuento = subtotalCalculado - descuento;
+      const totalFinal = totalConDescuento * (1 + ivaRate);
+
+      setSubtotal(subtotalCalculado);
+      setTotalGeneral(totalFinal);
+    };
+
+    calcularTotal(); // Call it initially
+  }, [servicioSeleccionado, adicionSeleccionada, descuento]);
+
+  const handleServicioChange = (e) => {
+    const servicioId = parseInt(e.target.value);
+    const servicio = servicios.find((s) => s.IdServicio === servicioId);
+    setServicioSeleccionado(servicio);
+  };
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const idServicio = parseInt(event.target.Servicios.value);
-    const idEmpleado = parseInt(event.target.Empleado.value);
-    const idCliente = parseInt(event.target.Cliente.value);
-    const iva = parseFloat(event.target.iva.value);
-    const fecha = event.target.fecha.value;
-    const descuento = event.target.Descuento.value;
+    const servicioElement = event.target.Servicio;
+    const empleadoElement = event.target.Empleado;
+    const clienteElement = event.target.Cliente;
+    const ivaElement = event.target.iva;
+    const fechaElement = event.target.fecha;
+    const descuentoElement = event.target.Descuento;
 
-    let subtotal = 0;
-    // Verifica si insumosSeleccionados está definido antes de usarlo
-    if (insumosSeleccionados) {
-      insumosSeleccionados.forEach((insumo) => {
-        subtotal +=
-          insumo.PrecioUnitario * (cantidadInsumos[insumo.IdInsumos] || 0);
-      });
+    if (
+      !servicioElement ||
+      !empleadoElement ||
+      !clienteElement ||
+      !ivaElement ||
+      !fechaElement ||
+      !descuentoElement
+    ) {
+      console.error("Uno o más campos del formulario no están definidos.");
+      return;
     }
 
-    const total = subtotal + (subtotal * iva) / 100;
+    const idServicio = parseInt(servicioElement.value);
+    const idEmpleado = parseInt(empleadoElement.value);
+    const idCliente = parseInt(clienteElement.value);
+    const iva = parseFloat(ivaElement.value);
+    const fecha = fechaElement.value;
+    const descuento = parseFloat(descuentoElement.value);
 
+    // Asegúrate de que subtotal y totalGeneral estén definidos y calculados
     const ventaData = {
-      idServicio: idServicio,
-      idEmpleado: idEmpleado,
+      idServicio,
+      idEmpleado,
       IdCliente: idCliente,
       Iva: iva,
       Subtotal: subtotal.toFixed(2),
       Fecha: fecha,
       Descuento: descuento,
-      Total: total.toFixed(2),
+      Total: totalGeneral.toFixed(2),
       Estado: 1,
     };
 
     console.log("Datos de la venta:", ventaData);
 
     try {
+      // Registrar la venta
       const ventaResponse = await axios.post(
         "http://localhost:5000/Jackenail/RegistrarVenta",
         ventaData
       );
 
-      console.log("Venta registrada con éxito:", ventaResponse.data);
+      console.log("adicionSeleccionada:", adicionSeleccionada);
+      console.log("ventaResponse:", ventaResponse);
 
-      if (insumosSeleccionados) {
-        const detallesVenta = {
-          detalles: insumosSeleccionados.map((insumo) => ({
-            Idventa: ventaResponse.data.idVentas,
-            Idinsumo: insumo.IdInsumos,
-            Usos: parseInt(cantidadInsumos[insumo.IdInsumos] || 0),
-            Precio_unitario: insumo.PrecioUnitario,
-          })),
-        };
+      const detallesVenta = {
+        detalles: adicionSeleccionada.map((adicion) => ({
+          Idventa: ventaResponse.data.idVentas,
+          IdAdiciones: adicion.IdAdiciones,
+        })),
+      };
 
-        try {
-          const detallesResponse = await axios.post(
-            "http://localhost:5000/Jackenail/Detalleregistrar",
-            detallesVenta
-          );
+      console.log("detallesVenta:", detallesVenta);
 
-          console.log(
-            "Detalles de venta registrados con éxito:",
-            detallesResponse.data
-          );
-        } catch (error) {
-          console.error("Error al registrar los detalles de venta:", error);
-        }
-      }
-
-      // Obtener el ID de la venta guardada
-      const ventaId = ventaResponse.data.idVentas;
-
-      // Utilizado para calcular las existencias disponibles y cantidades de los insumos después de realizar las ventas y el detalle
-      const updatedInsumos = insumosSeleccionados.map((insumo) => {
-        const cantidadVendida = cantidadInsumos[insumo.IdInsumos] || 0;
-        const usoUnitario = insumo.usos_unitarios;
-        let nuevosUsosDisponibles = insumo.UsosDisponibles;
-        let nuevaCantidadDisponible = insumo.Cantidad;
-
-        console.log("Insumo:", insumo.NombreInsumos);
-        console.log("Cantidad vendida:", cantidadVendida);
-        console.log("Usos unitarios:", usoUnitario);
-        console.log("Usos disponibles antes:", nuevosUsosDisponibles);
-        console.log("Cantidad disponible antes:", nuevaCantidadDisponible);
-
-        if (cantidadVendida > 0) {
-          const usosCompletos = Math.floor(cantidadVendida / usoUnitario);
-          const resto = cantidadVendida % usoUnitario;
-
-          nuevosUsosDisponibles -= usosCompletos * usoUnitario;
-          nuevaCantidadDisponible -= usosCompletos;
-
-          if (resto > 0) {
-            nuevosUsosDisponibles -= resto;
-          }
-
-          console.log(
-            "Usos completos utilizados:",
-            usosCompletos * usoUnitario
-          );
-          console.log("Resto utilizado:", resto);
-          console.log("Nuevos usos disponibles:", nuevosUsosDisponibles);
-          console.log("Nueva cantidad disponible:", nuevaCantidadDisponible);
-        }
-
-        return {
-          idInsumo: insumo.IdInsumos,
-          usosDisponibles: nuevosUsosDisponibles,
-          cantidad: nuevaCantidadDisponible,
-        };
-      });
-
-      await Promise.all(
-        updatedInsumos.map(async (insumo) => {
-          await axios.put(
-            `http://localhost:5000/api/existenciainsumos/editar/${insumo.idInsumo}`,
-            {
-              UsosDisponibles: insumo.usosDisponibles,
-              Cantidad: insumo.cantidad,
-            }
-          );
-        })
+      const detallesVentaParams = new URLSearchParams();
+      detallesVentaParams.append(
+        "detalles",
+        JSON.stringify(detallesVenta.detalles)
       );
 
+      try {
+        const detallesResponse = await axios.post(
+          "http://localhost:5000/Jackenail/Detalleregistrar",
+          detallesVentaParams,
+          {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          }
+        );
+
+        console.log(
+          "Detalles de venta registrados con éxito:",
+          detallesResponse.data
+        );
+      } catch (error) {
+        console.error(
+          "Error al registrar los detalles de venta:",
+          error.response?.data || error.message
+        );
+      }
+
+      // Mostrar notificación de éxito y redireccionar
       Swal.fire({
         position: "bottom-end",
         icon: "success",
@@ -214,104 +227,13 @@ const Registrar = () => {
         showConfirmButton: false,
         timer: 1500,
       });
-      window.location.href = "http://localhost:3000/ventas";
     } catch (error) {
-      console.error("Error al registrar la venta:", error);
+      console.error(
+        "Error al registrar la venta:",
+        error.response?.data || error.message
+      );
     }
   };
-
-  //solicutd para traer todos los insumos y ponerlos en un modal para utilizarlo en el detalle de las ventas
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/insumos");
-        console.log(response.data);
-        setInsumos(response.data);
-      } catch (error) {
-        console.error("Error al obtener los insumos:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleAdd = (id) => {
-    const insumoSeleccionado = insumos.find(
-      (insumo) => insumo.IdInsumos === id
-    );
-    setInsumosSeleccionados([...insumosSeleccionados, insumoSeleccionado]);
-  };
-
-  useEffect(() => {
-    let total = 0;
-
-    insumosSeleccionados.forEach((insumo) => {
-      const cantidadVendida = cantidadInsumos[insumo.IdInsumos] || 0;
-      const usoUnitario = insumo.usos_unitarios;
-      let subtotal = 0;
-
-      if (cantidadVendida > 0) {
-        const usosCompletos = Math.floor(cantidadVendida / usoUnitario);
-        const resto = cantidadVendida % usoUnitario;
-
-        subtotal = insumo.PrecioUnitario * usosCompletos;
-
-        if (resto > 0) {
-          subtotal += insumo.PrecioUnitario;
-        }
-      }
-      const ivaCalculado = subtotal * 0.19;
-      total += subtotal + ivaCalculado;
-    });
-    const descuentoAplicado = total * (descuento / 100);
-    const totalConDescuento = total - descuentoAplicado;
-
-    setTotalGeneral(totalConDescuento);
-    setIva(total * (0.19 / 100));
-  }, [cantidadInsumos, insumosSeleccionados, descuento]);
-
-  const handleCantidadChange = (e, idInsumo) => {
-    const { value } = e.target;
-    let cantidad = parseInt(value);
-
-    // Validar que la cantidad no sea negativa
-    if (cantidad < 0 || isNaN(cantidad)) {
-      cantidad = 0; // Establecer la cantidad a cero si es negativa o no es un número
-      // Mostrar alerta de SweetAlert
-      Swal.fire({
-        icon: "warning",
-        title: "Cantidad inválida",
-        text: "La cantidad no puede ser negativa",
-        position: "center",
-      });
-    }
-
-    // Validar que la cantidad no sea mayor que los usos disponibles
-    const usosDisponibles = insumosSeleccionados.find(
-      (insumo) => insumo.IdInsumos === idInsumo
-    ).UsosDisponibles;
-
-    if (cantidad > usosDisponibles) {
-      // Mostrar alerta de SweetAlert con usos disponibles
-      Swal.fire({
-        icon: "warning",
-        title: "Cantidad inválida",
-        text: `La cantidad no puede ser mayor que los usos disponibles. Usos disponibles: ${usosDisponibles}`,
-        position: "center",
-      });
-
-      // Establecer la cantidad en los usos disponibles
-      setCantidadInsumos({
-        ...cantidadInsumos,
-        [idInsumo]: usosDisponibles,
-      });
-    } else {
-      // Si la cantidad es válida, actualizar el estado cantidadInsumos
-      setCantidadInsumos({ ...cantidadInsumos, [idInsumo]: cantidad });
-    }
-  };
-
-  const [fechaFactura, setFechaFactura] = useState("");
 
   useEffect(() => {
     const obtenerFechaActual = () => {
@@ -373,15 +295,16 @@ const Registrar = () => {
             <div className="relative">
               <input type="hidden" name="idventa" id="idventa" />
               <select
-                name="Servicios"
-                id="Servicios"
+                name="Servicio"
+                id="Servicio"
                 className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+                onChange={handleServicioChange}
                 required
               >
-                <option value="">Seleccione un servicio</option>
+                <option value="">Seleccione un Servicio</option>
                 {servicios.map((servicio) => (
                   <option key={servicio.IdServicio} value={servicio.IdServicio}>
-                    {servicio.Nombre_Servicio}
+                    {servicio.NombreServicio} , ${servicio.Precio_Servicio}
                   </option>
                 ))}
               </select>
@@ -522,7 +445,7 @@ const Registrar = () => {
           <h3
             style={{ textAlign: "left", fontSize: "23px", fontWeight: "bold" }}
           >
-            Factura de venta{" "}
+            Factura de venta
           </h3>
         </div>
 
@@ -538,29 +461,26 @@ const Registrar = () => {
             marginBottom: "10px",
           }}
         >
-          <div>Nombre</div>
-          <div>Precio Unitario</div>
-          <div>Cantidad</div>
-          <div>Cantidad</div>
+          <div>Img</div>
+          <div>Nombre Adicion</div>
+          <div>Precio Adicion</div>
         </div>
 
-        {insumosSeleccionados.map((insumo) => (
-          <div key={insumo.IdInsumos} style={{ marginBottom: "10px" }}>
+        {adicionSeleccionada.map((adicion, index) => (
+          <div key={index} style={{ marginBottom: "10px" }}>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <div>{insumo.NombreInsumos}</div>
-              <div>{insumo.PrecioUnitario}</div>
-              <div>{insumo.Cantidad}</div>
               <div>
-                <input
-                  type="number"
-                  value={cantidadInsumos[insumo.IdInsumos] || ""}
-                  onChange={(e) => handleCantidadChange(e, insumo.IdInsumos)}
+                <img
+                  src={`http://localhost:5000${adicion.Img}`}
+                  alt={adicion.NombreAdiciones}
+                  style={{ width: "50px", height: "50px", objectFit: "cover" }}
                 />
               </div>
+              <div>{adicion.NombreAdiciones}</div>
+              <div>${adicion.Precio.toFixed(2)}</div>
             </div>
           </div>
         ))}
-
         <div
           style={{
             marginTop: "40px",
@@ -612,16 +532,16 @@ const Registrar = () => {
         </div>
       </div>
 
-      <ModalInsumos
-        open={modalAbierto}
-        handleClose={cerrarModal}
-        title="Agregar adiciones"
-        onSubmit={handleSubmit}
-        seleccionado={modalData}
-        insumos={insumos}
-        insumosSeleccionados={insumosSeleccionados}
-        setInsumosSeleccionados={setInsumosSeleccionados}
-      />
+      <div>
+        <ModalAdiciones
+          open={modalAbierto}
+          handleClose={cerrarModal}
+          title="Selecciona Adiciones"
+          adiciones={adiciones}
+          setAdicionesSeleccionadas={setAdicionSeleccionada}
+          adicionesSeleccionadas={adicionSeleccionada}
+        />
+      </div>
     </section>
   );
 };

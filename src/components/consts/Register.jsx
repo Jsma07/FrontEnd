@@ -1,89 +1,257 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import { toast, ToastContainer } from "react-toastify";
 
-const CrearCuenta = () => {
-  const handleLogin = (e) => {
+function Register() {
+  const [formData, setFormData] = useState({
+    Nombre: '',
+    Apellido: '',
+    Correo: '',
+    Telefono: '',
+    Documento: '',
+    tipoDocumento: '',
+    Contrasena: ''
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí puedes implementar la lógica de inicio de sesión
-    // Por ejemplo, enviar datos a un servidor
+
+    try {
+      const { Nombre, Apellido, Correo, Telefono, Documento, tipoDocumento, Contrasena } = formData;
+      if (!Nombre || !Apellido || !Correo || !Telefono || !Documento || !tipoDocumento || !Contrasena) {
+        toast.error("Todos los campos son obligatorios.", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+        return ;
+      }
+      const nameRegex = /^[a-zA-Z\s]+$/;
+      const numeroRegex = /^[0-9]+$/;
+      if (!nameRegex.test(Nombre)) {
+        toast.error("El nombre solo puede contener letras y espacios.", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+        return ;
+      }
+      if (!nameRegex.test(Apellido)) {
+        toast.error("El Apellido solo puede contener letras y espacios.", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+        return ;
+      }
+      if (!numeroRegex.test(Documento)) {
+        toast.error("El Documento solo puede contener números.", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+        return ;
+      }
+      if (!numeroRegex.test(Telefono)) {
+        toast.error("El Teléfono solo puede contener números.", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+        return ;
+      }
+      const validacionCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!validacionCorreo.test(Correo)) {
+        toast.error("El Correo no tiene un formato válido.", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+        return
+      }
+      const validacionContrasena = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+      if (!validacionContrasena.test(Contrasena)) {
+        toast.error("La contraseña debe tener mínimo 8 caracteres, una mayúscula y un número..", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+      return
+      }
+      // Confirmación antes de registrar
+      const CorreoResponse = await axios.get(
+        `http://localhost:5000/api/verificarCorreo/${formData.Correo}`
+        
+      );
+      const DocumentoResponse = await axios.get(
+        `http://localhost:5000/api/verificarDocumento/${formData.Documento}`
+        
+      );
+
+      if(CorreoResponse.status === 200 && DocumentoResponse === 200){
+        const formDataNumerico = {
+          Nombre: formData.Nombre,
+          Apellido: formData.Apellido,
+          Correo: formData.Correo,
+          Telefono: formData.Telefono,
+          Estado: 1,
+          IdRol: 4,
+          Documento: formData.Documento,
+          tipoDocumento: formData.tipoDocumento,
+          Contrasena: formData.Contrasena,
+        };
+
+        // console.log("Datos del formulario:", formDataNumerico);
+
+        // Enviar datos al backend
+        const response = await axios.post(
+          "http://localhost:5000/Jackenail/RegistrarClientes",
+          formDataNumerico
+        );
+
+        // Mostrar alerta de éxito
+        toast.success("El cliente se ha registrado correctamente.", {
+          position: "bottom-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+        });
+
+        // Limpiar el formulario
+        setFormData({
+          Nombre: '',
+          Apellido: '',
+          Correo: '',
+          Telefono: '',
+          Documento: '',
+          tipoDocumento: '',
+          Contrasena: ''
+        });
+      }
+    }
+    catch (error) {
+      if (error.response && error.response.status === 400) {
+        // Mostrar alerta de error si el servidor responde con un error 400
+        toast.error(`${error.response.data.mensaje}`, {
+          position: "bottom-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+        });
+      } else {
+        console.error("Error al registrar el cliente:", error);
+        // Mostrar alerta de error en caso de error interno
+        toast.error("Ocurrió un error al registrar el cliente.", {
+          position: "bottom-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+        });
+      }
+    }
   };
 
   return (
-    <div className=" container mx-auto my-auto p-4 flex flex-col items-center justify-center ">
-    <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-        <img className="w-8 h-8 mr-2" src="Jacke.png" alt="logo"/>
-        Jacke Nail    
-    </a>
-
-
-<div className="bg-red-100 container mx-auto p-4 flex flex-col lg:flex-row items-center justify-center border-1 border-gray-900 lg:w-64 rounded-lg shadow-lg mt-8">
-    <div className=" bg-transparent lg:flex lg:items-center lg:justify-center lg:mr-8">
-        <img src="unas.png" alt="Imagen predeterminada" className="bg-transparent max-w-md w-full lg:w-64 rounded-lg shadow-lg" />
-    </div>
-
-    <div className="p-8 space-y-4">
-        <h1 className="text-center font-cursive mb-4">Regístrate</h1>
-
-        <div className="grid grid-cols-2 gap-4 mx-5">
-            <div className="relative">
-                <input type="text" id="small_outlined" className="block px-4 pb-1.5 pt-3 w-full text-sm text-grwhite rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
-                <label for="small_outlined" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-3 scale-75 top-1 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-1 peer-focus:scale-75 peer-focus:-translate-y-3 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                   Nombre: </label>
-            </div>
-
-            <div className="relative">
-                <input type="text" id="small_outlined" className="block px-4 pb-1.5 pt-3 w-full text-sm text-gray-900 bg-white rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
-                <label for="small_outlined" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-3 scale-75 top-1 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-1 peer-focus:scale-75 peer-focus:-translate-y-3 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                   Apellidos: </label>
-            </div>
-
-
-            
-            <div className="relative">
-                <input type="number" id="small_outlined" className="block px-2.5 pb-1.5 pt-3 w-full text-sm text-gray-900 bg-white rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
-                <label for="small_outlined" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-3 scale-75 top-1 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-1 peer-focus:scale-75 peer-focus:-translate-y-3 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                   Documento: </label>
-            </div>
-
-
-            <div className="relative">
-                <input type="email" id="small_outlined" className="block px-2.5 pb-1.5 pt-3 w-full text-sm text-gray-900 bg-white rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
-                <label for="small_outlined" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-3 scale-75 top-1 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-1 peer-focus:scale-75 peer-focus:-translate-y-3 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                   Correo: </label>
-            </div>
-
-            <div className="relative">
-                <input type="number" id="small_outlined" className="block px-2.5 pb-1.5 pt-3 w-full text-sm text-gray-900 bg-white rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
-                <label for="small_outlined" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-3 scale-75 top-1 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-1 peer-focus:scale-75 peer-focus:-translate-y-3 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                   Telefono: </label>
-            </div>
-
-            <div className="relative">
-                <input type="password" id="small_outlined" className="block px-2.5 pb-1.5 pt-3 w-full text-sm text-gray-900 bg-white rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
-                <label for="small_outlined" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-3 scale-75 top-1 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-1 peer-focus:scale-75 peer-focus:-translate-y-3 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">
-                   Contraseña: </label>
-            </div>
-
+   
+    <div className="bg-pink-900 absolute top-0 left-0 bg-gradient-to-b from-gray-900 via-gray-900 to-purple-800 bottom-0 leading-5 h-full w-full overflow-hidden">
+      <div className="relative min-h-screen sm:flex sm:flex-row justify-center bg-transparent rounded-3xl shadow-xl">
+        <div className="absolute top-0 left-0 p-4">
+          <img src="/jacke.png" alt="Logo" className="h-16 rounded-full" />
         </div>
-
-        <div className="flex flex-col items-center">
-                
-                    <div className="flex items-center justify-center">
-                        <button type="button" className="text-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Crear cuenta</button>
-                    </div>
-                </div>
-                <div className="m-3 flex items-center justify-center">
-                    <p className="text-sm font-light text-gray-700 dark:text-gray-700">
-                        ¿Ya tienes una cuenta? <a href="/iniciarSesion" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Inicia sesión!</a>
-                    </p>
-                </div>
+        <div className="flex-col flex self-center lg:px-14 sm:max-w-4xl xl:max-w-md z-10">
+          <div className="self-start hidden lg:flex flex-col text-gray-300">
+            <h1 className="my-7 font-semibold text-4xl">Jake Nails</h1>
+            <p className="pr-3 text-sm opacity-75">Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups</p>
+          </div>
+        </div>
+        <div className="flex justify-center self-center z-10">
+          <div className="p-12 bg-white mx-auto rounded-3xl w-96">
+            <div className="mb-7 text-center">
+              <h3 className="font-semibold text-2xl text-gray-800">Regístrate</h3>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <select
+                name="tipoDocumento"
+                value={formData.tipoDocumento}
+                onChange={handleChange}
+                className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+              >
+                <option value="" disabled>Tipo de documento</option>
+                <option value="C.C">Cédula de ciudadania</option>
+                <option value="C.E">Cédula de extranjeria</option>
+                {/* Añade más opciones según tus necesidades */}
+              </select>
+              <input
+                name="Documento"
+                value={formData.Documento}
+                onChange={handleChange}
+                className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+                type="text"
+                placeholder="Número de documento: "
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  name="Nombre"
+                  value={formData.Nombre}
+                  onChange={handleChange}
+                  className="text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+                  type="text"
+                  placeholder="Nombre:"
+                />
+                <input
+                  name="Apellido"
+                  value={formData.Apellido}
+                  onChange={handleChange}
+                  className="text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+                  type="text"
+                  placeholder="Apellido:"
+                />
+              </div>
+              <input
+                name="Telefono"
+                value={formData.Telefono}
+                onChange={handleChange}
+                className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+                type="text"
+                placeholder="Telefono: "
+              />
+              <input
+                name="Correo"
+                value={formData.Correo}
+                onChange={handleChange}
+                className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+                type="email"
+                placeholder="Correo Electrónico: "
+              />
+              <input
+                name="Contrasena"
+                value={formData.Contrasena}
+                onChange={handleChange}
+                className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+                type="password"
+                placeholder="Contraseña:"
+              />
+              <button
+                type="submit"
+                className="w-full flex justify-center bg-purple-800 hover:bg-purple-700 text-gray-100 p-3 rounded-lg tracking-wide font-semibold cursor-pointer transition ease-in duration-500"
+              >
+                Registrarse
+              </button>
+              <p className="text-gray-400 text-center">¿Ya tienes una cuenta? <a href="/iniciarSesion" className="text-sm text-purple-700 hover:text-purple-700">Inicia sesión</a></p>
+            </form>
+            <ToastContainer
+    position="bottom-right"
+    autoClose={5000}
+    hideProgressBar={false}
+    newestOnTop={false}
+    closeOnClick
+    rtl={false}
+    pauseOnFocusLoss
+    draggable
+    pauseOnHover
+  />
+          </div>
+        </div>
+      </div>
     </div>
-</div>
-
-
-
-</div>
-
+    
   );
-};
+}
 
-export default CrearCuenta;
+export default Register;

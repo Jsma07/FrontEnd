@@ -1,161 +1,510 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import ModalAdiciones from "../../components/consts/Modalventas";
+import Swal from "sweetalert2";
+import ServicioSeleccionado from "../../components/consts/SeleccionServicios";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import Fab from "@mui/material/Fab";
+import { Select, MenuItem } from "@mui/material";
 
-const InsumoDetalle = () => {
-  const { id } = useParams();
-  const [venta, setVenta] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const Registrar = () => {
+  const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
+  const [empleados, setEmpleados] = useState([]);
+  const [clientes, setClientes] = useState([]);
+  const [servicios, setServicios] = useState([]);
+  const [subtotal, setSubtotal] = useState(0);
+  const [modalData, setModalData] = useState(null);
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [adicionSeleccionada, setAdicionSeleccionada] = useState([]);
+  const [adiciones, setAdiciones] = useState([]);
+  const [ivaValue, setIvaValue] = useState(0.19); // IVA del 19%
+  const [iva, setIva] = useState(0);
+  const [totalGeneral, setTotalGeneral] = useState(0);
+  const [descuento, setDescuento] = useState(0);
+  const [fechaFactura, setFechaFactura] = useState("");
+  const ivaRate = 0.19; // IVA del 19%
+  const [servicioSeleccionado, setServicioSeleccionado] = useState(null);
+
+  const abrirModal = () => {
+    setModalAbierto(true);
+  };
+
+  const cerrarModal = () => {
+    setModalAbierto(false);
+  };
 
   useEffect(() => {
-    const fetchDetalleVenta = async () => {
+    const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/Buscardetalle/${id}`
+          "http://localhost:5000/jackenail/Listar_Empleados"
         );
-        setVenta(response.data[0]); // Asumimos que el primer elemento es la venta agrupada
-        setLoading(false);
-      } catch (err) {
-        setError(err);
-        setLoading(false);
+        setEmpleados(response.data);
+      } catch (error) {
+        console.error("Error al obtener los datos de empleados:", error);
       }
     };
 
-    fetchDetalleVenta();
-  }, [id]);
+    fetchData();
+  }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+  useEffect(() => {
+    fetchServicios();
+  }, []);
+
+  const fetchServicios = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/servicios");
+      setServicios(response.data);
+    } catch (error) {
+      console.error("Error fetching servicios:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/jackenail/Listar_Clientes"
+        );
+        setClientes(response.data);
+      } catch (error) {
+        console.error("Error al obtener los datos de clientes:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchAdiciones = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/Jackenail/Listarventas/adiciones"
+        );
+        setAdiciones(response.data);
+      } catch (error) {
+        console.error("Error al obtener las adiciones:", error);
+      }
+    };
+
+    fetchAdiciones();
+  }, []);
+
+  const handleImagenSeleccionada = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      setImagenSeleccionada(e.target.result);
+    };
+
+    reader.readAsDataURL(file);
+  };
+  useEffect(() => {
+    const calcularTotal = () => {
+      const precioServicio = servicioSeleccionado
+        ? parseFloat(servicioSeleccionado.Precio_Servicio)
+        : 0; // Convert to number and handle null
+
+      const subtotalAdiciones = adicionSeleccionada.reduce(
+        (acc, item) => acc + parseFloat(item.Precio), // Convert to number
+        0
+      );
+
+      const subtotalCalculado = subtotalAdiciones + precioServicio;
+      const totalConDescuento = subtotalCalculado - descuento;
+      const totalFinal = totalConDescuento * (1 + ivaRate);
+
+      setSubtotal(subtotalCalculado);
+      setTotalGeneral(totalFinal);
+    };
+
+    calcularTotal(); // Call it initially
+  }, [servicioSeleccionado, adicionSeleccionada, descuento]);
+
+  const handleServicioChange = (e) => {
+    const servicioId = parseInt(e.target.value);
+    const servicio = servicios.find((s) => s.IdServicio === servicioId);
+    setServicioSeleccionado(servicio);
+  };
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const idServicio = parseInt(event.target.Servicio.value); // Asegúrate de que el nombre del campo coincida
+    const idEmpleado = parseInt(event.target.Empleado.value);
+    const idCliente = parseInt(event.target.Cliente.value);
+    const iva = parseFloat(event.target.iva.value);
+    const fecha = event.target.fecha.value;
+    const descuento = parseFloat(event.target.Descuento.value);
+
+    const ventaData = {
+      idServicio: idServicio,
+      idEmpleado: idEmpleado,
+      IdCliente: idCliente,
+      Iva: iva,
+      Subtotal: subtotal.toFixed(2),
+      Fecha: fecha,
+      Descuento: descuento,
+      Total: totalGeneral.toFixed(2),
+      Estado: 1,
+    };
+
+    console.log("Datos de la venta:", ventaData);
+
+    try {
+      const ventaResponse = await axios.post(
+        "http://localhost:5000/Jackenail/RegistrarVenta",
+        ventaData
+      );
+
+      console.log("Venta registrada con éxito:", ventaResponse.data);
+
+      if (adicionSeleccionada) {
+        const detallesVenta = {
+          detalles: adicionSeleccionada.map((Adiconesdetalle) => ({
+            Idventa: ventaResponse.data.idVentas,
+            IdAdiciones: Adiconesdetalle.IdAdiciones,
+          })),
+        };
+
+        try {
+          const detallesResponse = await axios.post(
+            "http://localhost:5000/Jackenail/Detalleregistrar",
+            detallesVenta
+          );
+
+          console.log(
+            "Detalles de venta registrados con éxito:",
+            detallesResponse.data
+          );
+        } catch (error) {
+          console.error("Error al registrar los detalles de venta:", error);
+        }
+      }
+
+      Swal.fire({
+        position: "bottom-end",
+        icon: "success",
+        title: "Venta registrada con éxito",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+
+      window.location.href = "http://localhost:3000/ventas";
+    } catch (error) {
+      console.error("Error al registrar la venta:", error);
+    }
+  };
+
+  useEffect(() => {
+    const obtenerFechaActual = () => {
+      const fecha = new Date();
+      const options = {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+      };
+      const fechaFormateada = fecha.toLocaleDateString("es-ES", options);
+      setFechaFactura(fechaFormateada);
+    };
+
+    obtenerFechaActual();
+
+    // Actualizar la fecha cada segundo (opcional)
+    const intervalo = setInterval(() => {
+      obtenerFechaActual();
+    }, 1000);
+
+    // Limpiar intervalo al desmontar el componente
+    return () => clearInterval(intervalo);
+  }, []);
 
   return (
-    <div className="container mx-auto p-4 pt-6 md:p-6">
-    <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-white">Detalle de Venta</h1>
-
-    {venta && (
-      <div>
-        {/* Información principal de la venta */}
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg mb-6">
-          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-              <tr>
-                <th scope="col" className="px-6 py-3">Servicio</th>
-                <th scope="col" className="px-6 py-3">Cliente</th>
-                <th scope="col" className="px-6 py-3">Empleado</th>
-                <th scope="col" className="px-6 py-3">Precio Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                <td className="px-6 py-4 flex items-center space-x-4">
-                  <img
-                    src={venta.venta.servicio.ImgServicio}
-                    alt={venta.venta.servicio.Nombre_Servicio}
-                    className="w-12 h-12 rounded-full object-cover"
+    <section className="content">
+      <div
+        style={{
+          paddingTop: "40px", // Ajuste el padding superior para dar espacio al título
+          margin: "0 auto",
+          borderRadius: "30px",
+          marginTop: "20px",
+          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.25)",
+          position: "fixed",
+          top: "80px",
+          left: "100px",
+          width: "calc(38% - 100px)",
+          padding: "20px",
+        }}
+      >
+        <h1 className="text-2xl font-bold mb-6">Gestión de Ventas</h1>
+        <form
+          action=""
+          name="formulario"
+          id="formulario"
+          method="POST"
+          onSubmit={handleSubmit}
+        >
+          <div className="form-group mb-4">
+            <label
+              htmlFor="Servicios"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Servicios
+            </label>
+            <div className="relative">
+              <input type="hidden" name="idventa" id="idventa" />
+              <select
+                name="Servicio"
+                id="Servicio"
+                className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+                onChange={handleServicioChange}
+                required
+              >
+                <option value="">Seleccione un Servicio</option>
+                {servicios.map((servicio) => (
+                  <option key={servicio.IdServicio} value={servicio.IdServicio}>
+                    {servicio.NombreServicio} , ${servicio.Precio_Servicio}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <svg
+                  className="h-4 w-4 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
                   />
-                  <span>{venta.venta.servicio.Nombre_Servicio}</span>
-                </td>
-                <td className="px-6 py-4">{venta.venta.cliente.Nombre} {venta.venta.cliente.Apellido}</td>
-                <td className="px-6 py-4">{venta.venta.empleado.Nombre} {venta.venta.empleado.Apellido}</td>
-                <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">${venta.venta.Total.toFixed(2)}</td>
-              </tr>
-            </tbody>
-          </table>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-group mb-4">
+            <label htmlFor="Empleado">Empleado</label>
+            <select
+              name="Empleado"
+              id="Empleado"
+              className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+              required
+            >
+              <option value="">Seleccione un Empleado</option>
+              {empleados.map((empleado) => (
+                <option key={empleado.IdEmpleado} value={empleado.IdEmpleado}>
+                  {empleado.Nombre} {empleado.Apellido}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group mb-4">
+            <label htmlFor="Cliente">Cliente</label>
+            <select
+              name="Cliente"
+              id="Cliente"
+              className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+              required
+            >
+              <option value="">Seleccione un Cliente</option>
+              {clientes.map((cliente) => (
+                <option key={cliente.IdCliente} value={cliente.IdCliente}>
+                  {cliente.Nombre} {cliente.Apellido}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group mb-4">
+            <label
+              htmlFor="iva"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              IVA
+            </label>
+            <input
+              type="number"
+              name="iva"
+              id="iva"
+              value={iva.toFixed(2)}
+              onChange={(e) => setIva(parseFloat(e.target.value))}
+              className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+              placeholder="IVA"
+            />
+          </div>
+
+          <div className="form-group grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label htmlFor="fecha">Fecha</label>
+              <input
+                type="date"
+                id="fecha"
+                name="fecha"
+                className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="Descuento"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Descuento
+              </label>
+              <input
+                type="number"
+                id="Descuento"
+                className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+                placeholder="Descuento"
+                name="Descuento"
+                value={descuento}
+                onChange={(e) => setDescuento(parseFloat(e.target.value))}
+                required
+              />
+            </div>
+          </div>
+
+          <Fab
+            aria-label="add"
+            style={{
+              border: "0.5px solid grey",
+              backgroundColor: "#94CEF2",
+              position: "fixed",
+              bottom: "16px",
+              right: "16px",
+              zIndex: 1000,
+              cursor: "pointer",
+            }}
+            type="submit"
+          >
+            <i className="bx bxs-save" style={{ fontSize: "1.8rem" }}></i>
+          </Fab>
+        </form>
+      </div>
+
+      <div
+        style={{
+          paddingTop: "10px",
+          margin: "0 auto",
+          borderRadius: "30px",
+          marginTop: "20px",
+          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.3)",
+          position: "fixed",
+          right: "20px", // Alineado a la derecha
+          top: "80px",
+          width: "calc(65% - 100px)",
+          padding: "20px", // Agregado espacio interior para separar los elementos
+        }}
+      >
+        <div style={{ textAlign: "left", marginBottom: "20px" }}>
+          <h3
+            style={{ textAlign: "left", fontSize: "23px", fontWeight: "bold" }}
+          >
+            Factura de venta
+          </h3>
         </div>
 
-        {/* Resumen de la venta */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h2 className="text-2xl font-bold mb-4 text-gray-800">Resumen de la Venta</h2>
-          <div className="flow-root">
-            <ul className="divide-y divide-gray-200">
-              <li className="py-4 flex items-center space-x-4">
-                <div className="flex-shrink-0">
-                  <svg className="w-6 h-6 text-gray-500" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.75h7.5m-12 12.25h16.5m-16.5 0h16.5M3 8.25l6 5.25 6-5.25"/>
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-base font-semibold text-gray-800">Fecha:</p>
-                  <p className="text-sm text-gray-600">{venta.venta.Fecha}</p>
-                </div>
-              </li>
-              <li className="py-4 flex items-center space-x-4">
-                <div className="flex-shrink-0">
-                  <svg className="w-6 h-6 text-gray-500" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h19.5m-19.5 0h19.5m-18 18h16.5m-16.5 0h16.5"/>
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-base font-semibold text-gray-800">Subtotal:</p>
-                  <p className="text-sm text-gray-600">${venta.venta.Subtotal !== undefined ? venta.venta.Subtotal.toFixed(2) : "0.00"}</p>
-                </div>
-              </li>
-              <li className="py-4 flex items-center space-x-4">
-                <div className="flex-shrink-0">
-                  <svg className="w-6 h-6 text-gray-500" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.75h7.5m-12 12.25h16.5m-16.5 0h16.5M3 8.25l6 5.25 6-5.25"/>
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-base font-semibold text-gray-800">IVA:</p>
-                  <p className="text-sm text-gray-600">${venta.venta.Iva !== undefined ? venta.venta.Iva.toFixed(2) : "0.00"}</p>
-                </div>
-              </li>
-              <li className="py-4 flex items-center space-x-4">
-                <div className="flex-shrink-0">
-                  <svg className="w-6 h-6 text-gray-500" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.75h7.5m-12 12.25h16.5m-16.5 0h16.5M3 8.25l6 5.25 6-5.25"/>
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-base font-semibold text-gray-800">Descuento:</p>
-                  <p className="text-sm text-gray-600">${venta.venta.Descuento !== undefined ? venta.venta.Descuento.toFixed(2) : "0.00"}</p>
-                </div>
-              </li>
-              <li className="py-4 flex items-center space-x-4">
-                <div className="flex-shrink-0">
-                  <svg className="w-6 h-6 text-gray-500" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.75h7.5m-12 12.25h16.5m-16.5 0h16.5M3 8.25l6 5.25 6-5.25"/>
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-base font-semibold text-gray-800">Total:</p>
-                  <p className="text-sm text-gray-600">${venta.venta.Total !== undefined ? venta.venta.Total.toFixed(2) : "0.00"}</p>
-                </div>
-              </li>
-            </ul>
+        <div style={{ textAlign: "right", marginBottom: "20px" }}>
+          <p>Fecha: {fechaFactura}</p>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            fontWeight: "bold",
+            marginBottom: "10px",
+          }}
+        >
+          <div>Img</div>
+          <div>Nombre Adicion</div>
+          <div>Precio Adicion</div>
+        </div>
+
+        {adicionSeleccionada.map((adicion, index) => (
+          <div key={index} style={{ marginBottom: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div>
+                <img
+                  src={`http://localhost:5000${adicion.Img}`}
+                  alt={adicion.NombreAdiciones}
+                  style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                />
+              </div>
+              <div>{adicion.NombreAdiciones}</div>
+              <div>${adicion.Precio.toFixed(2)}</div>
+            </div>
+          </div>
+        ))}
+        <div
+          style={{
+            marginTop: "40px",
+            borderTop: "1px solid #ccc",
+            paddingTop: "20px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginBottom: "10px",
+            }}
+          >
+            <div style={{ fontWeight: "bold", marginRight: "20px" }}>
+              TOTAL:
+            </div>
+            <div>{totalGeneral.toFixed(2)}</div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div style={{ fontWeight: "bold", marginRight: "20px" }}>
+              Descuento aplicado:
+            </div>
+            <div>{descuento.toFixed(2)}</div>
           </div>
         </div>
 
-        {/* Insumos utilizados */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {venta.insumos.map((insumo, index) => (
-            <div
-              key={index}
-              className="max-w-xs bg-white border-2 border-gray-300 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700"
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            marginTop: "20px",
+          }}
+        >
+          <div className="form-group col-lg-3 col-md-3 col-sm-6 col-xs-12 mt-2 mb-3 mx-2">
+            <button
+              type="button"
+              className="bg-pink-200 hover:bg-black-300 focus:ring-4 focus:outline-none focus:ring-black-300 dark:focus:ring-black-800 shadow-lg shadow-black-500/50 dark:shadow-lg dark:shadow-black-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+              onClick={abrirModal}
+              style={{
+                alignSelf: "flex-end",
+                display: "flex",
+                alignItems: "center",
+              }}
             >
-              <div className="overflow-hidden rounded-full mx-auto mt-4 w-24 h-24">
-                <img
-                  className="object-cover w-full h-full"
-                  src={`http://localhost:5000${insumo.imagen}`}
-                  alt={insumo.NombreInsumos}
-                />
-              </div>
-              <div className="p-4 text-center">
-                <h5 className="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-                  {insumo.NombreInsumos}
-                </h5>
-                <p className="text-gray-700 dark:text-gray-400">
-                  Precio unitario: ${insumo.PrecioUnitario.toFixed(2)}
-                </p>
-              </div>
-            </div>
-          ))}
+              <ShoppingCartIcon />{" "}
+            </button>
+          </div>
         </div>
       </div>
-    )}
-  </div>
+
+      <div>
+        <ModalAdiciones
+          open={modalAbierto}
+          handleClose={cerrarModal}
+          title="Selecciona Adiciones"
+          adiciones={adiciones}
+          setAdicionesSeleccionadas={setAdicionSeleccionada}
+          adicionesSeleccionadas={adicionSeleccionada}
+        />
+      </div>
+    </section>
   );
 };
-
-export default InsumoDetalle;
+export default Registrar;

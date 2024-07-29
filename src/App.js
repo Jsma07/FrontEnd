@@ -6,7 +6,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from './components/consts/theme';
 import { toast, ToastContainer } from "react-toastify";
 
-import LoadingScreen from './components/consts/pantallaCarga'; // Importa tu componente de pantalla de carga
+import LoadingScreen from './components/consts/pantallaCarga'; 
 
 function App() {
   const [isLoading, setIsLoading] = React.useState(true);
@@ -46,7 +46,7 @@ function App() {
               justifyContent="center"
               style={{ minHeight: '80vh', position: 'relative' }}
             >
-              <Grid item xs={12} md={8}> {/* Ajusta el tamaño según tus necesidades */}
+              <Grid item xs={12} md={8}> 
                 <Outlet />
               </Grid>
               {/* Botón en la esquina inferior derecha */}

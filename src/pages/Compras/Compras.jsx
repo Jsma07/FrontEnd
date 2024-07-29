@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import Table from "../../components/consts/Tabla";
 import Fab from '@mui/material/Fab';
-import CustomCard from '../../components/consts/cards';
-import modalDetalle from '../../components/consts/modal'
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-const Compras = () => {
+const Compras = ({ params }) => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [compras, setCompras] = useState([]);
   const [buscar, setBuscar] = useState('');
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchCompras();
@@ -25,14 +25,46 @@ const Compras = () => {
     }
   };
 
-const handleEditClick = (id) => {
-  console.log(`Editando compra con ID: ${id}`);
+
+const handleClick = () => {
+  navigate('/compras/crearCompra'); 
 };
 
-const detail = (id) => {
-  console.log(`Editando compra con ID: ${id}`);
+const DetalleCompra = (id) => {
+  console.log('Navigating to:', `/compras/DetalleCompra/${id}`);
+  navigate(`/compras/DetalleCompra/${id}`);
 };
 
+
+const AnularCompra = async (IdCompra) => {
+  const result = await window.Swal.fire({
+      icon: 'warning',
+      title: '¿Estás seguro?',
+      text: '¿Quieres anular esta compra?',
+      showCancelButton: true,
+      confirmButtonText: 'Sí',
+      cancelButtonText: 'Cancelar',
+  });
+
+  if (result.isConfirmed) {
+      try {
+          await axios.put(`http://localhost:5000/api/compras/Anular/${IdCompra}`);
+          fetchCompras(); 
+          window.Swal.fire({
+              icon: 'success',
+              title: 'Compra anulada',
+              text: 'La compra ha sido anulada correctamente.',
+          });
+      } catch (error) {
+          console.error('Error al anular la compra:', error);
+          window.Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Hubo un error al anular la compra. Por favor, inténtalo de nuevo más tarde.',
+          });
+      }
+  }
+};
 
   const filtrar = compras.filter(compra => {
     return (
@@ -44,10 +76,6 @@ const detail = (id) => {
     );
   });
 
-  const handleClick = () => {
-    navigate('/compras/crearCompra'); 
-  };
-
   return (
     <div>
       <Table
@@ -56,28 +84,54 @@ const detail = (id) => {
           { field: 'descuento_compra', headerName: 'DESCUENTO', width: 'w-36' },
           { field: 'iva_compra', headerName: 'IVA', width: 'w-36' },
           { field: 'subtotal_compra', headerName: 'SUBTOTAL', width: 'w-36' },
-          { field: 'estado_compra', headerName: 'ESTADO', width: 'w-36' },
+          {
+            field: 'estado_compra',
+            headerName: "ESTADO",
+            width: "w-36",
+            readOnly: true,
+            renderCell: (params) => (
+              <div>
+                {params.row.estado_compra === "Anulada" && (
+                  <span className="bg-red-100 text-red-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
+                    Anulada
+                  </span>
+                )}
+                {params.row.estado_compra === "Terminada" && (
+                  <span className="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
+                    Terminada
+                  </span>
+                )}
+                {params.row.estado_compra === "Pendiente" && (
+                  <span className="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+                    Pendiente
+                  </span>
+                )}
+              </div>
+            )
+          },
+          
           {
             field: 'Acciones',
             headerName: 'ACCIONES',
             width: 'w-48',
             renderCell: (params) => (
               <div className="flex justify-center space-x-4">
-                {params.row.estado_compra === 'Pendiente' && (
-                  <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
-                    <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
-                  </button>
-                )}
-                <button onClick={() => detail(params.row)} className="text-yellow-500">
-                  <i className="bx bx-ghost" style={{ fontSize: "24px" }}></i>
+                <button onClick={() => params && DetalleCompra(params.row.IdCompra)} className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white">
+                  <RemoveRedEyeIcon /> 
                 </button>
+                  {params.row.estado_compra === 'Pendiente' && (
+                    <button onClick={() => AnularCompra(params.row.IdCompra)} className="flex items-center justify-center w-10 h-10 rounded-full bg-red-500 text-white">
+                        <DeleteIcon /> 
+                    </button>
+                )}
               </div>
             ),
           }
           
         ]}
         data={filtrar}
-        title="Gestion de Compras"
+        title={'Gestion de Compras'}
+
       />
       <Fab
         aria-label="add"

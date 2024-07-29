@@ -18,7 +18,7 @@ const TablePrueba = ({ title, columns, data, roles }) => {
 
   // Verificar si roles está definido
   if (!roles) {
-    roles = []; // Inicializar roles como un arreglo vacío si no está definido
+    roles = [];
   }
 
   return (
@@ -35,16 +35,21 @@ const TablePrueba = ({ title, columns, data, roles }) => {
           top: "80px",
           width: "calc(100% - 100px)",
         }}
-      
       >
-        <div className="bg-white rounded-lg shadow-md p-8 border border-purple-500">
+        <div className="bg-white rounded-lg shadow-md p-8 ">
           <div className="flex justify-between items-center mb-4">
-            <h4 style={{ textAlign: "left", fontSize: "23px", fontWeight: "bold" }} className="text-3xl">{title}</h4>
-
+            <h4
+              style={{
+                textAlign: "left",
+                fontSize: "23px",
+                fontWeight: "bold",
+              }}
+              className="text-3xl"
+            >
+              {title}
+            </h4>
 
             <div className="relative w-80">
-              {" "}
-              {/* Aumenta el tamaño del contenedor del input */}
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg
                   className="w-5 h-5 text-gray-500 dark:text-gray-400"
@@ -92,9 +97,7 @@ const TablePrueba = ({ title, columns, data, roles }) => {
 
           <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
             <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
-              <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
-                
-              </div>
+              <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3"></div>
             </div>
             <div className="w-full overflow-x-auto">
               <table className="w-full table-auto text-sm text-center text-gray-500 dark:text-gray-400">
@@ -108,10 +111,13 @@ const TablePrueba = ({ title, columns, data, roles }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {/* Filas de la tabla */}
                   {data
                     .filter((row) => {
-                      if (row.rolId && selectedRole !== "" && row.rolId !== parseInt(selectedRole)) {
+                      if (
+                        row.rolId &&
+                        selectedRole !== "" &&
+                        row.rolId !== parseInt(selectedRole)
+                      ) {
                         return false;
                       }
 
