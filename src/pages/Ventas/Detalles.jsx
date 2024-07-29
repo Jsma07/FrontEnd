@@ -74,9 +74,9 @@ const InsumoDetalle = () => {
     // Tabla de Insumos
     let y = 115; // Posición inicial para la tabla
     const headers = ["Nombre Insumo", "Precio Unitario"];
-    const data = venta.insumos.map((insumo) => [
-      insumo.NombreInsumos,
-      `$ ${insumo.PrecioUnitario}`,
+    const data = venta.adiciones.map((Adicion) => [
+      Adicion.NombreAdiciones,
+      `$ ${Adicion.Precio}`,
     ]);
 
     // Utilizamos autoTable para generar la tabla
