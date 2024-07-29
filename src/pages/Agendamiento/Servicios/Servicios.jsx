@@ -6,6 +6,8 @@ import ModalEditarServicio from "../../../components/consts/modalEditar"; // Cam
 import CamposObligatorios from "../../../components/consts/camposVacios";
 import TablePrueba from "../../../components/consts/Tabla";
 import Fab from "@mui/material/Fab";
+import { toast } from "react-toastify";
+
 
 const Servicios = () => {
   const [selectedRows, setSelectedRows] = useState([]);
@@ -14,6 +16,8 @@ const Servicios = () => {
   const [servicios, setServicios] = useState([]);
   const [servicioSeleccionado, setServicioSeleccionado] = useState(null);
   const [buscar, setBuscar] = useState("");
+  const [clientes, setClientes] = useState([]);
+
 
   useEffect(() => {
     fetchServicios();
@@ -38,6 +42,21 @@ const Servicios = () => {
     );
   });
 
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/jackenail/Listar_Clientes"
+        );
+        setClientes(response.data);
+      } catch (error) {
+        console.error("Error al obtener los datos de clientes:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
     
   const handleAddServicio = async (formData) => {
     try {
