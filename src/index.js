@@ -21,9 +21,10 @@ import Clientes from "./pages/Clientes/Clientes";
 import Empleados from "./pages/Empleados/Empleados";
 import Registrar from './pages/Ventas/Registrar'
 import InsumoDetalle from './pages/Ventas/Detalles';
+import Contendioitems from './components/consts/VIewClients/contenido'
+
 import DetalleCompra from './pages/Compras/DetalleCompra';
 import { UserProvider } from './context/ContextoUsuario';
-import Navbarclient from './components/consts/VIewClients/Navbarclient'
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -34,8 +35,9 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="/iniciarSesion" element={<Login />} />
+        <Route path="/Catalogo" element={<Contendioitems />} />
+
         <Route path="/Registrar" element={<CrearCuenta />} />
-        <Route path="/Catalogo" element={<Navbarclient />} />
         <Route path="/" element={<App />}>
           <Route path="/configuracion/roles" element={<Roles />} />
           <Route path="/Usuarios/Administradores" element={<Admin />} />
