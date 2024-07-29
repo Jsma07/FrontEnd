@@ -24,13 +24,15 @@ const Ventas = () => {
           id: venta.idVentas,
           idServicio: (
             <img
-              src={`http://localhost:5000${venta.servicio.ImgServicio}}`}
+              src={`http://localhost:5000${venta.servicio.ImgServicio}`}
               alt={venta.servicio.Nombre_Servicio}
               className="w-16 h-16 md:w-24 md:h-24 object-cover rounded-full"
             />
           ),
           IdCliente: `${venta.cliente.Nombre} ${venta.cliente.Apellido}`,
-          idEmpleado: `${venta.empleado.Nombre} ${venta.empleado.Apellido}`,
+          idEmpleado: `${venta.empleado?.Nombre || ""} ${
+            venta.empleado?.Apellido || ""
+          }`,
           Fecha: venta.Fecha,
           Total: venta.Total,
           Subtotal: venta.Subtotal,
@@ -64,7 +66,7 @@ const Ventas = () => {
                     size="small"
                     aria-label="delete"
                     onClick={() => handleOpenAlert(venta.idVentas)}
-                    className="flex items-center justif y-center w-10 h-10 rounded-full bg-red-500 text-white"
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-red-500 text-white"
                   >
                     <DeleteIcon />
                   </Fab>
@@ -72,7 +74,7 @@ const Ventas = () => {
               )}
             </div>
           ),
-          estiloFila: venta.Estado === "Anulado" ? "bg-gray-200" : "",
+          estiloFila: venta.Estado === 3 ? "bg-gray-200" : "",
         }));
         setVentas(ventasConDetalles);
         toast.success("Ventas cargadas exitosamente");
@@ -216,7 +218,6 @@ const Ventas = () => {
   };
 
   const columns = [
-    
     { field: "idServicio", headerName: "Servicio" },
     { field: "IdCliente", headerName: "Cliente" },
     { field: "idEmpleado", headerName: "Empleado" },
