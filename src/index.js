@@ -25,6 +25,7 @@ import Contendioitems from './components/consts/VIewClients/contenido'
 
 import DetalleCompra from './pages/Compras/DetalleCompra';
 import { UserProvider } from './context/ContextoUsuario';
+import Navbarclient from './components/consts/VIewClients/Navbarclient'
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -35,8 +36,6 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="/iniciarSesion" element={<Login />} />
-        <Route path="/Catalogo" element={<Contendioitems />} />
-
         <Route path="/Registrar" element={<CrearCuenta />} />
         <Route path="/" element={<App />}>
           <Route path="/configuracion/roles" element={<Roles />} />

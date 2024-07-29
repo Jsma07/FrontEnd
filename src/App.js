@@ -46,7 +46,7 @@ function App() {
               justifyContent="center"
               style={{ minHeight: '80vh', position: 'relative' }}
             >
-              <Grid item xs={12} md={8}> {/* Ajusta el tamaño según tus necesidades */}
+              <Grid item xs={12} md={8}> 
                 <Outlet />
               </Grid>
               {/* Botón en la esquina inferior derecha */}
