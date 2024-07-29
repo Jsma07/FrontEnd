@@ -107,7 +107,7 @@ const Clientes = () => {
 
   const handleSubmit = async (formData) => {
     try {
-      // Continuar con el registro del cliente si el correo y el documento no están duplicados
+      // Confirmación antes de registrar
       const result = await Swal.fire({
         title: "¿Estás seguro?",
         text: "¿Quieres registrar este cliente?",
@@ -137,8 +137,8 @@ const Clientes = () => {
           formDataNumerico
         );
 
-        // Mostrar una alerta de éxito si el registro es exitoso
-        toast.success("El cliente se ha registrado correctamente..", {
+        // Mostrar una notificación de éxito si el registro es exitoso
+        toast.success("El cliente se ha registrado correctamente.", {
           position: "top-right",
           autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
@@ -151,19 +151,28 @@ const Clientes = () => {
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        // Mostrar una alerta de error si ocurre algún problema durante el registro
-        Swal.fire({
-          icon: "error",
-          title: "Error de registro",
-          text: error.response.data.mensaje,
+        // Mostrar el mensaje específico del backend usando toast
+        toast.error(error.response.data.mensaje, {
+          position: "bottom-right",
+          autoClose: 5000, // Cierra automáticamente después de 5 segundos
         });
+
+        // Mostrar errores individuales si existen
+        if (error.response.data.errores) {
+          error.response.data.errores.forEach((err) => {
+            toast.error(`Campo ${err.campo}: ${err.mensaje}`, {
+              position: "bottom-right",
+              autoClose: 5000,
+            });
+          });
+        }
       } else {
         console.error("Error al registrar el cliente:", error);
 
-        // Mostrar una alerta de error si ocurre algún problema durante el registro
+        // Mostrar una notificación de error genérica para otros errores
         toast.error("Ocurrió un error al registrar el cliente.", {
           position: "bottom-right",
-          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+          autoClose: 3000,
         });
       }
     }

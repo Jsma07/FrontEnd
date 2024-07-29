@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 function NavbarClient() {
   return (
@@ -14,16 +14,16 @@ function NavbarClient() {
   );
 }
 
-
 function Logo() {
   return (
-    <div className="flex items-center ml-4 lg:ml-10"> {/* Utilizamos ml-4 y ml-10 en pantallas grandes */}
+    <div className="flex items-center ml-4 lg:ml-10">
+      {" "}
+      {/* Utilizamos ml-4 y ml-10 en pantallas grandes */}
       <img src="/jacke.png" alt="Logo" className="h-12 w-12 mr-2" />
       <span className="text-lg font-bold text-black">Jake Nail</span>
     </div>
   );
 }
-
 
 function Menu() {
   return (
@@ -39,7 +39,10 @@ function Menu() {
 function MenuItem({ href, text }) {
   return (
     <li>
-      <a href={href} className="text-black hover:text-purple-900 transition duration-300 ease-in-out">
+      <a
+        href={href}
+        className="text-black hover:text-purple-900 transition duration-300 ease-in-out"
+      >
         <span className="uppercase">{text}</span>
       </a>
     </li>
@@ -49,12 +52,12 @@ function MenuItem({ href, text }) {
 function Auth() {
   return (
     <a
-    href="/iniciarSesion"
-    className="text-black hover:text-purple-900 transition duration-300 ease-in-out flex items-center ml-4 lg:ml-2"
-  >
-    <span className="uppercase">Iniciar sesión</span>
-    <i className="bx bxs-user-circle text-4xl text-black-700 ml-2"></i>
-  </a>
+      href="/iniciarSesion"
+      className="text-black hover:text-purple-900 transition duration-300 ease-in-out flex items-center ml-4 lg:ml-2"
+    >
+      <span className="uppercase">Iniciar sesión</span>
+      <i className="bx bxs-user-circle text-4xl text-black-700 ml-2"></i>
+    </a>
   );
 }
 
