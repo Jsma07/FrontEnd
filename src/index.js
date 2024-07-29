@@ -25,8 +25,7 @@ import Contendioitems from './components/consts/VIewClients/contenido'
 
 import DetalleCompra from './pages/Compras/DetalleCompra';
 import { UserProvider } from './context/ContextoUsuario';
-import Navbarclient from './components/consts/VIewClients/Navbarclient'
-
+import CrearCita from './pages/Agendamiento/CrearCita'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -55,6 +54,8 @@ root.render(
           <Route path="/Empleados" element={<Empleados />} />
           <Route path="/RegistrarVentas" element={<Registrar />} />
           <Route path="/Detalleventa/:id" element={<InsumoDetalle />} />
+          <Route path="/RegistrarAgendamiento" element={<CrearCita />} />
+
 
         </Route>
       </Routes>

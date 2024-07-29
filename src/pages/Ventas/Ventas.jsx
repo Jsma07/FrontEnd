@@ -5,7 +5,7 @@ import Tabla from "../../components/consts/Tabla";
 import Fab from "@mui/material/Fab";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import EditIcon from "@mui/icons-material/Edit";
 import Swal from "sweetalert2";
@@ -163,7 +163,7 @@ const Ventas = () => {
       );
       console.log("Estado cambiado con éxito:", response.data);
       toast.success("Estado cambiado con éxito", {
-        position: "top-right",
+        position: "bottom-right",
         autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
     } catch (error) {
@@ -254,17 +254,7 @@ const Ventas = () => {
         </Fab>
       </Link>
 
-      <ToastContainer
-        position="bottom-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+    
     </div>
   );
 };
