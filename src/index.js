@@ -22,7 +22,7 @@ import Empleados from "./pages/Empleados/Empleados";
 import Registrar from './pages/Ventas/Registrar'
 import InsumoDetalle from './pages/Ventas/Detalles';
 import Contendioitems from './components/consts/VIewClients/contenido'
-
+import Adiciones from './pages/Adiciones/ListarAdiciones'
 import DetalleCompra from './pages/Compras/DetalleCompra';
 import { UserProvider } from './context/ContextoUsuario';
 import CrearCita from './pages/Agendamiento/CrearCita'
@@ -41,6 +41,7 @@ root.render(
           <Route path="/Usuarios/Administradores" element={<Admin />} />
           {/* <Route path="/Usuarios" element={<Usuarios2 />} /> */}
           <Route path="/ventas" element={<Ventas />} />
+          <Route path="/Adiciones" element={<Adiciones />} />
           <Route path="/compras" element={<Compras />} />
           <Route path="/compras/Proveedores" element={<Proveedores />} />
           <Route path="/compras/crearCompra" element={<CrearCompra />} />
