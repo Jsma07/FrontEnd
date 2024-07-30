@@ -121,7 +121,7 @@ const Registrar = () => {
   useEffect(() => {
     const calcularTotal = () => {
       const precioServicio = servicioSeleccionado
-        ? parseFloat(servicioSeleccionado.Precio_Servicio)
+        ? parseInt(servicioSeleccionado.Precio_Servicio)*1000
         : 0; // Convert to number and handle null
 
       const subtotalAdiciones = adicionSeleccionada.reduce(
@@ -130,8 +130,11 @@ const Registrar = () => {
       );
 
       const subtotalCalculado = subtotalAdiciones + precioServicio;
+      console.log(subtotalCalculado);
       const totalConDescuento = subtotalCalculado - descuento;
+      console.log(totalConDescuento);
       const totalFinal = totalConDescuento * (1 + ivaRate);
+      
 
       setSubtotal(subtotalCalculado);
       setTotalGeneral(totalFinal);
@@ -383,10 +386,11 @@ const Registrar = () => {
               type="number"
               name="iva"
               id="iva"
-              value={iva.toFixed(2)}
+              value={ivaValue.toFixed(2)}
               onChange={(e) => setIva(parseFloat(e.target.value))}
               className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-              placeholder="IVA"
+              placeholder="0.19"
+              disabled True
             />
           </div>
 
