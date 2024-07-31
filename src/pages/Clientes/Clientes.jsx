@@ -29,6 +29,9 @@ const Clientes = () => {
       setOpenPasswordModal(true);
     } else {
       console.error("Cliente no encontrado");
+      toast.error(
+        "Cliente no encontrado. Por favor, inténtalo de nuevo más tarde."
+      );
     }
   };
 
@@ -107,7 +110,7 @@ const Clientes = () => {
 
   const handleSubmit = async (formData) => {
     try {
-      // Confirmación antes de registrar
+      // Continuar con el registro del cliente si el correo y el documento no están duplicados
       const result = await Swal.fire({
         title: "¿Estás seguro?",
         text: "¿Quieres registrar este cliente?",
@@ -137,8 +140,8 @@ const Clientes = () => {
           formDataNumerico
         );
 
-        // Mostrar una notificación de éxito si el registro es exitoso
-        toast.success("El cliente se ha registrado correctamente.", {
+        // Mostrar una alerta de éxito si el registro es exitoso
+        toast.success("El cliente se ha registrado correctamente..", {
           position: "top-right",
           autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
@@ -151,38 +154,33 @@ const Clientes = () => {
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        // Mostrar el mensaje específico del backend usando toast
-        toast.error(error.response.data.mensaje, {
-          position: "bottom-right",
-          autoClose: 5000, // Cierra automáticamente después de 5 segundos
+        // Mostrar una alerta de error si ocurre algún problema durante el registro
+        Swal.fire({
+          icon: "error",
+          title: "Error de registro",
+          text: error.response.data.mensaje,
         });
-
-        // Mostrar errores individuales si existen
-        if (error.response.data.errores) {
-          error.response.data.errores.forEach((err) => {
-            toast.error(`Campo ${err.campo}: ${err.mensaje}`, {
-              position: "bottom-right",
-              autoClose: 5000,
-            });
-          });
-        }
       } else {
         console.error("Error al registrar el cliente:", error);
 
-        // Mostrar una notificación de error genérica para otros errores
+        // Mostrar una alerta de error si ocurre algún problema durante el registro
         toast.error("Ocurrió un error al registrar el cliente.", {
           position: "bottom-right",
-          autoClose: 3000,
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
       }
     }
   };
 
   const handleToggleSwitch = async (id) => {
-    // Actualizar el estado local de los clientes
+    if (!id) {
+      console.error("El ID del cliente es inválido");
+      return;
+    }
+
     const updatedClientes = clientes.map((cliente) => {
       if (cliente.IdCliente === id) {
-        const newEstado = cliente.Estado === 1 ? 0 : 1;
+        const newEstado = cliente.Estado === 1 ? 2 : 1; // Cambia 0 por 2 para el estado inactivo
         return { ...cliente, Estado: newEstado };
       }
       return cliente;
@@ -208,7 +206,7 @@ const Clientes = () => {
       });
 
       if (result.isConfirmed) {
-        // Realizar la solicitud PUT para actualizar el estado en el backend
+        // Asegúrate de usar el ID correcto aquí
         await axios.put(
           `http://localhost:5000/Jackenail/CambiarEstadocliente/${id}`,
           {
@@ -216,7 +214,6 @@ const Clientes = () => {
           }
         );
 
-        // Actualizar el estado en el frontend si la solicitud PUT tiene éxito
         setClientes(updatedClientes);
 
         toast.info("El estado del cliente ha sido actualizado correctamente.", {
