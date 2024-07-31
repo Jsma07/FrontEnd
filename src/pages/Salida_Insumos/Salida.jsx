@@ -110,7 +110,7 @@ const Salida = () => {
         rowClassName={(row) => row.estiloFila}
       />
 
-      <Link to="/RegistrarSalida">
+      <Link to="/Registrarsalida">
         <Fab
           aria-label="add"
           style={{
