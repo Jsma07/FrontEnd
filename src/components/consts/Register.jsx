@@ -48,6 +48,13 @@ const handleSubmit = async (e) => {
       });
       return;
     }
+    if (Telefono.length < 9 && Telefono.length >15 ) {
+      toast.error("El telefeno debe contener entre 9 y 15 números.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
     if (!nameRegex.test(Apellido)) {
       toast.error("El Apellido solo puede contener letras y espacios.", {
         position: "bottom-right",

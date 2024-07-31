@@ -213,7 +213,7 @@ const Usuarios = () => {
           newPassword: newPassword,
         }
       );
-      toast.error("La contraseña del usuario ha sido actualizada correctamente.", {
+      toast.success("La contraseña del usuario ha sido actualizada correctamente.", {
         position: "bottom-right",
         autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
@@ -369,7 +369,7 @@ const Usuarios = () => {
           user.id === seleccionado.id ? { ...user, ...formData } : user
         );
         setUsers(updatedUsers);
-        toast.error("El usuario ha sido editado correctamente.", {
+        toast.success("El usuario ha sido editado correctamente.", {
           position: "bottom-right",
           autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
@@ -384,7 +384,7 @@ const Usuarios = () => {
             },
           }
         );
-        toast.error("El usuario ha sido creado correctamente.", {
+        toast.success("El usuario ha sido creado correctamente.", {
           position: "bottom-right",
           autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
