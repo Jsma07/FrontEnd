@@ -41,10 +41,6 @@ const Categorias = () => {
   const handleAddCategoria = async (formData) => {
     try {
       const { nombre_categoria } = formData;
-      const response = await axios.get('http://localhost:5000/api/categorias');
-      const categorias = response.data;
-      const categoriaExistente = categorias.find(categoria => categoria.nombre_categoria === nombre_categoria && categoria.IdCategoria !== formData.IdCategoria);
-
   
       // Validación de los campos obligatorios
       const camposObligatorios = ['nombre_categoria'];
@@ -61,35 +57,39 @@ const Categorias = () => {
         });
         return;
       }
-
-      // Verificar si la categoría ya está registrada
-      if (categoriaExistente) {
-        window.Swal.fire({
-          icon: 'warning',
-          title: 'Categoría ya registrada',
-          text: 'La categoría ingresada ya está registrada.',
-        });
-        return;
-      }
   
-      // Confirmación antes de agregar la categoría
-      const confirmation = await window.Swal.fire({
-        title: '¿Estás seguro?',
-        text: '¿Quieres agregar esta categoría?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, agregar',
-        cancelButtonText: 'Cancelar'
-      });
-  
-      if (confirmation.isConfirmed) {
-        formData.estado_categoria = 1;
+      formData.estado_categoria = 1;
+      try {
+        // Intenta guardar la categoría en el backend
         await axios.post('http://localhost:5000/api/categorias/guardarCategoria', formData);
-        handleCloseModalAgregar();
-        fetchCategorias();
-        window.Swal.fire('¡Categoría agregada!', '', 'success');
+        
+        // Si la categoría se guarda exitosamente, muestra la confirmación
+        const confirmation = await window.Swal.fire({
+          title: '¿Estás seguro?',
+          text: '¿Quieres agregar esta categoría?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sí, agregar',
+          cancelButtonText: 'Cancelar'
+        });
+  
+        if (confirmation.isConfirmed) {
+          handleCloseModalAgregar();
+          fetchCategorias();
+          window.Swal.fire('¡Categoría agregada!', '', 'success');
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 400 && error.response.data.error === 'El nombre de la categoría ya está registrado.') {
+          window.Swal.fire({
+            icon: 'error',
+            title: 'Categoría ya registrada',
+            text: 'La categoría ingresada ya está registrada.',
+          });
+        } else {
+          console.error('Error al agregar categoría:', error);
+        }
       }
     } catch (error) {
       console.error('Error al agregar categoría:', error);
@@ -104,6 +104,16 @@ const Categorias = () => {
             return;
         }
 
+        // Formatear el nombre de la categoría antes de enviar
+        const formatNombreCategoria = (nombre) => {
+            const nombreSinEspacios = nombre.trim();
+            const nombreMinusculas = nombreSinEspacios.toLowerCase();
+            const nombreFormateado = nombreMinusculas.charAt(0).toUpperCase() + nombreMinusculas.slice(1);
+            return nombreFormateado;
+        };
+
+        formData.nombre_categoria = formatNombreCategoria(formData.nombre_categoria);
+
         const response = await axios.get('http://localhost:5000/api/categorias');
         const categorias = response.data;
         const categoriaExistente = categorias.find(categoria => categoria.nombre_categoria === formData.nombre_categoria && categoria.IdCategoria !== formData.IdCategoria);
@@ -117,27 +127,16 @@ const Categorias = () => {
             return;
         }
 
-        const confirmation = await window.Swal.fire({
-            title: '¿Estás seguro?',
-            text: '¿Quieres actualizar esta categoría?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, actualizar',
-            cancelButtonText: 'Cancelar'
-        });
-
-        if (confirmation.isConfirmed) {
-            await axios.put(`http://localhost:5000/api/categorias/editar/${formData.IdCategoria}`, formData);
-            handleCloseModalEditar();
-            fetchCategorias();
-            window.Swal.fire('¡Categoría actualizada!', '', 'success');
-        }
+        await axios.put(`http://localhost:5000/api/categorias/editar/${formData.IdCategoria}`, formData);
+        handleCloseModalEditar();
+        fetchCategorias();
+        window.Swal.fire('¡Categoría actualizada!', '', 'success');
     } catch (error) {
         console.error('Error al editar categoría:', error);
+        window.Swal.fire('Error', 'Hubo un error al intentar actualizar la categoría', 'error');
     }
 };
+
 
   const handleChange = (name, value) => {
     setCategoriaSeleccionado((prevCategoria) => ({
@@ -218,7 +217,7 @@ return (
         onSubmit={handleEditCategoria}
         title="Editar Categoria De Insumos"
         fields={[
-          { name: 'IdCategoria', label: 'Identificador', type: 'text', readOnly: true }, 
+          { name: 'IdCategoria', label: 'Identificador', type: 'number', readOnly: true }, 
           { name: 'nombre_categoria', label: 'Nombre', type: 'text' },
         ]}
         onChange={handleChange}

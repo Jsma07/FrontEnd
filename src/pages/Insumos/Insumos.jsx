@@ -12,18 +12,20 @@ const Insumos = () => {
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [insumos, setInsumos] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  const [proveedores, setProveedores] = useState([]);
   const [insumoSeleccionado, setInsumoSeleccionado] = useState(null);
   const [buscar, setBuscar] = useState("");
 
   useEffect(() => {
     fetchInsumos();
     fetchCategorias();
+    fetchProveedores();
   }, []);
 
   const fetchInsumos = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/insumos");
-      console.log("Insumos fetched:", response.data); // Agrega este log para verificar la estructura
+      console.log("Insumos fetched:", response.data); 
       setInsumos(response.data);
     } catch (error) {
       console.error("Error fetching insumos:", error);
@@ -39,12 +41,22 @@ const Insumos = () => {
     }
   };
 
+  const fetchProveedores = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/proveedores");
+      console.log("proveedores fetched:", response.data); 
+      setProveedores(response.data);
+    } catch (error) {
+      console.error("Error fetching proveedores:", error);
+    }
+  };
+
   const filtrar = insumos.filter((insumo) => {
     const {
       NombreInsumos,
       Cantidad,
-      UsosDisponibles,
       PrecioUnitario,
+      Idproveedor,
       IdCategoria,
       IdInsumos,
       Estado,
@@ -54,12 +66,18 @@ const Insumos = () => {
     const IdInsumoString = IdInsumos?.toString() || "";
     const PrecioUnitarioString = PrecioUnitario?.toString() || "";
     const CantidadString = Cantidad?.toString() || "";
-    const UsosDisponiblesString = UsosDisponibles?.toString() || "";
     const IdCategoriaString = IdCategoria?.toString() || "";
+    const IdproveedorString = Idproveedor?.toString() || "";
+
 
     const categoria = categorias.find((c) => c.IdCategoria === IdCategoria);
     const nombreCategoria = categoria
       ? categoria.nombre_categoria.toLowerCase()
+      : "";
+
+    const proveedor = proveedores.find((c) => c.Idproveedor === Idproveedor);
+    const nombreProveedor = proveedor
+      ? proveedor.nombre_proveedor.toLowerCase()
       : "";
 
     return (
@@ -67,7 +85,7 @@ const Insumos = () => {
       Estado.toLowerCase().includes(terminoABuscar) ||
       PrecioUnitarioString.includes(terminoABuscar) ||
       CantidadString.includes(terminoABuscar) ||
-      UsosDisponiblesString.includes(terminoABuscar) ||
+      nombreProveedor.includes(terminoABuscar) ||
       nombreCategoria.includes(terminoABuscar) ||
       IdInsumoString.includes(terminoABuscar)
     );
@@ -77,22 +95,17 @@ const Insumos = () => {
     try {
       const {
         NombreInsumos,
-        Cantidad,
-        usos_unitarios,
-        PrecioUnitario,
         IdCategoria,
+        Idproveedor,
         Imagen,
-      } = formData; // Asegúrate de incluir usos_unitarios y PrecioUnitario
-
+      } = formData;
+  
       const camposObligatorios = [
         "NombreInsumos",
         "Imagen",
-        "Cantidad",
-        "usos_unitarios",
-        "PrecioUnitario",
         "IdCategoria",
-      ]; // Añadir usos_unitarios y PrecioUnitario
-
+        "Idproveedor",
+      ]; 
       if (
         !CamposObligatorios(
           formData,
@@ -102,7 +115,7 @@ const Insumos = () => {
       ) {
         return;
       }
-
+  
       if (!/^[a-zA-Z0-9\s]+$/.test(NombreInsumos)) {
         window.Swal.fire({
           icon: "error",
@@ -111,11 +124,7 @@ const Insumos = () => {
         });
         return;
       }
-
-      const parsedCantidad = parseInt(Cantidad);
-      const parsedUsosUnitarios = parseInt(usos_unitarios); // Añadir la conversión de usos_unitarios
-      const parsedPrecioUnitario = parseFloat(PrecioUnitario); // Añadir la conversión de PrecioUnitario
-
+  
       const confirmation = await window.Swal.fire({
         title: "¿Estás seguro?",
         text: "¿Quieres agregar este insumo?",
@@ -126,17 +135,15 @@ const Insumos = () => {
         confirmButtonText: "Sí, agregar",
         cancelButtonText: "Cancelar",
       });
-
+  
       if (confirmation.isConfirmed) {
         const formDataToSend = new FormData();
         formDataToSend.append("NombreInsumos", NombreInsumos);
-        formDataToSend.append("Cantidad", parsedCantidad);
-        formDataToSend.append("usos_unitarios", parsedUsosUnitarios); // Añadir usos_unitarios al FormData
-        formDataToSend.append("PrecioUnitario", parsedPrecioUnitario); // Añadir PrecioUnitario al FormData
+        formDataToSend.append("Idproveedor", Idproveedor);
         formDataToSend.append("IdCategoria", IdCategoria);
         formDataToSend.append("Imagen", Imagen);
-
-        await axios.post(
+  
+        const response = await axios.post(
           "http://localhost:5000/api/insumos/guardarInsumo",
           formDataToSend,
           {
@@ -145,15 +152,22 @@ const Insumos = () => {
             },
           }
         );
-
+  
+        console.log("Respuesta del servidor:", response.data);
+  
         handleCloseModalAgregar();
         fetchInsumos();
         window.Swal.fire("Insumo agregado!", "", "success");
       }
     } catch (error) {
-      console.error("Error al agregar insumo:", error);
+      if (error.response) {
+        console.error("Error al agregar insumo:", error.response.data);
+      } else {
+        console.error("Error al agregar insumo:", error.message);
+      }
     }
   };
+  
 
   const handleEditInsumo = async (formData) => {
     try {
@@ -166,9 +180,9 @@ const Insumos = () => {
       const camposObligatorios = [
         "NombreInsumos",
         "Imagen",
-        "PrecioUnitario",
         "Estado",
         "IdCategoria",
+        "Idproveedor",
       ];
   
       if (
@@ -212,13 +226,13 @@ const Insumos = () => {
       });
   
       if (confirmation.isConfirmed) {
-        // Preparar datos para enviar
         const formDataWithNumbers = new FormData();
         formDataWithNumbers.append("NombreInsumos", formData.NombreInsumos);
-        formDataWithNumbers.append("Imagen", formData.Imagen); // Esto se actualizará si el usuario sube una nueva imagen
-        formDataWithNumbers.append("PrecioUnitario", formData.PrecioUnitario);
+        formDataWithNumbers.append("Imagen", formData.Imagen); 
         formDataWithNumbers.append("Estado", formData.Estado);
         formDataWithNumbers.append("IdCategoria", formData.IdCategoria);
+        formDataWithNumbers.append("Idproveedor", formData.Idproveedor);
+
   
         const response = await axios.put(
           `http://localhost:5000/api/insumos/editar/${formData.IdInsumos}`,
@@ -271,10 +285,17 @@ const Insumos = () => {
         onSubmit={handleAddInsumo}
         title="Crear Nuevo Insumo"
         fields={[
-          { name: "NombreInsumos", label: "Nombre insumo", type: "text" },
-          { name: "Cantidad", label: "Cantidad", type: "number" },
-          { name: "PrecioUnitario", label: "Precio Unitario", type: "number" },
-          { name: "usos_unitarios", label: "Usos Unitarios", type: "number" },
+          {
+            name: "Idproveedor",
+            label: "Proveedor",
+            type: "select",
+            options: proveedores
+              .filter((proveedor) => proveedor.estado_proveedor === 1)
+              .map((proveedor) => ({
+                value: proveedor.IdProveedor,
+                label: proveedor.nombre_proveedor,
+              })),
+          },
           {
             name: "IdCategoria",
             label: "Categoria insumo",
@@ -286,6 +307,7 @@ const Insumos = () => {
                 label: categoria.nombre_categoria,
               })),
           },
+          { name: "NombreInsumos", label: "Nombre insumo", type: "text" },
           { name: "Imagen", label: "Imagen", type: "file" },
         ]}
         onChange={handleChange}
@@ -299,13 +321,13 @@ const Insumos = () => {
           {
             name: "IdInsumos",
             label: "Identificador",
-            type: "text",
+            type: "number",
             readOnly: true,
           },
           { name: "NombreInsumos", label: "Nombre insumo", type: "text" },
           {
-            name: "IdCategoria",
-            label: "Categoria insumo",
+            name: "Idcategoria",
+            label: "Categoria",
             type: "select",
             options: categorias
               .filter((categoria) => categoria.estado_categoria === 1)
@@ -314,7 +336,17 @@ const Insumos = () => {
                 label: categoria.nombre_categoria,
               })),
           },
-          { name: "PrecioUnitario", label: "Precio Unitario", type: "number" },
+          {
+            name: "Idproveedor",
+            label: "Proveedor",
+            type: "select",
+            options: proveedores
+              .filter((proveedor) => proveedor.estado_proveedor === 1)
+              .map((proveedor) => ({
+                value: proveedor.IdProveedor,
+                label: proveedor.nombre_proveedor,
+              })),
+          },
           { name: "Imagen", label: "Imagen", type: "file" },
         ]}
         onChange={handleChange}
@@ -324,43 +356,39 @@ const Insumos = () => {
       <Table
         columns={[
           { field: "nombre_categoria", headerName: "CATEGORIA", width: "w-36" },
-          // {
-          //   field: "Imagen",
-          //   headerName: "IMAGEN",
-          //   width: "w-32",
-          //   renderCell: (params) => (
-          //     <div
-          //       style={{
-          //         display: "flex",
-          //         justifyContent: "center",
-          //         alignItems: "center",
-          //         height: "100%",
-          //       }}
-          //     >
-          //       <div>
-          //       {insumos.map((insumo) => (
-          //         <div key={insumo.IdInsumos}>
-          //           {console.log(`http://localhost:5000${insumo.imagen}`)}
-          //           <img
-          //             src={`http://localhost:5000${insumo.imagen}`}  
-          //             alt="Imagen" style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
-          //           />
-          //         </div>
-          //       ))}
-          //       </div>
-          //     </div>
-          //   ),
-          // },
+          {
+            field: "Imagen",
+            headerName: "IMAGEN",
+            width: "w-32",
+            renderCell: (params) => (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+                <img
+                  src={`http://localhost:5000${params.row.imagen}`}  
+                  alt="Imagen"
+                  style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
+                />
+              </div>
+            ),
+          },
           {
             field: "NombreInsumos",
-            headerName: "NOMBRE INSUMO",
+            headerName: "INSUMO",
             width: "w-36",
           },
+          { field: "nombre_proveedor", headerName: "PROVEEDOR", width: "w-36" },
           { field: "Cantidad", headerName: "CANTIDAD", width: "w-36" },
           {
-            field: "PrecioUnitario",
-            headerName: "PRECIO UNITARIO",
-            width: "w-36",
+            field: 'Precio_Servicio',
+            headerName: 'PRECIO',
+            width: 'w-36',
+            renderCell: (params) => <div>{`$${params.row.PrecioUnitario}`}</div>,
           },
           {
             field: "Estado",

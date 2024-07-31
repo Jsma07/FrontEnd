@@ -52,43 +52,100 @@ const DetalleCompra = () => {
           padding: "20px",
         }}
       >
-        <h1 className="text-2xl font-bold mb-6">Detalle de compras</h1>
+      <h1 className="text-2xl font-bold mb-6">Detalle de compras</h1>
+      <div className="relative overflow-x-auto shadow-md sm:rounded-lg mb-6">
+        {detalleCompra.map((compra, index) => (
+          <div key={index}>
+            <div
+              className="overflow-y-auto"
+              style={{
+                maxHeight: compra.insumos.length >= 3 ? "275px" : "auto", // Ajusta la altura máxima según tus necesidades
+              }}
+            >
+              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 text-center">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                  <tr>
+                    <th scope="col" className="px-6 py-3">Imagen</th>
+                    <th scope="col" className="px-6 py-3">Insumo</th>
+                    <th scope="col" className="px-6 py-3">Precio Unitario</th>
+                    <th scope="col" className="px-6 py-3">Cantidad</th>
+                    <th scope="col" className="px-6 py-3">Precio Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {compra.insumos.map((insumo, insumoIndex) => (
+                    <tr
+                      key={insumoIndex}
+                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-center"
+                    >
+                      <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
+                        <img
+                          src={`http://localhost:5000${insumo.imagen}`}
+                          alt="Imagen"
+                          style={{
+                            maxWidth: "100%",
+                            height: "auto",
+                            width: "3rem",
+                            height: "3rem",
+                            borderRadius: "50%",
+                          }}
+                        />
+                      </td>
+                      <td className="px-6 py-4 flex items-center space-x-4">
+                        <span className="px-6 py-4 font-bold text-gray-900 dark:text-white">
+                          {insumo.NombreInsumos}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
+                        ${insumo.PrecioUnitario}
+                      </td>
+                      <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
+                        {insumo.cantidad_insumo}
+                      </td>
+                      <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
+                        ${insumo.totalValorInsumos}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+      </div>
 
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg mb-6">
-  {detalleCompra.map((compra, index) => (
-    <div key={index}>
-      <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 text-center">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            <th scope="col" className="px-6 py-3">Imagen</th>
-            <th scope="col" className="px-6 py-3">Insumo</th>
-            <th scope="col" className="px-6 py-3">Precio Unitario</th>
-            <th scope="col" className="px-6 py-3">Cantidad</th>
-            <th scope="col" className="px-6 py-3">Precio Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {compra.insumos.map((insumo, insumoIndex) => (
-            <tr key={insumoIndex} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-center">
-              <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
-              <img
-                      src={`http://localhost:5000${insumo.imagen}`}  
-                      alt="Imagen" style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
-                    />
-              </td>
-              <td className="px-6 py-4 flex items-center space-x-4">
-                <span className="px-6 py-4 font-bold text-gray-900 dark:text-white">{insumo.NombreInsumos}</span>
-              </td>
-              <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">${insumo.PrecioUnitario}</td>
-              <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">{insumo.cantidad_insumo}</td>
-              <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">${insumo.totalValorInsumos}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  ))}
-</div>
+      <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginTop: "15px",
+            }}
+          >
+            <div
+              className="form-group col-lg-3 col-md-3 col-sm-6 col-xs-12 mt-2 mb-3 mx-2"
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              <a href="/compras">
+                <button
+                  type="button"
+                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                  style={{
+                    fontSize: "25px",
+                  }}
+                >
+                  <i className="bx bx-arrow-back"></i>
+                </button>
+              </a>
+              <button
+                type="button"
+                className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                style={{ fontSize: "20px", marginLeft: "10px" }}
+                // onClick={generarPDF}
+              >
+                <i className="bx bxs-file-pdf"> PDF</i>
+              </button>
+            </div>
+          </div>
 
         <div
           style={{
@@ -152,9 +209,9 @@ const DetalleCompra = () => {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-base font-semibold text-gray-800">Subtotal:</p>
+                        <p className="text-base font-semibold text-gray-800">Descuento:</p>
                         <p className="text-sm text-gray-600">
-                          ${compra.compra.subtotal_compra}
+                          ${compra.compra.descuento_compra}
                         </p>
                       </div>
                     </li>
@@ -200,47 +257,15 @@ const DetalleCompra = () => {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-base font-semibold text-gray-800">Descuento:</p>
+                        <p className="text-base font-semibold text-gray-800">Subtotal:</p>
                         <p className="text-sm text-gray-600">
-                          ${compra.compra.descuento_compra}
+                           ${compra.compra.subtotal_compra}
                         </p>
                       </div>
                     </li>
                   </React.Fragment>
                 ))}
               </ul>
-            </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              marginTop: "15px",
-            }}
-          >
-            <div
-              className="form-group col-lg-3 col-md-3 col-sm-6 col-xs-12 mt-2 mb-3 mx-2"
-              style={{ display: "flex", alignItems: "center" }}
-            >
-              <a href="/compras">
-                <button
-                  type="button"
-                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-                  style={{
-                    fontSize: "25px",
-                  }}
-                >
-                  <i className="bx bx-arrow-back"></i>
-                </button>
-              </a>
-              <button
-                type="button"
-                className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                style={{ fontSize: "20px", marginLeft: "10px" }}
-                // onClick={generarPDF}
-              >
-                <i className="bx bxs-file-pdf"> PDF</i>
-              </button>
             </div>
           </div>
         </div>
