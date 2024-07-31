@@ -26,6 +26,7 @@ import Adiciones from './pages/Adiciones/ListarAdiciones'
 import DetalleCompra from './pages/Compras/DetalleCompra';
 import { UserProvider } from './context/ContextoUsuario';
 import CrearCita from './pages/Agendamiento/CrearCita'
+import Contrasena from './components/consts/recuperarContrasena'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -34,6 +35,7 @@ root.render(
 <UserProvider>
     <BrowserRouter>
       <Routes>
+      <Route path="/recuperarContrasena" element={<Contrasena />} />
         <Route path="/iniciarSesion" element={<Login />} />
         <Route path="/Registrar" element={<CrearCuenta />} />
         <Route path="/" element={<App />}>
