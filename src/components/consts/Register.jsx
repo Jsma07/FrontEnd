@@ -11,7 +11,9 @@ function Register() {
     Telefono: '',
     Documento: '',
     tipoDocumento: '',
-    Contrasena: ''
+    Contrasena: '',
+    Estado: 1,
+    IdRol: 4
   });
 
   const handleChange = (e) => {
@@ -22,130 +24,128 @@ function Register() {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    try {
-      const { Nombre, Apellido, Correo, Telefono, Documento, tipoDocumento, Contrasena } = formData;
-      if (!Nombre || !Apellido || !Correo || !Telefono || !Documento || !tipoDocumento || !Contrasena) {
-        toast.error("Todos los campos son obligatorios.", {
-          position: "bottom-right",
-          autoClose: 3000,
-        });
-        return ;
-      }
-      const nameRegex = /^[a-zA-Z\s]+$/;
-      const numeroRegex = /^[0-9]+$/;
-      if (!nameRegex.test(Nombre)) {
-        toast.error("El nombre solo puede contener letras y espacios.", {
-          position: "bottom-right",
-          autoClose: 3000,
-        });
-        return ;
-      }
-      if (!nameRegex.test(Apellido)) {
-        toast.error("El Apellido solo puede contener letras y espacios.", {
-          position: "bottom-right",
-          autoClose: 3000,
-        });
-        return ;
-      }
-      if (!numeroRegex.test(Documento)) {
-        toast.error("El Documento solo puede contener números.", {
-          position: "bottom-right",
-          autoClose: 3000,
-        });
-        return ;
-      }
-      if (!numeroRegex.test(Telefono)) {
-        toast.error("El Teléfono solo puede contener números.", {
-          position: "bottom-right",
-          autoClose: 3000,
-        });
-        return ;
-      }
-      const validacionCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      if (!validacionCorreo.test(Correo)) {
-        toast.error("El Correo no tiene un formato válido.", {
-          position: "bottom-right",
-          autoClose: 3000,
-        });
-        return
-      }
-      const validacionContrasena = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
-      if (!validacionContrasena.test(Contrasena)) {
-        toast.error("La contraseña debe tener mínimo 8 caracteres, una mayúscula y un número..", {
-          position: "bottom-right",
-          autoClose: 3000,
-        });
-      return
-      }
-      // Confirmación antes de registrar
-      const CorreoResponse = await axios.get(
-        `http://localhost:5000/api/verificarCorreo/${formData.Correo}`
-        
-      );
-      const DocumentoResponse = await axios.get(
-        `http://localhost:5000/api/verificarDocumento/${formData.Documento}`
-        
-      );
 
-      if(CorreoResponse.status === 200 && DocumentoResponse === 200){
-        const formDataNumerico = {
-          Nombre: formData.Nombre,
-          Apellido: formData.Apellido,
-          Correo: formData.Correo,
-          Telefono: formData.Telefono,
-          Estado: 1,
-          IdRol: 4,
-          Documento: formData.Documento,
-          tipoDocumento: formData.tipoDocumento,
-          Contrasena: formData.Contrasena,
-        };
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-        // console.log("Datos del formulario:", formDataNumerico);
-
-        // Enviar datos al backend
-        const response = await axios.post(
-          "http://localhost:5000/Jackenail/RegistrarClientes",
-          formDataNumerico
-        );
-
-        // Mostrar alerta de éxito
-        toast.success("El cliente se ha registrado correctamente.", {
-          position: "bottom-right",
-          autoClose: 3000, // Cierra automáticamente después de 3 segundos
-        });
-
-        // Limpiar el formulario
-        setFormData({
-          Nombre: '',
-          Apellido: '',
-          Correo: '',
-          Telefono: '',
-          Documento: '',
-          tipoDocumento: '',
-          Contrasena: ''
-        });
-      }
+  try {
+    const { Nombre, Apellido, Correo, Telefono, Documento, tipoDocumento, Contrasena } = formData;
+    if (!Nombre || !Apellido || !Correo || !Telefono || !Documento || !tipoDocumento || !Contrasena) {
+      toast.error("Todos los campos son obligatorios.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
     }
-    catch (error) {
-      if (error.response && error.response.status === 400) {
-        // Mostrar alerta de error si el servidor responde con un error 400
-        toast.error(`${error.response.data.mensaje}`, {
-          position: "bottom-right",
-          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    const numeroRegex = /^[0-9]+$/;
+    if (!nameRegex.test(Nombre)) {
+      toast.error("El nombre solo puede contener letras y espacios.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    if (Telefono.length < 9 && Telefono.length >15 ) {
+      toast.error("El telefeno debe contener entre 9 y 15 números.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    if (!nameRegex.test(Apellido)) {
+      toast.error("El Apellido solo puede contener letras y espacios.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    if (!numeroRegex.test(Documento)) {
+      toast.error("El Documento solo puede contener números.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    if (!numeroRegex.test(Telefono)) {
+      toast.error("El Teléfono solo puede contener números.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    const validacionCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!validacionCorreo.test(Correo)) {
+      toast.error("El Correo no tiene un formato válido.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    const validacionContrasena = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!validacionContrasena.test(Contrasena)) {
+      toast.error("La contraseña debe tener mínimo 8 caracteres, una mayúscula y un número.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    const response = await axios.post("http://localhost:5000/Jackenail/RegistrarClientes", formData);
+
+    toast.success("El cliente se ha registrado correctamente.", {
+      position: "bottom-right",
+      autoClose: 3000,
+    });
+
+    setFormData({
+      Nombre: '',
+      Apellido: '',
+      Correo: '',
+      Telefono: '',
+      Documento: '',
+      tipoDocumento: '',
+      Contrasena: ''
+    });
+  } catch (error) {
+    if (error.response) {
+      console.error("Error al registrar el cliente:", error.response.data);
+      console.error("Status code:", error.response.status);
+      console.error("Headers:", error.response.headers);
+      
+      // Mostrar detalles específicos del error de validación
+      if (error.response.data && error.response.data.errores) {
+        error.response.data.errores.forEach(err => {
+          toast.error(`Error en ${err.campo}: ${err.mensaje}`, {
+            position: "bottom-right",
+            autoClose: 3000,
+          });
         });
       } else {
-        console.error("Error al registrar el cliente:", error);
-        // Mostrar alerta de error en caso de error interno
-        toast.error("Ocurrió un error al registrar el cliente.", {
+        toast.error(`Error: ${error.response.data.mensaje}`, {
           position: "bottom-right",
-          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+          autoClose: 3000,
         });
       }
+    } else if (error.request) {
+      console.error("No response received:", error.request);
+      toast.error("No se recibió respuesta del servidor.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+    } else {
+      console.error("Error al configurar la solicitud:", error.message);
+      toast.error("Error al configurar la solicitud.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
     }
-  };
+    console.error("Error config:", error.config);
+  }
+};
+
 
   return (
    
