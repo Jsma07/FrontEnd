@@ -1,16 +1,20 @@
-// PrivateRoute.js
-import React, { useContext } from 'react';
-import { Route, Navigate } from 'react-router-dom';
-import { UserContext } from './context/ContextoUsuario';
+// components/PrivateRoute.js
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { useUser } from '../context/ContextoUsuario';
 
-const PrivateRoute = ({ element, ...props }) => {
-  const { usuario } = useContext(UserContext);
+const PrivateRoute = ({ children, requiredPermissions }) => {
+  const { user, permissions } = useUser();
 
-  return usuario ? (
-    <Route {...props} element={element} />
-  ) : (
-    <Navigate to="/iniciarSesion" replace />
+  if (!user) {
+    return <Navigate to="/iniciarSesion" />;
+  }
+
+  const hasRequiredPermissions = requiredPermissions.every(permission => 
+    permissions.includes(permission)
   );
+
+  return hasRequiredPermissions ? children : <Navigate to="/iniciarSesion" />;
 };
 
 export default PrivateRoute;

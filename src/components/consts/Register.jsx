@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import Swal from 'sweetalert2';
 import { toast, ToastContainer } from "react-toastify";
 
 function Register() {
@@ -48,7 +47,7 @@ const handleSubmit = async (e) => {
       });
       return;
     }
-    if (Telefono.length < 9 && Telefono.length >15 ) {
+    if (Telefono.length < 9 || Telefono.length >15 ) {
       toast.error("El telefeno debe contener entre 9 y 15 números.", {
         position: "bottom-right",
         autoClose: 3000,
