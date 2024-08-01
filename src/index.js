@@ -26,6 +26,8 @@ import Adiciones from './pages/Adiciones/ListarAdiciones'
 import DetalleCompra from './pages/Compras/DetalleCompra';
 import { UserProvider } from './context/ContextoUsuario';
 import CrearCita from './pages/Agendamiento/CrearCita'
+import PrivateRoute from './context/verificarSesion';
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -37,8 +39,21 @@ root.render(
         <Route path="/iniciarSesion" element={<Login />} />
         <Route path="/Registrar" element={<CrearCuenta />} />
         <Route path="/" element={<App />}>
-          <Route path="/configuracion/roles" element={<Roles />} />
-          <Route path="/Usuarios/Administradores" element={<Admin />} />
+        <Route
+              path="/configuracion/roles"
+              element={
+                <PrivateRoute requiredPermissions={['Configuracion']}>
+                  <Roles />
+                </PrivateRoute>
+              }
+            />
+          <Route path="/Usuarios/Administradores" 
+          element={
+            <PrivateRoute requiredPermissions={['Usuarios']}>
+            <Admin />
+          </PrivateRoute>
+          } 
+          />
           {/* <Route path="/Usuarios" element={<Usuarios2 />} /> */}
           <Route path="/ventas" element={<Ventas />} />
           <Route path="/Adiciones" element={<Adiciones />} />
