@@ -26,8 +26,8 @@ const Ventas = () => {
             <img
             src={`http://localhost:5000${venta.servicio.ImgServicio}`}
             alt={venta.servicio.Nombre_Servicio}
-            className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-full"
-          />
+            style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
+            />
           
           ),
           IdCliente: `${venta.cliente.Nombre} ${venta.cliente.Apellido}`,

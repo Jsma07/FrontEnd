@@ -2,30 +2,20 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Card,
+  CardHeader,
+  CardFooter,
   CardBody,
-  Input,
-  Button,
   Typography,
-  Textarea,
+  Button,
 } from "@material-tailwind/react";
-import ModalInsumos from "../../components/consts/ModalSalida";
 
 const SalidaInsumos = () => {
-  const [openModal, setOpenModal] = useState(false);
   const [insumos, setInsumos] = useState([]);
-  const [insumosSeleccionados, setInsumosSeleccionados] = useState([]);
-  const [insumosAgregadosCount, setInsumosAgregadosCount] = useState(0);
-  const [descripcion, setDescripcion] = useState(""); // Estado para la descripción
 
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
-
-  // Fetch de insumos desde la API
   useEffect(() => {
     const fetchInsumos = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/insumos");
-        console.log("Datos obtenidos de la API:", response.data); // Verifica los datos aquí
         setInsumos(response.data);
       } catch (error) {
         console.error("Error al obtener los insumos:", error);
@@ -36,126 +26,100 @@ const SalidaInsumos = () => {
   }, []);
 
   return (
-    <div>
-      <div
-        style={{
-          paddingTop: "10px",
-          margin: "0 auto",
-          borderRadius: "30px",
-          marginTop: "20px",
-          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.3)",
-          position: "fixed",
-          left: "90px",
-          top: "80px",
-          width: "calc(40% - 100px)",
-          padding: "20px",
-        }}
-      >
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h2 className="text-2xl font-bold mb-4 text-gray-800">
-            Salida de insumos
-          </h2>
+    <div
+      style={{
+        paddingTop: "7px",
+        margin: "0 auto",
+        borderRadius: "30px",
+        marginTop: "20px",
+        position: "fixed",
+        right: "20px",
+        top: "30px",
+        width: "calc(100% - 100px)",
+        padding: "10px",
+      }}
+    >
+      <div className="p-2 mx-auto mt-6 max-w-screen-xl">
+  <div className="flex items-center justify-between mb-6">
+    <Typography
+      variant="h3"
+      color="blue-gray"
+      className="font-bold text-left"
+    >
+      Salida de Insumos
+    </Typography>
+    <i className='bx bx-cart-add text-xl cursor-pointer'></i>
+  </div>
 
-          <Button
-            type="submit"
-            color="blue"
-            className="mr-4"
-            onClick={handleOpenModal}
-          >
-            Registrar Salida
-          </Button>
-
-          {/* Textarea para la descripción */}
-          <div className="mt-4">
-            <Textarea
-              placeholder="Descripción de la salida"
-              value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
-              className="w-full border border-gray-300 rounded-md"
-              rows={4} // Ajusta la altura del textarea
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {insumos.map((insumo) => (
+            <Card
+              className="w-80"
               style={{
-                border: "1px solid #e2e8f0", // Añadir un borde gris claro
-                outline: "none", // Quitar el subrayado
-                resize: "none", // Desactivar el redimensionamiento
-                padding: "8px", // Añadir un poco de padding
+                boxShadow: "0 4px 3px rgba(0, 0, 0, 0.4)",
+                borderTop: "1px solid rgba(0, 0, 0, 0.2)",
+                borderRadius: "30px",
               }}
-            />
-          </div>
-        </div>
-      </div>
+            >
+              <CardHeader shadow={false} floated={false} className="h-60">
+                <img
+                  src={`http://localhost:5000${insumo.imagen}`}
+                  alt={insumo.NombreInsumos}
+                  className="h-full w-full object-cover"
+                />
+              </CardHeader>
+              <CardBody className="p-2">
+                <div className="mb-1 flex items-center justify-between">
+                  <Typography
+                    color="blue-gray"
+                    className="font-semibold text-lg"
+                  >
+                    {insumo.NombreInsumos}
+                  </Typography>
+                  <Typography color="blue-gray" className="font-medium text-sm">
+                    ${insumo.PrecioUnitario.toFixed(2)}
+                  </Typography>
+                </div>
+                <Typography
+                  color="blue-gray"
+                  className="font-medium text-md mt-1"
+                >
+                  Cantidad en stock: {insumo.Cantidad}
+                </Typography>
 
-      {/* Modal de Insumos */}
-      <ModalInsumos
-        open={openModal}
-        handleClose={handleCloseModal}
-        title="Seleccionar Insumos"
-        insumos={insumos}
-        setInsumosSeleccionados={setInsumosSeleccionados}
-        insumosSeleccionados={insumosSeleccionados}
-        setInsumosAgregadosCount={setInsumosAgregadosCount}
-      />
+                <Typography
+                  variant="small"
+                  color="gray"
+                  className="font-normal opacity-75 text-xs"
+                ></Typography>
+                <Typography color="gray" className="mb-2"></Typography>
 
-      <div
-        style={{
-          paddingTop: "10px",
-          margin: "0 auto",
-          borderRadius: "30px",
-          marginTop: "20px",
-          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.3)",
-          position: "fixed",
-          right: "20px",
-          top: "80px",
-          width: "calc(65% - 100px)",
-          padding: "20px",
-        }}
-      >
-        <div style={{ textAlign: "left", marginBottom: "20px" }}>
-          <h3
-            style={{ textAlign: "left", fontSize: "23px", fontWeight: "bold" }}
-          >
-            Insumos Seleccionados
-          </h3>
+                <div className="group mt-4 inline-flex flex-wrap items-center gap-2"></div>
+                <CardFooter className="pt-0 flex justify-center">
+                  {insumo.Estado !== "agotado" && (
+                    <Button
+                      style={{
+                        boxShadow: "0 4px 3px rgba(0, 0, 0, 0.2)",
+                        backgroundColor: "#EF5A6F", // Color de fondo rosado
+                        color: "#fff", // Color del texto blanco
+                        textTransform: "none", // Desactiva la transformación de texto
+                        fontSize: "1rem", // Tamaño del texto
+                      }}
+                      className="hover:scale-105 hover:shadow-none focus:scale-105 focus:shadow-none active:scale-100 flex items-center gap-2"
+                    >
+                      <i
+                        className="bx bx-trash"
+                        style={{ fontSize: "1.5rem" }}
+                      ></i>{" "}
+                      {/* Tamaño del ícono ajustado */}
+                      Sacar insumo
+                    </Button>
+                  )}
+                </CardFooter>
+              </CardBody>
+            </Card>
+          ))}
         </div>
-
-        <div style={{ textAlign: "right", marginBottom: "20px" }}>
-          <p>
-            <i className="bx bx-cart-download"></i>{" "}
-            <span className="text-lg font-bold">{insumosAgregadosCount}</span>
-          </p>
-        </div>
-        {/* Tabla de Insumos Seleccionados */}
-        <table className="min-w-full bg-white">
-          <thead>
-            <tr>
-              <th className="px-4 py-2 border-b border-gray-200">Imagen</th>
-              <th className="px-4 py-2 border-b border-gray-200">Nombre</th>
-              <th className="px-4 py-2 border-b border-gray-200">Cantidad</th>
-              <th className="px-4 py-2 border-b border-gray-200">Categoría</th>
-            </tr>
-          </thead>
-          <tbody>
-            {insumosSeleccionados.map((insumo) => (
-              <tr key={insumo.IdInsumos}>
-                <td className="px-4 py-2 border-b border-gray-200">
-                  <img
-                    src={`http://localhost:5000${insumo.Imagen}`}
-                    alt={insumo.NombreInsumos}
-                    className="w-20 h-20 object-cover"
-                  />
-                </td>
-                <td className="px-4 py-2 border-b border-gray-200">
-                  {insumo.NombreInsumos}
-                </td>
-                <td className="px-4 py-2 border-b border-gray-200">
-                  {insumo.Cantidad}
-                </td>
-                <td className="px-4 py-2 border-b border-gray-200">
-                  {insumo.nombre_categoria}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </div>
   );

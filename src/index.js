@@ -40,6 +40,9 @@ root.render(
       <Route path="/recuperarContrasena" element={<Contrasena />} />
         <Route path="/iniciarSesion" element={<Login />} />
         <Route path="/Registrar" element={<CrearCuenta />} />
+        <Route path="/Catalogo" element={<Contendioitems />} />
+
+        
         <Route path="/" element={<App />}>
           <Route path="/configuracion/roles" element={<Roles />} />
           <Route path="/Usuarios/Administradores" element={<Admin />} />
