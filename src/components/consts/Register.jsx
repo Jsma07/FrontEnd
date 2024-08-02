@@ -54,6 +54,27 @@ const handleSubmit = async (e) => {
       });
       return;
     }
+    if (Nombre.length < 4 || Nombre.length >20 ) {
+      toast.error("El nombre debe contener entre 4 y 20 letras.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    if (Apellido.length < 4 || Apellido.length >20 ) {
+      toast.error("El apellido debe contener entre 4 y 20 letras.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    if (Documento.length < 8 || Documento.length >17 ) {
+      toast.error("El documento debe contener entre 8 y 17 números.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
     if (!nameRegex.test(Apellido)) {
       toast.error("El Apellido solo puede contener letras y espacios.", {
         position: "bottom-right",
@@ -75,14 +96,17 @@ const handleSubmit = async (e) => {
       });
       return;
     }
-    const validacionCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!validacionCorreo.test(Correo)) {
+    const validacionCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    const correoSinEspacios = Correo.trim();
+
+    if (!validacionCorreo.test(correoSinEspacios)) {
       toast.error("El Correo no tiene un formato válido.", {
         position: "bottom-right",
         autoClose: 3000,
       });
       return;
     }
+    
     const validacionContrasena = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (!validacionContrasena.test(Contrasena)) {
       toast.error("La contraseña debe tener mínimo 8 caracteres, una mayúscula y un número.", {
