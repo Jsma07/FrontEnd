@@ -126,11 +126,11 @@ const Clientes = () => {
           Apellido: formData.Apellido,
           Correo: formData.Correo,
           Telefono: formData.Telefono,
-          Estado: 1,
-          IdRol: 4,
           Documento: formData.Documento,
           Tip_Documento: formData.Tip_Documento,
           Contrasena: formData.Contrasena,
+          Estado: 1,
+          IdRol: 4,
         };
 
         console.log("Datos del formulario numéricos:", formDataNumerico);

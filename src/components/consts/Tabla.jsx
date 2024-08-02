@@ -29,7 +29,7 @@ const TablePrueba = ({ title, columns, data, roles }) => {
           margin: "0 auto",
           borderRadius: "40px",
           marginTop: "20px",
-          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.1)",
+          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.15)",
           position: "fixed",
           left: "90px",
           top: "80px",
