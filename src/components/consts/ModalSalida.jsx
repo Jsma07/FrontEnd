@@ -1,44 +1,44 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Modal,
   Typography,
-  Grid,
   Button,
-  Card,
-  CardMedia,
-  CardContent,
-  CardActions,
+  Grid,
+  Box,
+  TextField,
+  Divider,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 
-const ModalInsumos = ({
-  open,
-  handleClose,
-  title = "",
-  insumos,
-  setInsumosSeleccionados,
-  insumosSeleccionados,
-  setInsumosAgregadosCount,
-}) => {
-  const [insumosAgregados, setInsumosAgregados] = useState([]);
+const ModalInsumos = ({ open, handleClose, title, insumos }) => {
+  const [cantidad, setCantidad] = React.useState(1);
+  const [total, setTotal] = React.useState(0);
+  const [carrito, setCarrito] = React.useState([]);
 
-  const handleAdd = (id) => {
-    const insumoSeleccionado = insumos.find(
-      (insumo) => insumo.IdInsumos === id
-    );
-    setInsumosSeleccionados([...insumosSeleccionados, insumoSeleccionado]);
-    setInsumosAgregados([...insumosAgregados, id]);
-    setInsumosAgregadosCount(insumosAgregados.length + 1);
+  React.useEffect(() => {
+    if (insumos) {
+      setTotal(insumos.PrecioUnitario * cantidad);
+    }
+  }, [insumos, cantidad]);
+
+  const handleCantidadChange = (event) => {
+    const newCantidad = parseInt(event.target.value) || 1;
+    setCantidad(newCantidad);
+    setTotal(newCantidad * insumos.PrecioUnitario);
   };
 
-  const isInsumoAgregado = (id) => {
-    return insumosAgregados.includes(id);
+  const handleAgregar = () => {
+    setCarrito([...carrito, { ...insumos, cantidad, total }]);
+    setCantidad(1); // Resetear cantidad
+    setTotal(insumos.PrecioUnitario); // Resetear total
   };
+
+  if (!insumos) return null; // Asegúrate de que `insumos` esté definido
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <div className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center">
-        <div className="bg-gray-800 text-white rounded-lg shadow-lg p-6 w-full max-w-[80%] h-full max-h-[90%] flex flex-col relative">
+      <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center">
+        <div className="bg-gray-800 text-white rounded-lg shadow-lg p-6 w-[65%] h-full max-h-[95%] flex flex-col relative ml-auto">
           <button
             onClick={handleClose}
             className="absolute top-2 right-2 p-2 text-white hover:text-gray-400"
@@ -48,79 +48,51 @@ const ModalInsumos = ({
           <Typography variant="h5" gutterBottom className="text-center mb-6">
             {title}
           </Typography>
-          <Grid
-            container
-            spacing={3}
-            justifyContent="center"
-            alignItems="center"
-          >
-            {insumos.map((insumo) => (
-              <Grid item key={insumo.IdInsumos} xs={12} sm={6} md={4} lg={3}>
-                <Card
-                  sx={{
-                    maxWidth: 345,
-                    bgcolor: "black",
-                    color: "white",
-                    borderRadius: "16px",
-                    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.25)",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
+          <Grid container spacing={2} sx={{ alignItems: "center" }}>
+            <Grid item xs={12} md={4}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "100px",
+                  padding: "0 1rem", // Ajusta según necesites
+                }}
+              >
+                <img
+                  src={`http://localhost:5000${insumos.imagen}`}
+                  alt={insumos.NombreInsumos}
+                  style={{
+                    maxWidth: "100%",
+                    height: "auto",
+                    width: "3rem",
+                    height: "3rem",
+                    borderRadius: "20%",
                   }}
-                >
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={`http://localhost:5000${insumo.Imagen}`}
-                    alt={insumo.NombreInsumos}
-                    style={{
-                      borderRadius: "12px",
-                      objectFit: "cover",
-                      width: "100%",
-                      marginBottom: "16px",
-                    }}
-                  />
-                  <CardContent sx={{ textAlign: "center" }}>
-                    <Typography gutterBottom variant="h5" component="div">
-                      {insumo.NombreInsumos}
-                    </Typography>
-                    <Typography variant="body2" color="white">
-                      Cantidad: {insumo.Cantidad}
-                    </Typography>
-                    <Typography variant="body2" color="white">
-                      Precio Unitario: {insumo.PrecioUnitario}
-                    </Typography>
-                  </CardContent>
-                  <CardActions sx={{ mt: "auto", mb: "16px" }}>
-                    <Button
-                      variant="contained"
-                      disabled={isInsumoAgregado(insumo.IdInsumos)}
-                      onClick={() => handleAdd(insumo.IdInsumos)}
-                      sx={{
-                        backgroundColor: "#1976D2",
-                        color: "#FFFFFF",
-                        "&:hover": {
-                          backgroundColor: "#1565C0",
-                        },
-                      }}
-                    >
-                      Agregar
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <Typography variant="h6" gutterBottom>
+                {insumos.NombreInsumos}
+              </Typography>
+              <Typography variant="body2" gutterBottom>
+                Precio: ${insumos.PrecioUnitario.toFixed(2)}
+              </Typography>
+              <Divider sx={{ mt: 2 }} />
+              <Typography variant="subtitle1" gutterBottom>
+                Cantidad:
+              </Typography>
+              <TextField
+                type="number"
+                inputProps={{ min: 1 }}
+                value={cantidad}
+                onChange={handleCantidadChange}
+                fullWidth
+              />
+            </Grid>
           </Grid>
-          <div className="flex justify-center mt-6">
-            <Button
-              variant="contained"
-              onClick={handleClose}
-              className="w-1/2 text-sm bg-blue-500 hover:bg-blue-600"
-            >
-              Cerrar
-            </Button>
-          </div>
+          <Divider sx={{ mt: 2 }} />
         </div>
       </div>
     </Modal>

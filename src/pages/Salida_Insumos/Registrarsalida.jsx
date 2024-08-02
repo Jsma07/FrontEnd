@@ -8,9 +8,12 @@ import {
   Typography,
   Button,
 } from "@material-tailwind/react";
+import ModalInsumos from "../../components/consts/ModalSalida"; // Asegúrate de importar el modal desde la ubicación correcta
 
 const SalidaInsumos = () => {
   const [insumos, setInsumos] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false); // Estado para controlar el modal
+  const [selectedInsumo, setSelectedInsumo] = useState(null); // Estado para el insumo seleccionado
 
   useEffect(() => {
     const fetchInsumos = async () => {
@@ -24,6 +27,18 @@ const SalidaInsumos = () => {
 
     fetchInsumos();
   }, []);
+
+  const handleOpenModal = (insumo) => {
+    console.log("Insumo seleccionado:", insumo); // Debug log
+    setSelectedInsumo(insumo);
+    setModalOpen(true);
+    console.log("Modal abierto:", true); // Debug log
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedInsumo(null);
+  };
 
   return (
     <div
@@ -40,20 +55,21 @@ const SalidaInsumos = () => {
       }}
     >
       <div className="p-2 mx-auto mt-6 max-w-screen-xl">
-  <div className="flex items-center justify-between mb-6">
-    <Typography
-      variant="h3"
-      color="blue-gray"
-      className="font-bold text-left"
-    >
-      Salida de Insumos
-    </Typography>
-    <i className='bx bx-cart-add text-xl cursor-pointer'></i>
-  </div>
+        <div className="flex items-center justify-between mb-6">
+          <Typography
+            variant="h3"
+            color="blue-gray"
+            className="font-bold text-left"
+          >
+            Salida de Insumos
+          </Typography>
+          <i className="bx bx-cart-add text-xl cursor-pointer"></i>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {insumos.map((insumo) => (
             <Card
+              key={insumo.IdInsumos}
               className="w-80"
               style={{
                 boxShadow: "0 4px 3px rgba(0, 0, 0, 0.4)",
@@ -106,12 +122,12 @@ const SalidaInsumos = () => {
                         fontSize: "1rem", // Tamaño del texto
                       }}
                       className="hover:scale-105 hover:shadow-none focus:scale-105 focus:shadow-none active:scale-100 flex items-center gap-2"
+                      onClick={() => handleOpenModal(insumo)}
                     >
                       <i
                         className="bx bx-trash"
                         style={{ fontSize: "1.5rem" }}
-                      ></i>{" "}
-                      {/* Tamaño del ícono ajustado */}
+                      ></i>
                       Sacar insumo
                     </Button>
                   )}
@@ -121,6 +137,15 @@ const SalidaInsumos = () => {
           ))}
         </div>
       </div>
+
+      {selectedInsumo && (
+        <ModalInsumos
+          open={modalOpen}
+          handleClose={handleCloseModal}
+          title={`Detalle de ${selectedInsumo.NombreInsumos}`}
+          insumos={selectedInsumo}
+        />
+      )}
     </div>
   );
 };
