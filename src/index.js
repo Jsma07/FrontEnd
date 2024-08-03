@@ -26,6 +26,7 @@ import Contendioitems from './components/consts/VIewClients/contenido'
 import DetalleCompra from './pages/Compras/DetalleCompra';
 import { UserProvider } from './context/ContextoUsuario';
 import CrearCita from './pages/Agendamiento/CrearCita'
+import FechasTrabajo from './pages/Agendamiento/FechaTrabajo'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -55,6 +56,7 @@ root.render(
           <Route path="/RegistrarVentas" element={<Registrar />} />
           <Route path="/Detalleventa/:id" element={<InsumoDetalle />} />
           <Route path="/RegistrarAgendamiento" element={<CrearCita />} />
+          <Route path="/FechasTrabajadas" element={<FechasTrabajo />}/>
 
 
         </Route>

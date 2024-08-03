@@ -11,7 +11,9 @@ function Register() {
     Telefono: '',
     Documento: '',
     tipoDocumento: '',
-    Contrasena: ''
+    Contrasena: '',
+    IdRol: 4,
+    Estado: 1
   });
 
   const handleChange = (e) => {
