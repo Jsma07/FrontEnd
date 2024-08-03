@@ -24,7 +24,9 @@ const Registrar = () => {
   const [fechaFactura, setFechaFactura] = useState("");
   const ivaRate = 0.19; // IVA del 19%
   const [servicioSeleccionado, setServicioSeleccionado] = useState(null);
-
+  const [minDate, setMinDate] = useState('');
+  const [maxDate, setMaxDate] = useState('');
+  
   const abrirModal = () => {
     setModalAbierto(true);
   };
@@ -77,6 +79,21 @@ const Registrar = () => {
   }, []);
 
   useEffect(() => {
+    const today = new Date();
+    
+     // Fecha mínima: 3 días antes del día actual
+     const minDateValue = new Date();
+     minDateValue.setDate(today.getDate() - 3);
+     const minDateStr = minDateValue.toISOString().split('T')[0];
+ 
+     // Fecha máxima: el día actual
+     const maxDateStr = today.toISOString().split('T')[0];
+
+    setMaxDate(maxDateStr);
+    setMinDate(minDateStr);
+  }, []);
+
+  useEffect(() => {
     const fetchAdiciones = async () => {
       try {
         const response = await axios.get(
@@ -104,7 +121,7 @@ const Registrar = () => {
   useEffect(() => {
     const calcularTotal = () => {
       const precioServicio = servicioSeleccionado
-        ? parseFloat(servicioSeleccionado.Precio_Servicio)
+        ? parseInt(servicioSeleccionado.Precio_Servicio)*1000
         : 0; // Convert to number and handle null
 
       const subtotalAdiciones = adicionSeleccionada.reduce(
@@ -113,8 +130,11 @@ const Registrar = () => {
       );
 
       const subtotalCalculado = subtotalAdiciones + precioServicio;
+      console.log(subtotalCalculado);
       const totalConDescuento = subtotalCalculado - descuento;
+      console.log(totalConDescuento);
       const totalFinal = totalConDescuento * (1 + ivaRate);
+      
 
       setSubtotal(subtotalCalculado);
       setTotalGeneral(totalFinal);
@@ -128,6 +148,7 @@ const Registrar = () => {
     const servicio = servicios.find((s) => s.IdServicio === servicioId);
     setServicioSeleccionado(servicio);
   };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -149,6 +170,8 @@ const Registrar = () => {
       console.error("Uno o más campos del formulario no están definidos.");
       return;
     }
+
+    
 
     const idServicio = parseInt(servicioElement.value);
     const idEmpleado = parseInt(empleadoElement.value);
@@ -182,41 +205,33 @@ const Registrar = () => {
       console.log("adicionSeleccionada:", adicionSeleccionada);
       console.log("ventaResponse:", ventaResponse);
 
-      const detallesVenta = {
-        detalles: adicionSeleccionada.map((adicion) => ({
+      for (const adicion of adicionSeleccionada) {
+        const detalleVenta = {
           Idventa: ventaResponse.data.idVentas,
           IdAdiciones: adicion.IdAdiciones,
-        })),
-      };
+        };
 
-      console.log("detallesVenta:", detallesVenta);
+        try {
+          const detallesResponse = await axios.post(
+            "http://localhost:5000/Jackenail/Detalleregistrar",
+            detalleVenta, // Enviamos el detalle individualmente
+            {
+              headers: {
+                "Content-Type": "application/json", // Asegúrate de usar application/json
+              },
+            }
+          );
 
-      const detallesVentaParams = new URLSearchParams();
-      detallesVentaParams.append(
-        "detalles",
-        JSON.stringify(detallesVenta.detalles)
-      );
-
-      try {
-        const detallesResponse = await axios.post(
-          "http://localhost:5000/Jackenail/Detalleregistrar",
-          detallesVentaParams,
-          {
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          }
-        );
-
-        console.log(
-          "Detalles de venta registrados con éxito:",
-          detallesResponse.data
-        );
-      } catch (error) {
-        console.error(
-          "Error al registrar los detalles de venta:",
-          error.response?.data || error.message
-        );
+          console.log(
+            "Detalle de venta registrado con éxito:",
+            detallesResponse.data
+          );
+        } catch (error) {
+          console.error(
+            "Error al registrar el detalle de venta:",
+            error.response?.data || error.message
+          );
+        }
       }
 
       // Mostrar notificación de éxito y redireccionar
@@ -304,7 +319,7 @@ const Registrar = () => {
                 <option value="">Seleccione un Servicio</option>
                 {servicios.map((servicio) => (
                   <option key={servicio.IdServicio} value={servicio.IdServicio}>
-                    {servicio.NombreServicio} , ${servicio.Precio_Servicio}
+                   <p>  {servicio.Nombre_Servicio+ " " + servicio.Precio_Servicio}</p>
                   </option>
                 ))}
               </select>
@@ -371,10 +386,11 @@ const Registrar = () => {
               type="number"
               name="iva"
               id="iva"
-              value={iva.toFixed(2)}
+              value={ivaValue.toFixed(2)}
               onChange={(e) => setIva(parseFloat(e.target.value))}
               className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-              placeholder="IVA"
+              placeholder="0.19"
+              disabled True
             />
           </div>
 
@@ -382,12 +398,14 @@ const Registrar = () => {
             <div>
               <label htmlFor="fecha">Fecha</label>
               <input
-                type="date"
-                id="fecha"
-                name="fecha"
-                className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-                required
-              />
+        type="date"
+        id="fecha"
+        name="fecha"
+        className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+        required
+        min={minDate}
+        max={maxDate}
+      />
             </div>
             <div>
               <label
