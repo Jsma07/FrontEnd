@@ -1,16 +1,17 @@
 import React, { useState, useContext } from 'react';
 import IconButton from '@mui/material/IconButton';
-
 import SettingsIcon from '@mui/icons-material/Settings';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ModalPerfil from './perfil'; // Ajusta la ruta si es necesario
 import { UserContext } from '../../context/ContextoUsuario';
 
 const SettingsMenu = () => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const { user, logout } = useContext(UserContext); // Obtenemos user y logout del contexto
+  const [openProfileModal, setOpenProfileModal] = useState(false);
+  const { user, logout } = useContext(UserContext);
 
   const handleSettingsClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -18,6 +19,12 @@ const SettingsMenu = () => {
 
   const handleSettingsClose = () => {
     setAnchorEl(null);
+    setOpenProfileModal(false); // Close profile modal when settings menu is closed
+  };
+
+  const handleProfileClick = () => {
+    setOpenProfileModal(true);
+    setAnchorEl(null); // Close settings menu
   };
 
   const menuStyle = {
@@ -55,20 +62,20 @@ const SettingsMenu = () => {
         onClose={handleSettingsClose}
       >
         <MenuItem disabled onClick={handleSettingsClose} sx={{ color: 'black' }}>
-          Bienvenido, {user ? user.nombre : 'Usuario'}
+          Bienvenido, {user ? user.nombre || user.Nombre : 'Usuario'}
         </MenuItem>
-
-        <MenuItem sx={menuStyle} onClick={handleSettingsClose}>
+        <MenuItem sx={menuStyle} onClick={handleProfileClick}>
           <AccountCircleIcon sx={{ marginRight: '10px' }} /> Perfil
         </MenuItem>
         <MenuItem sx={menuStyle} onClick={() => {
           logout(); // Cierra sesión
           handleSettingsClose(); // Cierra el menú
-          window.location.href = '/iniciarSesion'; // Cierra el menú después de cerrar sesión
+          window.location.href = '/iniciarSesion'; // Redirige después de cerrar sesión
         }}>
           <ExitToAppIcon sx={{ marginRight: '5px' }} /> Cerrar Sesión
         </MenuItem>
       </Menu>
+      <ModalPerfil open={openProfileModal} handleClose={handleSettingsClose} />
     </>
   );
 };
