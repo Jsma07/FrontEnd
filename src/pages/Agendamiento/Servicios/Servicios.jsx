@@ -7,6 +7,8 @@ import CamposObligatorios from "../../../components/consts/camposVacios";
 import TablePrueba from "../../../components/consts/Tabla";
 import Fab from "@mui/material/Fab";
 import { toast } from "react-toastify";
+import Tooltip from '@mui/material/Tooltip';
+
 
 
 const Servicios = () => {
@@ -386,11 +388,15 @@ const Servicios = () => {
             height: "100%",
           }}
         >
+            <Tooltip title='Imagen del Servicio'>
+
           <img
             src={`http://localhost:5000${params.row.ImgServicio}`}  
             alt="Imagen"
             style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
           />
+              </Tooltip>
+
         </div>
       ),
     },

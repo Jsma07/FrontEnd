@@ -12,6 +12,7 @@ import StoreIcon from '@mui/icons-material/Store';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import WorkHistoryTwoToneIcon from '@mui/icons-material/WorkHistoryTwoTone';
 
 export const NavbarItems = [
   {
@@ -112,6 +113,7 @@ export const NavbarItems = [
         icon: <BathtubIcon />,
         requiredPermissions: ['Servicios'],
       },
+      
     ],
   },
   {

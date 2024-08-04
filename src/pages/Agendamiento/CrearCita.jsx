@@ -154,14 +154,14 @@ const CrearCitas = () => {
             <Paper elevation={3} style={paperStyle}>
               <Box display="flex" justifyContent="space-between">
                 <Box width="50%">
-                  <StaticDatePickerLandscape date={date} onDateChange={handleDateChange} />
-                </Box>
+                <StaticDatePickerLandscape date={date} onDateChange={handleDateChange}  />                </Box>
                 <Box width="50%" display="flex" flexDirection="column" justifyContent="center" ml={2}>
                 <CustomTimeSelect
-            selectedTime={selectedTime}
-            setSelectedTime={setSelectedTime}
-            occupiedTimes={occupiedTimes} // Pasa las horas ocupadas aquí
-          />
+              selectedTime={selectedTime}
+              setSelectedTime={setSelectedTime}
+              selectedDate={date}
+              occupiedTimes={occupiedTimes}  // Pasamos las horas ocupadas aquí
+            />
                 </Box>
               </Box>
             </Paper>

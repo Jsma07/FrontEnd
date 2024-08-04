@@ -4,15 +4,19 @@ import { Link, useNavigate } from "react-router-dom";
 import Tabla from "../../components/consts/Tabla";
 import Fab from "@mui/material/Fab";
 import DeleteIcon from "@mui/icons-material/Delete";
+import WorkHistoryTwoToneIcon from '@mui/icons-material/WorkHistoryTwoTone';
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Swal from "sweetalert2";
 import dayjs from 'dayjs';
+import Tooltip from '@mui/material/Tooltip';
+import AddIcon from '@mui/icons-material/Add';
 
 const Agendamientos = () => {
   const [agendamientos, setAgendamientos] = useState([]);
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     const fetchAgendamientos = async () => {
@@ -206,7 +210,9 @@ const Agendamientos = () => {
         data={agendamientos}
         rowClassName={(row) => row.estiloFila}
       />
-      <Fab
+        <Tooltip title="Crear Cita" placement="top" 
+        TransitionProps={{ timeout: 500 }} >
+        <Fab
         aria-label="add"
         style={{
           border: "0.9px solid grey",
@@ -218,8 +224,29 @@ const Agendamientos = () => {
         }}
         onClick={() => navigate('/RegistrarAgendamiento')}
       >
-        <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
+      <AddIcon style={{fontSize: "2.3rem"}}/>
       </Fab>
+      </Tooltip>
+
+      <Tooltip title="Horarios" placement="top" 
+        TransitionProps={{ timeout: 500 }} >
+      <Fab
+        aria-label="other-action"
+        style={{
+          border: "0.9px solid grey",
+          backgroundColor: "#94CEF2",
+          position: "fixed",
+          bottom: "50px",
+          left: "90px",
+          zIndex: 1000,
+        }}
+        
+        onClick={() => navigate('/FechasTrabajadas')}
+      >
+        <WorkHistoryTwoToneIcon style={{ fontSize: "2.3rem" }} />        
+      </Fab>
+      </Tooltip>
+      
     </div>
   );
 };
