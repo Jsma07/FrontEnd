@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Typography, Grid, TextField, IconButton, Select, MenuItem, InputLabel } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
-import Swal from 'sweetalert2'; // Asegúrate de importar SweetAlert2
 
 const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityData, onChange }) => {
   const [formData, setFormData] = useState({});
   const [imagePreview, setImagePreview] = useState(null);
-  const [imageName, setImageName] = useState('');
-  const [imageSize, setImageSize] = useState('');
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -17,20 +14,14 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
 
       if (entityData.ImgServicio) {
         setImagePreview(`http://localhost:5000${entityData.ImgServicio}`);
-        setImageName('Imagen existente');
-        setImageSize('');
       } else if (entityData.image_preview) {
         setImagePreview(entityData.image_preview);
       } else {
         setImagePreview(null);
-        setImageName('');
-        setImageSize('');
       }
 
-      if (entityData.Imagen) {
-        setImagePreview(`http://localhost:5000${entityData.Imagen}`);
-        setImageName('Imagen existente en la base de datos');
-        setImageSize('');
+      if (entityData.imagen) {
+        setImagePreview(`http://localhost:5000${entityData.imagen}`);
       }
     }
   }, [entityData]);
@@ -108,9 +99,9 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
       }
     } else if (name === 'Precio_Servicio') {
           if (value <= 20000) {
-            error = 'El precio debe ser minimo de $20.000.';
+            error = 'El precio debe ser mínimo de $20.000.';
           }
-      }else {
+      } else {
       switch (type) {
         case 'text':
           if (!/^[a-zA-ZñÑ\s]*$/.test(value)) {
@@ -217,28 +208,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
                 >
                   <CloseIcon />
                 </IconButton>
-                <TextField
-                  variant="outlined"
-                  fullWidth
-                  size="small"
-                  value={imageName}
-                  disabled
-                  style={{ marginTop: '0.5rem' }}
-                  InputProps={{
-                    style: { textAlign: 'center' },
-                  }}
-                />
-                <TextField
-                  variant="outlined"
-                  fullWidth
-                  size="small"
-                  value={imageSize}
-                  disabled
-                  style={{ marginTop: '0.5rem' }}
-                  InputProps={{
-                    style: { textAlign: 'center' },
-                  }}
-                />
               </div>
             ) : (
               <label 
@@ -277,8 +246,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
           [`${name}_preview`]: reader.result,
         }));
         setImagePreview(reader.result);
-        setImageName(file.name);
-        setImageSize((file.size / 1024).toFixed(2) + ' KB');
       };
       reader.readAsDataURL(file);
     }
@@ -291,8 +258,6 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
       [`${name}_preview`]: null,
     }));
     setImagePreview(null);
-    setImageName('');
-    setImageSize('');
   };
 
   return (
@@ -326,24 +291,24 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
           style={{
             display: 'flex',
             justifyContent: 'flex-end',
-            marginTop: '1.5rem',
+            marginTop: '1rem',
           }}
         >
-         <Button
-            onClick={handleCancel}
-            color="secondary"
-            variant="contained"
-            style={{ marginRight: '1rem' }}
-          >
-            Cancelar
-          </Button>
           <Button
-            onClick={handleSubmit}
-            color="primary"
             variant="contained"
-            endIcon={<SendIcon />}
+            color="primary"
+            onClick={handleSubmit}
+            startIcon={<SendIcon />}
           >
             Enviar
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleCancel}
+            style={{ marginLeft: '1rem' }}
+          >
+            Cancelar
           </Button>
         </div>
       </div>

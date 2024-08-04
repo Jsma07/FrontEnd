@@ -85,7 +85,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
       }));
       return; // Salir de la función después de corregir el valor
     }
-
+  
     if (type === 'file' && e.target.accept.includes('image/*')) {
       const file = files[0];
       const reader = new FileReader();
@@ -100,44 +100,14 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
           }, 3000);
           return;
         }
-        if (type === 'text' && value.includes('  ')) {
-    const trimmedValue = value.replace(/ {2,}/g, ' ');
-    setFormValues((prevFormValues) => ({
-      ...prevFormValues,
-      [name]: trimmedValue,
-    }));
-    return; // Salir de la función después de corregir el valor
-  }
-
+  
         setFormValues((prevFormValues) => ({
           ...prevFormValues,
           [name]: file,
           [`${name}_preview`]: reader.result,
-          [`${name}_name`]: file.name,
-          [`${name}_size`]: (file.size / 1024).toFixed(2) + ' KB'
         }));
-
-        const extraFieldsData = [
-          {
-            name: `${name}_name`,
-            label: "Nombre de la imagen",
-            value: file.name,
-            type: "text",
-            disabled: true
-          },
-          {
-            name: `${name}_size`,
-            label: "Peso de la imagen",
-            value: (file.size / 1024).toFixed(2) + ' KB',
-            type: "text",
-            disabled: true
-          }
-        ];
-
-        setExtraFields((prevExtraFields) => [
-          ...prevExtraFields,
-          ...extraFieldsData
-        ]);
+  
+        // No agregar campos adicionales para nombre y tamaño
       };
       reader.readAsDataURL(file);
     } else {
@@ -146,26 +116,26 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
         [name]: type === 'file' ? files[0] : value,
       }));
     }
-
+  
     if (onChange) {
       onChange(name, type === 'file' ? files[0] : value);
     }
-
+  
     setErrors((prevErrors) => ({
       ...prevErrors,
       [name]: '',
     }));
   };
-
+  
   const handleRemoveImage = (name) => {
     setFormValues((prevFormValues) => {
       const newFormValues = { ...prevFormValues };
       delete newFormValues[name];
       delete newFormValues[`${name}_preview`];
-      delete newFormValues[`${name}_name`];
-      delete newFormValues[`${name}_size`];
+      // No eliminar los campos adicionales ya que no se están creando
       return newFormValues;
     });
+  
 
     setExtraFields((prevExtraFields) =>
       prevExtraFields.filter(
@@ -287,7 +257,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
 
   const renderFieldByType = (field) => {
     const { name, label, type, options, disabled } = field;
-
+  
     switch (type) {
       case "text":
       case "password":
@@ -407,7 +377,6 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
         return null;
     }
   };
-
   return (
     <Modal open={open} onClose={handleClose}>
       <div
