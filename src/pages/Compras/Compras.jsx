@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import * as Swal from 'sweetalert2';
 import Table from "../../components/consts/Tabla";
 import Fab from '@mui/material/Fab';
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const Compras = ({ params }) => {
-  const [selectedRows, setSelectedRows] = useState([]);
+const Compras = () => {
   const [compras, setCompras] = useState([]);
   const [buscar, setBuscar] = useState('');
   const navigate = useNavigate();
@@ -16,62 +16,78 @@ const Compras = ({ params }) => {
     fetchCompras();
   }, []);
 
-  const fetchCompras = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/compras');
-      setCompras(response.data);
-    } catch (error) {
-      console.error('Error fetching Compras:', error);
-    }
-  };
-
+const fetchCompras = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/compras');
+    setCompras(response.data);
+  } catch (error) {
+    console.error('Error fetching Compras:', error);
+  }
+};
 
 const handleClick = () => {
   navigate('/compras/crearCompra'); 
 };
 
 const DetalleCompra = (id) => {
-  console.log('Navigating to:', `/compras/DetalleCompra/${id}`);
-  navigate(`/compras/DetalleCompra/${id}`);
+    console.log('Navigating to:', `/compras/DetalleCompra/${id}`);
+    navigate(`/compras/DetalleCompra/${id}`);
 };
 
-
 const AnularCompra = async (IdCompra) => {
-  const result = await window.Swal.fire({
+    const result = await Swal.fire({
       icon: 'warning',
       title: '¿Estás seguro?',
       text: '¿Quieres anular esta compra?',
       showCancelButton: true,
       confirmButtonText: 'Sí',
       cancelButtonText: 'Cancelar',
-  });
+    });
 
-  if (result.isConfirmed) {
+    if (result.isConfirmed) {
       try {
-          await axios.put(`http://localhost:5000/api/compras/Anular/${IdCompra}`);
-          fetchCompras(); 
-          window.Swal.fire({
-              icon: 'success',
-              title: 'Compra anulada',
-              text: 'La compra ha sido anulada correctamente.',
-          });
+        await axios.put(`http://localhost:5000/api/compras/Anular/${IdCompra}`);
+        fetchCompras(); 
+        Swal.fire({
+          icon: 'success',
+          title: 'Compra anulada',
+          text: 'La compra ha sido anulada correctamente.',
+        });
       } catch (error) {
-          console.error('Error al anular la compra:', error);
-          window.Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Hubo un error al anular la compra. Por favor, inténtalo de nuevo más tarde.',
-          });
+        console.error('Error al anular la compra:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un error al anular la compra. Por favor, inténtalo de nuevo más tarde.',
+        });
       }
-  }
+    }
 };
 
-  const filtrar = compras.filter(compra => {
+const canAnular = (fecha_compra) => {
+    const [day, month, year] = fecha_compra.split('/').map(Number);
+    const fechaCompra = new Date(year, month - 1, day);
+
+    const hoy = new Date();
+    const fechaActual = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+
+    const diffTime = fechaActual - fechaCompra;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    console.log('Fecha de compra:', fechaCompra);
+    console.log('Fecha actual:', fechaActual);
+    console.log('Diferencia en días:', diffDays);
+
+    return diffDays <= 7;
+};
+
+const filtrar = compras.filter(compra => {
     return (
       (compra.fecha_compra && compra.fecha_compra.toLowerCase().includes(buscar.toLowerCase())) ||
       (compra.descuento_compra && compra.descuento_compra.toLowerCase().includes(buscar.toLowerCase())) ||
       (compra.iva_compra && compra.iva_compra.toLowerCase().includes(buscar.toLowerCase())) ||
       (compra.subtotal_compra && compra.subtotal_compra.toLowerCase().includes(buscar.toLowerCase())) ||
+      (compra.total_compra && compra.total_compra.toLowerCase().includes(buscar.toLowerCase())) ||
       (compra.estado_compra && compra.estado_compra.toLowerCase().includes(buscar.toLowerCase()))
     );
   });
@@ -84,6 +100,7 @@ const AnularCompra = async (IdCompra) => {
           { field: 'descuento_compra', headerName: 'DESCUENTO', width: 'w-36' },
           { field: 'iva_compra', headerName: 'IVA', width: 'w-36' },
           { field: 'subtotal_compra', headerName: 'SUBTOTAL', width: 'w-36' },
+          { field: 'total_compra', headerName: 'TOTAL', width: 'w-36' },
           {
             field: 'estado_compra',
             headerName: "ESTADO",
@@ -109,7 +126,6 @@ const AnularCompra = async (IdCompra) => {
               </div>
             )
           },
-          
           {
             field: 'Acciones',
             headerName: 'ACCIONES',
@@ -119,7 +135,7 @@ const AnularCompra = async (IdCompra) => {
                 <button onClick={() => params && DetalleCompra(params.row.IdCompra)} className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white">
                   <RemoveRedEyeIcon /> 
                 </button>
-                  {params.row.estado_compra === 'Pendiente' && (
+                {params.row.estado_compra !== 'Anulada' && canAnular(params.row.fecha_compra) && (
                     <button onClick={() => AnularCompra(params.row.IdCompra)} className="flex items-center justify-center w-10 h-10 rounded-full bg-red-500 text-white">
                         <DeleteIcon /> 
                     </button>
@@ -127,11 +143,9 @@ const AnularCompra = async (IdCompra) => {
               </div>
             ),
           }
-          
         ]}
         data={filtrar}
         title={'Gestion de Compras'}
-
       />
       <Fab
         aria-label="add"

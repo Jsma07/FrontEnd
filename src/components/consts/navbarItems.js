@@ -12,6 +12,7 @@ import StoreIcon from '@mui/icons-material/Store';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import HourglassDisabledIcon from '@mui/icons-material/HourglassDisabled';
 
 export const NavbarItems = [
   {
@@ -112,6 +113,13 @@ export const NavbarItems = [
         icon: <BathtubIcon />,
         requiredPermissions: ['Servicios'],
       },
+      { 
+        label: 'Horarios', 
+        route: '/FechasTrabajadas', 
+        icon: <HourglassDisabledIcon />,
+        requiredPermissions: ['Servicios'],
+      },
+      
     ],
   },
   {

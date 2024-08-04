@@ -71,19 +71,19 @@ const AddRoleModal = ({ open, handleClose, setRoles }) => {
     // Verificar que el nombre del rol no sea vacío
     if (!formData.nombre.trim()) {
       console.log("campo nombre del rol vacío");
-      window.Swal.fire({
-        icon: "error",
-        title: "Nombre del rol vacío",
-        text: "Por favor, ingresa el nombre del rol.",
+     
+      toast.error("Nombre vacío, por favor ingresa un nombre para el rol.", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
       return;
     }
 
     if (formData.nombre.trim() !== formData.nombre) {
-      window.Swal.fire({
-        icon: "error",
-        title: "Nombre del rol con espacios",
-        text: "El nombre del rol no puede contener espacios al inicio ni al final.",
+    
+      toast.error("El nombre del rol no puede contener espacios al inicio ni al final.", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
       return;
     }
@@ -92,10 +92,9 @@ const AddRoleModal = ({ open, handleClose, setRoles }) => {
     const rolExiste = rolesLocal.some((rol) => rol.nombre === formData.nombre);
 
     if (rolExiste) {
-      window.Swal.fire({
-        icon: "error",
-        title: "Rol existente",
-        text: "El Rol ingresado ya está creado. Por favor, utiliza otro nombre.",
+      toast.error("El Rol ingresado ya está creado. Por favor, utiliza otro nombre.", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
       return;
     }
@@ -108,10 +107,9 @@ const AddRoleModal = ({ open, handleClose, setRoles }) => {
     // Verificar que se haya seleccionado al menos un permiso antes de enviar la petición
     if (permisosSeleccionados.length === 0) {
       console.log("Debes seleccionar al menos un permiso");
-      window.Swal.fire({
-        icon: "error",
-        title: "Permiso sin seleccionar",
-        text: "Por favor, selecciona al menos un permiso.",
+      toast.error("Por favor, selecciona al menos un permiso.", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
       return;
     }
@@ -126,7 +124,7 @@ const AddRoleModal = ({ open, handleClose, setRoles }) => {
 
       // Manejar la respuesta del backend
       if (response.data && response.data.mensaje === "Rol creado exitosamente") {
-        toast.warn("El rol ha sido creado correctamenet", {
+        toast.success("El rol ha sido creado correctamente", {
           position: "bottom-right",
           autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });

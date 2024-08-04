@@ -6,6 +6,10 @@ import ModalEditarServicio from "../../../components/consts/modalEditar"; // Cam
 import CamposObligatorios from "../../../components/consts/camposVacios";
 import TablePrueba from "../../../components/consts/Tabla";
 import Fab from "@mui/material/Fab";
+import { toast } from "react-toastify";
+import Tooltip from '@mui/material/Tooltip';
+
+
 
 const Servicios = () => {
   const [selectedRows, setSelectedRows] = useState([]);
@@ -14,6 +18,8 @@ const Servicios = () => {
   const [servicios, setServicios] = useState([]);
   const [servicioSeleccionado, setServicioSeleccionado] = useState(null);
   const [buscar, setBuscar] = useState("");
+  const [clientes, setClientes] = useState([]);
+
 
   useEffect(() => {
     fetchServicios();
@@ -38,6 +44,21 @@ const Servicios = () => {
     );
   });
 
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/jackenail/Listar_Clientes"
+        );
+        setClientes(response.data);
+      } catch (error) {
+        console.error("Error al obtener los datos de clientes:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
     
   const handleAddServicio = async (formData) => {
     try {
@@ -330,27 +351,26 @@ const Servicios = () => {
     onChange={handleChange}
   />
 
-  <ModalEditarServicio
-    open={openModalEditar}
-    handleClose={handleCloseModalEditar}
-    onSubmit={handleEditServicio}
-    title="Editar Servicio"
-    fields={[
-      {
-        name: "IdServicio",
-        label: "Identificador",
-        type: "number",
-        readOnly: true,
-      },
-      { name: "Nombre_Servicio", label: "Nombre", type: "text" },
-      { name: "Tiempo_Servicio", label: "Tiempo", type: "select", options: opcionesTiempoServicio },
-      { name: "Precio_Servicio", label: "Precio", type: "number" },
-      { name: "ImgServicio", label: "Imagen", type: "file" },
-
-    ]}
-    onChange={handleChange}
-    entityData={servicioSeleccionado}
-  />
+<ModalEditarServicio
+  open={openModalEditar}
+  handleClose={handleCloseModalEditar}
+  onSubmit={handleEditServicio}
+  title="Editar Servicio"
+  fields={[
+    {
+      name: "IdServicio",
+      label: "Identificador",
+      type: "number",
+      readOnly: true,
+    },
+    { name: "Nombre_Servicio", label: "Nombre", type: "text" },
+    { name: "Tiempo_Servicio", label: "Tiempo", type: "select", options: opcionesTiempoServicio },
+    { name: "Precio_Servicio", label: "Precio", type: "number" },
+    { name: "ImgServicio", label: "Imagen", type: "file" },
+  ]}
+  onChange={handleChange}
+  entityData={servicioSeleccionado} // Asegúrate de pasar el estado aquí
+/>
 
 <TablePrueba
   columns={[
@@ -367,11 +387,15 @@ const Servicios = () => {
             height: "100%",
           }}
         >
+            <Tooltip title='Imagen del Servicio'>
+
           <img
             src={`http://localhost:5000${params.row.ImgServicio}`}  
             alt="Imagen"
             style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
           />
+              </Tooltip>
+
         </div>
       ),
     },

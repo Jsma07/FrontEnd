@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import ModalDinamico from "../../components/consts/modalJ"; // se importa el componente del modal
 import Table from "../../components/consts/Tabla"; // se importa el componente de la tabla
 import axios from "axios";
-import LoadingScreen from "../../components/consts/pantallaCarga";
 import Fab from "@mui/material/Fab";
 import Modal from "../../components/consts/modalContrasena";  // se importa el componente del modal para la contraseña
 import { toast} from "react-toastify";
@@ -14,7 +13,6 @@ const Usuarios = () => {
   const [users, setUsers] = useState([]); // hook donde se guardan los usuarios traidos de la api
   const [roles, setRoles] = useState([]);// hook donde se guardan los roles traidos de la api
   const [seleccionado, setSeleccionado] = useState(null); // hook para verificar si se esta editando un usuario y posteriormente traer su informacion
-  const [isLoading, setIsLoading] = useState(true);
   const [buscar, setBuscar] = useState(""); // hook para controlar lo que ingresa el usuario para se buscado por ciertos criterios
   const [rolesActivos, setRolesActivos] = useState([]); // hook para guardar unicamente los roles activos 
   const [openPasswordModal, setOpenPasswordModal] = useState(false); // Nuevo estado para controlar el modal de cambio de contraseña
@@ -58,10 +56,8 @@ const Usuarios = () => {
         }
         const response = await axios.get("http://localhost:5000/api/users");
         setUsers(response.data.usuarios);
-        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching users:", error);
-        setIsLoading(false);
       }
     };
 
@@ -213,7 +209,7 @@ const Usuarios = () => {
           newPassword: newPassword,
         }
       );
-      toast.error("La contraseña del usuario ha sido actualizada correctamente.", {
+      toast.success("La contraseña del usuario ha sido actualizada correctamente.", {
         position: "bottom-right",
         autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
@@ -369,7 +365,7 @@ const Usuarios = () => {
           user.id === seleccionado.id ? { ...user, ...formData } : user
         );
         setUsers(updatedUsers);
-        toast.error("El usuario ha sido editado correctamente.", {
+        toast.success("El usuario ha sido editado correctamente.", {
           position: "bottom-right",
           autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
@@ -384,7 +380,7 @@ const Usuarios = () => {
             },
           }
         );
-        toast.error("El usuario ha sido creado correctamente.", {
+        toast.success("El usuario ha sido creado correctamente.", {
           position: "bottom-right",
           autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
@@ -399,9 +395,7 @@ const Usuarios = () => {
         position: "bottom-right",
         autoClose: 3000, // Cierra automáticamente después de 3 segundos
       });
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   };
 
   // columnas para ser pasadas como props al componente de la tabla
@@ -458,9 +452,7 @@ const Usuarios = () => {
   ];
   // console.log("Roles en Usuarios:", roles); // Verifica los roles aquí antes de pasarlos a la tabla
 
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
+
 
   return (
     <div className="container mx-auto p-4 relative">
