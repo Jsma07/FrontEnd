@@ -197,7 +197,7 @@ const SalidaInsumos = () => {
                     {insumo.NombreInsumos}
                   </Typography>
                   <Typography color="blue-gray" className="font-medium text-sm">
-                    ${insumo.PrecioUnitario.toFixed(2)}
+                    ${insumo.PrecioUnitario}
                   </Typography>
                 </div>
                 <Typography
