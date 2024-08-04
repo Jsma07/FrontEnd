@@ -28,7 +28,7 @@ function Logo() {
 function Menu() {
   return (
     <ul className="flex justify-end items-center space-x-10">
-      <MenuItem href="/" text="Inicio" />
+      <MenuItem href="/vistaInicio" text="Inicio" />
       <MenuItem href="/servicios" text="Servicios" />
       <MenuItem href="/agendamiento" text="Agendamiento" />
       <MenuItem href="/contacto" text="Contacto" />

@@ -18,12 +18,12 @@ import CrearCuenta from "./components/consts/Register";
 import Servicios from "./pages/Agendamiento/Servicios/Servicios";
 import Salida from "./pages/Salida_Insumos/Salida";
 import Registrarsalida from "./pages/Salida_Insumos/Registrarsalida";
-
 import Clientes from "./pages/Clientes/Clientes";
 import Empleados from "./pages/Empleados/Empleados";
 import Registrar from "./pages/Ventas/Registrar";
 import InsumoDetalle from "./pages/Ventas/Detalles";
 import Contendioitems from "./components/consts/VIewClients/contenido";
+import VistaInicial from "./components/consts/VIewClients/vistaInicial";
 import Adiciones from "./pages/Adiciones/ListarAdiciones";
 import DetalleCompra from "./pages/Compras/DetalleCompra";
 import { UserProvider } from "./context/ContextoUsuario";
@@ -42,9 +42,9 @@ root.render(
           <Route path="/recuperarContrasena" element={<Contrasena />} />
           <Route path="/iniciarSesion" element={<Login />} />
           <Route path="/Registrar" element={<CrearCuenta />} />
-        <Route path="/Catalogo" element={<Contendioitems />} />
+          <Route path="/Catalogo" element={<Contendioitems />} />
+          <Route path="/vistaInicio" element={<VistaInicial />} />
 
-        
           <Route path="/" element={<App />}>
             <Route
               path="/configuracion/roles"
