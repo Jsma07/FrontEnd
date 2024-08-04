@@ -351,27 +351,26 @@ const Servicios = () => {
     onChange={handleChange}
   />
 
-  <ModalEditarServicio
-    open={openModalEditar}
-    handleClose={handleCloseModalEditar}
-    onSubmit={handleEditServicio}
-    title="Editar Servicio"
-    fields={[
-      {
-        name: "IdServicio",
-        label: "Identificador",
-        type: "number",
-        readOnly: true,
-      },
-      { name: "Nombre_Servicio", label: "Nombre", type: "text" },
-      { name: "Tiempo_Servicio", label: "Tiempo", type: "select", options: opcionesTiempoServicio },
-      { name: "Precio_Servicio", label: "Precio", type: "number" },
-      { name: "ImgServicio", label: "Imagen", type: "file" },
-
-    ]}
-    onChange={handleChange}
-    entityData={servicioSeleccionado}
-  />
+<ModalEditarServicio
+  open={openModalEditar}
+  handleClose={handleCloseModalEditar}
+  onSubmit={handleEditServicio}
+  title="Editar Servicio"
+  fields={[
+    {
+      name: "IdServicio",
+      label: "Identificador",
+      type: "number",
+      readOnly: true,
+    },
+    { name: "Nombre_Servicio", label: "Nombre", type: "text" },
+    { name: "Tiempo_Servicio", label: "Tiempo", type: "select", options: opcionesTiempoServicio },
+    { name: "Precio_Servicio", label: "Precio", type: "number" },
+    { name: "ImgServicio", label: "Imagen", type: "file" },
+  ]}
+  onChange={handleChange}
+  entityData={servicioSeleccionado} // Asegúrate de pasar el estado aquí
+/>
 
 <TablePrueba
   columns={[

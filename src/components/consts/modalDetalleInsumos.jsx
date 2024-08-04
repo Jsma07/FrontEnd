@@ -14,7 +14,7 @@ const ModalInsumos = ({
 
   const handleAdd = (id) => {
     const insumoSeleccionado = insumos.find((insumo) => insumo.IdInsumos === id);
-    
+
     if (insumoSeleccionado) {
       const nuevoDetalleCompra = {
         ...insumoSeleccionado,
@@ -23,6 +23,11 @@ const ModalInsumos = ({
       setInsumosSeleccionados([...insumosSeleccionados, nuevoDetalleCompra]);
       setInsumosAgregados([...insumosAgregados, id]);
     }
+  };
+
+  const handleRemove = (id) => {
+    setInsumosSeleccionados(insumosSeleccionados.filter((insumo) => insumo.IdInsumos !== id));
+    setInsumosAgregados(insumosAgregados.filter((insumoId) => insumoId !== id));
   };
 
   const isInsumoAgregado = (id) => {
@@ -65,7 +70,7 @@ const ModalInsumos = ({
                       Proveedor: {insumo.Idproveedor}
                     </Typography>
                   </CardBody>
-                  <CardFooter className="pt-2">
+                  <CardFooter className="pt-2 flex justify-between">
                     <Button
                       variant="contained"
                       onClick={() => handleAdd(insumo.IdInsumos)}
@@ -74,6 +79,16 @@ const ModalInsumos = ({
                     >
                       Agregar
                     </Button>
+                    {isInsumoAgregado(insumo.IdInsumos) && (
+                      <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleRemove(insumo.IdInsumos)}
+                        className="w-3/4 text-xs"
+                      >
+                        Eliminar
+                      </Button>
+                    )}
                   </CardFooter>
                 </Card>
               </Grid>

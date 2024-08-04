@@ -4,6 +4,7 @@ import Table from "../../components/consts/Tabla";
 import ModalAgregarInsumo from "../../components/consts/modal";
 import ModalEditarInsumo from "../../components/consts/modalEditar";
 import CamposObligatorios from "../../components/consts/camposVacios";
+import handleAddInsumo from './agregarInsumo';
 import Fab from "@mui/material/Fab";
 
 const Insumos = () => {
@@ -52,15 +53,7 @@ const Insumos = () => {
   };
 
   const filtrar = insumos.filter((insumo) => {
-    const {
-      NombreInsumos,
-      Cantidad,
-      PrecioUnitario,
-      Idproveedor,
-      IdCategoria,
-      IdInsumos,
-      Estado,
-    } = insumo;
+    const {NombreInsumos,Cantidad,PrecioUnitario,Idproveedor,IdCategoria,IdInsumos,Estado,} = insumo;
     const terminoABuscar = buscar.toLowerCase();
 
     const IdInsumoString = IdInsumos?.toString() || "";
@@ -91,100 +84,10 @@ const Insumos = () => {
     );
   });
 
-  const handleAddInsumo = async (formData) => {
-    try {
-      const {
-        NombreInsumos,
-        IdCategoria,
-        Idproveedor,
-        Imagen,
-      } = formData;
-  
-      const camposObligatorios = [
-        "NombreInsumos",
-        "Imagen",
-        "IdCategoria",
-        "Idproveedor",
-      ]; 
-      if (
-        !CamposObligatorios(
-          formData,
-          camposObligatorios,
-          "Por favor, complete todos los campos del proveedor."
-        )
-      ) {
-        return;
-      }
-  
-      if (!/^[a-zA-Z0-9\s]+$/.test(NombreInsumos)) {
-        window.Swal.fire({
-          icon: "error",
-          title: "Nombre del insumo inválido",
-          text: "El nombre del insumo no debe contener caracteres especiales.",
-        });
-        return;
-      }
-  
-      const confirmation = await window.Swal.fire({
-        title: "¿Estás seguro?",
-        text: "¿Quieres agregar este insumo?",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sí, agregar",
-        cancelButtonText: "Cancelar",
-      });
-  
-      if (confirmation.isConfirmed) {
-        const formDataToSend = new FormData();
-        formDataToSend.append("NombreInsumos", NombreInsumos);
-        formDataToSend.append("Idproveedor", Idproveedor);
-        formDataToSend.append("IdCategoria", IdCategoria);
-        formDataToSend.append("Imagen", Imagen);
-  
-        const response = await axios.post(
-          "http://localhost:5000/api/insumos/guardarInsumo",
-          formDataToSend,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-  
-        console.log("Respuesta del servidor:", response.data);
-  
-        handleCloseModalAgregar();
-        fetchInsumos();
-        window.Swal.fire("Insumo agregado!", "", "success");
-      }
-    } catch (error) {
-      if (error.response) {
-        console.error("Error al agregar insumo:", error.response.data);
-      } else {
-        console.error("Error al agregar insumo:", error.message);
-      }
-    }
-  };
-  
-
   const handleEditInsumo = async (formData) => {
     try {
-      const insumoExistente = insumos.find(
-        (insumo) =>
-          insumo.NombreInsumos === formData.NombreInsumos &&
-          insumo.IdInsumos !== formData.IdInsumos
-      );
-  
-      const camposObligatorios = [
-        "NombreInsumos",
-        "Imagen",
-        "Estado",
-        "IdCategoria",
-        "Idproveedor",
-      ];
-  
+      const camposObligatorios = ["NombreInsumos","Imagen","Idcategoria","Idproveedor",];
+
       if (
         !CamposObligatorios(
           formData,
@@ -194,7 +97,19 @@ const Insumos = () => {
       ) {
         return;
       }
-  
+
+      const formatNombreInsumo = (nombre) => {
+        const nombreSinEspacios = nombre.trim();
+        const nombreMinusculas = nombreSinEspacios.toLowerCase();
+        const nombreFormateado = nombreMinusculas.charAt(0).toUpperCase() + nombreMinusculas.slice(1);
+        return nombreFormateado;
+    };
+
+    formData.NombreInsumos = formatNombreInsumo(formData.NombreInsumos);
+    const response = await axios.get('http://localhost:5000/api/insumos');
+    const insumos = response.data;
+    const insumoExistente = insumos.find(insumo => insumo.NombreInsumos === formData.NombreInsumos && insumo.IdInsumos !== formData.IdInsumos);
+
       if (insumoExistente) {
         window.Swal.fire({
           icon: "warning",
@@ -230,7 +145,7 @@ const Insumos = () => {
         formDataWithNumbers.append("NombreInsumos", formData.NombreInsumos);
         formDataWithNumbers.append("Imagen", formData.Imagen); 
         formDataWithNumbers.append("Estado", formData.Estado);
-        formDataWithNumbers.append("IdCategoria", formData.IdCategoria);
+        formDataWithNumbers.append("IdCategoria", formData.Idcategoria);
         formDataWithNumbers.append("Idproveedor", formData.Idproveedor);
 
   
@@ -266,6 +181,10 @@ const Insumos = () => {
     setInsumoSeleccionado(null);
   };
 
+  const handleSubmit = (formData) => {
+    handleAddInsumo(formData, handleCloseModalAgregar, fetchInsumos);
+};
+
   const handleCloseModalEditar = () => {
     setOpenModalEditar(false);
     setInsumoSeleccionado(null);
@@ -282,7 +201,7 @@ const Insumos = () => {
       <ModalAgregarInsumo
         open={openModalAgregar}
         handleClose={handleCloseModalAgregar}
-        onSubmit={handleAddInsumo}
+        onSubmit={handleSubmit}
         title="Crear Nuevo Insumo"
         fields={[
           {
@@ -388,7 +307,7 @@ const Insumos = () => {
             field: 'Precio_Servicio',
             headerName: 'PRECIO',
             width: 'w-36',
-            renderCell: (params) => <div>{`$${params.row.PrecioUnitario}`}</div>,
+            renderCell: (params) => <div>{`${params.row.PrecioUnitario}`}</div>,
           },
           {
             field: "Estado",
@@ -397,9 +316,9 @@ const Insumos = () => {
             readOnly: true,
             renderCell: (params) => (
               <div>
-                {params.row.Estado === "Terminado" && (
+                {params.row.Estado === "Agotado" && (
                   <span className="bg-red-100 text-red-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
-                    Terminado
+                    Agotado
                   </span>
                 )}
                 {params.row.Estado === "Disponible" && (

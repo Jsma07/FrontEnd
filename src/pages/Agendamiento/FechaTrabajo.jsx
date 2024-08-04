@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Container, Typography, Card, CardContent, Fab, Tooltip, Box, Avatar, Input, Pagination, CardActionArea } from '@mui/material';
 import dayjs from 'dayjs';
+import { motion } from 'framer-motion';
 import ModalInactivarFecha from '../../components/consts/ModalInactivarFecha'; 
 import UpdateDisabledIcon from '@mui/icons-material/UpdateDisabled';
 
@@ -123,25 +124,31 @@ const FechasTrabajo = () => {
             mb={2}
           >
             {currentCards.map(horario => (
-              <Card key={horario.id} sx={{ backgroundColor: '#E3F2FD', borderRadius: 2 }}>
-                <CardActionArea>
-                  <CardContent>
-                    <Box display="flex" alignItems="center">
-                      <Avatar sx={{ backgroundColor: horario.color }}>
-                        {dayjs(horario.fecha).format('DD')}
-                      </Avatar>
-                      <Box ml={2}>
-                        <Typography variant="h6" component="div">
-                          {dayjs(horario.fecha).format('DD/MM/YYYY')}
-                        </Typography>
-                        <Typography variant="body2">
-                          Estado: {horario.estado}
-                        </Typography>
+              <motion.div
+                key={horario.id}
+                whileHover={{ scale: 1.09 }}
+                transition={{ type:"spring", stiffness: 400, damping: 10 }}
+              >
+                <Card sx={{ backgroundColor: '#E3F2FD', borderRadius: 2 }}>
+                  <CardActionArea>
+                    <CardContent>
+                      <Box display="flex" alignItems="center">
+                        <Avatar sx={{ backgroundColor: horario.color }}>
+                          {dayjs(horario.fecha).format('DD')}
+                        </Avatar>
+                        <Box ml={2}>
+                          <Typography variant="h6" component="div">
+                            {dayjs(horario.fecha).format('DD/MM/YYYY')}
+                          </Typography>
+                          <Typography variant="body2">
+                            Estado: {horario.estado}
+                          </Typography>
+                        </Box>
                       </Box>
-                    </Box>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              </motion.div>
             ))}
           </Box>
 

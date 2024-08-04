@@ -28,6 +28,7 @@ import Adiciones from "./pages/Adiciones/ListarAdiciones";
 import DetalleCompra from "./pages/Compras/DetalleCompra";
 import { UserProvider } from "./context/ContextoUsuario";
 import CrearCita from "./pages/Agendamiento/CrearCita";
+import FechasTrabajo from './pages/Agendamiento/FechaTrabajo'
 import Contrasena from "./components/consts/recuperarContrasena";
 import PrivateRoute from "./context/verificarSesion";
 
@@ -120,6 +121,9 @@ root.render(
               </PrivateRoute>
             }
             />
+            <Route path="/FechasTrabajadas" element={<FechasTrabajo />}/>
+
+
             <Route path="/Salida_Insumos" 
              element={
               <PrivateRoute requiredPermissions={["SalidaInsumos"]}>

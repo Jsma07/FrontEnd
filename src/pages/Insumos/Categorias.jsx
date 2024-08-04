@@ -42,7 +42,6 @@ const Categorias = () => {
     try {
       const { nombre_categoria } = formData;
   
-      // Validación de los campos obligatorios
       const camposObligatorios = ['nombre_categoria'];
       if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos de la categoría.')) {
         return;
@@ -60,10 +59,8 @@ const Categorias = () => {
   
       formData.estado_categoria = 1;
       try {
-        // Intenta guardar la categoría en el backend
         await axios.post('http://localhost:5000/api/categorias/guardarCategoria', formData);
         
-        // Si la categoría se guarda exitosamente, muestra la confirmación
         const confirmation = await window.Swal.fire({
           title: '¿Estás seguro?',
           text: '¿Quieres agregar esta categoría?',
@@ -83,7 +80,7 @@ const Categorias = () => {
       } catch (error) {
         if (error.response && error.response.status === 400 && error.response.data.error === 'El nombre de la categoría ya está registrado.') {
           window.Swal.fire({
-            icon: 'error',
+            icon: 'warning',
             title: 'Categoría ya registrada',
             text: 'La categoría ingresada ya está registrada.',
           });
@@ -104,7 +101,6 @@ const Categorias = () => {
             return;
         }
 
-        // Formatear el nombre de la categoría antes de enviar
         const formatNombreCategoria = (nombre) => {
             const nombreSinEspacios = nombre.trim();
             const nombreMinusculas = nombreSinEspacios.toLowerCase();
@@ -136,7 +132,6 @@ const Categorias = () => {
         window.Swal.fire('Error', 'Hubo un error al intentar actualizar la categoría', 'error');
     }
 };
-
 
   const handleChange = (name, value) => {
     setCategoriaSeleccionado((prevCategoria) => ({

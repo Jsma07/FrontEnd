@@ -6,7 +6,9 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ModalAgregarInsumo from "../../components/consts/modal";
+import handleAddInsumo from '../Insumos/agregarInsumo';
 import ModalAgregarProveedor from "../../components/consts/modal";
+import handleAddProveedor from '../Compras/agregarProveedor';
 import ModalDetalleInsumos from "../../components/consts/modalDetalleInsumos";
 import CamposObligatorios from "../../components/consts/camposVacios";
 import Fab from '@mui/material/Fab';
@@ -20,16 +22,16 @@ const CrearCompra = () => {
   const [proveedores, setProveedores] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [fecha_compra, setFechaCompra] = useState('');
-  const [descuento_compra, setDescuentoCompra] = useState('');
-  const [iva_compra, setIvaCompra] = useState('');
-  const [subtotal_compra, setSubtotalCompra] = useState('');
+  const [descuento_compra, setDescuentoCompra] = useState(0);
+  const [iva_compra, setIvaCompra] = useState(0);
+  const [subtotal_compra, setSubtotalCompra] = useState(0);
+  const [total_compra, setTotalCompra] = useState(0);
   const [estado_compra, setEstadoCompra] = useState('');
   const [modalData, setModalData] = useState(null);
   const [openModalAgregarInsumo, setOpenModalAgregarInsumo] = useState(false);
   const [openModalAgregarProveedor, setOpenModalAgregarProveedor] = useState(false);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [insumoSeleccionado, setInsumoSeleccionado] = useState(null);
-
   const [detallesCompra, setDetallesCompra] = useState([]);
   const [insumosSeleccionados, setInsumosSeleccionados] = useState([]);
   const [cantidad_insumo, setCantidadInsumo] = useState({});
@@ -58,34 +60,38 @@ const CrearCompra = () => {
     fetchProveedores();
   }, []);
 
-  const fetchCompras = async () => {
+const fetchCompras = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/compras');
       setCompras(response.data);
     } catch (error) {
       console.error('Error fetching Compras:', error);
     }
-  };
+};
 
-  const fetchInsumos = async () => {
+const fetchInsumos = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/insumos');
       setInsumos(response.data);
     } catch (error) {
       console.error('Error fetching Insumos:', error);
     }
-  };
+};
 
-  const fetchCategorias = async () => {
+const handleSubmitInsumos = (formData) => {
+  handleAddInsumo(formData, handleCloseModalAgregar, fetchInsumos);
+};
+
+const fetchCategorias = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/categorias');
       setCategorias(response.data);
     } catch (error) {
       console.error('Error fetching Categorias:', error);
     }
-  };
+};
 
-  const fetchProveedores = async () => {
+const fetchProveedores = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/proveedores");
       console.log("proveedores fetched:", response.data); 
@@ -93,327 +99,166 @@ const CrearCompra = () => {
     } catch (error) {
       console.error("Error fetching proveedores:", error);
     }
-  };
+};
 
-  const getNombreCategoria = (idCategoria) => {
+const handleSubmitProveedor = (formData) => {
+  handleAddProveedor(formData, handleCloseModalAgregar, fetchProveedores);
+};
+
+const getNombreCategoria = (idCategoria) => {
     const categoria = categorias.find((cat) => cat.IdCategoria === idCategoria);
     return categoria ? categoria.nombre_categoria : "Desconocido";
-  };
+};
 
-  const handleCantidadChange = (idInsumo, value) => {
-    setCantidadInsumo({ ...cantidad_insumo, [idInsumo]: value });
-  };
+const calcularSubtotal = (detalles) => {
+    return detalles.reduce((acc, detalle) => acc + detalle.totalValorInsumos, 0);
+};
 
-  const handlePrecioChange = (idInsumo, value) => {
-    setPrecioUnitario({ ...precio_unitario, [idInsumo]: value });
-  };
+const calcularIva = (subtotal) => {
+    return 0.19 * subtotal;
+};
 
-  const handleAddInsumo = async (formData) => {
-    try {
-      const {
-        NombreInsumos,
-        IdCategoria,
-        Idproveedor,
-        Imagen,
-      } = formData;
-  
-      const camposObligatorios = [
-        "NombreInsumos",
-        "Imagen",
-        "IdCategoria",
-        "Idproveedor",
-      ]; 
-      if (
-        !CamposObligatorios(
-          formData,
-          camposObligatorios,
-          "Por favor, complete todos los campos del proveedor."
-        )
-      ) {
-        return;
-      }
-  
-      if (!/^[a-zA-Z0-9\s]+$/.test(NombreInsumos)) {
-        window.Swal.fire({
-          icon: "error",
-          title: "Nombre del insumo inválido",
-          text: "El nombre del insumo no debe contener caracteres especiales.",
-        });
-        return;
-      }
-  
-      const confirmation = await window.Swal.fire({
-        title: "¿Estás seguro?",
-        text: "¿Quieres agregar este insumo?",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sí, agregar",
-        cancelButtonText: "Cancelar",
-      });
-  
-      if (confirmation.isConfirmed) {
-        const formDataToSend = new FormData();
-        formDataToSend.append("NombreInsumos", NombreInsumos);
-        formDataToSend.append("Idproveedor", Idproveedor);
-        formDataToSend.append("IdCategoria", IdCategoria);
-        formDataToSend.append("Imagen", Imagen);
-  
-        const response = await axios.post(
-          "http://localhost:5000/api/insumos/guardarInsumo",
-          formDataToSend,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-  
-        console.log("Respuesta del servidor:", response.data);
-  
-        handleCloseModalAgregar();
-        fetchInsumos();
-        window.Swal.fire("Insumo agregado!", "", "success");
-      }
-    } catch (error) {
-      if (error.response) {
-        console.error("Error al agregar insumo:", error.response.data);
-      } else {
-        console.error("Error al agregar insumo:", error.message);
-      }
-    }
-  };
+const calcularTotal = (subtotal, descuento) => {
+    return subtotal - descuento;
+};
 
-  const handleAddProveedor = async (formData) => {
-    try {
-      const { NIT, correo_proveedor, telefono_proveedor, direccion_proveedor, empresa_proveedor } = formData;
-      const response = await axios.get('http://localhost:5000/api/proveedores');
-      const proveedores = response.data;
-      const proveedorExistenteNIT = proveedores.find(proveedor => proveedor.NIT === NIT);
-      const proveedorExistenteCorreo = proveedores.find(proveedor => proveedor.correo_proveedor === correo_proveedor);
-      const proveedorExistenteTelefono = proveedores.find(proveedor => proveedor.telefono_proveedor === telefono_proveedor);
-      const proveedorExistenteDireccion = proveedores.find(proveedor => proveedor.direccion_proveedor === direccion_proveedor);
-      const proveedorExistenteEmpresa = proveedores.find(proveedor => proveedor.empresa_proveedor === empresa_proveedor);
-  
-      const camposObligatorios = ['NIT','nombre_proveedor', 'correo_proveedor', 'telefono_proveedor', 'direccion_proveedor', 'empresa_proveedor'];
+const actualizarTotales = (detalles, descuento) => {
+    const subtotal = calcularSubtotal(detalles);
+    const iva = calcularIva(subtotal);
+    const total = calcularTotal(subtotal, descuento);
 
-      if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos del proveedor.')) {
-        return;
-      }
+    setSubtotalCompra(subtotal);
+    setIvaCompra(iva);
+    setTotalCompra(total);
+};
 
-      if (proveedorExistenteNIT) {
-        window.Swal.fire({
-          icon: 'warning',
-          title: 'NIT ya registrado',
-          text: 'El NIT de la empresa ingresado ya está registrado para otro proveedor.',
-        });
-        return;
-      }
-      
-      const nit = formData['NIT'];
-      if (!/^\d+$/.test(nit)) {
-        window.Swal.fire({
-          icon: 'error',
-          title: 'NIT de la empresa inválido',
-          text: 'Por favor, ingresa solo números en el campo del NIT de la empresa.',
-        });
-        return;
-      }
-
-      if (NIT.length < 9 || NIT.length > 10) {
-        window.Swal.fire({
-          icon: 'error',
-          title: 'NIT de la empresa inválido',
-          text: 'Por favor, asegúrate de que el NIT de la empresa tenga minimo 9 dígitos.',
-        });
-        return;
-      }
-
-    const nombreProveedor = formData['nombre_proveedor'];
-    if (!/^[a-zA-Z\s]+$/.test(nombreProveedor)) {
-      window.Swal.fire({
-        icon: 'error',
-        title: 'Nombre de proveedor inválido',
-        text: 'El nombre de proveedor no debe contener números ni caracteres especiales.',
-      });
-      return;
-    }
-
-    const correoProveedor = formData['correo_proveedor'];
-    if (!/\b[A-Za-z0-9._%+-]+@(gmail|hotmail)\.com\b/.test(correoProveedor)) {
-      window.Swal.fire({
-        icon: 'error',
-        title: 'Correo electrónico inválido',
-        text: 'Por favor, ingresa un correo electrónico válido que termine en @gmail.com o @hotmail.com.',
-      });
-      return;
-    }
-     
-    const telefono = formData['telefono_proveedor'];
-      if (!/^\d+$/.test(telefono)) {
-        window.Swal.fire({
-          icon: 'error',
-          title: 'Teléfono inválido',
-          text: 'Por favor, ingresa solo números en el campo de teléfono.',
-        });
-        return;
-     }
-
-      if (telefono.length !== 10) {
-        window.Swal.fire({
-          icon: 'error',
-          title: 'Teléfono inválido',
-          text: 'Por favor, asegúrate de que el número de teléfono tenga 10 dígitos.',
-        });
-        return;
-      }
-
-      if (proveedorExistenteCorreo) {
-        window.Swal.fire({
-          icon: 'warning',
-          title: 'Correo ya registrado',
-          text: 'El correo electrónico ingresado ya está registrado para otro proveedor.',
-        });
-        return;
-      }
-  
-      if (proveedorExistenteTelefono) {
-        window.Swal.fire({
-          icon: 'warning',
-          title: 'Teléfono ya registrado',
-          text: 'El número de teléfono ingresado ya está registrado para otro proveedor.',
-        });
-        return;
-      }
-
-      if (proveedorExistenteDireccion) {
-        window.Swal.fire({
-          icon: 'warning',
-          title: 'Direccion ya registrada',
-          text: 'La direccion ingresada ya está registrado para otro proveedor.',
-        });
-        return;
-      }
-
-      if (proveedorExistenteEmpresa) {
-        window.Swal.fire({
-          icon: 'warning',
-          title: 'Empresa ya registrada',
-          text: 'La empresa ingresada ya está registrado para otro proveedor.',
-        });
-        return;
-      }
-
-      const confirmation = await window.Swal.fire({
-        title: '¿Estás seguro?',
-        text: '¿Quieres agregar este proveedor?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, agregar',
-        cancelButtonText: 'Cancelar'
-      });
-
-      if (confirmation.isConfirmed) {
-        formData.estado_proveedor = 1;
-        await axios.post('http://localhost:5000/api/proveedores/guardarProveedor', formData);
-        handleCloseModalAgregar();
-        fetchProveedores();
-        window.Swal.fire('¡Proveedor agregado!', '', 'success');
-      }
-    } catch (error) {
-      console.error('Error al agregar proveedor:', error);
-    }
-
-  };
-
-  const sendCompra = async (formData) => {
-    try {
-      const confirmation = await Swal.fire({
-        title: '¿Estás seguro?',
-        text: '¿Quieres agregar esta compra?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, agregar',
-        cancelButtonText: 'Cancelar',
-      });
-  
-      if (confirmation.isConfirmed) {
-        const postResponse = await axios.post('http://localhost:5000/api/compras/guardarCompra', formData);
-        console.log('Respuesta del servidor:', postResponse.data);
-        fetchCompras();
-        Swal.fire('¡Compra agregada!', '', 'success');
-      }
-    } catch (error) {
-      console.error('Error al agregar la compra:', error);
-      alert('No se pudo agregar la compra. Verifique la conexión al servidor.');
-    }
-  };
-  
-  const handleAgregarDetalleCompra = () => {
+const handleAgregarDetalleCompra = () => {
     const nuevosDetallesCompra = insumosSeleccionados.map((insumo) => ({
-      IdInsumo: insumo.IdInsumos,
-      cantidad_insumo: cantidad_insumo[insumo.IdInsumos] || 0,
-      precio_unitario: precio_unitario[insumo.IdInsumos] || 0,
-      totalValorInsumos: (cantidad_insumo[insumo.IdInsumos] || 0) * (precio_unitario[insumo.IdInsumos] || 0),
+        IdInsumo: insumo.IdInsumos,
+        cantidad_insumo: cantidad_insumo[insumo.IdInsumos] || 0,
+        precio_unitario: precio_unitario[insumo.IdInsumos] || 0,
+        totalValorInsumos: (cantidad_insumo[insumo.IdInsumos] || 0) * (precio_unitario[insumo.IdInsumos] || 0),
     }));
-  
+
     console.log("Nuevos detalles de compra:", nuevosDetallesCompra);
-  
-    // Actualiza el estado y luego llama a sendCompra
     setDetallesCompra(nuevosDetallesCompra);
-  };
-  
-  // Llama a handleAddCompra después de que detallesCompra se haya actualizado
-  const handleAddCompra = () => {
-    handleAgregarDetalleCompra();
-  };
-  
-  // Efecto que se ejecuta cuando detallesCompra cambia
-  useEffect(() => {
-    if (detallesCompra.length > 0) {
-      const subtotal_compra = detallesCompra.reduce((acc, detalle) => acc + detalle.totalValorInsumos, 0);
-  
-      const formData = {fecha_compra, descuento_compra: parseFloat(descuento_compra), iva_compra: parseFloat(iva_compra),subtotal_compra: parseFloat(subtotal_compra),estado_compra,
-        detallesCompra: detallesCompra.map(detalle => ({
-          ...detalle,
-          cantidad_insumo: parseFloat(detalle.cantidad_insumo),
-          precio_unitario: parseFloat(detalle.precio_unitario),
-          totalValorInsumos: parseFloat(detalle.totalValorInsumos),
-        })),
-      };
-  
-      console.log("Datos enviados al backend:", formData);
-  
-      const camposObligatorios = ['fecha_compra', 'descuento_compra', 'iva_compra', 'estado_compra'];
-      if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos de la compra.')) {
-        return;
-      }
-      // Envía la compra después de actualizar el estado
-      sendCompra(formData);
-    }
-  }, [detallesCompra]); 
-  
-  
-  const handleChange = (name, value) => {
-    setInsumoSeleccionado((prevInsumo) => ({
-      ...prevInsumo,
-      [name]: value,
+
+    actualizarTotales(nuevosDetallesCompra, descuento_compra);
+};
+
+const handleInputChange = (insumoId, field, value) => {
+  if (value < 0) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Valor no permitido',
+        text: 'No se permiten números negativos en los campos de cantidad o precio unitario.',
+    });
+    return;
+  }
+
+  if (field === 'cantidad_insumo') {
+      setCantidadInsumo((prevState) => ({ ...prevState, [insumoId]: value }));
+  } else {
+      setPrecioUnitario((prevState) => ({ ...prevState, [insumoId]: value }));
+  }
+
+    const nuevosDetallesCompra = insumosSeleccionados.map((insumo) => ({
+        IdInsumo: insumo.IdInsumos,
+        cantidad_insumo: field === 'cantidad_insumo' ? value : (cantidad_insumo[insumo.IdInsumos] || 0),
+        precio_unitario: field === 'precio_unitario' ? value : (precio_unitario[insumo.IdInsumos] || 0),
+        totalValorInsumos: (
+            (field === 'cantidad_insumo' ? value : (cantidad_insumo[insumo.IdInsumos] || 0)) *
+            (field === 'precio_unitario' ? value : (precio_unitario[insumo.IdInsumos] || 0))
+        ),
     }));
-  };
 
-  const handleCloseModalAgregar = () => {
-    setOpenModalAgregarInsumo(false);
-    setOpenModalAgregarProveedor(false);
-    setInsumoSeleccionado(null);
-  };
+    setDetallesCompra(nuevosDetallesCompra);
 
+    actualizarTotales(nuevosDetallesCompra, descuento_compra);
+};
 
-  return (
+const handleDescuentoChange = (value) => {
+    setDescuentoCompra(value);
+    actualizarTotales(detallesCompra, value);
+};
+
+const handleAddCompra = async () => {
+    handleAgregarDetalleCompra();
+
+    const formData = {fecha_compra, descuento_compra: parseFloat(descuento_compra), iva_compra: parseFloat(iva_compra),subtotal_compra: parseFloat(subtotal_compra),estado_compra,
+        detallesCompra: detallesCompra.map(detalle => ({
+            ...detalle, cantidad_insumo: parseInt(detalle.cantidad_insumo),precio_unitario: parseFloat(detalle.precio_unitario),totalValorInsumos: parseFloat(detalle.totalValorInsumos),
+        })),
+    };
+    console.log("Datos enviados al backend:", formData);
+    const camposObligatorios = ['fecha_compra', 'descuento_compra', 'iva_compra', 'estado_compra'];
+
+    if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos de la compra.')) {
+        return;
+    }
+
+    const detallesVacios = detallesCompra.some(detalle => detalle.cantidad_insumo === 0 || detalle.precio_unitario === 0);
+    if (detallesVacios) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Campos vacíos',
+            text: 'Por favor, complete todos los campos de cantidad y precio unitario en los detalles de la compra.',
+        });
+        return;
+    }
+
+    try {
+        const confirmation = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: '¿Quieres agregar esta compra?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, agregar',
+            cancelButtonText: 'Cancelar',
+        });
+
+        if (confirmation.isConfirmed) {
+            const postResponse = await axios.post('http://localhost:5000/api/compras/guardarCompra', formData);
+            console.log('Respuesta del servidor:', postResponse.data);
+            fetchCompras();
+            Swal.fire('¡Compra agregada!', '', 'success');
+        }
+    } catch (error) {
+        console.error('Error al agregar la compra:', error);
+        alert('No se pudo agregar la compra. Verifique la conexión al servidor.');
+    }
+};
+
+const handleChange = (name, value) => {
+  setInsumoSeleccionado((prevInsumo) => ({
+    ...prevInsumo,
+    [name]: value,
+  }));
+};
+
+const handleCloseModalAgregar = () => {
+  setOpenModalAgregarInsumo(false);
+  setOpenModalAgregarProveedor(false);
+  setInsumoSeleccionado(null);
+};
+
+const getFormattedDate = (date) => {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const today = new Date();
+const maxDate = getFormattedDate(today);
+
+const minDate = new Date();
+minDate.setDate(today.getDate() - 5);
+const minDateFormatted = getFormattedDate(minDate);
+
+return (
   <div className="max-w-4xl mx-auto p-4">
    <section className="content">
   <div
@@ -444,7 +289,10 @@ const CrearCompra = () => {
               id="fecha_compra"
               value={fecha_compra}
               onChange={(e) => setFechaCompra(e.target.value)}
-              className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500" required/>
+              className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500" 
+              min={minDateFormatted}
+              max={maxDate}
+              />
           </div>
 
           <div className="form-group mb-2">
@@ -453,7 +301,7 @@ const CrearCompra = () => {
               type="number"
               id="descuento_compra"
               value={descuento_compra}
-              onChange={(e) => setDescuentoCompra(e.target.value)}
+              onChange={(e) => handleDescuentoChange(parseFloat(e.target.value))}
               className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
               placeholder="Descuento" required/>
           </div>
@@ -467,7 +315,7 @@ const CrearCompra = () => {
             value={iva_compra}
             onChange={(e) => setIvaCompra(e.target.value)}
             className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-            placeholder="IVA" required/>
+            placeholder="IVA" disabled/>
         </div>
 
         <div className="form-group mb-2">
@@ -559,8 +407,8 @@ const CrearCompra = () => {
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                 <input
                   type="number"
-                  value={cantidad_insumo[insumo.IdInsumos] || ""}
-                  onChange={(e) => handleCantidadChange(insumo.IdInsumos, e.target.value)}
+                  value={cantidad_insumo[insumo.IdInsumos] || ''}
+                  onChange={(e) => handleInputChange(insumo.IdInsumos, 'cantidad_insumo', parseInt(e.target.value))}
                   style={{
                     width: "80px",
                     padding: "5px",
@@ -573,8 +421,8 @@ const CrearCompra = () => {
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                 <input
                   type="number"
-                  value={precio_unitario[insumo.IdInsumos] || ""}
-                  onChange={(e) => handlePrecioChange(insumo.IdInsumos, e.target.value)}
+                  value={precio_unitario[insumo.IdInsumos] || ''}
+                  onChange={(e) => handleInputChange(insumo.IdInsumos, 'precio_unitario', parseFloat(e.target.value))}
                   style={{
                     width: "80px",
                     padding: "5px",
@@ -604,9 +452,21 @@ const CrearCompra = () => {
             }}
           >
             <div style={{ fontWeight: "bold", marginRight: "20px" }}>
+              SUBTOTAL:
+            </div>
+            <div>{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(subtotal_compra)}</div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginBottom: "10px",
+            }}
+          >
+            <div style={{ fontWeight: "bold", marginRight: "20px" }}>
               TOTAL:
             </div>
-            <div></div>
+            <div>{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(total_compra)}</div>
           </div>
         </div>
 
@@ -671,7 +531,7 @@ const CrearCompra = () => {
       <ModalAgregarInsumo
         open={openModalAgregarInsumo}
         handleClose={handleCloseModalAgregar}
-        onSubmit={handleAddInsumo}
+        onSubmit={handleSubmitInsumos}
         title="Crear Nuevo Insumo"
         fields={[
           {
@@ -704,7 +564,7 @@ const CrearCompra = () => {
       <ModalAgregarProveedor
           open={openModalAgregarProveedor}
           handleClose={handleCloseModalAgregar}
-          onSubmit={(formData) => handleAddProveedor(formData)} 
+          onSubmit={(formData) => handleSubmitProveedor(formData)} 
           title="Crear Nuevo Proveedor"
           fields={[
             { name: 'NIT', label: 'NIT', type: 'text' },
