@@ -10,45 +10,61 @@ const PerfilUsuario = ({ open, handleClose }) => {
   const [apellido, setApellido] = useState('');
   const [telefono, setTelefono] = useState('');
   const [correo, setCorreo] = useState('');
-  const [contrasena, setContrasena] = useState('');
   const [documento, setDocumento] = useState('');
 
   useEffect(() => {
     if (user) {
+      console.log('User:', user); // Asegúrate de que user esté definido y tenga un id
       setNombre(user.nombre);
       setApellido(user.apellido);
       setCorreo(user.correo);
       setTelefono(user.Telefono || user.telefono);
       setDocumento(user.Documento || user.documento);
-      setContrasena(user.Contrasena || user.contrasena);
     }
   }, [user]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-
+  
+    if (!user || !user.id) {
+      toast.error('ID del usuario no encontrado', {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    console.log({
+      nombre,
+      apellido,
+      telefono,
+      correo,
+      documento,
+      tipo: user.tipo
+    });
     try {
-      const response = await axios.put('http://localhost:5000/api/editarPerfil', {
+      const response = await axios.put(`http://localhost:5000/api/editarPerfil/${user.id}`, {
         nombre,
         apellido,
         telefono,
         correo,
-        contrasena,
         documento,
-        tipo: 'usuario' // o 'empleado' o 'cliente' según sea el caso
+        tipo: user.tipo // Incluye el tipo de usuario en el cuerpo de la solicitud
       });
+  
       toast.success('Datos actualizados correctamente', {
         position: "bottom-right",
         autoClose: 3000,
       });
       handleClose();
     } catch (error) {
+      console.error('Error al actualizar los datos:', error.response ? error.response.data : error.message);
       toast.error('Error al actualizar los datos', {
         position: "bottom-right",
         autoClose: 3000,
       });
     }
   };
+  
 
   return (
     <Modal
@@ -74,7 +90,7 @@ const PerfilUsuario = ({ open, handleClose }) => {
         }}
       >
         <Typography id="profile-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
-        <i class='bx bx-user' style={{ fontSize: "24px" }}></i>  Perfil
+          <i className='bx bx-user' style={{ fontSize: "24px" }}></i> Perfil
         </Typography>
         <form onSubmit={handleUpdate}>
           <TextField
@@ -83,8 +99,8 @@ const PerfilUsuario = ({ open, handleClose }) => {
             onChange={(e) => setNombre(e.target.value)}
             fullWidth
             margin="normal"
-            InputLabelProps={{ style: { color: 'white' } }} // Etiqueta del campo
-            InputProps={{ style: { color: 'white' } }} // Campo del input
+            InputLabelProps={{ style: { color: 'white' } }}
+            InputProps={{ style: { color: 'white' } }}
             sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'pink' } } }}
           />
           <TextField
@@ -128,17 +144,7 @@ const PerfilUsuario = ({ open, handleClose }) => {
             InputProps={{ style: { color: 'white' } }}
             sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'pink' } } }}
           />
-          <TextField
-            label="Contraseña"
-            type="password"
-            value={contrasena}
-            onChange={(e) => setContrasena(e.target.value)}
-            fullWidth
-            margin="normal"
-            InputLabelProps={{ style: { color: 'white' } }}
-            InputProps={{ style: { color: 'white' } }}
-            sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'pink' } } }}
-          />
+        
           <Button
             type="submit"
             variant="contained"

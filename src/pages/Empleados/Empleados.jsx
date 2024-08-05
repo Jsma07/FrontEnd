@@ -160,7 +160,7 @@ const Empleados = () => {
             Correo: formData.Correo,
             Telefono: formData.Telefono,
             Estado: 1,
-            IdRol: 2,
+            IdRol: 2, // Asignar rol por defecto
             Documento: formData.Documento,
             Direccion: formData.Direccion,
             Tip_Documento: formData.Tip_Documento,

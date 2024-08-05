@@ -62,6 +62,15 @@ const validacionContrasena = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
     return conditions;
   };
 
+  const handleCorreoChange = (e) => {
+    const correo = e.target.value.toLowerCase().trim(); // Convertir a minúsculas y eliminar espacios
+    setCorreo(correo);
+  };
+  
+  const handleContrasenaChange = (e) => {
+    const contrasena = e.target.value.trim(); // Eliminar espacios
+    setContrasena(contrasena);
+  };
   const condicionesContrasena = validatePassword(contrasena);
   const todasCondicionesCumplidas = Object.values(condicionesContrasena).every(Boolean);
 
@@ -197,14 +206,14 @@ const validacionContrasena = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
               type="text" 
               placeholder="Correo Electrónico"
               value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
+              onChange={handleCorreoChange}
               required
                />
               <input className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
                type="password"
                 placeholder="Contraseña" 
                 value={contrasena}
-                onChange={(e) => setContrasena(e.target.value)}
+                onChange={handleContrasenaChange}
                 onFocus={() => setPasswordTouched(true)}
                 required
 
