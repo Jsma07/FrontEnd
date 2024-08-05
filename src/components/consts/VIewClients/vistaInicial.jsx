@@ -20,7 +20,7 @@ const VistaInicial = () => {
           </div>
           <div className="header-content">
             <p className="heading-1"></p>
-            <h1><span className="bienvenidos-style">Bienvenidos a</span> <span className="logo-style">Jake Nails</span> <span className="bienvenidos-style">un mundo lleno de estilo.</span></h1>
+            <h1><span className="bienvenidos-style">Bienvenidos a un mundo lleno de estilo.</span></h1>
             <p className="description">
               Aquí podrás encontrar nuestros servicios de manicure con estilos únicos y modernos, diseñados para resaltar tu belleza y personalidad.
             </p>
