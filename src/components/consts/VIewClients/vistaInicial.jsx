@@ -5,7 +5,6 @@ const VistaInicial = () => {
   useEffect(() => {
     console.log('VistaInicial se ha montado');
   }, []);
-
   return (
     <div>
       <NavbarClient />
