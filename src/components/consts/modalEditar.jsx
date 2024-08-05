@@ -10,7 +10,11 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
 
   useEffect(() => {
     if (entityData) {
-      setFormData(entityData);
+      const initialData = {
+        ...entityData,
+        Precio_Servicio: parseFloat(entityData.Precio_Servicio) || '', // Asegúrate de que sea una cadena vacía si es NaN
+      };
+      setFormData(initialData);
 
       if (entityData.ImgServicio) {
         setImagePreview(`http://localhost:5000${entityData.ImgServicio}`);
@@ -31,13 +35,13 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     const newValue = type === 'checkbox' ? checked : value;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: newValue,
+      [name]: type === 'number' ? parseFloat(newValue) || '' : newValue,
     }));
-
+    
     if (onChange) {
       onChange(name, newValue);
     }
-
+    
     const error = validateField(name, newValue, type);
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -98,10 +102,10 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
           error = 'El NIT de la empresa solo puede contener números.';
       }
     } else if (name === 'Precio_Servicio') {
-          if (value <= 20000) {
-            error = 'El precio debe ser mínimo de $20.000.';
-          }
-      } else {
+      if (isNaN(value) || Number(value) <= 20000) {
+        error = 'El precio debe ser un número mínimo de $20.000.';
+      }
+    } else {
       switch (type) {
         case 'text':
           if (!/^[a-zA-ZñÑ\s]*$/.test(value)) {
@@ -134,25 +138,26 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
     switch (type) {
       case 'text':
       case 'password':
-      case 'number':
-        return (
-          <TextField
-            id={name}
-            name={name}
-            label={label}
-            variant="outlined"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            fullWidth
-            size="medium"
-            type={type}
-            style={{ marginBottom: '0.5rem', textAlign: 'center' }}
-            value={formData[name] || ''}
-            error={!!errors[name]}
-            helperText={errors[name]}
-            disabled={readOnly}
-          />
-        );
+        case 'number':
+  return (
+    <TextField
+      id={name}
+      name={name}
+      label={label}
+      variant="outlined"
+      onChange={handleChange}
+      onBlur={handleBlur}
+      fullWidth
+      size="medium"
+      type={type}
+      style={{ marginBottom: '0.5rem', textAlign: 'center' }}
+      value={formData[name] || ''}
+      error={!!errors[name]}
+      helperText={errors[name]}
+      // Asegúrate de que el campo no esté deshabilitado si no es necesario
+      disabled={readOnly && name !== 'Precio_Servicio'}
+    />
+  );
       case 'select':
         return (
           <div>
@@ -261,55 +266,36 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
   };
 
   return (
-    <Modal open={open} onClose={handleClose}>
-      <div
-        style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'white',
-          borderRadius: '0.375rem',
-          width: '80%',
-          maxWidth: '50rem',
-          maxHeight: '80%',
-          overflow: 'auto',
-          padding: '1.5rem',
-        }}
-      >
-        <Typography
-          variant="h5"
-          gutterBottom
-          style={{ textAlign: 'center', marginBottom: '1.5rem' }}
-        >
-          {title}
-        </Typography>
-        <Grid container spacing={2}>
-          {renderFields()}
-        </Grid>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            marginTop: '1rem',
-          }}
-        >
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-            startIcon={<SendIcon />}
-          >
-            Enviar
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={handleCancel}
-            style={{ marginLeft: '1rem' }}
-          >
-            Cancelar
-          </Button>
+    <Modal open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-full max-w-4xl p-6 bg-white rounded-lg shadow-md">
+          <Typography variant="h6" gutterBottom style={{ textAlign: 'center' }}>
+            {title}
+          </Typography>
+          <Grid container spacing={2}>
+            {renderFields()}
+          </Grid>
+          <div style={{ textAlign: 'center' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              startIcon={<SendIcon />}
+              onClick={handleSubmit}
+              style={{ margin: '1rem 0.5rem' }}
+            >
+              Enviar
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              size="large"
+              onClick={handleCancel}
+              style={{ margin: '1rem 0.5rem' }}
+            >
+              Cancelar
+            </Button>
+          </div>
         </div>
       </div>
     </Modal>
