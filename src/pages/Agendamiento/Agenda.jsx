@@ -10,15 +10,14 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Swal from "sweetalert2";
 import Tooltip from '@mui/material/Tooltip';
-import Box from '@mui/material/Box'; // Importar Box
-import Pagination from '@mui/material/Pagination'; // Importar Pagination
+import Box from '@mui/material/Box'; 
 import dayjs from 'dayjs';
 import AddIcon from '@mui/icons-material/Add';
 
 const Agendamientos = () => {
   const [agendamientos, setAgendamientos] = useState([]);
   const [page, setPage] = useState(1);
-  const [rowsPerPage] = useState(5); // Número de filas por página
+  const [rowsPerPage] = useState(5); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,7 +32,7 @@ const Agendamientos = () => {
           empleado: `${agendamiento.empleado.Nombre} ${agendamiento.empleado.Apellido}`,
           Fecha: dayjs(agendamiento.Fecha).format('DD/MM/YYYY'),
           Hora: agendamiento.Hora,
-          EstadoAgenda: renderEstadoButton(agendamiento.EstadoAgenda, agendamiento.IdAgenda), // Asegúrate de usar renderEstadoButton aquí
+          EstadoAgenda: renderEstadoButton(agendamiento.EstadoAgenda, agendamiento.IdAgenda), 
           Acciones: agendamiento.EstadoAgenda !== 2 && agendamiento.EstadoAgenda !== 3 && (
             <div className="flex space-x-2">
               <Fab

@@ -9,8 +9,20 @@
 }
 
 .bienvenidos-style {
-    color: black;
-}
+	color: black;
+	font-size: 40px;
+	display: 'center';
+	/* width: 50%;
+	text-align: left;
+	word-break: break-word;
+	padding-left: 30px;  */
+  }
+/*   
+h1 {
+	text-align: left;
+	margin-left: 30px; 
+  } */
+  
 
 body {
 	margin: 0 auto;

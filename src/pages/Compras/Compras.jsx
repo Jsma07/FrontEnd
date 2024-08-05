@@ -16,25 +16,36 @@ const Compras = () => {
     fetchCompras();
   }, []);
 
-const fetchCompras = async () => {
-  try {
-    const response = await axios.get('http://localhost:5000/api/compras');
-    setCompras(response.data);
-  } catch (error) {
-    console.error('Error fetching Compras:', error);
-  }
-};
+  const fetchCompras = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/compras');
+      setCompras(response.data);
+    } catch (error) {
+      console.error('Error fetching Compras:', error);
+    }
+  };
 
-const handleClick = () => {
-  navigate('/compras/crearCompra'); 
-};
+  const filtrar = compras.filter(compra => {
+    return (
+      (compra.fecha_compra && compra.fecha_compra.toLowerCase().includes(buscar.toLowerCase())) ||
+      (compra.descuento_compra && compra.descuento_compra.toLowerCase().includes(buscar.toLowerCase())) ||
+      (compra.iva_compra && compra.iva_compra.toLowerCase().includes(buscar.toLowerCase())) ||
+      (compra.subtotal_compra && compra.subtotal_compra.toLowerCase().includes(buscar.toLowerCase())) ||
+      (compra.total_compra && compra.total_compra.toLowerCase().includes(buscar.toLowerCase())) ||
+      (compra.estado_compra && compra.estado_compra.toLowerCase().includes(buscar.toLowerCase()))
+    );
+  });
 
-const DetalleCompra = (id) => {
+  const handleClick = () => {
+    navigate('/compras/crearCompra'); 
+  };
+
+  const DetalleCompra = (id) => {
     console.log('Navigating to:', `/compras/DetalleCompra/${id}`);
     navigate(`/compras/DetalleCompra/${id}`);
-};
+  };
 
-const AnularCompra = async (IdCompra) => {
+  const AnularCompra = async (IdCompra) => {
     const result = await Swal.fire({
       icon: 'warning',
       title: '¿Estás seguro?',
@@ -62,9 +73,57 @@ const AnularCompra = async (IdCompra) => {
         });
       }
     }
-};
+  };
 
-const canAnular = (fecha_compra) => {
+  const cambiarEstadoCompra = async (IdCompra, nuevoEstado) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/compras/cambiarEstado/${IdCompra}`,
+        { estado_compra: nuevoEstado },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+
+      if (response.status === 200) {
+        fetchCompras();
+        Swal.fire({
+          icon: 'success',
+          title: 'Estado cambiado',
+          text: 'El estado de la compra ha sido cambiado exitosamente.',
+        });
+      }
+    } catch (error) {
+      console.error("Error al cambiar el estado:", error.response?.data || error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un problema al cambiar el estado. Por favor, inténtalo de nuevo más tarde.',
+      });
+    }
+  };
+
+  const handleEstadoClick = async (IdCompra, estadoActual) => {
+    if (estadoActual === "Pendiente") {
+      const confirmacion = await Swal.fire({
+        title: "¿Estás seguro de cambiar el estado a Terminada?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí, cambiar estado",
+        cancelButtonText: "Cancelar",
+      });
+
+      if (confirmacion.isConfirmed) {
+        cambiarEstadoCompra(IdCompra, "Terminada");
+      }
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: 'Cambio de estado no permitido',
+        text: 'Ya no puedes cambiar el estado de una compra que no está pendiente.',
+      });
+    }
+  };
+
+  const canAnular = (fecha_compra) => {
     const [day, month, year] = fecha_compra.split('/').map(Number);
     const fechaCompra = new Date(year, month - 1, day);
 
@@ -79,18 +138,7 @@ const canAnular = (fecha_compra) => {
     console.log('Diferencia en días:', diffDays);
 
     return diffDays <= 7;
-};
-
-const filtrar = compras.filter(compra => {
-    return (
-      (compra.fecha_compra && compra.fecha_compra.toLowerCase().includes(buscar.toLowerCase())) ||
-      (compra.descuento_compra && compra.descuento_compra.toLowerCase().includes(buscar.toLowerCase())) ||
-      (compra.iva_compra && compra.iva_compra.toLowerCase().includes(buscar.toLowerCase())) ||
-      (compra.subtotal_compra && compra.subtotal_compra.toLowerCase().includes(buscar.toLowerCase())) ||
-      (compra.total_compra && compra.total_compra.toLowerCase().includes(buscar.toLowerCase())) ||
-      (compra.estado_compra && compra.estado_compra.toLowerCase().includes(buscar.toLowerCase()))
-    );
-  });
+  };
 
   return (
     <div>
@@ -105,26 +153,24 @@ const filtrar = compras.filter(compra => {
             field: 'estado_compra',
             headerName: "ESTADO",
             width: "w-36",
-            readOnly: true,
             renderCell: (params) => (
-              <div>
-                {params.row.estado_compra === "Anulada" && (
-                  <span className="bg-red-100 text-red-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
-                    Anulada
-                  </span>
-                )}
-                {params.row.estado_compra === "Terminada" && (
-                  <span className="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
-                    Terminada
-                  </span>
-                )}
-                {params.row.estado_compra === "Pendiente" && (
-                  <span className="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
-                    Pendiente
-                  </span>
-                )}
-              </div>
-            )
+              <button
+                className={`px-3 py-1.5 text-white text-sm font-medium rounded-lg shadow-md focus:outline-none ${
+                  params.row.estado_compra === "Pendiente"
+                    ? "bg-blue-500"
+                    : params.row.estado_compra === "Terminada"
+                    ? "bg-green-500"
+                    : "bg-red-500"
+                }`}
+                onClick={() =>
+                  params.row.estado_compra === "Pendiente" &&
+                  handleEstadoClick(params.row.IdCompra, params.row.estado_compra)
+                }
+                disabled={params.row.estado_compra !== "Pendiente"}
+              >
+                {params.row.estado_compra}
+              </button>
+            ),
           },
           {
             field: 'Acciones',
@@ -132,13 +178,19 @@ const filtrar = compras.filter(compra => {
             width: 'w-48',
             renderCell: (params) => (
               <div className="flex justify-center space-x-4">
-                <button onClick={() => params && DetalleCompra(params.row.IdCompra)} className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white">
+                <button
+                  onClick={() => params && DetalleCompra(params.row.IdCompra)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white"
+                >
                   <RemoveRedEyeIcon /> 
                 </button>
                 {params.row.estado_compra !== 'Anulada' && canAnular(params.row.fecha_compra) && (
-                    <button onClick={() => AnularCompra(params.row.IdCompra)} className="flex items-center justify-center w-10 h-10 rounded-full bg-red-500 text-white">
-                        <DeleteIcon /> 
-                    </button>
+                  <button
+                    onClick={() => AnularCompra(params.row.IdCompra)}
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-red-500 text-white"
+                  >
+                    <DeleteIcon /> 
+                  </button>
                 )}
               </div>
             ),
