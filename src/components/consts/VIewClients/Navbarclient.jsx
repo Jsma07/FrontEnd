@@ -2,7 +2,7 @@ import React from "react";
 
 function NavbarClient() {
   return (
-    <nav className="bg-white shadow-md py-4 font-sans">
+    <nav className="bg-white shadow-md py-4 font-sans fixed w-full top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
         <Logo />
         <Menu />
@@ -17,10 +17,8 @@ function NavbarClient() {
 function Logo() {
   return (
     <div className="flex items-center ml-4 lg:ml-10">
-      {" "}
-      {/* Utilizamos ml-4 y ml-10 en pantallas grandes */}
       <img src="/jacke.png" alt="Logo" className="h-12 w-12 mr-2" />
-      <span className="text-lg font-bold text-black">Jake Nail</span>
+      <span className="text-lg font-bold text-black">Jake Nails</span>
     </div>
   );
 }

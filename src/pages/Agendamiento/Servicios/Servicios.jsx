@@ -69,14 +69,6 @@ const Servicios = () => {
         return;
       }
   
-      const response = await axios.get("http://localhost:5000/api/servicios");
-      const servicios = response.data;
-      const servicioExistente = servicios.find(
-        (servicio) =>
-          servicio.Nombre_Servicio === Nombre_Servicio &&
-          servicio.IdServicio !== formData.IdServicio
-      );
-      
       const camposObligatorios = [
         "ImgServicio",
         "Nombre_Servicio",
@@ -93,7 +85,7 @@ const Servicios = () => {
         return;
       }
   
-      const precio = Number(formData["Precio_Servicio"]);
+      let precio = parseFloat(formData["Precio_Servicio"]);
       if (isNaN(precio)) {
         window.Swal.fire({
           icon: "error",
@@ -111,6 +103,14 @@ const Servicios = () => {
         });
         return;
       }
+  
+      const response = await axios.get("http://localhost:5000/api/servicios");
+      const servicios = response.data;
+      const servicioExistente = servicios.find(
+        (servicio) =>
+          servicio.Nombre_Servicio === Nombre_Servicio &&
+          servicio.IdServicio !== formData.IdServicio
+      );
   
       if (servicioExistente) {
         window.Swal.fire({
@@ -155,7 +155,7 @@ const Servicios = () => {
       console.error("Error al agregar el servicio:", error);
     }
   };
-
+  
   const handleEditServicio = async (formData) => {
     try {
       const camposObligatorios = [
@@ -164,9 +164,9 @@ const Servicios = () => {
         "Tiempo_Servicio",
         "Precio_Servicio",
       ];
-
+  
       formData["Precio_Servicio"] = formData["Precio_Servicio"].toString();
-
+  
       const todosCamposValidos = CamposObligatorios(
         formData,
         camposObligatorios,
@@ -175,7 +175,26 @@ const Servicios = () => {
       if (!todosCamposValidos) {
         return;
       }
-
+  
+      let precio = parseFloat(formData["Precio_Servicio"]);
+      if (isNaN(precio)) {
+        window.Swal.fire({
+          icon: "error",
+          title: "Precio inválido",
+          text: "Por favor, ingresa solo números en el campo del precio.",
+        });
+        return;
+      }
+  
+      if (precio <= 20000) {
+        window.Swal.fire({
+          icon: "error",
+          title: "Precio inválido",
+          text: "Por favor, ingresa un precio mínimo de $20.000.",
+        });
+        return;
+      }
+  
       const response = await axios.get("http://localhost:5000/api/servicios");
       const servicios = response.data;
       const servicioExistente = servicios.find(
@@ -183,7 +202,7 @@ const Servicios = () => {
           servicio.Nombre_Servicio === formData.Nombre_Servicio &&
           servicio.IdServicio !== formData.IdServicio
       );
-
+  
       if (servicioExistente) {
         window.Swal.fire({
           icon: "warning",
@@ -192,17 +211,7 @@ const Servicios = () => {
         });
         return;
       }
-
-      const precio = formData["Precio_Servicio"];
-      if (!/^\d+$/.test(precio)) {
-        window.Swal.fire({
-          icon: "error",
-          title: "Precio inválido",
-          text: "Por favor, ingresa solo números en el campo del precio.",
-        });
-        return;
-      }
-
+  
       const confirmation = await window.Swal.fire({
         title: "¿Estás seguro?",
         text: "¿Quieres actualizar este servicio?",
@@ -213,7 +222,7 @@ const Servicios = () => {
         confirmButtonText: "Sí, actualizar",
         cancelButtonText: "Cancelar",
       });
-
+  
       if (confirmation.isConfirmed) {
         const formDataObj = new FormData();
         for (const key in formData) {
@@ -301,15 +310,10 @@ const Servicios = () => {
 
     const opcionesTiempoServicio = [
       { value: '1:00', label: '1:00 hora(s)' },
-      { value: '1:30', label: '1:30 hora(s)' },
       { value: '2:00', label: '2:00 horas' },
-      { value: '2:30', label: '2:30 horas' },
       { value: '3:00', label: '3:00 horas' },
-      { value: '3:30', label: '3:30 horas' },
       { value: '4:00', label: '4:00 horas' },
-      { value: '4:30', label: '4:30 horas' },
       { value: '5:00', label: '5:00 horas' },
-      { value: '5:30', label: '5:30 horas' },
       { value: '6:00', label: '6:00 horas' },
     ];
 
@@ -336,20 +340,19 @@ const Servicios = () => {
         </div>
       </div>
 
-        <ModalAgregarServicio
-    open={openModalAgregar}
-    handleClose={handleCloseModalAgregar}
-    onSubmit={handleAddServicio}
-    title="Crear Nuevo Servicio!"
-    fields={[
-      
-      { name: "Nombre_Servicio", label: "Nombre", type: "text" },
-      { name: "Tiempo_Servicio", label: "Tiempo", type: "select", options: opcionesTiempoServicio },
-      { name: "Precio_Servicio", label: "Precio", type: "number" },
-      { name: "ImgServicio", label: "Imagen", type: "file" },
-    ]}
-    onChange={handleChange}
-  />
+      <ModalAgregarServicio
+  open={openModalAgregar}
+  handleClose={handleCloseModalAgregar}
+  onSubmit={handleAddServicio}
+  title="Crear Nuevo Servicio!"
+  fields={[
+    { name: "Nombre_Servicio", label: "Nombre", type: "text" },
+    { name: "Tiempo_Servicio", label: "Tiempo", type: "select", options: opcionesTiempoServicio },
+    { name: "Precio_Servicio", label: "Precio", type: "number" }, // Asegúrate de que 'type' sea 'number'
+    { name: "ImgServicio", label: "Imagen", type: "file" },
+  ]}
+  onChange={handleChange}
+/>
 
 <ModalEditarServicio
   open={openModalEditar}
@@ -365,11 +368,11 @@ const Servicios = () => {
     },
     { name: "Nombre_Servicio", label: "Nombre", type: "text" },
     { name: "Tiempo_Servicio", label: "Tiempo", type: "select", options: opcionesTiempoServicio },
-    { name: "Precio_Servicio", label: "Precio", type: "number" },
+    { name: "Precio_Servicio", label: "Precio", type: "number" }, // Asegúrate de que 'type' sea 'number'
     { name: "ImgServicio", label: "Imagen", type: "file" },
   ]}
   onChange={handleChange}
-  entityData={servicioSeleccionado} // Asegúrate de pasar el estado aquí
+  entityData={servicioSeleccionado}
 />
 
 <TablePrueba
@@ -403,11 +406,12 @@ const Servicios = () => {
     { field: 'Nombre_Servicio', headerName: 'NOMBRE', width: 'w-36' },
     { field: 'Tiempo_Servicio', headerName: 'TIEMPO EN HORAS', width: 'w-36' },
     {
-      field: 'Precio_Servicio',
-      headerName: 'PRECIO',
-      width: 'w-36',
-      renderCell: (params) => <div>{`$${params.row.Precio_Servicio}`}</div>,
-    },
+  field: 'Precio_Servicio',
+  headerName: 'PRECIO',
+  width: 'w-36',
+  renderCell: (params) => <div>{`$${params.row.Precio_Servicio}`}</div>,
+}
+,
     {
       field: 'Acciones',
       headerName: 'ACCIONES',
