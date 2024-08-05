@@ -24,11 +24,16 @@ const Ventas = () => {
           id: venta.idVentas,
           idServicio: (
             <img
-            src={`http://localhost:5000${venta.servicio.ImgServicio}`}
-            alt={venta.servicio.Nombre_Servicio}
-            style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
+              src={`http://localhost:5000${venta.servicio.ImgServicio}`}
+              alt={venta.servicio.Nombre_Servicio}
+              style={{
+                maxWidth: "100%",
+                height: "auto",
+                width: "3rem",
+                height: "3rem",
+                borderRadius: "50%",
+              }}
             />
-          
           ),
           IdCliente: `${venta.cliente.Nombre} ${venta.cliente.Apellido}`,
           idEmpleado: `${venta.empleado?.Nombre || ""} ${
@@ -253,8 +258,6 @@ const Ventas = () => {
           <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
         </Fab>
       </Link>
-
-    
     </div>
   );
 };

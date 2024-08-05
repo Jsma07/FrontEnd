@@ -118,7 +118,6 @@ const Empleados = () => {
       ),
     },
   ];
-
   const handleSubmit = async (formData) => {
     try {
       // Verificar si el correo electrónico está duplicado
@@ -132,17 +131,13 @@ const Empleados = () => {
       );
 
       if (correoExistente) {
-        Swal.fire({
-          icon: "error",
-          title: "Correo electrónico duplicado",
-          text: "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico.",
-        });
+        toast.error(
+          "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico."
+        );
       } else if (documentoExistente) {
-        Swal.fire({
-          icon: "error",
-          title: "Documento duplicado",
-          text: "El documento ingresado ya está registrado. Por favor, elija otro documento.",
-        });
+        toast.error(
+          "El documento ingresado ya está registrado. Por favor, elija otro documento."
+        );
       } else {
         const result = await Swal.fire({
           title: "¿Estás seguro?",
@@ -169,10 +164,17 @@ const Empleados = () => {
 
           console.log("Datos del formulario numéricos:", formDataNumerico);
 
-          await axios.post(
+          // Enviar solicitud POST al servidor
+          const response = await axios.post(
             "http://localhost:5000/Jackenail/RegistrarEmpleados",
             formDataNumerico
           );
+
+          // Suponiendo que el servidor devuelve el empleado creado con todos sus campos
+          const nuevoEmpleado = response.data;
+          console.log("Nuevo empleado:", nuevoEmpleado);
+
+          setEmpleados((prevEmpleados) => [...prevEmpleados, nuevoEmpleado]);
 
           Swal.fire({
             icon: "success",
@@ -181,19 +183,18 @@ const Empleados = () => {
           });
 
           setModalData(null);
-
-          setEmpleados([...empleados, formDataNumerico]);
         }
       }
     } catch (error) {
       console.error("Error al registrar el empleado:", error);
+      console.error(
+        "Detalles del error:",
+        error.response ? error.response.data : error.message
+      );
 
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Ocurrió un error al registrar el empleado.",
-        footer: '<a href="#">Inténtelo nuevamente</a>',
-      });
+      toast.error(
+        "Ocurrió un error al registrar el empleado. Inténtelo nuevamente."
+      );
     }
   };
 
@@ -273,8 +274,8 @@ const Empleados = () => {
       // Convertir campos de texto a números si es necesario
       const formDataNumerico = {
         ...formData,
-        Telefono: parseInt(formData.Telefono),
-        IdRol: 2, // Rol por defecto
+        Telefono: parseInt(formData.Telefono, 10),
+        IdRol: formData.IdRol || 2, // Rol por defecto si no se proporciona
       };
 
       // Determinar la URL de la API para actualizar el empleado
@@ -283,14 +284,24 @@ const Empleados = () => {
       // Realizar la solicitud de actualización a la API utilizando axios.put
       await axios.put(url, formDataNumerico);
 
+      // Actualizar el empleado en la lista localmente
+      const empleadosActualizados = empleados.map((empleado) =>
+        empleado.IdEmpleado === formDataNumerico.IdEmpleado
+          ? { ...empleado, ...formDataNumerico } // Actualiza el empleado con los nuevos datos
+          : empleado
+      );
+
+      // Actualizar el estado con la lista de empleados actualizada
+      setEmpleados(empleadosActualizados);
+
       Swal.fire({
         icon: "success",
         title: "¡Actualización exitosa!",
         text: "El empleado se ha actualizado correctamente.",
       }).then((result) => {
         if (result.isConfirmed || result.dismiss === Swal.DismissReason.close) {
+          // Limpiar los datos del modal
           setModalData(null);
-          window.location.reload(); // Recargar la página
         }
       });
     } catch (error) {
@@ -307,15 +318,28 @@ const Empleados = () => {
   };
 
   const empleadosFiltrados = empleados.filter((empleado) => {
+    // Convertir el filtro a minúsculas una vez
+    const filtroLower = filtro.toLowerCase();
+
+    // Verificar y convertir cada campo a minúsculas si está definido
+    const nombreLower = empleado.Nombre ? empleado.Nombre.toLowerCase() : "";
+    const apellidoLower = empleado.Apellido
+      ? empleado.Apellido.toLowerCase()
+      : "";
+    const correoLower = empleado.Correo ? empleado.Correo.toLowerCase() : "";
+    const documentoLower = empleado.Documento
+      ? empleado.Documento.toLowerCase()
+      : "";
+
     return (
-      empleado.Nombre.toLowerCase().includes(filtro.toLowerCase()) ||
-      empleado.Apellido.toLowerCase().includes(filtro.toLowerCase()) ||
-      empleado.Correo.toLowerCase().includes(filtro.toLowerCase()) ||
-      empleado.Documento.toLowerCase().includes(filtro.toLowerCase()) ||
+      nombreLower.includes(filtroLower) ||
+      apellidoLower.includes(filtroLower) ||
+      correoLower.includes(filtroLower) ||
+      documentoLower.includes(filtroLower) ||
       empleado.Telefono.toString().includes(filtro) ||
       (empleado.Estado === 1 ? "Activo" : "Inactivo")
         .toLowerCase()
-        .includes(filtro.toLowerCase())
+        .includes(filtroLower)
     );
   });
 
@@ -409,7 +433,7 @@ const Empleados = () => {
       <TablePrueba
         title="Gestion de Empleados"
         columns={columns}
-        data={empleadosFiltrados}
+        data={empleados}
       />
 
       {modalData && modalData && (
