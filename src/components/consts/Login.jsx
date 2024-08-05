@@ -60,6 +60,15 @@ const Login = () => {
     return conditions;
   };
 
+  const handleCorreoChange = (e) => {
+    const correo = e.target.value.toLowerCase().trim(); // Convertir a minúsculas y eliminar espacios
+    setCorreo(correo);
+  };
+  
+  const handleContrasenaChange = (e) => {
+    const contrasena = e.target.value.trim(); // Eliminar espacios
+    setContrasena(contrasena);
+  };
   const condicionesContrasena = validatePassword(contrasena);
   const todasCondicionesCumplidas = Object.values(condicionesContrasena).every(Boolean);
 
@@ -156,23 +165,24 @@ const Login = () => {
               <h3 className="font-semibold text-2xl text-gray-800">Iniciar sesión</h3>
             </div>
             <form onSubmit={handleLogin}>
-              <div className="space-y-6">
-                <input
-                  className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
-                  type="text"
-                  placeholder="Correo Electrónico"
-                  value={correo}
-                  onChange={(e) => setCorreo(e.target.value)}
-                  required
-                />
-                <input
-                  className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
-                  type="password"
-                  placeholder="Contraseña"
-                  value={contrasena}
-                  onChange={(e) => setContrasena(e.target.value)}
-                  onFocus={() => setPasswordTouched(true)}
-                  required
+            <div className="space-y-6">
+
+
+              <input className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400" 
+              type="text" 
+              placeholder="Correo Electrónico"
+              value={correo}
+              onChange={handleCorreoChange}
+              required
+               />
+              <input className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+               type="password"
+                placeholder="Contraseña" 
+                value={contrasena}
+                onChange={handleContrasenaChange}
+                onFocus={() => setPasswordTouched(true)}
+                required
+
                 />
                 {passwordTouched && !todasCondicionesCumplidas && (
                   <div>
