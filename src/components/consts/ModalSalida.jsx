@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Modal,
   Typography,
@@ -7,8 +7,14 @@ import {
   Box,
   Divider,
   IconButton,
+  TextField,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
+import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import Swal from "sweetalert2";
 
 const ModalInsumos = ({
   open,
@@ -17,6 +23,8 @@ const ModalInsumos = ({
   carrito,
   actualizarCarrito,
 }) => {
+  const [descripcion, setDescripcion] = useState(""); // Estado para la descripción
+
   const handleCantidadChange = (index, event) => {
     const newCantidad = parseInt(event.target.value, 10) || 1;
     const newCarrito = [...carrito];
@@ -29,10 +37,116 @@ const ModalInsumos = ({
     actualizarCarrito(newCarrito);
   };
 
-  const handleFinalizarCompra = () => {
-    console.log("Insumos en el carrito:", carrito);
-    actualizarCarrito([]);
-    handleClose();
+  const GuardarSalidaInsumos = () => {
+    if (carrito.length === 0) {
+      toast.error(
+        "El carrito está vacío. No se puede registrar la salida de insumos."
+      );
+      return; // Sale de la función si el carrito está vacío
+    }
+
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Quieres registrar la salida de insumos?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, registrar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleGuardarSalidaConDescripcion();
+      }
+    });
+  };
+
+  const handleGuardarSalidaConDescripcion = async () => {
+    // Verificar si el carrito está vacío
+    if (carrito.length === 0) {
+      toast.error(
+        "El carrito está vacío. No se puede registrar la salida de insumos."
+      );
+      return; // Sale de la función si el carrito está vacío
+    }
+
+    // Validar la descripción
+    if (!descripcion.trim()) {
+      toast.error("La descripción no puede estar vacía.");
+      return; // Sale de la función si la descripción está vacía
+    }
+
+    // Validar la longitud mínima de la descripción (por ejemplo, mínimo 10 caracteres)
+    if (descripcion.length < 10) {
+      toast.error("La descripción debe tener al menos 10 caracteres.");
+      return; // Sale de la función si la descripción es demasiado corta
+    }
+
+    // Opcional: Validar caracteres especiales (ejemplo: solo letras y números permitidos)
+    const invalidChars = /[^a-zA-Z0-9\s.,]/;
+    if (invalidChars.test(descripcion)) {
+      toast.error("La descripción contiene caracteres no permitidos.");
+      return; // Sale de la función si hay caracteres no permitidos
+    }
+
+    // Busca el primer insumo cuya cantidad excede el stock
+    const itemExcedido = carrito.find((item) => item.cantidad > item.Cantidad);
+
+    if (itemExcedido) {
+      toast.error(
+        `La cantidad para el insumo "${itemExcedido.NombreInsumos}" excede el stock disponible.`
+      );
+      return; // Sale de la función para evitar enviar datos incorrectos
+    }
+
+    try {
+      const fechaSalida = new Date().toISOString(); // Fecha actual en formato ISO
+
+      // Procesar cada insumo en el carrito
+      for (const item of carrito) {
+        const salidaInsumo = {
+          Idinsumos: item.IdInsumos,
+          Cantidad: item.cantidad,
+          Fecha_salida: fechaSalida,
+          Estado: "Terminado", // Puedes cambiar esto si es necesario
+          Descripcion: descripcion, // Añade la descripción
+        };
+
+        console.log("Insumo a registrar:", salidaInsumo); // Imprime los datos antes de enviar
+
+        // Enviar la solicitud POST a la API para registrar cada salida de insumo
+        const response = await axios.post(
+          "http://localhost:5000/salidasInsumos",
+          salidaInsumo
+        );
+
+        if (response.status !== 201) {
+          console.error("Error al crear salida de insumo:", response);
+          throw new Error("Error al crear salida de insumo");
+        }
+
+        // Actualizar la cantidad en los insumos
+        const nuevaCantidad = item.Cantidad - item.cantidad; // Calcular la nueva cantidad
+        await axios.put(
+          `http://localhost:5000/api/existenciainsumos/editar/${item.IdInsumos}`,
+          { Cantidad: nuevaCantidad }
+        );
+
+        toast.success(
+          `Salida de insumo "${item.NombreInsumos}" creada y existencia actualizada con éxito`
+        );
+
+        console.log("Salida de insumo creada:", response.data);
+      }
+
+      // Limpiar el carrito y cerrar el modal
+      actualizarCarrito([]);
+      setDescripcion(""); // Limpiar la descripción
+      handleClose();
+    } catch (error) {
+      console.error("Error al crear salida de insumos:", error);
+      toast.error("Error al crear salida de insumos.");
+    }
   };
 
   return (
@@ -88,10 +202,10 @@ const ModalInsumos = ({
                       {item.NombreInsumos}
                     </Typography>
                     <Typography variant="body2" gutterBottom>
-                      Precio: ${item.PrecioUnitario}
+                      Precio: ${item.PrecioUnitario.toFixed(2)}
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
-                      Cantidad:
+                      Cantidad:{item.Cantidad}
                     </Typography>
                     <div className="flex items-center">
                       <IconButton
@@ -163,8 +277,18 @@ const ModalInsumos = ({
               </div>
             ))}
           </div>
+          <TextField
+            label="Descripción"
+            multiline
+            rows={3}
+            variant="outlined"
+            value={descripcion}
+            onChange={(e) => setDescripcion(e.target.value)}
+            sx={{ mt: 2, backgroundColor: "#fff", borderRadius: "4px" }}
+            fullWidth
+          />
           <Button
-            onClick={handleFinalizarCompra}
+            onClick={GuardarSalidaInsumos}
             sx={{
               mt: 2,
               backgroundColor: "#EF5A6F",

@@ -11,6 +11,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
   const [modalSize, setModalSize] = useState({ width: 0, height: 0 });
   const [errores, setErrores] = useState({});
 
+
   useEffect(() => {
     if (fields && fields.length > 0) {
       const initialFormData = {};
@@ -38,6 +39,38 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
       }
     }
   }, [fields, open]);
+  const formatNombreApellido = (value) => {
+    // Elimina espacios adicionales al principio y al final
+    const trimmedValue = value.trim();
+  
+    // Reemplaza múltiples espacios consecutivos por un solo espacio
+    const formattedValue = trimmedValue.charAt(0).toUpperCase() + trimmedValue.slice(1).toLowerCase();
+
+    const words = formattedValue.split(' ');
+  if (words.length > 2) {
+    // Si hay más de dos palabras, solo toma las dos primeras
+    return words.slice(0, 2).join(' ');
+  }
+
+    return formattedValue;
+  };
+  
+  
+  
+  const formatCorreo = (value) => {
+    const trimmedValue = value.trim().toLowerCase();
+    return trimmedValue;
+  };
+  
+  const formatTelefono = (value) => {
+    const trimmedValue = value.trim();
+    return trimmedValue;
+  };
+  
+  const formatDocumento = (value) => {
+    const trimmedValue = value.trim();
+    return trimmedValue;
+  };
 
   const handleMouseDown = (e) => {
     setDragging(true);
@@ -64,7 +97,23 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
 
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
-    const newValue = type === 'checkbox' ? checked : value;
+    let newValue = type === 'checkbox' ? checked : value;
+  
+    switch (name) {
+     
+      case 'correo':
+        newValue = formatCorreo(newValue);
+        break;
+      case 'telefono':
+        newValue = formatTelefono(newValue);
+        break;
+      case 'Documento':
+        newValue = formatDocumento(newValue);
+        break;
+      default:
+        break;
+    }
+  
     setFormValues((prevFormValues) => ({
       ...prevFormValues,
       [name]: newValue,
@@ -78,7 +127,15 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
 
   const handleBlur = (e) => {
     const { name, value } = e.target;
-    const trimmedValue = typeof value === 'string' ? value.trim() : value; // Verificar si es una cadena de texto antes de llamar a trim()
+    const trimmedValue = typeof value === 'string' ? value.trim() : value;
+    if (name === 'nombre' || name === 'apellido') {
+      const formattedValue = formatNombreApellido(trimmedValue);
+      setFormValues((prevFormValues) => ({
+        ...prevFormValues,
+        [name]: formattedValue,
+      }));
+    }
+     // Verificar si es una cadena de texto antes de llamar a trim()
     validateField(name, trimmedValue); // Llamar a validateField con el valor limpio
   };
   
@@ -90,9 +147,13 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
       case 'nombre':
       case 'apellido':
         const validacionNombreApellido = /^[a-zA-ZÀ-ÿ\s]{1,40}$/;
-        if (!validacionNombreApellido.test(value)) {
-          errorMessage = 'El campo debe contener solo letras y espacios.';
-        }
+      // Verifica que solo haya dos palabras
+      const palabras = value.trim().split(' ');
+      if (palabras.length > 2) {
+        errorMessage = 'El campo debe contener solo dos palabras.';
+      } else if (!validacionNombreApellido.test(value)) {
+        errorMessage = 'El campo debe contener solo letras y espacios.';
+      }
         break;
       case 'Documento':
         const validacionDocumento = /^[0-9]{10,17}$/; // Rango de 10 a 17 caracteres numéricos
