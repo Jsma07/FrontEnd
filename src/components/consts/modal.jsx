@@ -155,22 +155,44 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
         error = 'El correo electrónico no es válido.';
       }
     } else if (name === 'telefono_proveedor') {
-      if (!/^[0-9+\s]*$/.test(value)) {
-        error = 'El número de teléfono solo puede contener números y el signo +.';
+      if (!/^\+?\d+$/.test(value)) {
+          error = 'El número de teléfono solo puede contener números.';
       }
-    } else if (name === 'direccion_proveedor') {
-      if (!/^[a-zA-ZñÑ0-9\s#-]*$/.test(value)) {
-        error = 'La dirección solo puede contener letras, números, espacios, # y -.';
+    }else if (name === 'direccion_proveedor') {
+      const regex = /^[a-zA-ZñÑ0-9\s#-]*$/;
+      const containsThreeLetters = /[a-zA-ZñÑ].*[a-zA-ZñÑ].*[a-zA-ZñÑ]/;
+      const containsSixNumbers = /[0-9].*[0-9].*[0-9].*[0-9].*[0-9].*[0-9]/;
+      const containsOneHash = /^(?=(?:[^#]*#){0,1}[^#]*$)/;
+      const containsOneDash = /^(?=(?:[^-]*-){0,1}[^-]*$)/;
+
+      if (!regex.test(value)) {
+          error = 'La dirección solo puede contener letras, números, espacios, # y -.';
+      } else if (!containsThreeLetters.test(value)) {
+          error = 'La dirección debe contener al menos 3 letras.';
+      } else if (!containsSixNumbers.test(value)) {
+          error = 'La dirección debe contener al menos 6 números.';
+      } else if (!containsOneHash.test(value)) {
+          error = 'La dirección solo puede contener un único carácter especial "#".';
+      } else if (!containsOneDash.test(value)) {
+          error = 'La dirección solo puede contener un único carácter especial "-".';
       }
     } else if (name === 'NIT') {
-        if (!/^[a-zA-ZñÑ0-9\s#-]*$/.test(value)) {
-          error = 'El NIT de la empresa solo puede contener números.';
-        }
-    } else if (name === 'Precio_Servicio') {
+      if (!/^\d+(-\d+)?$/.test(value)) {
+          error = 'El NIT solo puede contener números y un solo guion "-".';
+      }
+    }else if (name === 'NombreInsumos') {
+      if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9ñÑ\s]*$/.test(value)) {
+          error = 'El nombre del insumo debe contener al menos una letra y no puede contener caracteres especiales.';
+      }
+    }else if (name === 'empresa_proveedor') {
+      if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9ñÑ\s]*$/.test(value)) {
+          error = 'El nombre de la empresa debe contener al menos una letra y no puede contener caracteres especiales.';
+      }
+    }else if (name === 'Precio_Servicio') {
       if (value <= 20000) {
         error = 'El precio debe ser minimo de $20.000.';
       }
-  }else {
+    }else {
       switch (type) {
         case 'text':
           if (!/^[a-zA-ZñÑ\s]*$/.test(value)) {

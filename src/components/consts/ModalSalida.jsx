@@ -88,7 +88,7 @@ const ModalInsumos = ({
                       {item.NombreInsumos}
                     </Typography>
                     <Typography variant="body2" gutterBottom>
-                      Precio: ${item.PrecioUnitario.toFixed(2)}
+                      Precio: ${item.PrecioUnitario}
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
                       Cantidad:

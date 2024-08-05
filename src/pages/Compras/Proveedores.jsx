@@ -3,6 +3,7 @@ import axios from 'axios';
 import CustomSwitch from "../../components/consts/switch";
 import ModalAgregarProveedor from "../../components/consts/modal";
 import ModalEditarProveedor from "../../components/consts/modalEditar";
+import handleAddProveedor from '../Compras/agregarProveedor';
 import Table from "../../components/consts/Tabla";
 import CamposObligatorios from "../../components/consts/camposVacios";
 import Fab from '@mui/material/Fab';
@@ -44,150 +45,6 @@ const Proveedores = () => {
 
     )
   })
-
-  const handleAddProveedor = async (formData) => {
-    try {
-      const { NIT, correo_proveedor, telefono_proveedor, direccion_proveedor, empresa_proveedor } = formData;
-      const response = await axios.get('http://localhost:5000/api/proveedores');
-      const proveedores = response.data;
-      const proveedorExistenteNIT = proveedores.find(proveedor => proveedor.NIT === NIT);
-      const proveedorExistenteCorreo = proveedores.find(proveedor => proveedor.correo_proveedor === correo_proveedor);
-      const proveedorExistenteTelefono = proveedores.find(proveedor => proveedor.telefono_proveedor === telefono_proveedor);
-      const proveedorExistenteDireccion = proveedores.find(proveedor => proveedor.direccion_proveedor === direccion_proveedor);
-      const proveedorExistenteEmpresa = proveedores.find(proveedor => proveedor.empresa_proveedor === empresa_proveedor);
-  
-      const camposObligatorios = ['NIT','nombre_proveedor', 'correo_proveedor', 'telefono_proveedor', 'direccion_proveedor', 'empresa_proveedor'];
-
-      if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos del proveedor.')) {
-        return;
-      }
-
-      if (proveedorExistenteNIT) {
-        window.Swal.fire({
-          icon: 'warning',
-          title: 'NIT ya registrado',
-          text: 'El NIT de la empresa ingresado ya está registrado para otro proveedor.',
-        });
-        return;
-      }
-      
-      const nit = formData['NIT'];
-      if (!/^\d+$/.test(nit)) {
-        window.Swal.fire({
-          icon: 'error',
-          title: 'NIT de la empresa inválido',
-          text: 'Por favor, ingresa solo números en el campo del NIT de la empresa.',
-        });
-        return;
-      }
-
-      if (NIT.length < 9 || NIT.length > 10) {
-        window.Swal.fire({
-          icon: 'error',
-          title: 'NIT de la empresa inválido',
-          text: 'Por favor, asegúrate de que el NIT de la empresa tenga minimo 9 dígitos.',
-        });
-        return;
-      }
-
-    const nombreProveedor = formData['nombre_proveedor'];
-    if (!/^[a-zA-Z\s]+$/.test(nombreProveedor)) {
-      window.Swal.fire({
-        icon: 'error',
-        title: 'Nombre de proveedor inválido',
-        text: 'El nombre de proveedor no debe contener números ni caracteres especiales.',
-      });
-      return;
-    }
-
-    const correoProveedor = formData['correo_proveedor'];
-    if (!/\b[A-Za-z0-9._%+-]+@(gmail|hotmail)\.com\b/.test(correoProveedor)) {
-      window.Swal.fire({
-        icon: 'error',
-        title: 'Correo electrónico inválido',
-        text: 'Por favor, ingresa un correo electrónico válido que termine en @gmail.com o @hotmail.com.',
-      });
-      return;
-    }
-     
-    const telefono = formData['telefono_proveedor'];
-      if (!/^\d+$/.test(telefono)) {
-        window.Swal.fire({
-          icon: 'error',
-          title: 'Teléfono inválido',
-          text: 'Por favor, ingresa solo números en el campo de teléfono.',
-        });
-        return;
-     }
-
-      if (telefono.length !== 10) {
-        window.Swal.fire({
-          icon: 'error',
-          title: 'Teléfono inválido',
-          text: 'Por favor, asegúrate de que el número de teléfono tenga 10 dígitos.',
-        });
-        return;
-      }
-
-      if (proveedorExistenteCorreo) {
-        window.Swal.fire({
-          icon: 'warning',
-          title: 'Correo ya registrado',
-          text: 'El correo electrónico ingresado ya está registrado para otro proveedor.',
-        });
-        return;
-      }
-  
-      if (proveedorExistenteTelefono) {
-        window.Swal.fire({
-          icon: 'warning',
-          title: 'Teléfono ya registrado',
-          text: 'El número de teléfono ingresado ya está registrado para otro proveedor.',
-        });
-        return;
-      }
-
-      if (proveedorExistenteDireccion) {
-        window.Swal.fire({
-          icon: 'warning',
-          title: 'Direccion ya registrada',
-          text: 'La direccion ingresada ya está registrado para otro proveedor.',
-        });
-        return;
-      }
-
-      if (proveedorExistenteEmpresa) {
-        window.Swal.fire({
-          icon: 'warning',
-          title: 'Empresa ya registrada',
-          text: 'La empresa ingresada ya está registrado para otro proveedor.',
-        });
-        return;
-      }
-
-      const confirmation = await window.Swal.fire({
-        title: '¿Estás seguro?',
-        text: '¿Quieres agregar este proveedor?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, agregar',
-        cancelButtonText: 'Cancelar'
-      });
-
-      if (confirmation.isConfirmed) {
-        formData.estado_proveedor = 1;
-        await axios.post('http://localhost:5000/api/proveedores/guardarProveedor', formData);
-        handleCloseModalAgregar();
-        fetchProveedores();
-        window.Swal.fire('¡Proveedor agregado!', '', 'success');
-      }
-    } catch (error) {
-      console.error('Error al agregar proveedor:', error);
-    }
-
-  };
 
   const handleEditProveedor = async (formData) => {
     try {
@@ -352,6 +209,10 @@ const Proveedores = () => {
     setOpenModalEditar(true);
   };
 
+  const handleSubmitProveedor = (formData) => {
+    handleAddProveedor(formData, handleCloseModalAgregar, fetchProveedores);
+  };
+
   const handleCloseModalAgregar = () => {
     setOpenModalAgregar(false);
     setProveedorSeleccionado(null);
@@ -364,14 +225,12 @@ const Proveedores = () => {
 
 return (
 <div>
-<div className="container mx-auto p-4 relative">
-      
+<div className="container mx-auto p-4 relative">   
   </div>
-
       <ModalAgregarProveedor
           open={openModalAgregar}
           handleClose={handleCloseModalAgregar}
-          onSubmit={(formData) => handleAddProveedor(formData)} 
+          onSubmit={(formData) => handleSubmitProveedor(formData)} 
           title="Crear Nuevo Proveedor"
           fields={[
             { name: 'NIT', label: 'NIT', type: 'text' },
@@ -383,7 +242,6 @@ return (
           ]}
           onChange={handleChange}
         />
-
         <ModalEditarProveedor
           open={openModalEditar}
           handleClose={handleCloseModalEditar}

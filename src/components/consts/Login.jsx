@@ -27,6 +27,8 @@ const Login = () => {
         correo,
         contrasena,
       });
+      console.log('Respuesta del login:', response.data);
+
 
       const token = response.data.token;
       const userData = {

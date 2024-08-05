@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const DetalleCompra = () => {
   const { id } = useParams();
@@ -24,6 +26,91 @@ const DetalleCompra = () => {
     fetchDetalleCompra();
   }, [id]);
 
+  const generarPDFCompra = () => {
+    if (detalleCompra.length === 0 || !detalleCompra[0].compra) {
+      console.error('detalleCompra no tiene la estructura esperada:', detalleCompra);
+      return;
+    }
+  
+    const compra = detalleCompra[0];
+    const doc = new jsPDF();
+    const logoImg = "/jacke.png";
+  
+    // Encabezado: Logo y Nombre de la Aplicación
+    doc.addImage(logoImg, "JPEG", 20, 10, 30, 30);
+    doc.setFontSize(16);
+    doc.text("Jake Nails", 60, 25);
+  
+    // Línea separadora
+    doc.line(20, 45, 190, 45);
+  
+    // Fecha y hora de generación del PDF
+    const fecha = new Date().toLocaleDateString("es-CO");
+    const hora = new Date().toLocaleTimeString("es-CO");
+    doc.setFontSize(12);
+    doc.text(`Fecha del reporte: ${fecha}`, 140, 20);
+    doc.text(`Hora del reporte: ${hora}`, 140, 30);
+  
+    // Datos de la Compra
+    doc.setFontSize(12);
+    const title = "Datos de la Compra";
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const textWidth = doc.getTextWidth(title);
+    const x = (pageWidth - textWidth) / 2; // Calcular la posición X para centrar
+    doc.text(title, x, 55);
+    
+    doc.text(`Fecha: ${compra.compra.fecha_compra}`, 20, 65);
+    doc.text(`Descuento: ${compra.compra.descuento_compra}`, 20, 75);
+    doc.text(`IVA: ${compra.compra.iva_compra}`, 20, 85);
+    doc.text(`Subtotal: ${compra.compra.subtotal_compra}`, 20, 95);
+    doc.text(`Total: ${compra.compra.total_compra}`, 20, 105);
+    doc.text(`Estado: ${compra.compra.estado_compra}`, 20, 115);
+  
+    // Título de la tabla
+    const tableTitle = "Información del Detalle de los Insumos";
+    const tableTitleWidth = doc.getTextWidth(tableTitle);
+    const tableTitleX = (pageWidth - tableTitleWidth) / 2;
+    doc.setFontSize(12);
+    doc.text(tableTitle, tableTitleX, 125);
+  
+    // Tabla de Insumos
+    let y = 135; // Posición inicial para la tabla
+    const headers = ["Nombre Insumo", "Precio Unitario", "Cantidad", "Precio Total"];
+    const data = compra.insumos.map((insumo) => [
+      insumo.NombreInsumos,
+      insumo.PrecioUnitario,
+      insumo.cantidad_insumo,
+      insumo.totalValorInsumos,
+    ]);
+  
+    // Utilizamos autoTable para generar la tabla
+    doc.autoTable({
+      startY: y,
+      head: [headers],
+      body: data,
+      theme: "grid", // Cambia a 'grid' para tener líneas visibles
+      styles: {
+        cellPadding: 5,
+        valign: 'middle',
+        halign: 'center', // Centrar el contenido de las celdas
+      },
+      headStyles: {
+        fillColor: [255, 255, 255], // Color de fondo de los encabezados (blanco)
+        textColor: [0, 0, 0], // Color del texto de los encabezados (negro)
+        fontSize: 12,
+      },
+      bodyStyles: {
+        fillColor: [255, 255, 255], // Color de fondo de las celdas del cuerpo (blanco)
+        textColor: [0, 0, 0], // Color del texto de las celdas del cuerpo (negro)
+        fontSize: 12,
+      },
+      margin: { top: 10 }, // Margen superior para la tabla
+    });
+  
+    // Guardar el PDF con un nombre específico
+    doc.save(`compra_${compra.idCompra}.pdf`);
+  };
+  
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -97,13 +184,13 @@ const DetalleCompra = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
-                        ${insumo.PrecioUnitario}
+                        {insumo.PrecioUnitario}
                       </td>
                       <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
                         {insumo.cantidad_insumo}
                       </td>
                       <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
-                        ${insumo.totalValorInsumos}
+                        {insumo.totalValorInsumos}
                       </td>
                     </tr>
                   ))}
@@ -140,7 +227,7 @@ const DetalleCompra = () => {
                 type="button"
                 className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                 style={{ fontSize: "20px", marginLeft: "10px" }}
-                // onClick={generarPDF}
+                onClick={generarPDFCompra}
               >
                 <i className="bx bxs-file-pdf"> PDF</i>
               </button>
@@ -211,7 +298,7 @@ const DetalleCompra = () => {
                       <div>
                         <p className="text-base font-semibold text-gray-800">Descuento:</p>
                         <p className="text-sm text-gray-600">
-                          ${compra.compra.descuento_compra}
+                          {compra.compra.descuento_compra}
                         </p>
                       </div>
                     </li>
@@ -235,7 +322,7 @@ const DetalleCompra = () => {
                       <div>
                         <p className="text-base font-semibold text-gray-800">IVA:</p>
                         <p className="text-sm text-gray-600">
-                          ${compra.compra.iva_compra}
+                          {compra.compra.iva_compra}
                         </p>
                       </div>
                     </li>
@@ -259,7 +346,7 @@ const DetalleCompra = () => {
                       <div>
                         <p className="text-base font-semibold text-gray-800">Subtotal:</p>
                         <p className="text-sm text-gray-600">
-                           ${compra.compra.subtotal_compra}
+                           {compra.compra.subtotal_compra}
                         </p>
                       </div>
                     </li>
