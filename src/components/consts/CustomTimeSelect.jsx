@@ -22,9 +22,9 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
             params: { fecha: selectedDate.format('YYYY-MM-DD') },
           });
           console.log("Response from backend:", response.data);
-
-          const formattedOccupiedTimes = response.data.map(time => dayjs(time, 'HH:mm:ss').format('HH:mm'));
-
+  
+          const formattedOccupiedTimes = response.data;
+  
           setOccupiedTimes(formattedOccupiedTimes);
           console.log("Occupied times set:", formattedOccupiedTimes);
           
@@ -35,7 +35,7 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
         }
       }
     };
-
+  
     const checkInactiveDay = async () => {
       if (selectedDate) {
         try {
@@ -45,7 +45,7 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
             .map(horario => dayjs(horario.fecha));
           const isDayInactive = inactiveDays.some(inactiveDate => inactiveDate.isSame(selectedDate, 'day'));
           setIsInactive(isDayInactive);
-
+  
           if (isDayInactive) {
             Swal.fire({
               title: 'Día Inactivo',
@@ -59,7 +59,7 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
         }
       }
     };
-
+  
     fetchOccupiedTimes();
     checkInactiveDay();
   }, [selectedDate]);
