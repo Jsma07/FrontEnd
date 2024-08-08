@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import NavbarClient from "./Navbarclient";
 
+
 const VistaInicial = () => {
   useEffect(() => {
     console.log('VistaInicial se ha montado');
@@ -18,13 +19,13 @@ const VistaInicial = () => {
             />
           </div>
           <div className="header-content">
-            <p className="heading-1"></p>
-            <h1><span className="bienvenidos-style">Bienvenidos a un mundo lleno de estilo.</span></h1>
+            <h2><span className="bienvenidos-style">BIENVENIDOS A UN MUNDO LLENO DE ESTILO.</span></h2>
+            <br></br>
             <p className="description">
-              Aquí podrás encontrar nuestros servicios de manicure con estilos únicos y modernos, diseñados para resaltar tu belleza y personalidad.
+              Servicios de manicure con estilos únicos y modernos, diseñados para resaltar tu belleza y personalidad.
             </p>
             <button className="button" type="button">
-              <p>Ver servicios</p>
+              <p><i className="bx bxs-right-arrow-circle"></i> Ver servicios</p>
             </button>
           </div>
         </div>

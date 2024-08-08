@@ -8,28 +8,22 @@
 	box-sizing: border-box;
 }
 
-.bienvenidos-style {
-	color: black;
-	font-size: 40px;
-	display: 'center';
-	/* width: 50%;
-	text-align: left;
-	word-break: break-word;
-	padding-left: 30px;  */
-  }
-/*   
-h1 {
-	text-align: left;
-	margin-left: 30px; 
-  } */
-  
-
 body {
 	margin: 0 auto;
 	background-color: #ffffff;
 	font-size: 16px;
 	font-family: "Lato", sans-serif;
 	overflow-x: hidden;
+}
+
+.bienvenidos-style {
+    color: rgb(11, 11, 11);
+	font-family: 'Roboto', sans-serif; 
+    font-size: 30px;
+    display: center;
+    width: 20%;
+    margin-top: 200px; 
+	font-weight: 700;
 }
 
 #header-hero {
@@ -46,30 +40,25 @@ body {
 #header-hero .header-bg img {
 	width: 100%;
 	height: auto;
-	max-height: 580px; /* Ajusta este valor según sea necesario */
-	object-fit: cover; /* Para recortar la imagen si es más alta que el max-height */
+	max-height: 680px;
+	object-fit: cover; 
   }
 
 #header-hero .header-content {
-	width: 100%;
-	height: 100%;
-	background-color: rgba(255, 255, 255, 0.1);
-	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
-	position: absolute;
-	top: 0%;
-	text-align: center;
-	color: #f2f2f2;
-	padding: 0rem 0.4rem;
-}
-
-#header-hero .header-content p.heading-1 {
-	text-transform: uppercase;
-	margin: 0 auto;
-	font-family: "Lato", sans-serif;
-	font-size: 1.5rem;
-	font-weight: 500;
-	margin-bottom: 2vw;
-	padding-top: 9vw;
+    width: 40%; 
+    height: auto;
+    background-color: rgba(254, 254, 254, 0.7);
+    text-shadow: 1px 1px 2px rgba(247, 241, 241, 0.4);
+    position: absolute;
+    top: 200px;
+    left: 20px; 
+    color: #050505; 
+    padding: 2rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+	border-radius: 30px; 
 }
 
 #header-hero .header-content h1 {
@@ -86,13 +75,19 @@ body {
 }
 
 #header-hero .header-content p.description {
-	margin: 0 auto;
-	width: 30%;
-	font-family: Cambria;
-	font-size: 1.4rem;
-	font-style: italic;
-	margin-bottom: 5vw;
-	color: black;
+    font-family: Cambria;
+    font-size: 1.4rem;
+    font-style: italic;
+    color: rgb(7, 7, 7);
+    position: relative;
+    overflow: hidden; /* Oculta el contenido que excede el contenedor */
+    white-space: normal; /* Permite que el texto se envuelva en múltiples líneas */
+    width: auto; /* Ajusta el ancho al contenido */
+    animation: typing 10s steps(40, end) 1s 1 normal both, blink-caret .75s step-end infinite;
+}
+
+@keyframes typing {
+    to { width: 100%; }
 }
 
 @keyframes heartbeat {
@@ -102,28 +97,34 @@ body {
 	}
 	50% {
 	  transform: scale(0.9);
-	  box-shadow: 0 0 30px rgba(255, 0, 0, 0.8); /* Destello más fuerte */
+	  box-shadow: 0 0 30px rgba(192, 123, 218, 0.8); 
 	}
 	100% {
 	  transform: scale(1);
 	  box-shadow: 0 0 0 rgba(0, 0, 0, 0.35);
 	}
-  }
+}
   
-  #header-hero .header-content .button {
-	margin: 0 auto;
-	background-color: #a61458;
-	-webkit-box-shadow: 0px 1px 3.84px 0.16px rgba(0, 0, 0, 0.35);
-	box-shadow: 0px 1px 3.84px 0.16px rgba(0, 0, 0, 0.35);
-	width: 10rem;
-	padding: 0.8rem;
-	border: none; /* Elimina el borde predeterminado */
-	border-radius: 5px; /* Opcional: Agrega bordes redondeados */
-	cursor: pointer; /* Cambia el cursor para indicar que el botón es clickeable */
-	animation: heartbeat 1.5s infinite; /* Aplicar la animación de pulsación */
-  }
-  
-  #header-hero .header-content .button p {
+#header-hero .header-content .button {
+    background-color: #ae81d6;
+    -webkit-box-shadow: 0px 1px 3.84px 0.16px rgba(0, 0, 0, 0.35);
+    box-shadow: 0px 1px 3.84px 0.16px rgba(0, 0, 0, 0.35);
+    width: 12rem;
+    padding: 0.8rem;
+    border: none; 
+    border-radius: 5px;
+    cursor: pointer; 
+    animation: heartbeat 1.5s infinite; 
+    margin: 0; 
+    align-self: flex-start;
+}
+
+.button i {
+    font-size: 1.5rem;
+    margin-right: 0.5rem; 
+}
+
+#header-hero .header-content .button p {
 	font-family: Cambria;
 	font-size: 1rem;
 	font-weight: 400;
@@ -131,10 +132,8 @@ body {
 	margin: 0 auto;
 	text-transform: uppercase;
 	color: #fff; /* Ajusta el color del texto si es necesario */
-  }
+}
   
-  
-
 @media only screen and (max-width: 1440px) {
 	#header-hero .header-content p.description {
 		width: 40%;
@@ -258,6 +257,7 @@ body {
 	width: 100%;
 	height: 400px;
 	object-fit: cover;
+	border-radius: 15px;
 }
 
 @media only screen and (max-width: 1024px) {
@@ -373,9 +373,15 @@ body {
 }
 
 #products .container .product figure img {
-	width: 100%;
-	height: 300px; /* Ajusta la altura según tus necesidades */
-	object-fit: cover;
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    transition: transform 0.3s ease; 
+	border-radius: 10px;
+}
+
+#products .container .product figure img:hover {
+    transform: scale(1.2); /* Escala la imagen al 120% cuando el mouse está sobre ella */
 }
 
 #products .container .product figure figcaption {
@@ -420,20 +426,21 @@ body {
 	justify-content: space-between;
 	margin: 0 auto;
 	width: 80%;
-	margin-top: -6rem;
+	margin-top: -2rem;
   }
   
   #features .container .feature {
 	width: 30%;
-	border: 2px solid #ce0095;
+	border: 3px solid #ae81d6;
 	padding: 1rem;
 	text-align: center;
 	font-family: "Lato", sans-serif;
+	border-radius: 30px;
   }
   
   #features .container .feature i {
 	font-size: 5rem; 
-	color: #ce0095;
+	color: #ae81d6;
 	margin-bottom: 1rem;
   }
   
@@ -454,6 +461,7 @@ body {
 	font-style: italic;
 	line-height: 1.5;
   }
+  
   
   @media only screen and (max-width: 768px) {
 	#features .container {
