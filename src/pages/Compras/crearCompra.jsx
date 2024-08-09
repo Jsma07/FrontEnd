@@ -33,6 +33,7 @@ const CrearCompra = () => {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [insumoSeleccionado, setInsumoSeleccionado] = useState(null);
   const [detallesCompra, setDetallesCompra] = useState([]);
+  const [insumosAgregados, setInsumosAgregados] = useState([]);
   const [insumosSeleccionados, setInsumosSeleccionados] = useState([]);
   const [cantidad_insumo, setCantidadInsumo] = useState({});
   const [precio_unitario, setPrecioUnitario] = useState({});
@@ -111,25 +112,30 @@ const getNombreCategoria = (idCategoria) => {
 };
 
 const calcularSubtotal = (detalles) => {
-    return detalles.reduce((acc, detalle) => acc + detalle.totalValorInsumos, 0);
+  return detalles.reduce((acc, detalle) => acc + detalle.totalValorInsumos, 0);
 };
 
-const calcularIva = (subtotal) => {
-    return 0.19 * subtotal;
+const calcularIva = (totalValorInsumos) => {
+  return 0.19 * totalValorInsumos;
 };
 
-const calcularTotal = (subtotal, descuento) => {
-    return subtotal - descuento;
+const calcularTotal = (totalValorInsumos, descuento) => {
+  return totalValorInsumos - descuento;
+};
+
+const calcularSubtotalCompra = (totalCompra, iva) => {
+  return totalCompra - iva;
 };
 
 const actualizarTotales = (detalles, descuento) => {
-    const subtotal = calcularSubtotal(detalles);
-    const iva = calcularIva(subtotal);
-    const total = calcularTotal(subtotal, descuento);
+  const totalValorInsumos = calcularSubtotal(detalles);
+  const iva = calcularIva(totalValorInsumos);
+  const totalCompra = calcularTotal(totalValorInsumos, descuento);
+  const subtotalCompra = calcularSubtotalCompra(totalCompra, iva);
 
-    setSubtotalCompra(subtotal);
-    setIvaCompra(iva);
-    setTotalCompra(total);
+  setSubtotalCompra(subtotalCompra);
+  setIvaCompra(iva);
+  setTotalCompra(totalCompra);
 };
 
 const handleAgregarDetalleCompra = () => {
@@ -258,6 +264,11 @@ const minDate = new Date();
 minDate.setDate(today.getDate() - 5);
 const minDateFormatted = getFormattedDate(minDate);
 
+const handleRemove = (id) => {
+  setInsumosSeleccionados(insumosSeleccionados.filter((insumo) => insumo.IdInsumos !== id));
+  setInsumosAgregados(insumosAgregados.filter((insumoId) => insumoId !== id));
+};
+
 return (
   <div className="max-w-4xl mx-auto p-4">
    <section className="content">
@@ -281,7 +292,6 @@ return (
     <br />
     <div className="col-md-12">
       <div className="grid grid-cols-1 gap-4">
-        <div className="grid grid-cols-2 gap-4">
           <div className="form-group mb-2">
             <label htmlFor="fecha_compra" className="block text-sm font-medium text-gray-900 dark:text-white">Fecha:</label>
             <input
@@ -295,25 +305,13 @@ return (
               />
           </div>
 
-          <div className="form-group mb-2">
-            <label htmlFor="descuento_compra" className="block text-sm font-medium text-gray-900 dark:text-white">Descuento:</label>
-            <input
-              type="number"
-              id="descuento_compra"
-              value={descuento_compra}
-              onChange={(e) => handleDescuentoChange(parseFloat(e.target.value))}
-              className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-              placeholder="Descuento" required/>
-          </div>
-        </div>
-
         <div className="form-group mb-2">
-          <label htmlFor="iva_compra" className="block text-sm font-medium text-gray-900 dark:text-white">IVA:</label>
+          <label htmlFor="iva_compra" className="block text-sm font-medium text-gray-900 dark:text-white">Descuento:</label>
           <input
             type="number"
-            id="iva_compra"
-            value={iva_compra}
-            onChange={(e) => setIvaCompra(e.target.value)}
+            id="descuento_compra"
+            value={descuento_compra}
+            onChange={(e) => handleDescuentoChange(parseFloat(e.target.value))}
             className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
             placeholder="IVA" disabled/>
         </div>
@@ -364,79 +362,91 @@ return (
           padding: "20px", 
         }}
       >
+          <h3 style={{ textAlign: "left", fontSize: "23px", fontWeight: "bold" }}>
+            Detalle de la compra
+          </h3>
+          <br></br>
 
-      <div style={{ display: "flex", flexDirection: "column", marginTop: "20px" }}>
-        <div
-          style={{
-            fontWeight: "bold",
-            display: "grid",
-            gridTemplateColumns: "repeat(5, 1fr)",
-            gap: "10px",
-            textAlign: "center",
-          }}
-        >
-          <div>Imagen</div>
-          <div>Categoria</div>
-          <div>Insumo</div>
-          <div>Cantidad</div>
-          <div>P Unitario</div>
+          <div style={{ display: "flex", flexDirection: "column", marginTop: "20px" }}>
+          <div
+            style={{
+              fontWeight: "bold",
+              display: "grid",
+              gridTemplateColumns: "repeat(6, 1fr)", 
+              gap: "10px",
+              textAlign: "center",
+            }}
+          >
+            <div>Imagen</div>
+            <div>Categoria</div>
+            <div>Insumo</div>
+            <div>Cantidad</div>
+            <div>P Unitario</div>
+            <div>Actions</div>
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(6, 1fr)", 
+              gap: "10px",
+              marginTop: "20px",
+              overflowY: insumosSeleccionados.length > 2 ? "auto" : "visible",
+              maxHeight: insumosSeleccionados.length > 2 ? "150px" : "none",
+              textAlign: "center",
+            }}
+          >
+            {insumosSeleccionados.map((insumo, index) => (
+              <React.Fragment key={index}>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                  <img 
+                    src={`http://localhost:5000${insumo.imagen}`} 
+                    alt={insumo.NombreInsumos} 
+                    width="50" 
+                    style={{ borderRadius: "50%", width: "50px", height: "50px", objectFit: "cover" }}
+                  />
+                </div>
+                <div>{getNombreCategoria(insumo.Idcategoria)}</div>
+                <div>{insumo.NombreInsumos}</div>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                  <input
+                    type="number"
+                    value={cantidad_insumo[insumo.IdInsumos] || ''}
+                    onChange={(e) => handleInputChange(insumo.IdInsumos, 'cantidad_insumo', parseInt(e.target.value))}
+                    style={{
+                      width: "80px",
+                      padding: "5px",
+                      borderRadius: "5px",
+                      border: "1px solid #ccc",
+                      textAlign: "center",
+                    }}
+                  />
+                </div>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                  <input
+                    type="number"
+                    value={precio_unitario[insumo.IdInsumos] || ''}
+                    onChange={(e) => handleInputChange(insumo.IdInsumos, 'precio_unitario', parseFloat(e.target.value))}
+                    style={{
+                      width: "80px",
+                      padding: "5px",
+                      borderRadius: "5px",
+                      border: "1px solid #ccc",
+                      textAlign: "center",
+                    }}
+                  />
+                </div>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                  <button
+                      onClick={() => handleRemove(insumo.IdInsumos)}
+                      className="w-10 h-10 flex items-center justify-center bg-red-500 text-white rounded-full"
+                    >
+                      <i className="bx bxs-trash" style={{ fontSize: '24px' }}></i>
+                </button>
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
         </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(5, 1fr)",
-            gap: "10px",
-            marginTop: "20px",
-            overflowY: insumosSeleccionados.length > 2 ? "auto" : "visible",
-            maxHeight: insumosSeleccionados.length > 2 ? "150px" : "none",
-            textAlign: "center",
-          }}
-        >
-          {insumosSeleccionados.map((insumo, index) => (
-            <React.Fragment key={index}>
-             <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <img 
-                  src={`http://localhost:5000${insumo.imagen}`} 
-                  alt={insumo.NombreInsumos} 
-                  width="50" 
-                  style={{ borderRadius: "50%", width: "50px", height: "50px", objectFit: "cover" }}
-                />
-              </div>
-              <div>{getNombreCategoria(insumo.Idcategoria)}</div>
-              <div>{insumo.NombreInsumos}</div>
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <input
-                  type="number"
-                  value={cantidad_insumo[insumo.IdInsumos] || ''}
-                  onChange={(e) => handleInputChange(insumo.IdInsumos, 'cantidad_insumo', parseInt(e.target.value))}
-                  style={{
-                    width: "80px",
-                    padding: "5px",
-                    borderRadius: "5px",
-                    border: "1px solid #ccc",
-                    textAlign: "center",
-                  }}
-                />
-              </div>
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <input
-                  type="number"
-                  value={precio_unitario[insumo.IdInsumos] || ''}
-                  onChange={(e) => handleInputChange(insumo.IdInsumos, 'precio_unitario', parseFloat(e.target.value))}
-                  style={{
-                    width: "80px",
-                    padding: "5px",
-                    borderRadius: "5px",
-                    border: "1px solid #ccc",
-                    textAlign: "center",
-                  }}
-                />
-              </div>
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-
         <div
           style={{
             marginTop: "40px",
@@ -444,6 +454,18 @@ return (
             paddingTop: "20px",
           }}
         >
+           <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginBottom: "10px",
+            }}
+          >
+            <div style={{ fontWeight: "bold", marginRight: "20px" }}>
+              IVA:
+            </div>
+            <div>{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(iva_compra)}</div>
+          </div>
           <div
             style={{
               display: "flex",

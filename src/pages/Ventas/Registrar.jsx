@@ -5,28 +5,22 @@ import Swal from "sweetalert2";
 import ServicioSeleccionado from "../../components/consts/SeleccionServicios";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Fab from "@mui/material/Fab";
-import { Select, MenuItem } from "@mui/material";
 
 const Registrar = () => {
-  const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
   const [empleados, setEmpleados] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [subtotal, setSubtotal] = useState(0);
-  const [modalData, setModalData] = useState(null);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [adicionSeleccionada, setAdicionSeleccionada] = useState([]);
   const [adiciones, setAdiciones] = useState([]);
-  const [ivaValue, setIvaValue] = useState(0.19); // IVA del 19%
-  const [iva, setIva] = useState(0);
   const [totalGeneral, setTotalGeneral] = useState(0);
   const [descuento, setDescuento] = useState(0);
   const [fechaFactura, setFechaFactura] = useState("");
-  const ivaRate = 0.19; // IVA del 19%
   const [servicioSeleccionado, setServicioSeleccionado] = useState(null);
-  const [minDate, setMinDate] = useState('');
-  const [maxDate, setMaxDate] = useState('');
-  
+  const [minDate, setMinDate] = useState("");
+  const [maxDate, setMaxDate] = useState("");
+
   const abrirModal = () => {
     setModalAbierto(true);
   };
@@ -80,14 +74,14 @@ const Registrar = () => {
 
   useEffect(() => {
     const today = new Date();
-    
-     // Fecha mínima: 3 días antes del día actual
-     const minDateValue = new Date();
-     minDateValue.setDate(today.getDate() - 3);
-     const minDateStr = minDateValue.toISOString().split('T')[0];
- 
-     // Fecha máxima: el día actual
-     const maxDateStr = today.toISOString().split('T')[0];
+
+    // Fecha mínima: 3 días antes del día actual
+    const minDateValue = new Date();
+    minDateValue.setDate(today.getDate() - 3);
+    const minDateStr = minDateValue.toISOString().split("T")[0];
+
+    // Fecha máxima: el día actual
+    const maxDateStr = today.toISOString().split("T")[0];
 
     setMaxDate(maxDateStr);
     setMinDate(minDateStr);
@@ -108,24 +102,14 @@ const Registrar = () => {
     fetchAdiciones();
   }, []);
 
-  const handleImagenSeleccionada = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = function (e) {
-      setImagenSeleccionada(e.target.result);
-    };
-
-    reader.readAsDataURL(file);
-  };
   useEffect(() => {
     const calcularTotal = () => {
       const precioServicio = servicioSeleccionado
-        ? parseInt(servicioSeleccionado.Precio_Servicio)*1000
-        : 0; // Convert to number and handle null
+        ? parseInt(servicioSeleccionado.Precio_Servicio) * 1000
+        : 0; // Convertir a número y manejar valores nulos
 
       const subtotalAdiciones = adicionSeleccionada.reduce(
-        (acc, item) => acc + parseFloat(item.Precio), // Convert to number
+        (acc, item) => acc + parseFloat(item.Precio), // Convertir a número
         0
       );
 
@@ -133,14 +117,13 @@ const Registrar = () => {
       console.log(subtotalCalculado);
       const totalConDescuento = subtotalCalculado - descuento;
       console.log(totalConDescuento);
-      const totalFinal = totalConDescuento * (1 + ivaRate);
-      
 
+      // Eliminando el cálculo del IVA
       setSubtotal(subtotalCalculado);
-      setTotalGeneral(totalFinal);
+      setTotalGeneral(totalConDescuento);
     };
 
-    calcularTotal(); // Call it initially
+    calcularTotal(); // Llamar inicialmente
   }, [servicioSeleccionado, adicionSeleccionada, descuento]);
 
   const handleServicioChange = (e) => {
@@ -155,7 +138,6 @@ const Registrar = () => {
     const servicioElement = event.target.Servicio;
     const empleadoElement = event.target.Empleado;
     const clienteElement = event.target.Cliente;
-    const ivaElement = event.target.iva;
     const fechaElement = event.target.fecha;
     const descuentoElement = event.target.Descuento;
 
@@ -163,7 +145,6 @@ const Registrar = () => {
       !servicioElement ||
       !empleadoElement ||
       !clienteElement ||
-      !ivaElement ||
       !fechaElement ||
       !descuentoElement
     ) {
@@ -171,12 +152,9 @@ const Registrar = () => {
       return;
     }
 
-    
-
     const idServicio = parseInt(servicioElement.value);
     const idEmpleado = parseInt(empleadoElement.value);
     const idCliente = parseInt(clienteElement.value);
-    const iva = parseFloat(ivaElement.value);
     const fecha = fechaElement.value;
     const descuento = parseFloat(descuentoElement.value);
 
@@ -185,7 +163,7 @@ const Registrar = () => {
       idServicio,
       idEmpleado,
       IdCliente: idCliente,
-      Iva: iva,
+      // Eliminando el campo Iva
       Subtotal: subtotal.toFixed(2),
       Fecha: fecha,
       Descuento: descuento,
@@ -242,6 +220,8 @@ const Registrar = () => {
         showConfirmButton: false,
         timer: 1500,
       });
+
+      window.location.href = "/ventas";
     } catch (error) {
       console.error(
         "Error al registrar la venta:",
@@ -275,6 +255,14 @@ const Registrar = () => {
     // Limpiar intervalo al desmontar el componente
     return () => clearInterval(intervalo);
   }, []);
+
+  const eliminarAdicion = (idAdicion) => {
+    // Filtra las adiciones para eliminar la seleccionada
+    const nuevasAdiciones = adicionSeleccionada.filter(
+      (adicion) => adicion.IdAdiciones !== idAdicion
+    );
+    setAdicionSeleccionada(nuevasAdiciones);
+  };
 
   return (
     <section className="content">
@@ -319,7 +307,12 @@ const Registrar = () => {
                 <option value="">Seleccione un Servicio</option>
                 {servicios.map((servicio) => (
                   <option key={servicio.IdServicio} value={servicio.IdServicio}>
-                   <p>  {servicio.Nombre_Servicio+ " " + servicio.Precio_Servicio}</p>
+                    <p>
+                      {" "}
+                      {servicio.Nombre_Servicio +
+                        " " +
+                        servicio.Precio_Servicio}
+                    </p>
                   </option>
                 ))}
               </select>
@@ -375,37 +368,17 @@ const Registrar = () => {
             </select>
           </div>
 
-          <div className="form-group mb-4">
-            <label
-              htmlFor="iva"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              IVA
-            </label>
-            <input
-              type="number"
-              name="iva"
-              id="iva"
-              value={ivaValue.toFixed(2)}
-              onChange={(e) => setIva(parseFloat(e.target.value))}
-              className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-              placeholder="0.19"
-              disabled True
-            />
-          </div>
-
           <div className="form-group grid grid-cols-2 gap-4 mb-4">
             <div>
               <label htmlFor="fecha">Fecha</label>
               <input
-        type="date"
-        id="fecha"
-        name="fecha"
-        className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-        required
-        min={minDate}
-        max={maxDate}
-      />
+                id="fecha"
+                name="fecha"
+                className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+                value={fechaFactura}
+                disabled
+                True
+              />
             </div>
             <div>
               <label
@@ -440,7 +413,7 @@ const Registrar = () => {
             }}
             type="submit"
           >
-            <i className="bx bxs-save" style={{ fontSize: "1.8rem" }}></i>
+            <i class="bx bxs-cart-add" style={{ fontSize: "1.8rem" }}></i>
           </Fab>
         </form>
       </div>
@@ -482,11 +455,21 @@ const Registrar = () => {
           <div>Img</div>
           <div>Nombre Adicion</div>
           <div>Precio Adicion</div>
+          <div>Acciones</div>
         </div>
 
         {adicionSeleccionada.map((adicion, index) => (
-          <div key={index} style={{ marginBottom: "10px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div
+            key={index}
+            style={{ marginBottom: "10px", position: "relative" }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <div>
                 <img
                   src={`http://localhost:5000${adicion.Img}`}
@@ -496,9 +479,21 @@ const Registrar = () => {
               </div>
               <div>{adicion.NombreAdiciones}</div>
               <div>${adicion.Precio.toFixed(2)}</div>
+              <div
+                style={{
+                  cursor: "pointer",
+                  color: "red",
+                  fontSize: "20px",
+                  marginLeft: "10px",
+                }}
+                onClick={() => eliminarAdicion(adicion.IdAdiciones)}
+              >
+                <i className="bx bx-trash"></i>
+              </div>
             </div>
           </div>
         ))}
+
         <div
           style={{
             marginTop: "40px",

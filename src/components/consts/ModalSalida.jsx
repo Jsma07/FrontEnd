@@ -101,51 +101,65 @@ const ModalInsumos = ({
 
     try {
       const fechaSalida = new Date().toISOString(); // Fecha actual en formato ISO
+      const salidaInsumos = carrito.map((item) => ({
+        Idinsumos: item.IdInsumos,
+        Cantidad: item.cantidad,
+        Fecha_salida: fechaSalida,
+        Estado: "Terminado", // Puedes cambiar esto si es necesario
+        Descripcion: descripcion, // Añade la descripción
+      }));
 
-      // Procesar cada insumo en el carrito
-      for (const item of carrito) {
-        const salidaInsumo = {
-          Idinsumos: item.IdInsumos,
-          Cantidad: item.cantidad,
-          Fecha_salida: fechaSalida,
-          Estado: "Terminado", // Puedes cambiar esto si es necesario
-          Descripcion: descripcion, // Añade la descripción
-        };
+      console.log("Insumos en el carrito:", salidaInsumos); // Imprime los datos antes de enviar
 
-        console.log("Insumo a registrar:", salidaInsumo); // Imprime los datos antes de enviar
+      // Enviar la solicitud POST a la API para registrar la salida de insumos
+      const response = await axios.post(
+        "http://localhost:5000/salidasInsumos",
+        salidaInsumos
+      );
 
-        // Enviar la solicitud POST a la API para registrar cada salida de insumo
-        const response = await axios.post(
-          "http://localhost:5000/salidasInsumos",
-          salidaInsumo
-        );
+      console.log("Respuesta recibida del servidor:", response);
 
-        if (response.status !== 201) {
-          console.error("Error al crear salida de insumo:", response);
-          throw new Error("Error al crear salida de insumo");
-        }
+      if (response.status === 201) {
+        console.log("Salida de insumos creada:", response.data);
 
         // Actualizar la cantidad en los insumos
-        const nuevaCantidad = item.Cantidad - item.cantidad; // Calcular la nueva cantidad
-        await axios.put(
-          `http://localhost:5000/api/existenciainsumos/editar/${item.IdInsumos}`,
-          { Cantidad: nuevaCantidad }
-        );
+        const updatePromises = carrito.map((item) => {
+          const nuevaCantidad = item.Cantidad - item.cantidad; // Calcular la nueva cantidad
+          return axios.put(
+            `http://localhost:5000/api/existenciainsumos/editar/${item.IdInsumos}`,
+            { Cantidad: nuevaCantidad }
+          );
+        });
+
+        // Esperar a que todas las solicitudes PUT se completen
+        await Promise.all(updatePromises);
 
         toast.success(
-          `Salida de insumo "${item.NombreInsumos}" creada y existencia actualizada con éxito`
+          "Salida de insumos creada y existencias actualizadas con éxito"
         );
 
-        console.log("Salida de insumo creada:", response.data);
+        // Limpiar el carrito y cerrar el modal
+        actualizarCarrito([]);
+        setDescripcion(""); // Limpiar la descripción
+        handleClose();
+      } else {
+        console.error("Error al crear salida de insumos:", response);
+        toast.error("Hubo un problema al crear la salida de insumos.");
       }
-
-      // Limpiar el carrito y cerrar el modal
-      actualizarCarrito([]);
-      setDescripcion(""); // Limpiar la descripción
-      handleClose();
     } catch (error) {
       console.error("Error al crear salida de insumos:", error);
-      toast.error("Error al crear salida de insumos.");
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.mensaje
+      ) {
+        // Mostrar mensaje específico del error si está disponible
+        toast.error(error.response.data.mensaje);
+      } else {
+        toast.error(
+          "Error al crear salida de insumos. Por favor, intente de nuevo."
+        );
+      }
     }
   };
 
@@ -202,7 +216,7 @@ const ModalInsumos = ({
                       {item.NombreInsumos}
                     </Typography>
                     <Typography variant="body2" gutterBottom>
-                      Precio: ${item.PrecioUnitario.toFixed(2)}
+                      Precio: $
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
                       Cantidad:{item.Cantidad}

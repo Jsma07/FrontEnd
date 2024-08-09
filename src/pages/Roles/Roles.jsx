@@ -39,6 +39,13 @@ const Roles = () => {
   }, []);
 
   const handleToggleSwitch = async (id) => {
+    if(id=== 1 || id ===2 || id===4){
+      toast.error("No se puede desactivar este rol.", {
+        position: "bottom-right",
+        autoClose: 3000, 
+      });
+      return;
+    }
     const updatedRoles = roles.map((rol) =>
       rol.idRol === id
         ? { ...rol, EstadoRol: rol.EstadoRol === 1 ? 0 : 1 }
@@ -101,7 +108,13 @@ const Roles = () => {
   });
 
   const handleEditClick = (id) => {
-    console.log(`Editando rol con ID: ${id}`);
+    if (id === 1 || id === 2 || id === 4) {
+      toast.error("No se puede editar este rol.", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
+      });
+      return;
+    }
     setSelectedRoleId(id);
   };
 
@@ -156,7 +169,7 @@ const Roles = () => {
       width: "w-48",
       renderCell: (params) => (
         <div className="flex justify-center space-x-4">
-          {params.row.EstadoRol === 1 && (
+          {params.row.EstadoRol === 1 && ![1, 2, 4].includes(params.row.idRol) && (
             <button
               onClick={() => handleEditClick(params.row.idRol)}
               className="text-yellow-500"
@@ -164,11 +177,12 @@ const Roles = () => {
               <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
             </button>
           )}
-
+    { ![1, 2, 4].includes(params.row.idRol) &&(
           <CustomSwitch
             active={params.row.EstadoRol === 1}
             onToggle={() => handleToggleSwitch(params.row.idRol)}
           />
+        )}
         </div>
       ),
     },

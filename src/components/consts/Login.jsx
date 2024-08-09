@@ -38,8 +38,11 @@ const Login = () => {
       login(userData);
 
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
+      if(userData.rolId === 4) {
+         window.location.href = '/vistaInicio';}
+         else{
       window.location.href = '/';
+         }
     } catch (error) {
       if (error.response) {
         setError(error.response.data.mensaje);

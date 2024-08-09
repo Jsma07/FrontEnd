@@ -156,30 +156,32 @@ const InsumoDetalle = () => {
             </table>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {venta.adiciones.map((Adiciones, index) => (
-              <div
-                key={index}
-                className="max-w-xs bg-white border-2 border-gray-300 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700"
-              >
-                <div className="overflow-hidden rounded-full mx-auto mt-4 w-24 h-24">
-                  <img
-                    className="object-cover w-full h-full"
-                    src={`http://localhost:5000${Adiciones.Img}`}
-                    alt={Adiciones.NombreAdiciones}
-                  />
+          {venta.adiciones && venta.adiciones.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {venta.adiciones.map((Adiciones, index) => (
+                <div
+                  key={index}
+                  className="max-w-xs bg-white border-2 border-gray-300 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700"
+                >
+                  <div className="overflow-hidden rounded-full mx-auto mt-4 w-24 h-24">
+                    <img
+                      className="object-cover w-full h-full"
+                      src={`http://localhost:5000${Adiciones.Img}`}
+                      alt={Adiciones.NombreAdiciones}
+                    />
+                  </div>
+                  <div className="p-4 text-center">
+                    <h5 className="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+                      {Adiciones.NombreAdiciones}
+                    </h5>
+                    <p className="text-gray-700 dark:text-gray-400">
+                      Precio unitario: ${Adiciones.Precio.toFixed(2)}
+                    </p>
+                  </div>
                 </div>
-                <div className="p-4 text-center">
-                  <h5 className="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-                    {Adiciones.NombreAdiciones}
-                  </h5>
-                  <p className="text-gray-700 dark:text-gray-400">
-                    Precio unitario: ${Adiciones.Precio.toFixed(2)}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           <div
             style={{
