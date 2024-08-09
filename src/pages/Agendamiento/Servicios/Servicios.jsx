@@ -309,12 +309,12 @@ const Servicios = () => {
     };
 
     const opcionesTiempoServicio = [
-      { value: '1:00', label: '1:00 hora(s)' },
-      { value: '2:00', label: '2:00 horas' },
-      { value: '3:00', label: '3:00 horas' },
-      { value: '4:00', label: '4:00 horas' },
-      { value: '5:00', label: '5:00 horas' },
-      { value: '6:00', label: '6:00 horas' },
+      { value: '60', label: '1:00 hora(s)' },
+      { value: '120', label: '2:00 horas' },
+      { value: '180', label: '3:00 horas' },
+      { value: '240', label: '4:00 horas' },
+      { value: '300', label: '5:00 horas' },
+      { value: '360', label: '6:00 horas' },
     ];
 
   return (

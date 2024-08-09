@@ -28,7 +28,8 @@ import Adiciones from "./pages/Adiciones/ListarAdiciones";
 import DetalleCompra from "./pages/Compras/DetalleCompra";
 import { UserProvider } from "./context/ContextoUsuario";
 import CrearCita from "./pages/Agendamiento/CrearCita";
-import FechasTrabajo from './pages/Agendamiento/FechaTrabajo'
+import FechasTrabajo from './pages/Agendamiento/FechaTrabajo';
+// import InactivarHoras from "./pages/Agendamiento/InactivarHoras";
 import Contrasena from "./components/consts/recuperarContrasena";
 import PrivateRoute from "./context/verificarSesion";
 
@@ -122,6 +123,9 @@ root.render(
             }
             />
             <Route path="/FechasTrabajadas" element={<FechasTrabajo />}/>
+
+            {/* <Route path="/InactivarHoras" element={<InactivarHoras />}/> */}
+
 
 
             <Route path="/Salida_Insumos" 
