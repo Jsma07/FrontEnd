@@ -1,17 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Container, Typography, Card, CardContent, Fab, Tooltip, Box, Avatar, Input, Pagination, CardActionArea } from '@mui/material';
-import dayjs from 'dayjs';
-import { motion } from 'framer-motion';
-import ModalInactivarFecha from '../../components/consts/ModalInactivarFecha'; 
-import UpdateDisabledIcon from '@mui/icons-material/UpdateDisabled';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-dayjs.locale('es');
+import {
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  Fab,
+  Tooltip,
+  Box,
+  Avatar,
+  Input,
+  Pagination,
+  CardActionArea,
+  IconButton,
+} from "@mui/material";
+import dayjs from "dayjs";
+import { motion } from "framer-motion";
+import ModalInactivarFecha from "../../components/consts/ModalInactivarFecha";
+import UpdateDisabledIcon from "@mui/icons-material/UpdateDisabled";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import Swal from "sweetalert2";
+import InactivarHorasModal from "../../components/InactivarHorasModal"; // Ajusta la ruta según sea necesario
 
-// Función para generar un color aleatorio
+dayjs.locale("es");
+
 const getRandomColor = () => {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
+  const letters = "0123456789ABCDEF";
+  let color = "#";
   for (let i = 0; i < 6; i++) {
     color += letters[Math.floor(Math.random() * 16)];
   }
@@ -19,30 +38,57 @@ const getRandomColor = () => {
 };
 
 const FechasTrabajo = () => {
+  const [modalInactivarHorasOpen, setModalInactivarHorasOpen] = useState(false);
   const [horarios, setHorarios] = useState([]);
+  const [fechasConHorasInactivas, setFechasConHorasInactivas] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedEstado, setSelectedEstado] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedEstado, setSelectedEstado] = useState("");
   const [page, setPage] = useState(1);
-  const [cardsPerPage] = useState(15); // Número de tarjetas por página
-
-  const fetchHorarios = () => {
-    axios.get('http://localhost:5000/api/horarios')
-      .then(response => {
-        const horariosWithColors = response.data.map(horario => ({
-          ...horario,
-          color: getRandomColor()
-        }));
-        setHorarios(horariosWithColors);
-      })
-      .catch(error => {
-        console.error('Error al obtener los horarios:', error);
-      });
-  };
+  const [cardsPerPage] = useState(6);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchHorarios();
+    fetchFechasConHorasInactivas();
   }, []);
+
+  const fetchHorarios = () => {
+    axios
+      .get("http://localhost:5000/api/horarios")
+      .then((response) => {
+        const horariosWithColors = response.data.map((horario) => ({
+          ...horario,
+          color: getRandomColor(),
+        }));
+        setHorarios(horariosWithColors);
+      })
+      .catch((error) => {
+        console.error("Error al obtener los horarios:", error);
+      });
+  };
+
+  const fetchFechasConHorasInactivas = () => {
+    axios
+      .get("http://localhost:5000/api/horarios/listarFechasConHorasInactivas")
+      .then((response) => {
+        setFechasConHorasInactivas(response.data);
+      })
+      .catch((error) => {
+        console.error(
+          "Error al obtener las fechas con horas inactivas:",
+          error
+        );
+      });
+  };
+
+  const handleOpenInactivarHorasModal = () => {
+    setModalInactivarHorasOpen(true);
+  };
+
+  const handleCloseInactivarHorasModal = () => {
+    setModalInactivarHorasOpen(false);
+  };
 
   const handleOpenModal = () => {
     setModalOpen(true);
@@ -54,7 +100,13 @@ const FechasTrabajo = () => {
 
   const handleFechaInactivada = () => {
     fetchHorarios();
+    fetchFechasConHorasInactivas();
   };
+
+
+
+
+  
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -64,16 +116,69 @@ const FechasTrabajo = () => {
     setSelectedEstado(event.target.value);
   };
 
-  const filteredHorarios = horarios.filter(horario => {
-    const matchesSearchTerm = dayjs(horario.fecha).format('DD/MM/YYYY').includes(searchTerm);
-    const matchesEstado = selectedEstado ? horario.estado === selectedEstado : true;
+  const handleEliminarHorario = (id) => {
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Quieres eliminar este horario?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`http://localhost:5000/api/horarios/${id}`)
+          .then(() => {
+            setHorarios(horarios.filter((horario) => horario.id !== id));
+            Swal.fire("Eliminado!", "El horario ha sido eliminado.", "success");
+          })
+          .catch((error) => {
+            console.error("Error al eliminar el horario:", error);
+            Swal.fire(
+              "Error",
+              "Hubo un error al eliminar el horario. Por favor, inténtalo de nuevo más tarde.",
+              "error"
+            );
+          });
+      }
+    });
+  };
+
+  const handleViewHorasInactivas = (fecha) => {
+    axios
+      .get(`http://localhost:5000/api/horarios/listarHorasInactivas/${fecha}`)
+      .then((response) => {
+        const horasInactivas = response.data.horas_inactivas.join(", ");
+        Swal.fire({
+          title: `Horas inactivas para ${fecha}`,
+          text: horasInactivas,
+          icon: "info",
+          confirmButtonText: "Cerrar",
+        });
+      })
+      .catch((error) => {
+        console.error("Error al obtener horas inactivas:", error);
+      });
+  };
+
+  const filteredHorarios = horarios.filter((horario) => {
+    const matchesSearchTerm = dayjs(horario.fecha)
+      .format("DD/MM/YYYY")
+      .includes(searchTerm);
+    const matchesEstado = selectedEstado
+      ? horario.estado === selectedEstado
+      : true;
     return matchesSearchTerm && matchesEstado;
   });
 
-  // Paginación
   const indexOfLastCard = page * cardsPerPage;
   const indexOfFirstCard = indexOfLastCard - cardsPerPage;
-  const currentCards = filteredHorarios.slice(indexOfFirstCard, indexOfLastCard);
+  const currentCards = filteredHorarios.slice(
+    indexOfFirstCard,
+    indexOfLastCard
+  );
 
   const handleChangePage = (event, value) => {
     setPage(value);
@@ -104,7 +209,7 @@ const FechasTrabajo = () => {
               }}
               className="text-3xl"
             >
-              Fechas de Trabajo
+              Horarios de Trabajo
             </h4>
             <div className="relative w-80">
               <Input
@@ -117,33 +222,73 @@ const FechasTrabajo = () => {
             </div>
           </div>
 
-          <Box 
-            display="grid" 
-            gridTemplateColumns="repeat(4, 1fr)" 
+          <Box
+            display="grid"
+            gridTemplateColumns="repeat(3, 1fr)" // 3 tarjetas por fila
             gap={2}
             mb={2}
           >
-            {currentCards.map(horario => (
+            {currentCards.map((horario) => (
               <motion.div
                 key={horario.id}
-                whileHover={{ scale: 1.09 }}
-                transition={{ type:"spring", stiffness: 400, damping: 10 }}
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                whileTap={{ scale: 1.0 }}
               >
-                <Card sx={{ backgroundColor: '#E3F2FD', borderRadius: 2 }}>
+                <Card sx={{ backgroundColor: "#E3F2FD", borderRadius: 2 }}>
                   <CardActionArea>
                     <CardContent>
-                      <Box display="flex" alignItems="center">
-                        <Avatar sx={{ backgroundColor: horario.color }}>
-                          {dayjs(horario.fecha).format('DD')}
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <Avatar
+                          sx={{
+                            backgroundColor: horario.color,
+                            marginRight: 2,
+                          }}
+                        >
+                          {dayjs(horario.fecha).format("DD")}
                         </Avatar>
-                        <Box ml={2}>
+                        <Box textAlign="center" flexGrow={1}>
                           <Typography variant="h6" component="div">
-                            {dayjs(horario.fecha).format('DD/MM/YYYY')}
+                            {dayjs(horario.fecha).format("DD/MM/YYYY")}
                           </Typography>
                           <Typography variant="body2">
                             Estado: {horario.estado}
                           </Typography>
                         </Box>
+                        {fechasConHorasInactivas.some(
+                          (f) => f.fecha === horario.fecha
+                        ) && (
+                          <IconButton
+                            aria-label="view-hours"
+                            onClick={() =>
+                              handleViewHorasInactivas(horario.fecha)
+                            }
+                            sx={{ marginLeft: 2 }}
+                          >
+                            <VisibilityIcon style={{ fontSize: "2.0rem" }} />
+                          </IconButton>
+                        )}
+                        <IconButton
+                          aria-label="delete"
+                          onClick={() => handleEliminarHorario(horario.id)}
+                          sx={{
+                            backgroundColor: "#f6cdf3",
+                            "&:hover": {
+                              backgroundColor: "#ed9187",
+                            },
+                            borderRadius: "50%",
+                            padding: 1,
+                          }}
+                        >
+                          <DeleteIcon
+                            color="error"
+                            style={{ fontSize: "2.3rem" }}
+                          />
+                        </IconButton>
                       </Box>
                     </CardContent>
                   </CardActionArea>
@@ -157,27 +302,64 @@ const FechasTrabajo = () => {
               count={Math.ceil(filteredHorarios.length / cardsPerPage)}
               page={page}
               onChange={handleChangePage}
-              color="primary"
+              variant="outlined"
+              shape="rounded"
             />
           </Box>
 
-          <Tooltip title="Crear Fechas" placement="top" TransitionProps={{ timeout: 500 }}>
+          <Tooltip
+            title="Inactivar Días"
+            placement="top"
+            TransitionProps={{ timeout: 500 }}
+          >
             <Fab
-              aria-label="add"
+              aria-label="inactivate"
               style={{
                 border: "0.9px solid grey",
                 backgroundColor: "#94CEF2",
                 position: "fixed",
-                bottom: "50px",
+                bottom: "48px",
                 right: "50px",
                 zIndex: 1000,
               }}
               onClick={handleOpenModal}
             >
-              <UpdateDisabledIcon style={{ fontSize: "2.0rem"}}/>
+              <PendingActionsIcon style={{ fontSize: "2.3rem" }} />
             </Fab>
           </Tooltip>
-          <ModalInactivarFecha open={modalOpen} handleClose={handleCloseModal} onFechaInactivada={handleFechaInactivada} />
+          <ModalInactivarFecha
+            open={modalOpen}
+            handleClose={handleCloseModal}
+            onFechaInactivada={handleFechaInactivada}
+          />
+
+          <Tooltip
+            title="Inactivar Horas"
+            placement="top"
+            TransitionProps={{ timeout: 500 }}
+          >
+            <Fab
+              aria-label="inactivate"
+              style={{
+                border: "0.9px solid grey",
+                backgroundColor: "#94CEF2",
+                position: "fixed",
+                bottom: "120px",
+                right: "50px",
+                zIndex: 1000,
+              }}
+              onClick={handleOpenInactivarHorasModal} // Cambiado aquí
+            >
+              <UpdateDisabledIcon style={{ fontSize: "2.3rem" }} />
+            </Fab>
+          </Tooltip>
+
+          <InactivarHorasModal
+            open={modalInactivarHorasOpen}
+            onClose={handleCloseInactivarHorasModal}
+            onHorasInactivas={handleFechaInactivada}
+            
+          />
         </div>
       </div>
     </section>

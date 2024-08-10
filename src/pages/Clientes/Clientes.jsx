@@ -110,7 +110,7 @@ const Clientes = () => {
 
   const handleSubmit = async (formData) => {
     try {
-      // Continuar con el registro del cliente si el correo y el documento no están duplicados
+      // Mostrar confirmación antes de registrar al cliente
       const result = await Swal.fire({
         title: "¿Estás seguro?",
         text: "¿Quieres registrar este cliente?",
@@ -127,7 +127,7 @@ const Clientes = () => {
           Correo: formData.Correo,
           Telefono: formData.Telefono,
           Documento: formData.Documento,
-          Tip_Documento: formData.Tip_Documento,
+          tipoDocumento: formData.Tip_Documento,
           Contrasena: formData.Contrasena,
           Estado: 1,
           IdRol: 4,
@@ -135,30 +135,37 @@ const Clientes = () => {
 
         console.log("Datos del formulario numéricos:", formDataNumerico);
 
+        // Enviar los datos al backend
         const response = await axios.post(
-          "http://localhost:5000/Jackenail/RegistrarClientes",
+          "http://localhost:5000/Jackenail/RegistrarClientes", // Asegúrate de que la URL sea correcta
           formDataNumerico
         );
 
+        const NuevoCliente = response.data;
+        console.log("Nuevo empleado:", NuevoCliente);
+        setClientes((prevCliete) => [...prevCliete, NuevoCliente]);
+
         // Mostrar una alerta de éxito si el registro es exitoso
-        toast.success("El cliente se ha registrado correctamente..", {
+        toast.success("El cliente se ha registrado correctamente.", {
           position: "top-right",
           autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
 
         // Cerrar el modal después de enviar el formulario
         setModalData(null);
-
-        // Agregar el nuevo cliente a la lista de clientes
-        setClientes([...clientes, formDataNumerico]);
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        // Mostrar una alerta de error si ocurre algún problema durante el registro
-        Swal.fire({
-          icon: "error",
-          title: "Error de registro",
-          text: error.response.data.mensaje,
+        // Mostrar alertas usando react-toastify en lugar de Swal
+        const errores = error.response.data.errores || [
+          { mensaje: error.response.data.mensaje },
+        ];
+
+        errores.forEach((error) => {
+          toast.error(`Error: ${error.mensaje}`, {
+            position: "top-right",
+            autoClose: 5000, // Cierra automáticamente después de 5 segundos
+          });
         });
       } else {
         console.error("Error al registrar el cliente:", error);
@@ -235,6 +242,11 @@ const Clientes = () => {
 
   const handleActualizacionSubmit = async (formData) => {
     try {
+      // Verificar que formData tenga el IdCliente
+      if (!formData.IdCliente) {
+        throw new Error("El ID del cliente no está definido.");
+      }
+
       // Verificar si el correo electrónico o el documento están siendo utilizados por otro cliente
       const correoExistente = clientes.some(
         (cliente) =>
@@ -253,7 +265,7 @@ const Clientes = () => {
           "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico.",
           {
             position: "bottom-right",
-            autoClose: 3000, // Cierra automáticamente después de 3 segundos
+            autoClose: 3000,
           }
         );
       } else if (documentoExistente) {
@@ -261,24 +273,23 @@ const Clientes = () => {
           "El documento ingresado ya está registrado. Por favor, elija otro documento.",
           {
             position: "bottom-right",
-            autoClose: 3000, // Cierra automáticamente después de 3 segundos
+            autoClose: 3000,
           }
         );
       } else {
         const formDataNumerico = {
           ...formData,
-          Telefono: parseInt(formData.Telefono),
+          Telefono: parseInt(formData.Telefono, 10), // Asegúrate de que Telefono sea un número entero
           IdRol: 2,
         };
 
-        console.log(formDataNumerico);
-        console.log(formDataNumerico.IdCliente);
-
-        // Determinar la URL de la API para actualizar el cliente
+        // Verifica la URL y asegúrate de que IdCliente esté en la URL
         const url = `http://localhost:5000/Jackenail/Actualizar/${formDataNumerico.IdCliente}`;
+        console.log("URL de solicitud:", url); // Agrega un log para depuración
 
         // Realizar la solicitud de actualización a la API utilizando axios.put
-        await axios.put(url, formDataNumerico);
+        const response = await axios.put(url, formDataNumerico);
+        console.log("Respuesta de la API:", response.data); // Agrega un log para depuración
 
         // Actualizar el estado local de clientes
         const updatedClientes = clientes.map((cliente) =>
@@ -291,7 +302,7 @@ const Clientes = () => {
 
         toast.success("El cliente se ha actualizado correctamente.", {
           position: "top-right",
-          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+          autoClose: 3000,
         });
 
         // Acciones adicionales después de la actualización
@@ -303,7 +314,7 @@ const Clientes = () => {
         "Ocurrió un error al actualizar el cliente. Inténtelo nuevamente.",
         {
           position: "top-right",
-          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+          autoClose: 3000,
         }
       );
     }
@@ -432,16 +443,6 @@ const Clientes = () => {
 
           <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
             <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
-              <div className="flex items-center flex-1 space-x-4">
-                <h5>
-                  <span className="text-gray-500">All Products:</span>
-                  <span className="dark:text-white">123456</span>
-                </h5>
-                <h5>
-                  <span className="text-gray-500">Total sales:</span>
-                  <span className="dark:text-white">$88.4k</span>
-                </h5>
-              </div>
               <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
                 <button
                   type="button"

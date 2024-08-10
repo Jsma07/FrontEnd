@@ -76,21 +76,24 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
 
   const handleChange = (e) => {
     const { name, files, value, type } = e.target;
-    
-    if (type === 'text' && value.includes('  ')) {
-      const trimmedValue = value.replace(/ {2,}/g, ' ');
-      setFormValues((prevFormValues) => ({
-        ...prevFormValues,
-        [name]: trimmedValue,
-      }));
-      return; // Salir de la función después de corregir el valor
-    }
   
     if (type === 'file' && e.target.accept.includes('image/*')) {
       const file = files[0];
+      
+      // Validar que el archivo sea una imagen
+      if (!file.type.startsWith('image/')) {
+        setAlertOpen(true);
+        setAlertMessage("Solo se permiten archivos de imagen.");
+        setTimeout(() => {
+          setAlertOpen(false);
+          setAlertMessage('');
+        }, 3000);
+        return;
+      }
+  
       const reader = new FileReader();
       reader.onload = () => {
-        const maxSizeBytes = 1 * 1024 * 1024; // 1 MB
+        const maxSizeBytes = 5 * 1024 * 1024; // 1 MB
         if (file.size > maxSizeBytes) {
           setAlertOpen(true);
           setAlertMessage("El tamaño del archivo excede el límite permitido (1 MB).");

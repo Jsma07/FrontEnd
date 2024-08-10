@@ -1,76 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Pagination, Box } from "@mui/material";
 
-const TablePrueba = ({ title, columns, data, roles }) => {
+const TablePrueba = ({ title, columns, data, roles = [] }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [page, setPage] = useState(1);
-  const [rowsPerPage] = useState(5); // Número de filas por página
+  const [rowsPerPage] = useState(5);
 
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
+  const handleSearchChange = (event) => setSearchTerm(event.target.value);
 
-  const handleRoleFilterChange = (event) => {
-    setSelectedRole(event.target.value);
-  };
+  const handleRoleFilterChange = (event) => setSelectedRole(event.target.value);
 
-  // Filtrar datos basado en el término de búsqueda y rol seleccionado
-  const filteredData = data.filter((row) => {
-    if (row.rolId && selectedRole !== "" && row.rolId !== parseInt(selectedRole)) {
-      return false;
-    }
-    return Object.values(row).some((val) =>
-      String(val).toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
+  // Filtrar datos usando useMemo para optimizar el rendimiento
+  const filteredData = useMemo(() => {
+    return data.filter((row) => {
+      const matchesRole =
+        selectedRole === "" || row.rolId === parseInt(selectedRole);
+      const matchesSearch = Object.values(row).some((val) =>
+        String(val).toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      return matchesRole && matchesSearch;
+    });
+  }, [data, searchTerm, selectedRole]);
 
   // Paginación
-  const indexOfLastRow = page * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = filteredData.slice(indexOfFirstRow, indexOfLastRow);
+  const currentRows = useMemo(() => {
+    const indexOfLastRow = page * rowsPerPage;
+    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+    return filteredData.slice(indexOfFirstRow, indexOfLastRow);
+  }, [filteredData, page, rowsPerPage]);
 
-  const handleChangePage = (event, value) => {
-    setPage(value);
-  };
-
-  // Verificar si roles está definido
-  if (!roles) {
-    roles = [];
-  }
+  const handleChangePage = (event, value) => setPage(value);
 
   return (
     <section>
       <div
+        className="fixed bg-white rounded-lg shadow-md"
         style={{
-          paddingTop: "5px",
+          padding: "5px",
           margin: "0 auto",
-          borderRadius: "40px",
+          borderRadius: "30px",
           marginTop: "20px",
-          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.15)",
-          position: "fixed",
-          left: "90px",
-          top: "80px",
+          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.3)",
+          left: "82px",
+          top: "70px",
           width: "calc(100% - 100px)",
         }}
       >
-        <div className="bg-white rounded-lg shadow-md p-8 ">
+        <div className="bg-white rounded-lg  p-8">
           <div className="flex justify-between items-center mb-4">
-            <h4
-              style={{
-                textAlign: "left",
-                fontSize: "23px",
-                fontWeight: "bold",
-              }}
-              className="text-3xl"
-            >
-              {title}
-            </h4>
+            <h4 className="text-3xl font-bold text-left">{title}</h4>
 
             <div className="relative w-80">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg
-                  className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                  className="w-5 h-5 text-gray-500"
                   aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -91,6 +75,7 @@ const TablePrueba = ({ title, columns, data, roles }) => {
                 onChange={handleSearchChange}
                 className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Buscar"
+                aria-label="Buscar"
               />
             </div>
 
@@ -100,6 +85,7 @@ const TablePrueba = ({ title, columns, data, roles }) => {
                   value={selectedRole}
                   onChange={handleRoleFilterChange}
                   className="block w-full p-4 pl-3 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                  aria-label="Filtrar por rol"
                 >
                   <option value="">Filtrar por rol</option>
                   {roles.map((role) => (
@@ -128,10 +114,14 @@ const TablePrueba = ({ title, columns, data, roles }) => {
                   {currentRows.map((row, rowIndex) => (
                     <tr key={rowIndex} className="border-b hover:bg-gray-100">
                       {columns.map((column, colIndex) => (
-                        <td key={colIndex} className="px-6 py-3 text-center whitespace-nowrap">
+                        <td
+                          key={colIndex}
+                          className="px-6 py-3 text-center whitespace-nowrap"
+                        >
                           {column.field === "rolId"
-                            ? roles.find((role) => role.idRol === row[column.field])?.nombre ||
-                              "Desconocido"
+                            ? roles.find(
+                                (role) => role.idRol === row[column.field]
+                              )?.nombre || "Desconocido"
                             : column.renderCell
                             ? column.renderCell({ row })
                             : row[column.field]}

@@ -1,11 +1,17 @@
-import React from "react";
+import React, { useState, useContext } from 'react';
+import { Menu as MuiMenu, MenuItem as MuiMenuItem } from '@mui/material';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { UserContext } from '../../../context/ContextoUsuario';
+import { useNavigate } from 'react-router-dom'; 
+import ModalPerfil from '../perfil'; 
 
 function NavbarClient() {
   return (
-    <nav className="bg-white shadow-md py-4 font-sans">
+    <nav className="bg-white shadow-md py-4 font-sans fixed w-full top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
         <Logo />
-        <Menu />
+        <NavigationMenu />
         <div className="flex items-center">
           <Auth />
         </div>
@@ -17,15 +23,13 @@ function NavbarClient() {
 function Logo() {
   return (
     <div className="flex items-center ml-4 lg:ml-10">
-      {" "}
-      {/* Utilizamos ml-4 y ml-10 en pantallas grandes */}
       <img src="/jacke.png" alt="Logo" className="h-12 w-12 mr-2" />
-      <span className="text-lg font-bold text-black">Jake Nail</span>
+      <span className="text-lg font-bold text-black">Jake Nails</span>
     </div>
   );
 }
 
-function Menu() {
+function NavigationMenu() {
   return (
     <ul className="flex justify-end items-center space-x-10">
       <MenuItem href="/vistaInicio" text="Inicio" />
@@ -50,14 +54,78 @@ function MenuItem({ href, text }) {
 }
 
 function Auth() {
+  const { user, logout } = useContext(UserContext);
+  const [openProfileModal, setOpenProfileModal] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const navigate = useNavigate();
+
+  const handleMenuClick = (event) => {
+    if (user) {
+      setAnchorEl(event.currentTarget);
+    } else {
+      navigate('/iniciarSesion'); 
+    }
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    handleMenuClose();
+    navigate('/iniciarSesion'); 
+  };
+
+  const handleSettingsClose = () => {
+    setAnchorEl(null);
+    setOpenProfileModal(false);
+  };
+
+  const handleProfileClick = () => {
+    setOpenProfileModal(true);
+    setAnchorEl(null); 
+  };
+
+  const menuStyle = {
+    '&:hover': {
+      backgroundColor: '#8C09FF',
+      color: 'white',
+      borderRadius: '10px'
+    }
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-menu' : undefined;
+
   return (
-    <a
-      href="/iniciarSesion"
-      className="text-black hover:text-purple-900 transition duration-300 ease-in-out flex items-center ml-4 lg:ml-2"
-    >
-      <span className="uppercase">Iniciar sesión</span>
-      <i className="bx bxs-user-circle text-4xl text-black-700 ml-2"></i>
-    </a>
+    <div>
+      <span
+        onClick={handleMenuClick}
+        className="text-black hover:text-purple-900 transition duration-300 ease-in-out flex items-center ml-4 lg:ml-2 cursor-pointer"
+      >
+        <span className="uppercase"> {user ? `Bienvenid@, ${user.nombre || user.Nombre}` : 'Iniciar Sesión'} </span>
+        <i className="bx bxs-user-circle text-4xl text-black-700 ml-2"></i>
+      </span>
+      {user && (
+        <>
+          <MuiMenu
+            id={id}
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleMenuClose}
+          >
+            <MuiMenuItem sx={menuStyle} onClick={handleProfileClick}>
+              <AccountCircleIcon sx={{ marginRight: '10px' }} /> Perfil
+            </MuiMenuItem>
+            <MuiMenuItem sx={menuStyle} onClick={handleLogout}>
+              <ExitToAppIcon sx={{ marginRight: '5px' }} /> Cerrar Sesión
+            </MuiMenuItem>
+          </MuiMenu>
+          <ModalPerfil open={openProfileModal} handleClose={handleSettingsClose} />
+        </>
+      )}
+    </div>
   );
 }
 

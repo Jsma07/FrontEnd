@@ -13,22 +13,27 @@ import Swal from "sweetalert2";
 const Ventas = () => {
   const [ventas, setVentas] = useState([]);
   const [ventaIdToDelete, setVentaIdToDelete] = useState(null);
-
   useEffect(() => {
     const fetchVentas = async () => {
       try {
         const response = await axios.get(
           "http://localhost:5000/Jackenail/Listarventas"
         );
+
         const ventasConDetalles = response.data.map((venta) => ({
           id: venta.idVentas,
           idServicio: (
             <img
-            src={`http://localhost:5000${venta.servicio.ImgServicio}`}
-            alt={venta.servicio.Nombre_Servicio}
-            style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
+              src={`http://localhost:5000${venta.servicio.ImgServicio}`}
+              alt={venta.servicio.Nombre_Servicio}
+              style={{
+                maxWidth: "100%",
+                height: "auto",
+                width: "3rem",
+                height: "3rem",
+                borderRadius: "50%",
+              }}
             />
-          
           ),
           IdCliente: `${venta.cliente.Nombre} ${venta.cliente.Apellido}`,
           idEmpleado: `${venta.empleado?.Nombre || ""} ${
@@ -36,7 +41,6 @@ const Ventas = () => {
           }`,
           Fecha: venta.Fecha,
           Total: venta.Total,
-          Subtotal: venta.Subtotal,
           Estado: (
             <div className="flex space-x-2">
               {renderEstadoButton(venta.Estado, venta.idVentas)}
@@ -77,6 +81,10 @@ const Ventas = () => {
           ),
           estiloFila: venta.Estado === 3 ? "bg-gray-200" : "",
         }));
+
+        // Ordenar las ventas por fecha de forma descendente
+        ventasConDetalles.sort((a, b) => new Date(b.Fecha) - new Date(a.Fecha));
+
         setVentas(ventasConDetalles);
         toast.success("Ventas cargadas exitosamente");
       } catch (error) {
@@ -202,29 +210,36 @@ const Ventas = () => {
         { Estado: 3 }
       );
 
-      // Actualizar el estado local de la venta
-      setVentas((prevVentas) =>
-        prevVentas.map((venta) =>
-          venta.id === ventaId
-            ? { ...venta, Estado: renderEstadoButton(3), Acciones: null } // Remover Acciones si el estado es Anulado
-            : venta
-        )
-      );
-      console.log("Venta anulada con éxito:", response.data);
-      toast.success("Venta anulada con éxito");
+      if (response.data.success) {
+        setVentas((prevVentas) =>
+          prevVentas.map((venta) =>
+            venta.id === ventaId
+              ? { ...venta, Estado: renderEstadoButton(3), Acciones: null } // Remover Acciones si el estado es Anulado
+              : venta
+          )
+        );
+        toast.success("Venta anulada con éxito");
+      } else {
+        // Mostrar el mensaje de error recibido del backend
+        toast.error(
+          response.data.error || "Error desconocido al anular la venta"
+        );
+      }
     } catch (error) {
+      // Manejar errores de red u otros problemas
       console.error("Error al anular la venta:", error);
-      toast.error("Hubo un problema al anular la venta");
+      toast.error(
+        error.response?.data?.error || "Hubo un problema al anular la venta"
+      );
     }
   };
 
   const columns = [
-    { field: "idServicio", headerName: "Servicio" },
-    { field: "IdCliente", headerName: "Cliente" },
-    { field: "idEmpleado", headerName: "Empleado" },
     { field: "Fecha", headerName: "Fecha" },
+    { field: "idEmpleado", headerName: "Empleado" },
+    { field: "IdCliente", headerName: "Cliente" },
+    { field: "idServicio", headerName: "Servicio" },
     { field: "Total", headerName: "Total" },
-    { field: "Subtotal", headerName: "Subtotal" },
     { field: "Estado", headerName: "Estado" },
     { field: "Acciones", headerName: "Acciones" },
   ];
@@ -253,8 +268,6 @@ const Ventas = () => {
           <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
         </Fab>
       </Link>
-
-    
     </div>
   );
 };

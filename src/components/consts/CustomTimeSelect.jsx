@@ -5,6 +5,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Box, List, ListItem, ListItemButton, ListItemText, Paper, Typography, CircularProgress } from '@mui/material';
 import Swal from 'sweetalert2';
+import Tooltip from '@mui/material/Tooltip';
 
 export default function CustomTimeSelect({ selectedTime, setSelectedTime, selectedDate }) {
   const [occupiedTimes, setOccupiedTimes] = useState([]);
@@ -21,12 +22,11 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
             params: { fecha: selectedDate.format('YYYY-MM-DD') },
           });
           console.log("Response from backend:", response.data);
-
-          const formattedOccupiedTimes = response.data.map(time => dayjs(time, 'HH:mm:ss').format('HH:mm'));
-
+  
+          const formattedOccupiedTimes = response.data;
+  
           setOccupiedTimes(formattedOccupiedTimes);
           console.log("Occupied times set:", formattedOccupiedTimes);
-
           
         } catch (error) {
           console.error("Error fetching occupied times", error);
@@ -35,7 +35,7 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
         }
       }
     };
-
+  
     const checkInactiveDay = async () => {
       if (selectedDate) {
         try {
@@ -45,7 +45,7 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
             .map(horario => dayjs(horario.fecha));
           const isDayInactive = inactiveDays.some(inactiveDate => inactiveDate.isSame(selectedDate, 'day'));
           setIsInactive(isDayInactive);
-
+  
           if (isDayInactive) {
             Swal.fire({
               title: 'Día Inactivo',
@@ -59,17 +59,20 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
         }
       }
     };
-
+  
     fetchOccupiedTimes();
     checkInactiveDay();
   }, [selectedDate]);
 
   const generateTimeOptions = () => {
     const times = [];
-    for (let hour = 13; hour <= 17; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        times.push(dayjs().hour(hour).minute(minute).format('HH:mm'));
-      }
+    // Horario de trabajo 8 AM - 11 AM
+    for (let hour = 8; hour <= 11; hour++) {
+      times.push(dayjs().hour(hour).minute(0).format('HH:mm'));
+    }
+    // Horario de trabajo 1 PM - 4 PM
+    for (let hour = 13; hour <= 16; hour++) {
+      times.push(dayjs().hour(hour).minute(0).format('HH:mm'));
     }
     return times;
   };
@@ -81,7 +84,6 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
   };
 
   return (
-    
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Paper
         sx={{
@@ -108,35 +110,37 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
         ) : (
           <List>
             {generateTimeOptions().map((time, index) => (
-              <ListItem key={index} disablePadding>
-                <ListItemButton
-                  onClick={() => handleChange(time)}
-                  disabled={occupiedTimes.includes(time)}
-                  sx={{
-                    borderRadius: '18px',
-                    margin: '1px 0',
-                    backgroundColor: occupiedTimes.includes(time) ? 'transparent' : 'transparent',
-                    color: occupiedTimes.includes(time) ? '#000000' : '#3f51b5',
-                    cursor: occupiedTimes.includes(time) ? 'no-drop' : 'pointer',
-                  }}
-                >
-                  <Box
+              <Tooltip key={index} TransitionProps={{ timeout: 650 }} disableInteractive followCursor title={occupiedTimes.includes(time) ? "Hora ocupada" : ""} arrow>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={() => handleChange(time)}
+                    disabled={occupiedTimes.includes(time)}
                     sx={{
-                      width: '98%',
-                      padding: '7px 10px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: occupiedTimes.includes(time) ? '#ffcdd2' : (time === selectedTime ? '#bbdefb' : 'transparent'),
-                      border: time === selectedTime ? '1px solid #3f51b5' : '1px solid #ccc',
-                      borderRadius: '20px',
-                      boxShadow: occupiedTimes.includes(time) ? '0px 5px 12px rgba(255, 0, 0, 0.5)' : (time === selectedTime ? '0px 5px 12px rgba(0, 0, 0, 0.2)' : 'none'),
+                      borderRadius: '18px',
+                      margin: '1px 0',
+                      backgroundColor: occupiedTimes.includes(time) ? 'transparent' : 'transparent',
+                      color: occupiedTimes.includes(time) ? '#000000' : '#3f51b5',
+                      cursor: occupiedTimes.includes(time) ? 'no-drop' : 'pointer',
                     }}
                   >
-                    <ListItemText primary={time} sx={{ textAlign: 'center', color: occupiedTimes.includes(time) ? '#000000' : 'inherit' }} />
-                  </Box>
-                </ListItemButton>
-              </ListItem>
+                    <Box
+                      sx={{
+                        width: '98%',
+                        padding: '7px 10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: occupiedTimes.includes(time) ? '#ffcdd2' : (time === selectedTime ? '#bbdefb' : 'transparent'),
+                        border: time === selectedTime ? '1px solid #3f51b5' : '1px solid #ccc',
+                        borderRadius: '20px',
+                        boxShadow: occupiedTimes.includes(time) ? '0px 5px 12px rgba(255, 0, 0, 0.5)' : (time === selectedTime ? '0px 5px 12px rgba(0, 0, 0, 0.2)' : 'none'),
+                      }}
+                    >
+                      <ListItemText primary={time} sx={{ textAlign: 'center', color: occupiedTimes.includes(time) ? '#000000' : 'inherit' }} />
+                    </Box>
+                  </ListItemButton>
+                </ListItem>
+              </Tooltip>
             ))}
           </List>
         )}

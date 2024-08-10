@@ -13,6 +13,7 @@ import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import HourglassDisabledIcon from '@mui/icons-material/HourglassDisabled';
+import AutoDeleteIcon from '@mui/icons-material/AutoDelete';
 
 export const NavbarItems = [
   {
@@ -116,9 +117,14 @@ export const NavbarItems = [
       { 
         label: 'Horarios', 
         route: '/FechasTrabajadas', 
-        icon: <HourglassDisabledIcon />,
+        icon: <AutoDeleteIcon />,
         requiredPermissions: ['Servicios'],
-      },
+      // },{
+      //   label: 'Inactivar Horas',
+      //   route: '/InactivarHoras',
+      //   icon: <HourglassDisabledIcon/>,
+      //   requiredPermissions: ['Servicios'],
+      }
       
     ],
   },
