@@ -29,6 +29,7 @@ import DetalleCompra from "./pages/Compras/DetalleCompra";
 import { UserProvider } from "./context/ContextoUsuario";
 import CrearCita from "./pages/Agendamiento/CrearCita";
 import FechasTrabajo from './pages/Agendamiento/FechaTrabajo';
+import Panel from './pages/Panel/dashboard';
 // import InactivarHoras from "./pages/Agendamiento/InactivarHoras";
 import Contrasena from "./components/consts/recuperarContrasena";
 import PrivateRoute from "./context/verificarSesion";
@@ -46,7 +47,15 @@ root.render(
           <Route path="/Catalogo" element={<Contendioitems />} />
           <Route path="/vistaInicio" element={<VistaInicial />} />
 
-          <Route path="/" element={<App />}>
+
+        <Route path="/" element={<App />}>
+           <Route path="/panel/dashboard" 
+             element={
+              <PrivateRoute requiredPermissions={["Panel"]}>
+                <Panel />
+              </PrivateRoute>
+            }
+            />
             <Route
               path="/configuracion/roles"
               element={
@@ -55,6 +64,7 @@ root.render(
                 </PrivateRoute>
               }
             />
+            
             <Route
               path="/Usuarios/Administradores"
               element={

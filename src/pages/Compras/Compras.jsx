@@ -102,7 +102,7 @@ const Compras = () => {
   };
 
   const handleEstadoClick = async (IdCompra, estadoActual) => {
-    if (estadoActual === "Pendiente") {
+    if (estadoActual === "En espera") {
       const confirmacion = await Swal.fire({
         title: "¿Estás seguro de cambiar el estado a Terminada?",
         icon: "question",
@@ -137,7 +137,7 @@ const Compras = () => {
     console.log('Fecha actual:', fechaActual);
     console.log('Diferencia en días:', diffDays);
 
-    return diffDays <= 7;
+    return diffDays <= 3;
   };
 
   return (
@@ -156,17 +156,17 @@ const Compras = () => {
             renderCell: (params) => (
               <button
                 className={`px-3 py-1.5 text-white text-sm font-medium rounded-lg shadow-md focus:outline-none ${
-                  params.row.estado_compra === "Pendiente"
+                  params.row.estado_compra === "En espera"
                     ? "bg-blue-500"
                     : params.row.estado_compra === "Terminada"
                     ? "bg-green-500"
                     : "bg-red-500"
                 }`}
                 onClick={() =>
-                  params.row.estado_compra === "Pendiente" &&
+                  params.row.estado_compra === "En espera" &&
                   handleEstadoClick(params.row.IdCompra, params.row.estado_compra)
                 }
-                disabled={params.row.estado_compra !== "Pendiente"}
+                disabled={params.row.estado_compra !== "En espera"}
               >
                 {params.row.estado_compra}
               </button>

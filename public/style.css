@@ -1,3 +1,4 @@
+/* vista inicial */
 @import url("https://fonts.googleapis.com/css?family=Lato");
 *,
 *:before,
@@ -462,7 +463,6 @@ body {
 	line-height: 1.5;
   }
   
-  
   @media only screen and (max-width: 768px) {
 	#features .container {
 	  flex-direction: column;
@@ -570,3 +570,7 @@ footer .copy-right {
 	background-color: rgba(255, 255, 255, 0.4);
 	opacity: 1;
 }
+
+
+/* vista del Dashboard */
+

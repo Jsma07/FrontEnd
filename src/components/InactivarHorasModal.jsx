@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Modal, Button, TextField, IconButton, Checkbox, Typography, Box } from '@mui/material';
 import { ArrowLeft, ArrowRight, Close as CloseIcon } from '@mui/icons-material';
 import axios from 'axios';
@@ -18,7 +18,7 @@ const generateTimeOptions = () => {
     return times;
 };
 
-const InactivarHorasModal = ({ open, onClose, onHoursInactivated }) => { // Agrega onHoursInactivated como prop
+const InactivarHorasModal = ({ open, onClose, onHoursInactivated }) => {
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedHours, setSelectedHours] = useState([]);
     const [carouselIndex, setCarouselIndex] = useState(0);
@@ -35,15 +35,50 @@ const InactivarHorasModal = ({ open, onClose, onHoursInactivated }) => { // Agre
 
     const handleSubmit = async () => {
         try {
+            if (!selectedDate || selectedHours.length === 0) {
+                window.Swal.fire({
+                    icon: 'warning',
+                    title: 'Campos vacíos',
+                    text: 'Por favor, selecciona una fecha y al menos una hora.',
+                });
+                return;
+            }
+
+            const confirmation = await window.Swal.fire({
+                title: '¿Estás seguro?',
+                text: '¿Quieres inactivar las horas seleccionadas?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, inactivar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (!confirmation.isConfirmed) {
+                return; 
+            }
+
             const response = await axios.post('http://localhost:5000/api/horarios/inactivarHoras', {
                 fecha: selectedDate,
                 horas: selectedHours
             });
-            alert('Horas inactivas registradas con éxito');
-            onHoursInactivated(response.data); // Llama a la función de callback con los datos recibidos
+
+            if (typeof onHoursInactivated === 'function') {
+                onHoursInactivated(); 
+            } else {
+                console.warn('onHoursInactivated no es una función');
+            }
+            window.Swal.fire('¡Horas inactivadas!', 'Las horas han sido registradas como inactivas con éxito.', 'success');
             onClose();
+
         } catch (error) {
             console.error('Error al inactivar horas', error);
+            window.Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un error al inactivar las horas. Por favor, inténtalo de nuevo más tarde.',
+            });
         }
     };
 
@@ -88,7 +123,7 @@ const InactivarHorasModal = ({ open, onClose, onHoursInactivated }) => { // Agre
                     }}
                 >
                     <Typography variant="h6" id="modal-title">
-                        Inactivar Horas
+                        Inactivar Horas De Trabajo
                     </Typography>
                     <IconButton onClick={onClose} color="inherit">
                         <CloseIcon />
@@ -149,10 +184,15 @@ const InactivarHorasModal = ({ open, onClose, onHoursInactivated }) => { // Agre
                         <ArrowRight />
                     </IconButton>
                 </Box>
+                <Box mt={2} display="flex" justifyContent="space-between">
+                    <Button ariant="contained" color="primary" onClick={handleSubmit} sx={{ marginRight: 2 }} >
+                        Inactivar
+                    </Button>
+                    <Button variant="outlined" color="secondary" onClick={onClose}>
+                        Cancelar
+                    </Button>
+                </Box>
 
-                <Button variant="contained" color="primary" onClick={handleSubmit}>
-                    Inactivar
-                </Button>
             </Box>
         </Modal>
     );
