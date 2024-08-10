@@ -69,7 +69,6 @@ const SalidaInsumos = () => {
       selectedCategory ? insumo.nombre_categoria === selectedCategory : true
     );
 
-  // Obtener categorías únicas para el select
   const categorias = [
     ...new Set(insumos.map((insumo) => insumo.nombre_categoria)),
   ];
