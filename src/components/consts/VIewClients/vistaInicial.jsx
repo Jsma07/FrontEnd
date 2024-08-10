@@ -1,55 +1,80 @@
-import React, { useEffect } from 'react';
-import NavbarClient from "./Navbarclient";
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
+import NavbarClient from './Navbarclient';
+
 
 
 const VistaInicial = () => {
-  useEffect(() => {
-    console.log('VistaInicial se ha montado');
-  }, []);
+              // Hook para manejar la visibilidad de los elementos en la vista
+  const [headerRef, headerInView] = useInView({ triggerOnce: true, threshold: 0.2 });
+  const [summerCollectionRef, summerCollectionInView] = useInView({ triggerOnce: false, threshold: 0.2 });
+  const [product1Ref, product1InView] = useInView({ triggerOnce: false, threshold: 0.2 });
+  const [product2Ref, product2InView] = useInView({ triggerOnce: false, threshold: 0.2 });
+  const [product3Ref, product3InView] = useInView({ triggerOnce: false, threshold: 0.2 });
+  const [product4Ref, product4InView] = useInView({ triggerOnce: false, threshold: 0.2 });
+  
+
   return (
     <div>
       <NavbarClient />
 
-      <header>
-        <div id="header-hero">
+      <header id="header-hero">
+     <motion.div 
+  ref={headerRef}
+  initial={{ opacity: 0, y: -50, scale: 0.9 }}
+  animate={headerInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+  transition={{ duration: 0.8, type: 'spring', stiffness: 300 }}
+>
           <div className="header-bg">
             <img 
               src="https://muchosnegociosrentables.com/wp-content/uploads/2017/10/manicura-haciendo-arreglo-de-manos-2.jpg" 
               alt="header-image" 
             />
-          </div>
+                </div> 
           <div className="header-content">
             <h2><span className="bienvenidos-style">BIENVENIDOS A UN MUNDO LLENO DE ESTILO.</span></h2>
-            <br></br>
+            <br />
             <p className="description">
               Servicios de manicure con estilos únicos y modernos, diseñados para resaltar tu belleza y personalidad.
             </p>
+            <br></br>
             <button className="button" type="button">
               <p><i className="bx bxs-right-arrow-circle"></i> Ver servicios</p>
             </button>
           </div>
-        </div>
+        </motion.div>
       </header>
 
       <section id="summer-collection">
-        <div className="container">
-          <div className="sc-content">
-            <h1>Elegancia en Cada Uña</h1>
-            <p className="description">
+  <motion.div
+    ref={summerCollectionRef} // Referencia para detectar el scroll
+    className="container"
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={summerCollectionInView ? { opacity: 1, scale: 1 } : {}} // Anima solo cuando es visible
+    transition={{ duration: 0.8 }}
+  >
+    <div className="sc-content">
+      <h1>Elegancia en Cada Uña</h1>
+      <p className="description">
               Ofrecemos una amplia gama de tratamientos, desde manicuras clásicas hasta las últimas tendencias en nail art, utilizando productos de alta calidad para garantizar que tus uñas luzcan impecables y saludables.
               En Jake Nails encontrarás servicios personalizados que se adaptan a tus gustos y necesidades, proporcionando una experiencia de manicure que embellece tus manos y te permite relajarte.
-            </p>
-          </div>
-          <div className="sc-media">
-            <div className="sc-media-bg">
-              <img 
-                src="https://cuponassets.cuponatic-latam.com/backendPe/uploads/imagenes_descuentos/106889/4cb1e2bb9c7a6c4aac8a04eb61bcd5398cc5a2c4.XL2.jpg" 
-                alt="sc-image" 
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+        </p>
+    </div>
+    <motion.div 
+      className="sc-media" 
+      whileHover={{ scale: 1.05 }} // Escala la imagen al pasar el cursor
+      transition={{ type: "spring", stiffness: 400, damping: 10 }}
+    >
+      <div className="sc-media-bg">
+        <img 
+          src="https://cuponassets.cuponatic-latam.com/backendPe/uploads/imagenes_descuentos/106889/4cb1e2bb9c7a6c4aac8a04eb61bcd5398cc5a2c4.XL2.jpg" 
+          alt="sc-image" 
+        />
+      </div>
+    </motion.div>
+  </motion.div>
+</section>
 
       <section id="features">
         <div className="container">
@@ -78,48 +103,68 @@ const VistaInicial = () => {
       <section id="products">
         <div className="container">
           <div className="products-header">
-            <h2>Tecnicas de uñas mas populares </h2>
+            <h2>Tecnicas de uñas mas populares</h2>
             <p>Estas son las tecnicas mas populares de nuestro negocio.</p>
           </div>
           <div className="product product-1">
-            <figure>
+            <motion.figure
+              ref={product1Ref} // Referencia para detectar el scroll
+              initial={{ opacity: 0, y: 20 }}
+              animate={product1InView ? { opacity: 1, y: 0 } : {}} // Anima solo cuando es visible
+              transition={{ duration: 0.6 }}
+            >
               <img 
                 src="https://i.pinimg.com/736x/aa/6b/6c/aa6b6c50b738427eef8b1328149175c1.jpg" 
                 alt="product-image" 
               />
               <figcaption>Uñas Acrilicas</figcaption>
               <figcaption>$ 56.000</figcaption>
-            </figure>
+            </motion.figure>
           </div>
           <div className="product product-2">
-            <figure>
+            <motion.figure
+              ref={product2Ref} // Referencia para detectar el scroll
+              initial={{ opacity: 0, y: 20 }}
+              animate={product2InView ? { opacity: 1, y: 0 } : {}} // Anima solo cuando es visible
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               <img 
                 src="https://www.tiendasemilac.com/modules/ph_simpleblog/covers/16.jpg" 
                 alt="product-image" 
               />
               <figcaption>Uñas Semipermanentes</figcaption>
               <figcaption>$ 84.000</figcaption>
-            </figure>
+            </motion.figure>
           </div>
           <div className="product product-3">
-            <figure>
+            <motion.figure
+              ref={product3Ref} // Referencia para detectar el scroll
+              initial={{ opacity: 0, y: 20 }}
+              animate={product3InView ? { opacity: 1, y: 0 } : {}} // Anima solo cuando es visible
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
               <img 
                 src="https://www.diariodepuertomontt.cl/files/64377718de625.png" 
                 alt="product-image" 
               />
               <figcaption>Uñas Press On</figcaption>
               <figcaption>$ 48.000</figcaption>
-            </figure>
+            </motion.figure>
           </div>
           <div className="product product-4">
-            <figure>
+            <motion.figure
+              ref={product4Ref} // Referencia para detectar el scroll
+              initial={{ opacity: 0, y: 20 }}
+              animate={product4InView ? { opacity: 1, y: 0 } : {}} // Anima solo cuando es visible
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
               <img 
                 src="https://i.pinimg.com/564x/a6/3a/9f/a63a9f083db8a508683b1ee2700cafec.jpg" 
                 alt="product-image" 
               />
               <figcaption>Uñas Poly Gel</figcaption>
               <figcaption>$ 89.000</figcaption>
-            </figure>
+            </motion.figure>
           </div>
         </div>
       </section>
