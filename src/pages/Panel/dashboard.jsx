@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import DashboardCard from './dashboardCard'; // Importar el componente
-import DoughnutChart from './dashboardCirculo'; // Importar el componente
+import DashboardCard from './dashboardCard'; 
+import DoughnutChart from './dashboardCirculo'; 
+import VentasPorMes from '../../components/consts/ventaspormes';
+import ComparacionSemanal from '../../components/consts/comparacionSemanal';
+
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale } from 'chart.js';
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale);
@@ -11,6 +14,7 @@ const Dashboard = () => {
     const [totalVentas, setTotalVentas] = useState(0);
     const [totalCompras, setTotalCompras] = useState(0);
     const [totalServicios, setTotalServicios] = useState(0);
+    const [totalEmpleados, setTotalEmpleados] = useState(0);
     const [serviciosMasAgendados, setServiciosMasAgendados] = useState([]);
 
     useEffect(() => {
@@ -19,6 +23,7 @@ const Dashboard = () => {
         fetchTotalClientes();
         fetchTotalCompras();
         fetchTotalVentas();
+        fetchTotalEmpleados();
     }, []);
 
     const fetchTotalClientes = async () => {
@@ -54,6 +59,15 @@ const Dashboard = () => {
             setTotalServicios(response.data.totalServicios); 
         } catch (error) {
             console.error("Error fetching servicios:", error);
+        }
+    };
+
+    const fetchTotalEmpleados = async () => {
+        try {
+            const response = await axios.get("http://localhost:5000/api/totalempleados");
+            setTotalEmpleados(response.data.totalEmpleados);
+        } catch (error) {
+            console.error("Error fetching empleados:", error);
         }
     };
 
@@ -138,10 +152,10 @@ const Dashboard = () => {
                     onClick={() => handleClick('/ventas')} 
                 />
                  <DashboardCard 
-                    title="GENERICA" 
-                    count={totalVentas} 
+                    title="Empleados" 
+                    count={totalEmpleados} 
                     iconClass="bx bx-money" 
-                    onClick={() => handleClick('/ventas')} 
+                    onClick={() => handleClick('/empleados')} 
                 />
                 <DashboardCard 
                     title="Compras" 
@@ -172,10 +186,10 @@ const Dashboard = () => {
                  transition: 'transform 0.3s ease-in-out',
             }}
             onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} // Escalar al pasar el ratón
-onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
-<h3 style={{ margin: '3px 0', fontSize: '1.5rem', color: '#444', fontFamily: 'Arial, sans-serif' }}>Servicios más vendidos</h3>
-<div style={{ 
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        >
+            <h3 style={{ margin: '3px 0', fontSize: '1.5rem', color: '#444', fontFamily: 'Arial, sans-serif' }}>Servicios más vendidos</h3>
+            <div style={{ 
                     width: '100%', 
                     height: 'calc(100% - 40px)', // Ajusta la altura para evitar desbordamientos
                     position: 'relative'
@@ -183,6 +197,8 @@ onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                     <DoughnutChart data={chartData} options={chartOptions} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
                 </div>
             </div>
+            <ComparacionSemanal />
+            <VentasPorMes />
         </div>
     );
     
