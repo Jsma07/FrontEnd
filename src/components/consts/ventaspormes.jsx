@@ -78,7 +78,6 @@ const VentasPorMes = () => {
 
     return (
         <div>
-            <h2>Total de Ventas por Mes</h2>
             <Bar data={data} options={config.options} />
         </div>
     );

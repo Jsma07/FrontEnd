@@ -137,7 +137,7 @@ const Dashboard = () => {
                 flexWrap: 'wrap', 
                 gap: '20px', 
                 width: '100%', // Asegura que el contenedor tome todo el ancho disponible
-                marginBottom: '20px' // Añade espacio entre las tarjetas y la gráfica
+                marginBottom: '20px' // Añade espacio entre las tarjetas y las gráficas
             }}>
                 <DashboardCard 
                     title="Clientes" 
@@ -151,7 +151,7 @@ const Dashboard = () => {
                     iconClass="bx bx-money" 
                     onClick={() => handleClick('/ventas')} 
                 />
-                 <DashboardCard 
+                <DashboardCard 
                     title="Empleados" 
                     count={totalEmpleados} 
                     iconClass="bx bx-money" 
@@ -171,36 +171,93 @@ const Dashboard = () => {
                 />
             </div>
     
-            {/* Contenedor para la gráfica */}
-            <div style={{ 
-                 width: '300px', 
-                 height: '370px', 
-                 border: '1px solid rgba(0, 0, 0, 0.2)',
-                 display: 'flex',
-                 flexDirection: 'column',
-                 alignItems: 'center',
-                 borderRadius: '10px',
-                 backgroundColor: '#ffffff', // Fondo blanco para un contraste claro
-                 boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)', // Sombra sutil
-                 padding: '10px',
-                 transition: 'transform 0.3s ease-in-out',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} // Escalar al pasar el ratón
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                        >
-            <h3 style={{ margin: '3px 0', fontSize: '1.5rem', color: '#444', fontFamily: 'Arial, sans-serif' }}>Servicios más vendidos</h3>
-            <div style={{ 
-                    width: '100%', 
-                    height: 'calc(100% - 40px)', // Ajusta la altura para evitar desbordamientos
-                    position: 'relative'
-                }}>
-                    <DoughnutChart data={chartData} options={chartOptions} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+            {/* Contenedor para las gráficas */}
+            <div style={{
+                display: 'flex', // Alinea las gráficas en una fila
+                flexWrap: 'wrap', // Permite que las gráficas se envuelvan si el espacio es limitado
+                gap: '10px', // Añade espacio entre las gráficas
+                width: '100%' // Asegura que el contenedor tome todo el ancho disponible
+            }}>
+                <div style={{ 
+                    width: '300px', 
+                    height: '370px', 
+                    border: '1px solid rgba(0, 0, 0, 0.2)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    borderRadius: '10px',
+                    backgroundColor: '#ffffff', // Fondo blanco para un contraste claro
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)', // Sombra sutil
+                    padding: '10px',
+                    transition: 'transform 0.3s ease-in-out',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} // Escalar al pasar el ratón
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                    <h3 style={{ margin: '3px 0', fontSize: '1.5rem', color: '#444', fontFamily: 'Arial, sans-serif' }}>Servicios más vendidos</h3>
+                    <div style={{ 
+                        width: '100%', 
+                        height: 'calc(100% - 40px)', // Ajusta la altura para evitar desbordamientos
+                        position: 'relative'
+                    }}>
+                        <DoughnutChart data={chartData} options={chartOptions} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+                    </div>
+                </div>
+                <div style={{ 
+                    width: '410px', 
+                    height: '370px', 
+                    border: '1px solid rgba(0, 0, 0, 0.2)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    borderRadius: '10px',
+                    backgroundColor: '#ffffff', // Fondo blanco para un contraste claro
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)', // Sombra sutil
+                    padding: '10px',
+                    transition: 'transform 0.3s ease-in-out',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} // Escalar al pasar el ratón
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                     <h3 style={{ margin: '3px 0', fontSize: '1.5rem', color: '#444', fontFamily: 'Arial, sans-serif' }}>Ventas por Mes</h3>
+                    <div style={{ 
+                        width: '100%', 
+                        height: 'calc(100% - 40px)', // Ajusta la altura para evitar desbordamientos
+                        position: 'relative'
+                    }}>
+                        <VentasPorMes style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+                    </div>
+                   
+                </div>
+                <div style={{ 
+                    width: '350px', 
+                    height: '370px', 
+                    border: '1px solid rgba(0, 0, 0, 0.2)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    borderRadius: '10px',
+                    backgroundColor: '#ffffff', // Fondo blanco para un contraste claro
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)', // Sombra sutil
+                    padding: '10px',
+                    transition: 'transform 0.3s ease-in-out',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} // Escalar al pasar el ratón
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                    <h3 style={{ margin: '3px 0', fontSize: '1.5rem', color: '#444', fontFamily: 'Arial, sans-serif' }}>Comparación Semanal</h3>
+                    <div style={{ 
+                        width: '100%', 
+                        height: 'calc(100% - 40px)', // Ajusta la altura para evitar desbordamientos
+                        position: 'relative'
+                    }}>
+                        <ComparacionSemanal style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+                    </div>
                 </div>
             </div>
-            <ComparacionSemanal />
-            <VentasPorMes />
         </div>
     );
+    
     
 };
 

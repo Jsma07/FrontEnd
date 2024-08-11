@@ -93,7 +93,6 @@ const ComparacionSemanal = () => {
 
     return (
         <div>
-            <h2>Compras VS Ventas</h2>
             <Bar data={data} options={config.options} />
         </div>
     );
