@@ -50,92 +50,177 @@ const Dashboard = () => {
             console.error("Error fetching servicios:", error);
         }
     };
+    const handleClick = (url) => {
+        window.location.href = url;
+    };
 
     return (
         <div style={{ 
             display: 'flex', 
-            justifyContent: 'space-between', 
+            justifyContent: 'center', 
             flexWrap: 'wrap', 
-            padding: '20px', 
             position: 'relative', 
-            gap: '10px', 
-            top: '-290px',
+            gap: '20px', 
+            marginTop: '-290px',
         }}>
             <div style={{ 
-                backgroundColor: '#FF8C9E', 
-                color: '#fff', 
-                padding: '30px', 
-                borderRadius: '8px', 
-                width: '24%', 
+                backgroundColor: '#fff7e5', 
+                color: 'black', 
+                padding: '20px', 
+                borderRadius: '12px', 
+                width: '23%', 
                 textAlign: 'center', 
                 boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
                 transform: 'translateY(-10px)', 
                 display: 'flex', 
                 alignItems: 'center', 
-                justifyContent: 'center'
-            }}>
-                {/* <i className='bx bx-user' style={{ fontSize: '2rem', marginRight: '10px' }}></i> */}
-                <div>
-                    <p style={{ fontSize: '1.5rem', margin: '0' }}>Clientes</p>
-                    <h2 style={{ fontSize: '2rem', margin: '0' }}>{totalClientes}</h2>
-                </div>
+                justifyContent: 'center',
+                border: '1px solid rgba(0, 0, 0, 0.2)',
+                    cursor: 'pointer',
+                  
+            }}
+            onClick={() => handleClick('/Clientes')} // Redirige a la ruta '/ruta-clientes'
+          
+
+            >
+ <div style={{ 
+            backgroundColor: '#EFD4F5', // Fondo blanco para el cuadrado del ícono
+            width: '45px', 
+            height: '45px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            borderRadius: '100%', // Borde redondeado opcional
+            position: 'absolute', 
+            border: '1px solid rgba(0, 0, 0, 0.2)',
+            left: '10px' 
+        }}>
+            <i className='bx bx-user' style={{ fontSize: '1.5rem', color: 'black' }}></i>
+        </div>        <div style={{ marginLeft: '45px' }}>
+            <p style={{ fontSize: '1.5rem', margin: '0' }}>Clientes</p>
+            <h2 style={{ fontSize: '1.5rem', margin: '0' }}>{totalClientes}</h2>
+        </div>
             </div>
             <div style={{ 
-                backgroundColor: '#B692C2', 
-                color: '#fff', 
-                padding: '30px', 
-                borderRadius: '8px', 
-                width: '24%', 
+                backgroundColor: '#fff7e5', 
+                color: 'black', 
+                padding: '20px', 
+                borderRadius: '12px', 
+                width: '23%', 
                 textAlign: 'center', 
                 boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
                 transform: 'translateY(-10px)', 
                 display: 'flex', 
                 alignItems: 'center', 
-                justifyContent: 'center'
-            }}>
-                {/* <i className='bx bx-money' style={{ fontSize: '2rem', marginRight: '10px' }}></i> */}
-                <div>
-                    <p style={{ fontSize: '1.5rem', margin: '0' }}>Ventas</p>
-                    <h2 style={{ fontSize: '2rem', margin: '0' }}>{totalVentas}</h2>
-                </div>
+                justifyContent: 'center',
+                border: '1px solid rgba(0, 0, 0, 0.2)',
+                cursor: 'pointer',
+               
+
+            }}
+            onClick={() => handleClick('/ventas')} // Redirige a la ruta '/ruta-clientes'
+           
+            >
+               <div style={{ 
+            backgroundColor: '#EFD4F5', // Fondo blanco para el cuadrado del ícono
+            width: '45px', 
+            height: '45px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            borderRadius: '100%', // Borde redondeado opcional
+            position: 'absolute', 
+            border: '1px solid rgba(0, 0, 0, 0.2)',
+            left: '10px' 
+        }}>
+            <i className='bx bx-money' style={{ fontSize: '1.5rem', color: 'black' }}></i>
+        </div>        <div style={{ marginLeft: '45px' }}>
+            <p style={{ fontSize: '1.5rem', margin: '0' }}>Ventas</p>
+            <h2 style={{ fontSize: '1.5rem', margin: '0' }}>{totalVentas}</h2>
+        </div>
             </div>
             <div style={{ 
-                backgroundColor: '#96CEB4', 
-                color: '#fff', 
-                padding: '30px', 
-                borderRadius: '8px', 
-                width: '24%', 
+                backgroundColor: '#fff7e5', 
+                color: 'black', 
+                padding: '20px', 
+                borderRadius: '12px', 
+                width: '23%', 
                 textAlign: 'center', 
                 boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
                 transform: 'translateY(-10px)', 
                 display: 'flex', 
                 alignItems: 'center', 
-                justifyContent: 'center'
-            }}>
-                {/* <i className='bx bx-box' style={{ fontSize: '2rem', marginRight: '10px' }}></i> */}
-                <div>
-                    <p style={{ fontSize: '1.5rem', margin: '0' }}>Compras</p>
-                    <h2 style={{ fontSize: '2rem', margin: '0' }}>{totalCompras}</h2>
-                </div>
+                justifyContent: 'center',
+                border: '1px solid rgba(0, 0, 0, 0.2)',
+                transition: 'transform 0.3s ease',
+                cursor: 'pointer',
+                transform: 'scale(1)',
+                transformOrigin: 'center',
+                overflow: 'hidden',
+
+            }}
+            onClick={() => handleClick('/compras')} // Redirige a la ruta '/ruta-clientes'
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'} // Aumenta el tamaño al pasar el ratón
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'} // Vuelve al tamaño original al salir el ratón
+>
+               <div style={{ 
+            backgroundColor: '#EFD4F5', // Fondo blanco para el cuadrado del ícono
+            width: '45px', 
+            height: '45px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            borderRadius: '100%', // Borde redondeado opcional
+            position: 'absolute', 
+            border: '1px solid rgba(0, 0, 0, 0.2)',
+            left: '10px' 
+        }}>
+            <i className='bx bx-cart-alt' style={{ fontSize: '1.5rem', color: 'black' }}></i>
+        </div>        <div style={{ marginLeft: '45px' }}>
+            <p style={{ fontSize: '1.5rem', margin: '0' }}>Compras</p>
+            <h2 style={{ fontSize: '1.5rem', margin: '0' }}>{totalCompras}</h2>
+        </div>
             </div>
             <div style={{ 
-                backgroundColor: '#6EACDA', 
-                color: '#fff', 
-                padding: '30px', 
-                borderRadius: '8px', 
-                width: '24%', 
+                backgroundColor: '#fff7e5', 
+                color: 'black', 
+                padding: '20px', 
+                borderRadius: '12px', 
+                width: '23%', 
                 textAlign: 'center', 
                 boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
                 transform: 'translateY(-10px)', 
                 display: 'flex', 
                 alignItems: 'center', 
-                justifyContent: 'center'
-            }}>
-                {/* <i className='bx bx-calendar' style={{ fontSize: '2rem', marginRight: '10px' }}></i> */}
-                <div>
-                    <p style={{ fontSize: '1.5rem', margin: '0' }}>Servicios</p>
-                    <h2 style={{ fontSize: '2rem', margin: '0' }}>{totalServicios}</h2>
-                </div>
+                justifyContent: 'center',
+                border: '1px solid rgba(0, 0, 0, 0.2)',
+                transition: 'transform 0.3s ease',
+                cursor: 'pointer',
+                transform: 'scale(1)',
+                transformOrigin: 'center',
+
+            }}
+            onClick={() => handleClick('/agendamiento/Servicios')} // Redirige a la ruta '/ruta-clientes'
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'} // Aumenta el tamaño al pasar el ratón
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'} // Vuelve al tamaño original al salir el ratón
+>
+                <div style={{ 
+            backgroundColor: '#EFD4F5', // Fondo blanco para el cuadrado del ícono
+            width: '45px', 
+            height: '45px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            borderRadius: '100%', // Borde redondeado opcional
+            position: 'absolute', 
+            border: '1px solid rgba(0, 0, 0, 0.2)',
+            left: '10px' 
+        }}>
+            <i className='bx bx-spray-can' style={{ fontSize: '1.5rem', color: 'black' }}></i>
+        </div>        <div style={{ marginLeft: '45px' }}>
+            <p style={{ fontSize: '1.5rem', margin: '0' }}>Servicios</p>
+            <h2 style={{ fontSize: '1.5rem', margin: '0' }}>{totalServicios}</h2>
+        </div>
             </div>
         </div>
     );
