@@ -123,20 +123,21 @@ const calcularTotal = (totalValorInsumos, descuento) => {
   return totalValorInsumos - descuento;
 };
 
-const calcularSubtotalCompra = (totalCompra, iva) => {
-  return totalCompra - iva;
-};
-
 const actualizarTotales = (detalles, descuento) => {
   const totalValorInsumos = calcularSubtotal(detalles);
   const iva = calcularIva(totalValorInsumos);
   const totalCompra = calcularTotal(totalValorInsumos, descuento);
-  const subtotalCompra = calcularSubtotalCompra(totalCompra, iva);
+  const subtotalCompra = totalValorInsumos - iva; 
+  console.log("Total Valor Insumos:", totalValorInsumos);
+  console.log("IVA:", iva);
+  console.log("Subtotal Compra:", subtotalCompra);
+  console.log("Total Compra:", totalCompra);
 
   setSubtotalCompra(subtotalCompra);
   setIvaCompra(iva);
   setTotalCompra(totalCompra);
 };
+
 
 const handleAgregarDetalleCompra = () => {
     const nuevosDetallesCompra = insumosSeleccionados.map((insumo) => ({
