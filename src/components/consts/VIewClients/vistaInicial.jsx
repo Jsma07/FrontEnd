@@ -3,11 +3,8 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import NavbarClient from './Navbarclient';
 
-
-
 const VistaInicial = () => {
-              // Hook para manejar la visibilidad de los elementos en la vista
-  const [headerRef, headerInView] = useInView({ triggerOnce: true, threshold: 0.2 });
+  const [headerRef, headerInView] = useInView({ triggerOnce: false, threshold: 0.2 });
   const [summerCollectionRef, summerCollectionInView] = useInView({ triggerOnce: false, threshold: 0.2 });
   const [product1Ref, product1InView] = useInView({ triggerOnce: false, threshold: 0.2 });
   const [product2Ref, product2InView] = useInView({ triggerOnce: false, threshold: 0.2 });

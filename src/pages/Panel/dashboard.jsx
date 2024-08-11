@@ -1,18 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import DashboardCard from './dashboardCard'; 
+import DoughnutChart from './dashboardCirculo'; 
+import VentasPorMes from '../../components/consts/ventaspormes';
+import ComparacionSemanal from '../../components/consts/comparacionSemanal';
+
+import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale } from 'chart.js';
+
+ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale);
 
 const Dashboard = () => {
     const [totalClientes, setTotalClientes] = useState(0);
     const [totalVentas, setTotalVentas] = useState(0);
     const [totalCompras, setTotalCompras] = useState(0);
     const [totalServicios, setTotalServicios] = useState(0);
-
+    const [totalEmpleados, setTotalEmpleados] = useState(0);
+    const [serviciosMasAgendados, setServiciosMasAgendados] = useState([]);
 
     useEffect(() => {
+        fetchServiciosMasAgendados();
         fetchTotalServicios();
         fetchTotalClientes();
         fetchTotalCompras();
         fetchTotalVentas();
+        fetchTotalEmpleados();
     }, []);
 
     const fetchTotalClientes = async () => {
@@ -51,94 +62,203 @@ const Dashboard = () => {
         }
     };
 
+    const fetchTotalEmpleados = async () => {
+        try {
+            const response = await axios.get("http://localhost:5000/api/totalempleados");
+            setTotalEmpleados(response.data.totalEmpleados);
+        } catch (error) {
+            console.error("Error fetching empleados:", error);
+        }
+    };
+
+    const fetchServiciosMasAgendados = async () => {
+        try {
+            const response = await axios.get("http://localhost:5000/api/masagendados");
+            setServiciosMasAgendados(response.data);
+        } catch (error) {
+            console.error("Error fetching servicios más agendados:", error);
+        }
+    };
+
+    const chartData = {
+        labels: serviciosMasAgendados.map(servicio => servicio.Nombre_Servicio),
+        datasets: [{
+            label: 'Cantidad de Agendamientos',
+            data: serviciosMasAgendados.map(servicio => servicio.cantidadAgendamientos),
+            backgroundColor: [
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)'
+            ],
+            borderColor: [
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)'
+            ],
+            borderWidth: 1,
+        }]
+    };
+
+    const chartOptions = {
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            tooltip: {
+                callbacks: {
+                    label: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw}`
+                }
+            }
+        }
+    };
+
+    const handleClick = (url) => {
+        window.location.href = url;
+    };
+
     return (
         <div style={{ 
             display: 'flex', 
-            justifyContent: 'space-between', 
-            flexWrap: 'wrap', 
-            padding: '20px', 
-            position: 'relative', 
-            gap: '10px', 
-            top: '-290px',
+            flexDirection: 'column', // Coloca los elementos en una columna
+            alignItems: 'flex-start', 
+            padding: '20px',
+            width: '100%',
+            maxWidth: '1200px',
+            margin: '0 auto',
+            marginTop: '-10px'
         }}>
-            <div style={{ 
-                backgroundColor: '#FF8C9E', 
-                color: '#fff', 
-                padding: '30px', 
-                borderRadius: '8px', 
-                width: '24%', 
-                textAlign: 'center', 
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
-                transform: 'translateY(-10px)', 
+            {/* Contenedor para las tarjetas */}
+            <div style={{
                 display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center'
+                flexWrap: 'wrap', 
+                gap: '20px', 
+                width: '100%', // Asegura que el contenedor tome todo el ancho disponible
+                marginBottom: '20px' // Añade espacio entre las tarjetas y las gráficas
             }}>
-                {/* <i className='bx bx-user' style={{ fontSize: '2rem', marginRight: '10px' }}></i> */}
-                <div>
-                    <p style={{ fontSize: '1.5rem', margin: '0' }}>Clientes</p>
-                    <h2 style={{ fontSize: '2rem', margin: '0' }}>{totalClientes}</h2>
-                </div>
+                <DashboardCard 
+                    title="Clientes" 
+                    count={totalClientes} 
+                    iconClass="bx bx-user" 
+                    onClick={() => handleClick('/Clientes')} 
+                />
+                <DashboardCard 
+                    title="Ventas" 
+                    count={totalVentas} 
+                    iconClass="bx bx-money" 
+                    onClick={() => handleClick('/ventas')} 
+                />
+                <DashboardCard 
+                    title="Empleados" 
+                    count={totalEmpleados} 
+                    iconClass="bx bx-money" 
+                    onClick={() => handleClick('/empleados')} 
+                />
+                <DashboardCard 
+                    title="Compras" 
+                    count={totalCompras} 
+                    iconClass="bx bx-box" 
+                    onClick={() => handleClick('/Compras')} 
+                />
+                <DashboardCard 
+                    title="Servicios" 
+                    count={totalServicios} 
+                    iconClass="bx bx-calendar" 
+                    onClick={() => handleClick('/Servicios')} 
+                />
             </div>
-            <div style={{ 
-                backgroundColor: '#B692C2', 
-                color: '#fff', 
-                padding: '30px', 
-                borderRadius: '8px', 
-                width: '24%', 
-                textAlign: 'center', 
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
-                transform: 'translateY(-10px)', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center'
+    
+            {/* Contenedor para las gráficas */}
+            <div style={{
+                display: 'flex', // Alinea las gráficas en una fila
+                flexWrap: 'wrap', // Permite que las gráficas se envuelvan si el espacio es limitado
+                gap: '10px', // Añade espacio entre las gráficas
+                width: '100%' // Asegura que el contenedor tome todo el ancho disponible
             }}>
-                {/* <i className='bx bx-money' style={{ fontSize: '2rem', marginRight: '10px' }}></i> */}
-                <div>
-                    <p style={{ fontSize: '1.5rem', margin: '0' }}>Ventas</p>
-                    <h2 style={{ fontSize: '2rem', margin: '0' }}>{totalVentas}</h2>
+                <div style={{ 
+                    width: '300px', 
+                    height: '370px', 
+                    border: '1px solid rgba(0, 0, 0, 0.2)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    borderRadius: '10px',
+                    backgroundColor: '#ffffff', // Fondo blanco para un contraste claro
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)', // Sombra sutil
+                    padding: '10px',
+                    transition: 'transform 0.3s ease-in-out',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} // Escalar al pasar el ratón
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                    <h3 style={{ margin: '3px 0', fontSize: '1.5rem', color: '#444', fontFamily: 'Arial, sans-serif' }}>Servicios más vendidos</h3>
+                    <div style={{ 
+                        width: '100%', 
+                        height: 'calc(100% - 40px)', // Ajusta la altura para evitar desbordamientos
+                        position: 'relative'
+                    }}>
+                        <DoughnutChart data={chartData} options={chartOptions} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+                    </div>
                 </div>
-            </div>
-            <div style={{ 
-                backgroundColor: '#96CEB4', 
-                color: '#fff', 
-                padding: '30px', 
-                borderRadius: '8px', 
-                width: '24%', 
-                textAlign: 'center', 
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
-                transform: 'translateY(-10px)', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center'
-            }}>
-                {/* <i className='bx bx-box' style={{ fontSize: '2rem', marginRight: '10px' }}></i> */}
-                <div>
-                    <p style={{ fontSize: '1.5rem', margin: '0' }}>Compras</p>
-                    <h2 style={{ fontSize: '2rem', margin: '0' }}>{totalCompras}</h2>
+                <div style={{ 
+                    width: '410px', 
+                    height: '370px', 
+                    border: '1px solid rgba(0, 0, 0, 0.2)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    borderRadius: '10px',
+                    backgroundColor: '#ffffff', // Fondo blanco para un contraste claro
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)', // Sombra sutil
+                    padding: '10px',
+                    transition: 'transform 0.3s ease-in-out',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} // Escalar al pasar el ratón
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                     <h3 style={{ margin: '3px 0', fontSize: '1.5rem', color: '#444', fontFamily: 'Arial, sans-serif' }}>Ventas por Mes</h3>
+                    <div style={{ 
+                        width: '100%', 
+                        height: 'calc(100% - 40px)', // Ajusta la altura para evitar desbordamientos
+                        position: 'relative'
+                    }}>
+                        <VentasPorMes style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+                    </div>
+                   
                 </div>
-            </div>
-            <div style={{ 
-                backgroundColor: '#6EACDA', 
-                color: '#fff', 
-                padding: '30px', 
-                borderRadius: '8px', 
-                width: '24%', 
-                textAlign: 'center', 
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
-                transform: 'translateY(-10px)', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center'
-            }}>
-                {/* <i className='bx bx-calendar' style={{ fontSize: '2rem', marginRight: '10px' }}></i> */}
-                <div>
-                    <p style={{ fontSize: '1.5rem', margin: '0' }}>Servicios</p>
-                    <h2 style={{ fontSize: '2rem', margin: '0' }}>{totalServicios}</h2>
+                <div style={{ 
+                    width: '350px', 
+                    height: '370px', 
+                    border: '1px solid rgba(0, 0, 0, 0.2)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    borderRadius: '10px',
+                    backgroundColor: '#ffffff', // Fondo blanco para un contraste claro
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)', // Sombra sutil
+                    padding: '10px',
+                    transition: 'transform 0.3s ease-in-out',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} // Escalar al pasar el ratón
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                    <h3 style={{ margin: '3px 0', fontSize: '1.5rem', color: '#444', fontFamily: 'Arial, sans-serif' }}>Comparación Semanal</h3>
+                    <div style={{ 
+                        width: '100%', 
+                        height: 'calc(100% - 40px)', // Ajusta la altura para evitar desbordamientos
+                        position: 'relative'
+                    }}>
+                        <ComparacionSemanal style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+                    </div>
                 </div>
             </div>
         </div>
     );
+    
+    
 };
 
 export default Dashboard;

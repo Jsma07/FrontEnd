@@ -49,9 +49,9 @@ root.render(
 
 
         <Route path="/" element={<App />}>
-           <Route path="/panel/dashboard" 
+           <Route index path="/panel/dashboard" 
              element={
-              <PrivateRoute requiredPermissions={["Panel"]}>
+              <PrivateRoute requiredPermissions={["Usuarios"]}>
                 <Panel />
               </PrivateRoute>
             }
