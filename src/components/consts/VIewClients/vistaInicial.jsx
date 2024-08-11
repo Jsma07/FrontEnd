@@ -3,8 +3,6 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import NavbarClient from './Navbarclient';
 
-
-
 const VistaInicial = () => {
               // Hook para manejar la visibilidad de los elementos en la vista
   const [headerRef, headerInView] = useInView({ triggerOnce: true, threshold: 0.2 });

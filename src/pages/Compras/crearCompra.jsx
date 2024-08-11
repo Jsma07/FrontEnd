@@ -325,7 +325,7 @@ return (
             onChange={(e) => setEstadoCompra(e.target.value)}
             className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500" required>
             <option value="">Seleccione el estado</option>
-            <option value="Pendiente">Pendiente</option>
+            <option value="En espera">En espera</option>
             <option value="Terminada">Terminada</option>
           </select>
         </div>
