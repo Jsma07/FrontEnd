@@ -40,18 +40,17 @@ function App() {
         draggable
         pauseOnHover
       />
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="center"
-              style={{ minHeight: '80vh', position: 'relative' }}
-            >
-              <Grid item xs={12} md={8}> 
-                <Outlet />
-              </Grid>
-              {/* Botón en la esquina inferior derecha */}
-             
-            </Grid>
+           <Grid
+  container
+  alignItems="center"
+  justifyContent="center"
+  style={{ minHeight: '80vh', position: 'relative', width: '100%' }}
+>
+<Grid item xs={12} md={10} style={{ width: '100%' }}>
+<Outlet />
+  </Grid>
+</Grid>
+
           </>
         )}
       </ThemeProvider>

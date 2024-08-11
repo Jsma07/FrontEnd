@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Doughnut } from 'react-chartjs-2';
+import DashboardCard from './dashboardCard'; // Importar el componente
+import DoughnutChart from './dashboardCirculo'; // Importar el componente
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale } from 'chart.js';
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale);
@@ -108,177 +109,83 @@ const Dashboard = () => {
     return (
         <div style={{ 
             display: 'flex', 
-            justifyContent: 'center', 
-            flexWrap: 'wrap', 
-            position: 'relative', 
-            gap: '20px', 
-            marginTop: '-100px',
+            flexDirection: 'column', // Coloca los elementos en una columna
+            alignItems: 'flex-start', 
+            padding: '20px',
+            width: '100%',
+            maxWidth: '1200px',
+            margin: '0 auto',
+            marginTop: '-10px'
         }}>
-            <div style={{ 
-                backgroundColor: '#fff7e5', 
-                color: 'black', 
-                padding: '20px', 
-                borderRadius: '12px', 
-                width: '23%', 
-                textAlign: 'center', 
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
-                transform: 'translateY(-10px)', 
+            {/* Contenedor para las tarjetas */}
+            <div style={{
                 display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                border: '1px solid rgba(0, 0, 0, 0.2)',
-                cursor: 'pointer',
-            }}
-            onClick={() => handleClick('/Clientes')} // Redirige a la ruta '/ruta-clientes'
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'} // Aumenta el tamaño al pasar el ratón
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
-                <div style={{ 
-                    backgroundColor: '#EFD4F5', // Fondo blanco para el cuadrado del ícono
-                    width: '45px', 
-                    height: '45px', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    borderRadius: '100%', // Borde redondeado opcional
-                    position: 'absolute', 
-                    border: '1px solid rgba(0, 0, 0, 0.2)',
-                    left: '10px' 
-                }}>
-                    <i className='bx bx-user' style={{ fontSize: '1.5rem', color: 'black' }}></i>
-                </div>        
-                <div style={{ marginLeft: '45px' }}>
-                    <p style={{ fontSize: '1.5rem', margin: '0' }}>Clientes</p>
-                    <h2 style={{ fontSize: '1.5rem', margin: '0' }}>{totalClientes}</h2>
-                </div>
-            </div>
-            <div style={{ 
-                backgroundColor: '#fff7e5', 
-                color: 'black', 
-                padding: '20px', 
-                borderRadius: '12px', 
-                width: '23%', 
-                textAlign: 'center', 
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
-                transform: 'translateY(-10px)', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                border: '1px solid rgba(0, 0, 0, 0.2)',
-                cursor: 'pointer',
-            }}
-            onClick={() => handleClick('/ventas')} // Redirige a la ruta '/ruta-clientes'
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'} // Aumenta el tamaño al pasar el ratón
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
-                <div style={{ 
-                    backgroundColor: '#EFD4F5', // Fondo blanco para el cuadrado del ícono
-                    width: '45px', 
-                    height: '45px', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    borderRadius: '100%', // Borde redondeado opcional
-                    position: 'absolute', 
-                    border: '1px solid rgba(0, 0, 0, 0.2)',
-                    left: '10px' 
-                }}>
-                    <i className='bx bx-money' style={{ fontSize: '1.5rem', color: 'black' }}></i>
-                </div>        
-                <div style={{ marginLeft: '45px' }}>
-                    <p style={{ fontSize: '1.5rem', margin: '0' }}>Ventas</p>
-                    <h2 style={{ fontSize: '1.5rem', margin: '0' }}>{totalVentas}</h2>
-                </div>
-            </div>
-            <div style={{ 
-                backgroundColor: '#fff7e5', 
-                color: 'black', 
-                padding: '20px', 
-                borderRadius: '12px', 
-                width: '23%', 
-                textAlign: 'center', 
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
-                transform: 'translateY(-10px)', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                border: '1px solid rgba(0, 0, 0, 0.2)',
-                cursor: 'pointer',
-            }}
-            onClick={() => handleClick('/Compras')} // Redirige a la ruta '/ruta-clientes'
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'} // Aumenta el tamaño al pasar el ratón
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
-                <div style={{ 
-                    backgroundColor: '#EFD4F5', // Fondo blanco para el cuadrado del ícono
-                    width: '45px', 
-                    height: '45px', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    borderRadius: '100%', // Borde redondeado opcional
-                    position: 'absolute', 
-                    border: '1px solid rgba(0, 0, 0, 0.2)',
-                    left: '10px' 
-                }}>
-                    <i className='bx bx-box' style={{ fontSize: '1.5rem', color: 'black' }}></i>
-                </div>        
-                <div style={{ marginLeft: '45px' }}>
-                    <p style={{ fontSize: '1.5rem', margin: '0' }}>Compras</p>
-                    <h2 style={{ fontSize: '1.5rem', margin: '0' }}>{totalCompras}</h2>
-                </div>
-            </div>
-            <div style={{ 
-                backgroundColor: '#fff7e5', 
-                color: 'black', 
-                padding: '20px', 
-                borderRadius: '12px', 
-                width: '23%', 
-                textAlign: 'center', 
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
-                transform: 'translateY(-10px)', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                border: '1px solid rgba(0, 0, 0, 0.2)',
-                cursor: 'pointer',
-            }}
-            onClick={() => handleClick('/Servicios')} // Redirige a la ruta '/ruta-clientes'
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'} // Aumenta el tamaño al pasar el ratón
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
-                <div style={{ 
-                    backgroundColor: '#EFD4F5', // Fondo blanco para el cuadrado del ícono
-                    width: '45px', 
-                    height: '45px', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    borderRadius: '100%', // Borde redondeado opcional
-                    position: 'absolute', 
-                    border: '1px solid rgba(0, 0, 0, 0.2)',
-                    left: '10px' 
-                }}>
-                    <i className='bx bx-calendar' style={{ fontSize: '1.5rem', color: 'black' }}></i>
-                </div>        
-                <div style={{ marginLeft: '45px' }}>
-                    <p style={{ fontSize: '1.5rem', margin: '0' }}>Servicios</p>
-                    <h2 style={{ fontSize: '1.5rem', margin: '0' }}>{totalServicios}</h2>
-                </div>
-            </div>
-
-            <div style={{ 
-                width: '30%', 
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                flexDirection: 'column', 
-                marginTop: '20px' 
+                flexWrap: 'wrap', 
+                gap: '20px', 
+                width: '100%', // Asegura que el contenedor tome todo el ancho disponible
+                marginBottom: '20px' // Añade espacio entre las tarjetas y la gráfica
             }}>
-                <Doughnut data={chartData} options={chartOptions} />
+                <DashboardCard 
+                    title="Clientes" 
+                    count={totalClientes} 
+                    iconClass="bx bx-user" 
+                    onClick={() => handleClick('/Clientes')} 
+                />
+                <DashboardCard 
+                    title="Ventas" 
+                    count={totalVentas} 
+                    iconClass="bx bx-money" 
+                    onClick={() => handleClick('/ventas')} 
+                />
+                 <DashboardCard 
+                    title="GENERICA" 
+                    count={totalVentas} 
+                    iconClass="bx bx-money" 
+                    onClick={() => handleClick('/ventas')} 
+                />
+                <DashboardCard 
+                    title="Compras" 
+                    count={totalCompras} 
+                    iconClass="bx bx-box" 
+                    onClick={() => handleClick('/Compras')} 
+                />
+                <DashboardCard 
+                    title="Servicios" 
+                    count={totalServicios} 
+                    iconClass="bx bx-calendar" 
+                    onClick={() => handleClick('/Servicios')} 
+                />
+            </div>
+    
+            {/* Contenedor para la gráfica */}
+            <div style={{ 
+                 width: '300px', 
+                 height: '370px', 
+                 border: '1px solid rgba(0, 0, 0, 0.2)',
+                 display: 'flex',
+                 flexDirection: 'column',
+                 alignItems: 'center',
+                 borderRadius: '10px',
+                 backgroundColor: '#ffffff', // Fondo blanco para un contraste claro
+                 boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)', // Sombra sutil
+                 padding: '10px',
+                 transition: 'transform 0.3s ease-in-out',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'} // Escalar al pasar el ratón
+onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+<h3 style={{ margin: '3px 0', fontSize: '1.5rem', color: '#444', fontFamily: 'Arial, sans-serif' }}>Servicios más vendidos</h3>
+<div style={{ 
+                    width: '100%', 
+                    height: 'calc(100% - 40px)', // Ajusta la altura para evitar desbordamientos
+                    position: 'relative'
+                }}>
+                    <DoughnutChart data={chartData} options={chartOptions} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+                </div>
             </div>
         </div>
     );
+    
 };
 
 export default Dashboard;
