@@ -34,7 +34,7 @@ function NavigationMenu() {
     <ul className="flex justify-end items-center space-x-10">
       <MenuItem href="/vistaInicio" text="Inicio" />
       <MenuItem href="/servicios" text="Servicios" />
-      <MenuItem href="/agendamiento" text="Agendamiento" />
+      <MenuItem href="/solicitarCita" text="Agendamiento" />
       <MenuItem href="/contacto" text="Contacto" />
     </ul>
   );

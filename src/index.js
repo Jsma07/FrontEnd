@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Router } from "react-router-dom";
 import "./index.css";
 import App from "./App";
 import Roles from "./pages/Roles/Roles";
@@ -32,6 +32,7 @@ import FechasTrabajo from './pages/Agendamiento/FechaTrabajo';
 // import InactivarHoras from "./pages/Agendamiento/InactivarHoras";
 import Contrasena from "./components/consts/recuperarContrasena";
 import PrivateRoute from "./context/verificarSesion";
+import SolicitarCita from "./components/consts/VIewClients/solicitarCita";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -45,6 +46,7 @@ root.render(
           <Route path="/Registrar" element={<CrearCuenta />} />
           <Route path="/Catalogo" element={<Contendioitems />} />
           <Route path="/vistaInicio" element={<VistaInicial />} />
+          <Route path="/solicitarCita" element={<SolicitarCita />} />
 
           <Route path="/" element={<App />}>
             <Route
