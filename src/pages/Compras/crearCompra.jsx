@@ -123,20 +123,21 @@ const calcularTotal = (totalValorInsumos, descuento) => {
   return totalValorInsumos - descuento;
 };
 
-const calcularSubtotalCompra = (totalCompra, iva) => {
-  return totalCompra - iva;
-};
-
 const actualizarTotales = (detalles, descuento) => {
   const totalValorInsumos = calcularSubtotal(detalles);
   const iva = calcularIva(totalValorInsumos);
   const totalCompra = calcularTotal(totalValorInsumos, descuento);
-  const subtotalCompra = calcularSubtotalCompra(totalCompra, iva);
+  const subtotalCompra = totalValorInsumos - iva; 
+  console.log("Total Valor Insumos:", totalValorInsumos);
+  console.log("IVA:", iva);
+  console.log("Subtotal Compra:", subtotalCompra);
+  console.log("Total Compra:", totalCompra);
 
   setSubtotalCompra(subtotalCompra);
   setIvaCompra(iva);
   setTotalCompra(totalCompra);
 };
+
 
 const handleAgregarDetalleCompra = () => {
     const nuevosDetallesCompra = insumosSeleccionados.map((insumo) => ({
@@ -324,7 +325,7 @@ return (
             onChange={(e) => setEstadoCompra(e.target.value)}
             className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500" required>
             <option value="">Seleccione el estado</option>
-            <option value="Pendiente">Pendiente</option>
+            <option value="En espera">En espera</option>
             <option value="Terminada">Terminada</option>
           </select>
         </div>

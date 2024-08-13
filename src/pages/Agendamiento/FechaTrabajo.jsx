@@ -1,21 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-import {
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Fab,
-  Tooltip,
-  Box,
-  Avatar,
-  Input,
-  Pagination,
-  CardActionArea,
-  IconButton,
-} from "@mui/material";
+import {Container,Typography,Card,CardContent,Fab,Tooltip,Box,Avatar,Input,Pagination,CardActionArea,IconButton,} from "@mui/material";
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
 import ModalInactivarFecha from "../../components/consts/ModalInactivarFecha";
@@ -45,9 +31,8 @@ const FechasTrabajo = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedEstado, setSelectedEstado] = useState("");
   const [page, setPage] = useState(1);
-  const [cardsPerPage] = useState(6);
+  const [cardsPerPage] = useState(9);
   const navigate = useNavigate();
-
   useEffect(() => {
     fetchHorarios();
     fetchFechasConHorasInactivas();
@@ -98,15 +83,10 @@ const FechasTrabajo = () => {
     setModalOpen(false);
   };
 
-  const handleFechaInactivada = () => {
-    fetchHorarios();
-    fetchFechasConHorasInactivas();
+  const handleFechaInactivada = async () => {
+    await fetchHorarios(); 
+    await fetchFechasConHorasInactivas(); 
   };
-
-
-
-
-  
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -133,6 +113,8 @@ const FechasTrabajo = () => {
           .then(() => {
             setHorarios(horarios.filter((horario) => horario.id !== id));
             Swal.fire("Eliminado!", "El horario ha sido eliminado.", "success");
+            fetchHorarios(); 
+            fetchFechasConHorasInactivas(); 
           })
           .catch((error) => {
             console.error("Error al eliminar el horario:", error);
@@ -209,7 +191,7 @@ const FechasTrabajo = () => {
               }}
               className="text-3xl"
             >
-              Horarios de Trabajo
+              Inhabilitacion De Fechas y Horarios
             </h4>
             <div className="relative w-80">
               <Input
@@ -224,7 +206,7 @@ const FechasTrabajo = () => {
 
           <Box
             display="grid"
-            gridTemplateColumns="repeat(3, 1fr)" // 3 tarjetas por fila
+            gridTemplateColumns="repeat(3, 1fr)" 
             gap={2}
             mb={2}
           >
@@ -302,8 +284,7 @@ const FechasTrabajo = () => {
               count={Math.ceil(filteredHorarios.length / cardsPerPage)}
               page={page}
               onChange={handleChangePage}
-              variant="outlined"
-              shape="rounded"
+              color="primary"
             />
           </Box>
 
@@ -348,17 +329,16 @@ const FechasTrabajo = () => {
                 right: "50px",
                 zIndex: 1000,
               }}
-              onClick={handleOpenInactivarHorasModal} // Cambiado aquí
+              onClick={handleOpenInactivarHorasModal} 
             >
               <UpdateDisabledIcon style={{ fontSize: "2.3rem" }} />
             </Fab>
           </Tooltip>
 
           <InactivarHorasModal
-            open={modalInactivarHorasOpen}
-            onClose={handleCloseInactivarHorasModal}
-            onHorasInactivas={handleFechaInactivada}
-            
+          open={modalInactivarHorasOpen}
+          onClose={() => setModalInactivarHorasOpen(false)}
+          onHoursInactivated={handleFechaInactivada}
           />
         </div>
       </div>

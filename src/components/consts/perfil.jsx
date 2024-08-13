@@ -14,7 +14,6 @@ const PerfilUsuario = ({ open, handleClose }) => {
 
   useEffect(() => {
     if (user) {
-      console.log('User:', user); // Asegúrate de que user esté definido y tenga un id
       setNombre(user.nombre);
       setApellido(user.apellido);
       setCorreo(user.correo);
@@ -25,22 +24,93 @@ const PerfilUsuario = ({ open, handleClose }) => {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-  
-    if (!user || !user.id) {
-      toast.error('ID del usuario no encontrado', {
+    
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    const numeroRegex = /^[0-9]+$/;
+    
+    if (!nombre || !apellido || !correo || !telefono || !documento) {
+      toast.error("Todos los campos son obligatorios.", {
         position: "bottom-right",
         autoClose: 3000,
       });
       return;
     }
-    console.log({
-      nombre,
-      apellido,
-      telefono,
-      correo,
-      documento,
-      tipo: user.tipo
-    });
+    
+    if (!nameRegex.test(nombre)) {
+      toast.error("El nombre solo puede contener letras y espacios.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    
+    if (telefono.length < 9 || telefono.length > 15) {
+      toast.error("El teléfono debe contener entre 9 y 15 números.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    
+    if (nombre.length < 4 || nombre.length > 20) {
+      toast.error("El nombre debe contener entre 4 y 20 letras.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    
+    if (apellido.length < 4 || apellido.length > 20) {
+      toast.error("El apellido debe contener entre 4 y 20 letras.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    
+    if (documento.length < 8 || documento.length > 17) {
+      toast.error("El documento debe contener entre 8 y 17 números.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    
+    if (!nameRegex.test(apellido)) {
+      toast.error("El apellido solo puede contener letras y espacios.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    
+    if (!numeroRegex.test(documento)) {
+      toast.error("El documento solo puede contener números.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    
+    if (!numeroRegex.test(telefono)) {
+      toast.error("El teléfono solo puede contener números.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    
+    const validacionCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    const correoSinEspacios = correo.trim();
+    
+    if (!validacionCorreo.test(correoSinEspacios)) {
+      toast.error("El correo no tiene un formato válido.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
     try {
       const response = await axios.put(`http://localhost:5000/api/editarPerfil/${user.id}`, {
         nombre,
@@ -50,7 +120,7 @@ const PerfilUsuario = ({ open, handleClose }) => {
         documento,
         tipo: user.tipo // Incluye el tipo de usuario en el cuerpo de la solicitud
       });
-  
+
       toast.success('Datos actualizados correctamente', {
         position: "bottom-right",
         autoClose: 3000,
@@ -64,7 +134,6 @@ const PerfilUsuario = ({ open, handleClose }) => {
       });
     }
   };
-  
 
   return (
     <Modal

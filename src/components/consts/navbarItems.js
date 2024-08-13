@@ -19,6 +19,20 @@ export const NavbarItems = [
   {
     id: 0,
     icon: <SettingsSuggestIcon />,
+    label: 'Panel',
+     requiredPermissions: ['Configuracion'],
+    subitems: [
+      { 
+        label: 'Dashboard', 
+        route: '/panel/dashboard', 
+        icon: <i className='bx bx-shield-quarter' style={{ fontSize: "24px" }}></i>, 
+        requiredPermissions: ['Configuracion'],
+      },
+    ],
+  },
+  {
+    id: 1,
+    icon: <SettingsSuggestIcon />,
     label: 'Configuración',
     requiredPermissions: ['Configuracion'],
     subitems: [
@@ -31,7 +45,7 @@ export const NavbarItems = [
     ],
   },
   {
-    id: 1,
+    id: 2,
     icon: <PeopleIcon />,
     label: 'Usuarios',
     requiredPermissions: ['Usuarios','Clientes','Empleados'],
@@ -57,7 +71,7 @@ export const NavbarItems = [
     ],
   },
   {
-    id: 2,
+    id: 3,
     icon: <Shopping />,
     label: 'Ventas',
     requiredPermissions: ['Ventas'],
@@ -77,7 +91,7 @@ export const NavbarItems = [
     ],
   },
   {
-    id: 3,
+    id: 4,
     icon: <BusinessIcon />,
     label: 'Compras',
     requiredPermissions: ['Compras'],
@@ -97,7 +111,7 @@ export const NavbarItems = [
     ],
   },
   {
-    id: 4,
+    id: 5,
     icon: <Calendar />,
     label: 'Agendamiento',
     requiredPermissions: ['Agenda'],
@@ -115,7 +129,7 @@ export const NavbarItems = [
         requiredPermissions: ['Servicios'],
       },
       { 
-        label: 'Horarios', 
+        label: 'No Disponibilidad', 
         route: '/FechasTrabajadas', 
         icon: <AutoDeleteIcon />,
         requiredPermissions: ['Servicios'],
@@ -129,7 +143,7 @@ export const NavbarItems = [
     ],
   },
   {
-    id: 5,
+    id: 6,
     icon: <InventoryIcon />,
     label: 'Insumos',
     requiredPermissions: ['Insumos'],
