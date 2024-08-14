@@ -2,43 +2,68 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import TablePrueba from "../../components/consts/Tabla";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const ListarAdiciones = () => {
   const [adiciones, setAdiciones] = useState([]);
+
   const [columns, setColumns] = useState([
     { field: "IdAdiciones", headerName: "ID" },
     { field: "NombreAdiciones", headerName: "Nombre" },
     {
+      field: "Imagen",
+      headerName: "Imagen",
+      renderCell: (params) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <img
+            src={`http://localhost:5000${params.row.Img}`}
+            alt={params.row.NombreAdiciones}
+            style={{
+              maxWidth: "100%",
+              height: "auto",
+              width: "3rem",
+              height: "3rem",
+              borderRadius: "50%",
+            }}
+          />
+        </div>
+      ),
+    },
+    {
       field: "Estado",
       headerName: "Estado",
       renderCell: (params) =>
-        renderEstadoButton(params.value, params.row.IdAdiciones),
+        renderEstadoButton(params.row.Estado, params.row.IdAdiciones), // Usa params.row.Estado
     },
   ]);
 
   const renderEstadoButton = (estado, adicionId) => {
-    console.log(`Estado value: ${estado}`); // Log el estado value
-
     let buttonClass, estadoTexto;
 
-    // Aquí definimos los estados como en ventas: 1 para Activo y 2 para Inactivo
     switch (estado) {
-      case 1:
-        buttonClass = "btn btn-success";
+      case 1: // Activo
+        buttonClass = "bg-green-500"; // Verde para Activo
         estadoTexto = "Activo";
         break;
-      case 2:
-        buttonClass = "btn btn-danger";
+      case 2: // Inactivo
+        buttonClass = "bg-red-500"; // Rojo para Inactivo
         estadoTexto = "Inactivo";
         break;
       default:
-        buttonClass = "btn btn-secondary";
+        buttonClass = "bg-gray-500"; // Gris para Desconocido
         estadoTexto = "Desconocido";
     }
 
     return (
       <button
-        className={buttonClass}
+        className={`px-3 py-1.5 text-white text-sm font-medium rounded-lg shadow-md focus:outline-none ${buttonClass}`}
         onClick={() => handleEstadoClick(adicionId, estado)}
       >
         {estadoTexto}
@@ -47,43 +72,54 @@ const ListarAdiciones = () => {
   };
 
   const handleEstadoClick = (adicionId, estadoActual) => {
-    // Alternar estado: si es Activo (1) lo pasamos a Inactivo (2) y viceversa
+    // Cambia el estado a 2 si es 1, o a 1 si es 2
     const nuevoEstado = estadoActual === 1 ? 2 : 1;
 
-    console.log(
-      `Estado cambiado para la adición ${adicionId} a ${nuevoEstado}`
-    );
-
-    // Aquí puedes agregar la lógica para actualizar el estado en el servidor
-    axios
-      .put(
-        `http://localhost:5000/Jackenail/ActualizarEstadoAdicion/${adicionId}`,
-        {
-          Estado: nuevoEstado,
-        }
-      )
-      .then((response) => {
-        console.log(`Estado actualizado correctamente: ${response.data}`);
-        setAdiciones((prevAdiciones) =>
-          prevAdiciones.map((adicion) =>
-            adicion.IdAdiciones === adicionId
-              ? { ...adicion, Estado: nuevoEstado }
-              : adicion
-          )
-        );
-        toast.success("Estado actualizado correctamente");
-      })
-      .catch((error) => {
-        console.error("Error al actualizar el estado:", error);
-        toast.error("Error al actualizar el estado");
-      });
+    // Mostrar la ventana de confirmación
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: `¿Deseas cambiar el estado de la adición a ${nuevoEstado}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, cambiar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Si el usuario confirma, realizar la solicitud para actualizar el estado
+        axios
+          .put(`http://localhost:5000/Jackenail/CambiaEstado/${adicionId}`, {
+            Estado: nuevoEstado,
+          })
+          .then((response) => {
+            console.log("Respuesta del servidor:", response.data);
+            setAdiciones((prevAdiciones) =>
+              prevAdiciones.map((adicion) =>
+                adicion.IdAdiciones === adicionId
+                  ? { ...adicion, Estado: nuevoEstado }
+                  : adicion
+              )
+            );
+            toast.success("Estado actualizado correctamente");
+          })
+          .catch((error) => {
+            console.error("Error al actualizar el estado:", error);
+            toast.error(
+              `Error al actualizar el estado: ${
+                error.response ? error.response.data.mensaje : error.message
+              }`
+            );
+          });
+      }
+    });
   };
 
   useEffect(() => {
     axios
       .get("http://localhost:5000/Jackenail/Listarventas/adiciones")
       .then((response) => {
-        console.log(response.data); // Verifica que los datos estén siendo recibidos correctamente
+        console.log(response.data);
         setAdiciones(response.data);
       })
       .catch((error) => {
