@@ -23,17 +23,22 @@ const Ventas = () => {
         const ventasConDetalles = response.data.map((venta) => ({
           id: venta.idVentas,
           idServicio: (
+            <div style={{ display: 'flex', alignItems: 'center' }}>
             <img
               src={`http://localhost:5000${venta.servicio.ImgServicio}`}
               alt={venta.servicio.Nombre_Servicio}
               style={{
-                maxWidth: "100%",
-                height: "auto",
-                width: "3rem",
-                height: "3rem",
-                borderRadius: "50%",
+                width: '3rem',
+                height: '3rem',
+                borderRadius: '50%',
+                marginRight: '1rem' 
               }}
             />
+            <h1 style={{ margin: 0 }}>
+              {venta.servicio.Nombre_Servicio}
+            </h1>
+          </div>
+          
           ),
           IdCliente: `${venta.cliente.Nombre} ${venta.cliente.Apellido}`,
           idEmpleado: `${venta.empleado?.Nombre || ""} ${

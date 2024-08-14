@@ -21,6 +21,7 @@ const Registrar = () => {
   const [minDate, setMinDate] = useState("");
   const [maxDate, setMaxDate] = useState("");
 
+  
   const abrirModal = () => {
     setModalAbierto(true);
   };
@@ -35,42 +36,59 @@ const Registrar = () => {
         const response = await axios.get(
           "http://localhost:5000/jackenail/Listar_Empleados"
         );
-        setEmpleados(response.data);
+        
+        // Filtrar empleados para incluir solo aquellos con estado 1
+        const empleadosFiltrados = response.data.filter(
+          (empleado) => empleado.Estado === 1
+        );
+        
+        setEmpleados(empleadosFiltrados);
       } catch (error) {
         console.error("Error al obtener los datos de empleados:", error);
       }
     };
-
+  
     fetchData();
   }, []);
-
+  
   useEffect(() => {
     fetchServicios();
   }, []);
-
+  
   const fetchServicios = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/servicios");
-      setServicios(response.data);
+      // Filtrar servicios para incluir solo aquellos con estado 1
+      const serviciosFiltrados = response.data.filter(
+        (servicio) => servicio.EstadoServicio === 1
+      );
+      setServicios(serviciosFiltrados);
     } catch (error) {
       console.error("Error fetching servicios:", error);
     }
   };
-
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
           "http://localhost:5000/jackenail/Listar_Clientes"
         );
-        setClientes(response.data);
+        
+        // Filtrar clientes para incluir solo aquellos con estado 1
+        const clientesFiltrados = response.data.filter(
+          (cliente) => cliente.Estado === 1
+        );
+        
+        setClientes(clientesFiltrados);
       } catch (error) {
         console.error("Error al obtener los datos de clientes:", error);
       }
     };
-
+  
     fetchData();
   }, []);
+  
 
   useEffect(() => {
     const today = new Date();
@@ -553,6 +571,7 @@ const Registrar = () => {
           adiciones={adiciones}
           setAdicionesSeleccionadas={setAdicionSeleccionada}
           adicionesSeleccionadas={adicionSeleccionada}
+          
         />
       </div>
     </section>

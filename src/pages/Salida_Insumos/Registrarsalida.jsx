@@ -152,10 +152,21 @@ const SalidaInsumos = () => {
                   Cantidad en stock: {insumo.Cantidad}
                 </span>
                 <div className="mt-4 flex justify-center">
-                  {insumo.Estado !== "agotado" && (
+                  {insumo.Estado !== "Agotado" && insumo.Cantidad > 0 ? (
                     <button
                       className="px-4 py-2 bg-red-500 text-white rounded-md shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-600 transition"
                       onClick={() => handleAgregarInsumo(insumo)}
+                    >
+                      <i
+                        className="bx bx-plus"
+                        style={{ fontSize: "1.5rem" }}
+                      ></i>
+                      Sacar insumo
+                    </button>
+                  ) : (
+                    <button
+                      className="px-4 py-2 bg-gray-400 text-white rounded-md shadow cursor-not-allowed"
+                      disabled
                     >
                       <i
                         className="bx bx-plus"

@@ -88,7 +88,6 @@ const ListarAdiciones = () => {
 
   const columns = [
     { field: "IdAdiciones", headerName: "ID" },
-    { field: "NombreAdiciones", headerName: "Nombre" },
     {
       field: "Imagen",
       headerName: "Imagen",
@@ -115,6 +114,9 @@ const ListarAdiciones = () => {
         </div>
       ),
     },
+    { field: "NombreAdiciones", headerName: "Nombre" },
+   
+    { field: "Precio", headerName: "Precio", type: "number" },
     {
       field: "Estado",
       headerName: "Estado",
