@@ -56,7 +56,7 @@ function Contenidoitems() {
           transition={{ duration: 0.8, type: "spring", stiffness: 300 }}
         >
           <div
-            className="header-bg relative bg-gradient-to-r from-purple-500 to-indigo-500 p-8 rounded-lg"
+            className="header-bg relative bg-gradient-to-r from-purple-400 to-indigo-400 p-8 rounded-xl"
             style={{
               boxShadow: "0px 1.5px 3px rgba(0, 0, 0, 0.5)", // Sombra negra de 1.5
             }}
