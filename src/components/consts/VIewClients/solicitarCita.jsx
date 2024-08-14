@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
@@ -7,12 +7,12 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import ServiceCard from "./components/ServiceCard";
 import Sidebar from "./components/Sidebar";
-import Grid from "@mui/material/Grid"; 
+import Grid from "@mui/material/Grid";
+import dayjs from "dayjs";
+import { UserContext } from '../../../context/ContextoUsuario';
 
-import {
-  EmployeeCard,
-  EmployeeSelection,
-} from "./components/EmployeeCard";
+
+import { EmployeeCard, EmployeeSelection } from "./components/EmployeeCard";
 import axios from "axios";
 import { styled } from "@mui/material/styles";
 import Swal from "sweetalert2";
@@ -27,7 +27,7 @@ import {
   MenuItem,
 } from "@mui/material";
 
-import ParentComponent from './components/ParentComponent';
+import ParentComponent from "./components/ParentComponent";
 
 const StepperContainer = styled(Box)(({ alignment }) => ({
   display: "flex",
@@ -66,18 +66,18 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
 }));
 
 const SolicitarCita = () => {
-    const [services, setServices] = useState([]);
-    const [employees, setEmployees] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [cart, setCart] = useState([]);
-    const [selectedServiceId, setSelectedServiceId] = useState(null);
-    const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
-    const [selectedEmployee, setSelectedEmployee] = useState(null); 
-    const [total, setTotal] = useState(0);
-    const [activeStep, setActiveStep] = useState(0);
-    const [selectedDay, setSelectedDay] = useState(null);
-    const [selectedHour, setSelectedHour] = useState(null);
-
+  const { user } = useContext(UserContext);
+  const [services, setServices] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [cart, setCart] = useState([]);
+  const [selectedServiceId, setSelectedServiceId] = useState(null);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [total, setTotal] = useState(0);
+  const [activeStep, setActiveStep] = useState(0);
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedHour, setSelectedHour] = useState(null);
 
   const navigate = useNavigate();
 
@@ -138,8 +138,6 @@ const SolicitarCita = () => {
     }
   };
 
-  
-
   const handleEmployeeSelect = (employeeId) => {
     setSelectedEmployeeId(employeeId);
     const selectedEmp = employees.find((emp) => emp.IdEmpleado === employeeId);
@@ -153,23 +151,55 @@ const SolicitarCita = () => {
   };
 
   const handleContinue = () => {
-    setActiveStep((prev) => prev + 1);
-  };
+    if (activeStep === 2) {
+      const selectedService = services.find(service => service.IdServicio === selectedServiceId);
+      
+      // Aquí se realiza la petición para crear la cita
+      const appointmentData = {
+        IdCliente: user?.clienteId, // Usa el ID del cliente logueado
+        IdServicio: selectedServiceId,
+        IdEmpleado: selectedEmployeeId,
+        Fecha: selectedDay.format("YYYY-MM-DD"),
+        Hora: selectedHour,
+      };
 
+      axios.post("http://localhost:5000/api/crearAgenda", appointmentData)
+        .then(response => {
+          Swal.fire({
+            title: "Cita Confirmada",
+            text: "Tu cita ha sido confirmada con éxito.",
+            icon: "success",
+            confirmButtonText: "OK"
+          }).then(() => {
+            navigate("/vistaInicio");
+          });
+        })
+        .catch(error => {
+          Swal.fire({
+            title: "Error",
+            text: "Hubo un problema al confirmar tu cita. Inténtalo nuevamente.",
+            icon: "error",
+            confirmButtonText: "OK"
+          });
+          console.error("Error al confirmar la cita:", error); // Esto te ayudará a entender mejor el error
+        });
+    } else {
+      setActiveStep((prevStep) => prevStep + 1);
+    }
+  };
   const handleStepClick = (stepIndex) => {
     setActiveStep(stepIndex);
   };
 
-
   const handleDateSelect = (day) => {
-    setSelectedDay(day);
-};
+    setSelectedDay(dayjs(day)); // Convertir a un objeto dayjs
+  };
 
-const handleHourSelect = (hour) => {
+  const handleHourSelect = (hour) => {
     setSelectedHour(hour);
-};
+  };
 
-  const steps = ["Servicios", "Profesional", "Hora", "Confirmar"];
+  const steps = ["Servicios", "Profesional", "Hora"];
 
   if (loading) {
     return (
@@ -203,7 +233,7 @@ const handleHourSelect = (hour) => {
           className="text-black font-bold"
           sx={{ fontWeight: "700", fontSize: "1.5rem" }}
         >
-         {activeStep === 0
+          {activeStep === 0
             ? "Seleccionar Servicio"
             : activeStep === 1
             ? "Seleccionar Profesional"
@@ -233,7 +263,7 @@ const handleHourSelect = (hour) => {
         </StepperContainer>
 
         <SectionTitle>
-        {activeStep === 0
+          {activeStep === 0
             ? "Seleccionar Servicio"
             : activeStep === 1
             ? "Seleccionar Profesional"
@@ -271,18 +301,20 @@ const handleHourSelect = (hour) => {
           )}
           {activeStep === 2 && (
             <Box className="p-1 mt-1">
-               <ParentComponent onDateSelect={handleDateSelect} onHourSelect={handleHourSelect} />
+              <ParentComponent
+                onDateSelect={handleDateSelect}
+                onHourSelect={handleHourSelect}
+              />
             </Box>
           )}
-
-          
         </Box>
         <Box className="w-1/3">
           <Sidebar
             business={{
               name: "Spa de uñas | Jake Nail | Manicure en Bello oriente",
               address: "Laureles - Estadio, Laureles, Medellín",
-              image: "https://i.pinimg.com/736x/af/95/86/af9586d44d0b3dcdf65b8056a66dc8a0.jpg",
+              image:
+                "https://i.pinimg.com/736x/af/95/86/af9586d44d0b3dcdf65b8056a66dc8a0.jpg",
             }}
             cart={cart}
             total={total}
