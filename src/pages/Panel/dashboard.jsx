@@ -271,7 +271,6 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Tarjeta para AgendasPorMes */}
             <div style={{ 
                 width: '490px', 
                 height: '370px', 
