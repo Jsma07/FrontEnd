@@ -1,13 +1,92 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import TablePrueba from "../../components/consts/Tabla";
+import ModalDinamico from "../../components/consts/modal";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import Fab from "@mui/material/Fab";
 
 const ListarAdiciones = () => {
   const [adiciones, setAdiciones] = useState([]);
+  const [selectedAdicion, setSelectedAdicion] = useState(null);
+  const [formData, setFormData] = useState({
+    NombreAdiciones: "",
+    Precio: "",
+    Img: null,
+  });
+  const [precioError, setPrecioError] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
-  const [columns, setColumns] = useState([
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "Precio") {
+      // Limitar el valor a números enteros positivos
+      const cleanValue = value.replace(/[^0-9]/g, "");
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: cleanValue,
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault(); // Asegúrate de que este evento sea del formulario
+
+    const precio = Number(formData.Precio);
+
+    if (isNaN(precio) || precio < 5000) {
+      setPrecioError(true);
+      toast.error("El precio debe ser un número mayor o igual a 5000.");
+      return;
+    }
+
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("NombreAdiciones", formData.NombreAdiciones);
+      formDataToSend.append("Precio", formData.Precio);
+      if (formData.Img) {
+        formDataToSend.append("Img", formData.Img);
+      }
+
+      // Enviar datos al servidor
+      const response = await axios.post(
+        "http://localhost:5000/Jackenail/endpoint",
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      // Actualizar la lista de adiciones
+      setAdiciones((prevAdiciones) => [...prevAdiciones, response.data]);
+
+      // Limpiar los datos del formulario después de enviar
+      setFormData({
+        NombreAdiciones: "",
+        Precio: "",
+        Img: null,
+      });
+
+      setPrecioError(false);
+      setOpenModal(false);
+      toast.success("Adición guardada correctamente");
+    } catch (error) {
+      console.error("Error al enviar el formulario:", error);
+      toast.error(
+        "Error al enviar el formulario. Por favor, inténtelo de nuevo."
+      );
+    }
+  };
+
+  const columns = [
     { field: "IdAdiciones", headerName: "ID" },
     { field: "NombreAdiciones", headerName: "Nombre" },
     {
@@ -40,24 +119,24 @@ const ListarAdiciones = () => {
       field: "Estado",
       headerName: "Estado",
       renderCell: (params) =>
-        renderEstadoButton(params.row.Estado, params.row.IdAdiciones), // Usa params.row.Estado
+        renderEstadoButton(params.row.Estado, params.row.IdAdiciones),
     },
-  ]);
+  ];
 
   const renderEstadoButton = (estado, adicionId) => {
     let buttonClass, estadoTexto;
 
     switch (estado) {
-      case 1: // Activo
-        buttonClass = "bg-green-500"; // Verde para Activo
+      case 1:
+        buttonClass = "bg-green-500";
         estadoTexto = "Activo";
         break;
-      case 2: // Inactivo
-        buttonClass = "bg-red-500"; // Rojo para Inactivo
+      case 2:
+        buttonClass = "bg-red-500";
         estadoTexto = "Inactivo";
         break;
       default:
-        buttonClass = "bg-gray-500"; // Gris para Desconocido
+        buttonClass = "bg-gray-500";
         estadoTexto = "Desconocido";
     }
 
@@ -72,10 +151,8 @@ const ListarAdiciones = () => {
   };
 
   const handleEstadoClick = (adicionId, estadoActual) => {
-    // Cambia el estado a 2 si es 1, o a 1 si es 2
     const nuevoEstado = estadoActual === 1 ? 2 : 1;
 
-    // Mostrar la ventana de confirmación
     Swal.fire({
       title: "¿Estás seguro?",
       text: `¿Deseas cambiar el estado de la adición a ${nuevoEstado}?`,
@@ -87,13 +164,11 @@ const ListarAdiciones = () => {
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        // Si el usuario confirma, realizar la solicitud para actualizar el estado
         axios
           .put(`http://localhost:5000/Jackenail/CambiaEstado/${adicionId}`, {
             Estado: nuevoEstado,
           })
           .then((response) => {
-            console.log("Respuesta del servidor:", response.data);
             setAdiciones((prevAdiciones) =>
               prevAdiciones.map((adicion) =>
                 adicion.IdAdiciones === adicionId
@@ -104,7 +179,6 @@ const ListarAdiciones = () => {
             toast.success("Estado actualizado correctamente");
           })
           .catch((error) => {
-            console.error("Error al actualizar el estado:", error);
             toast.error(
               `Error al actualizar el estado: ${
                 error.response ? error.response.data.mensaje : error.message
@@ -115,25 +189,89 @@ const ListarAdiciones = () => {
     });
   };
 
+  const handleCrearUsuarioClick = () => {
+    setSelectedAdicion(null);
+    setOpenModal(true);
+  };
+
   useEffect(() => {
     axios
       .get("http://localhost:5000/Jackenail/Listarventas/adiciones")
       .then((response) => {
-        console.log(response.data);
         setAdiciones(response.data);
       })
       .catch((error) => {
-        console.error("Error al obtener las adiciones:", error);
         toast.error("Error al obtener las adiciones");
       });
   }, []);
 
   return (
-    <TablePrueba
-      title="Gestión de Adiciones"
-      columns={columns}
-      data={adiciones}
-    />
+    <div>
+      <TablePrueba
+        title="Gestión de Adiciones"
+        columns={columns}
+        data={adiciones}
+      />
+      <Fab
+        aria-label="add"
+        style={{
+          border: "0.5px solid grey",
+          backgroundColor: "#94CEF2",
+          position: "fixed",
+          bottom: "16px",
+          right: "16px",
+          zIndex: 1000,
+        }}
+        onClick={handleCrearUsuarioClick}
+      >
+        <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
+      </Fab>
+      <ModalDinamico
+        open={openModal}
+        handleClose={() => setOpenModal(false)}
+        title="Agregar/Editar Adición"
+        fields={[
+          {
+            name: "NombreAdiciones",
+            label: "Nombre",
+            type: "text",
+            value: formData.NombreAdiciones,
+            onChange: handleInputChange,
+            inputProps: {
+              pattern: "^[A-Za-zñÑ]+$",
+              title: "El nombre solo puede contener letras y la letra ñ.",
+            },
+          },
+          {
+            name: "Precio",
+            label: "Precio",
+            type: "number",
+            value: formData.Precio,
+            onChange: handleInputChange,
+            inputProps: {
+              style: precioError ? { borderColor: "red" } : {}, // Resaltar en rojo si hay un error
+              onKeyPress: (e) => {
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault();
+                }
+              },
+            },
+          },
+          {
+            name: "Img",
+            label: "Imagen",
+            type: "file",
+            onChange: (e) =>
+              setFormData((prevData) => ({
+                ...prevData,
+                Img: e.target.files[0],
+              })),
+          },
+        ]}
+        onSubmit={handleFormSubmit}
+        seleccionado={selectedAdicion}
+      />
+    </div>
   );
 };
 
