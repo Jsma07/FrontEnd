@@ -139,28 +139,40 @@ const DetalleCompra = () => {
           padding: "20px",
         }}
       >
-      <h1 className="text-2xl font-bold mb-6">Detalle de compras</h1>
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg mb-6">
-        {detalleCompra.map((compra, index) => (
-          <div key={index}>
-            <div
-              className="overflow-y-auto"
-              style={{
-                maxHeight: compra.insumos.length >= 3 ? "275px" : "auto", // Ajusta la altura máxima según tus necesidades
-              }}
-            >
-              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 text-center">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                  <tr>
-                    <th scope="col" className="px-6 py-3">Imagen</th>
-                    <th scope="col" className="px-6 py-3">Insumo</th>
-                    <th scope="col" className="px-6 py-3">Precio Unitario</th>
-                    <th scope="col" className="px-6 py-3">Cantidad</th>
-                    <th scope="col" className="px-6 py-3">Precio Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {compra.insumos.map((insumo, insumoIndex) => (
+    <h1 className="text-2xl font-bold mb-6">Detalle de compras</h1>
+    <div className="relative overflow-x-auto shadow-md sm:rounded-lg mb-6">
+      {detalleCompra.map((compra, index) => (
+        <div key={index}>
+          <div
+            className="overflow-y-auto"
+            style={{
+              maxHeight: compra.insumos.length >= 3 ? "275px" : "auto",
+            }}
+          >
+            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 text-center">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                  <th scope="col" className="px-6 py-3">Imagen</th>
+                  <th scope="col" className="px-6 py-3">Insumo</th>
+                  <th scope="col" className="px-6 py-3">Precio Unitario</th>
+                  <th scope="col" className="px-6 py-3">Cantidad</th>
+                  <th scope="col" className="px-6 py-3">Precio Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {compra.insumos.map((insumo, insumoIndex) => {
+                  // Encuentra el detalle correspondiente al insumo
+                  const detalle = compra.detallesCompra 
+                    ? compra.detallesCompra.find(
+                        (detalle) => detalle.IdInsumo === insumo.IdInsumos
+                      )
+                    : null;
+
+                  const precioUnitario = detalle ? detalle.precio_unitario : insumo.PrecioUnitario;
+                  const cantidadInsumo = detalle ? detalle.cantidad_insumo : insumo.cantidad_insumo;
+                  const totalValorInsumos = detalle ? detalle.totalValorInsumos : insumo.totalValorInsumos; // Usa 0 como valor por defecto
+
+                  return (
                     <tr
                       key={insumoIndex}
                       className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-center"
@@ -171,7 +183,6 @@ const DetalleCompra = () => {
                           alt="Imagen"
                           style={{
                             maxWidth: "100%",
-                            height: "auto",
                             width: "3rem",
                             height: "3rem",
                             borderRadius: "50%",
@@ -184,22 +195,24 @@ const DetalleCompra = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
-                        {insumo.PrecioUnitario}
+                        {precioUnitario}
                       </td>
                       <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
-                        {insumo.cantidad_insumo}
+                        {cantidadInsumo}
                       </td>
                       <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
-                        {insumo.totalValorInsumos}
+                        {totalValorInsumos}
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
+    </div>
+
 
       <div
             style={{
@@ -344,9 +357,9 @@ const DetalleCompra = () => {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-base font-semibold text-gray-800">Subtotal:</p>
+                        <p className="text-base font-semibold text-gray-800">Total:</p>
                         <p className="text-sm text-gray-600">
-                           {compra.compra.subtotal_compra}
+                           {compra.compra.total_compra}
                         </p>
                       </div>
                     </li>

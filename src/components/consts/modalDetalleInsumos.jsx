@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Modal, Typography, Button, Divider } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 
@@ -9,18 +9,14 @@ const ModalInsumos = ({
   insumos,
   setInsumosSeleccionados,
   insumosSeleccionados,
+  insumosAgregados,
+  setInsumosAgregados,
 }) => {
-  const [insumosAgregados, setInsumosAgregados] = useState([]);
 
   const handleAdd = (id) => {
     const insumoSeleccionado = insumos.find((insumo) => insumo.IdInsumos === id);
-
     if (insumoSeleccionado) {
-      const nuevoDetalleCompra = {
-        ...insumoSeleccionado,
-      };
-
-      setInsumosSeleccionados([...insumosSeleccionados, nuevoDetalleCompra]);
+      setInsumosSeleccionados([...insumosSeleccionados, insumoSeleccionado]);
       setInsumosAgregados([...insumosAgregados, id]);
     }
   };

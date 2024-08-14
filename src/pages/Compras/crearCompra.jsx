@@ -33,8 +33,8 @@ const CrearCompra = () => {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [insumoSeleccionado, setInsumoSeleccionado] = useState(null);
   const [detallesCompra, setDetallesCompra] = useState([]);
-  const [insumosAgregados, setInsumosAgregados] = useState([]);
   const [insumosSeleccionados, setInsumosSeleccionados] = useState([]);
+  const [insumosAgregados, setInsumosAgregados] = useState([]);  
   const [cantidad_insumo, setCantidadInsumo] = useState({});
   const [precio_unitario, setPrecioUnitario] = useState({});
   const [totalValorInsumos, settotalValorInsumos] = useState('');
@@ -46,6 +46,7 @@ const CrearCompra = () => {
   const cerrarModal = () => {
     setModalAbierto(false);
   };
+
   const [isFieldDisabled, setIsFieldDisabled] = useState({
     fecha_compra: false,
     descuento_compra: false,
@@ -138,55 +139,64 @@ const actualizarTotales = (detalles, descuento) => {
   setTotalCompra(totalCompra);
 };
 
-
-const handleAgregarDetalleCompra = () => {
-    const nuevosDetallesCompra = insumosSeleccionados.map((insumo) => ({
-        IdInsumo: insumo.IdInsumos,
-        cantidad_insumo: cantidad_insumo[insumo.IdInsumos] || 0,
-        precio_unitario: precio_unitario[insumo.IdInsumos] || 0,
-        totalValorInsumos: (cantidad_insumo[insumo.IdInsumos] || 0) * (precio_unitario[insumo.IdInsumos] || 0),
-    }));
-
-    console.log("Nuevos detalles de compra:", nuevosDetallesCompra);
-    setDetallesCompra(nuevosDetallesCompra);
-
-    actualizarTotales(nuevosDetallesCompra, descuento_compra);
-};
-
 const handleInputChange = (insumoId, field, value) => {
   if (value < 0) {
     Swal.fire({
-        icon: 'error',
-        title: 'Valor no permitido',
-        text: 'No se permiten números negativos en los campos de cantidad o precio unitario.',
+      icon: 'error',
+      title: 'Valor no permitido',
+      text: 'No se permiten números negativos en los campos de cantidad o precio unitario.',
     });
     return;
   }
 
   if (field === 'cantidad_insumo') {
-      setCantidadInsumo((prevState) => ({ ...prevState, [insumoId]: value }));
+    setCantidadInsumo((prevState) => {
+      const updatedCantidad = { ...prevState, [insumoId]: value };
+      actualizarDetallesCompra(updatedCantidad, precio_unitario);
+      return updatedCantidad;
+    });
   } else {
-      setPrecioUnitario((prevState) => ({ ...prevState, [insumoId]: value }));
+    setPrecioUnitario((prevState) => {
+      const updatedPrecio = { ...prevState, [insumoId]: value };
+      actualizarDetallesCompra(cantidad_insumo, updatedPrecio);
+      return updatedPrecio;
+    });
   }
+};
 
-    const nuevosDetallesCompra = insumosSeleccionados.map((insumo) => ({
-        IdInsumo: insumo.IdInsumos,
-        cantidad_insumo: field === 'cantidad_insumo' ? value : (cantidad_insumo[insumo.IdInsumos] || 0),
-        precio_unitario: field === 'precio_unitario' ? value : (precio_unitario[insumo.IdInsumos] || 0),
-        totalValorInsumos: (
-            (field === 'cantidad_insumo' ? value : (cantidad_insumo[insumo.IdInsumos] || 0)) *
-            (field === 'precio_unitario' ? value : (precio_unitario[insumo.IdInsumos] || 0))
-        ),
-    }));
+const actualizarDetallesCompra = (nuevaCantidadInsumo, nuevoPrecioUnitario) => {
+  const nuevosDetallesCompra = insumosSeleccionados.map((insumo) => {
+    const cantidad = nuevaCantidadInsumo[insumo.IdInsumos] || 0;
+    const precio = nuevoPrecioUnitario[insumo.IdInsumos] || 0;
+    
+    return {
+      IdInsumo: insumo.IdInsumos,
+      cantidad_insumo: cantidad,
+      precio_unitario: precio,
+      totalValorInsumos: cantidad * precio,
+    };
+  });
 
-    setDetallesCompra(nuevosDetallesCompra);
+  setDetallesCompra(nuevosDetallesCompra);
+  actualizarTotales(nuevosDetallesCompra, descuento_compra);
+};
 
-    actualizarTotales(nuevosDetallesCompra, descuento_compra);
+const handleAgregarDetalleCompra = () => {
+  const nuevosDetallesCompra = insumosSeleccionados.map((insumo) => ({
+    IdInsumo: insumo.IdInsumos,
+    cantidad_insumo: cantidad_insumo[insumo.IdInsumos] || 0,
+    precio_unitario: precio_unitario[insumo.IdInsumos] || 0,
+    totalValorInsumos: (cantidad_insumo[insumo.IdInsumos] || 0) * (precio_unitario[insumo.IdInsumos] || 0),
+  }));
+
+  console.log("Nuevos detalles de compra:", nuevosDetallesCompra);
+  setDetallesCompra(nuevosDetallesCompra);
+  actualizarTotales(nuevosDetallesCompra, descuento_compra);
 };
 
 const handleDescuentoChange = (value) => {
-    setDescuentoCompra(value);
-    actualizarTotales(detallesCompra, value);
+  setDescuentoCompra(value);
+  actualizarTotales(detallesCompra, value);
 };
 
 const handleAddCompra = async () => {
@@ -270,6 +280,14 @@ const handleRemove = (id) => {
   setInsumosAgregados(insumosAgregados.filter((insumoId) => insumoId !== id));
 };
 
+const handleAdd = (id) => {
+  const insumoSeleccionado = insumos.find((insumo) => insumo.IdInsumos === id);
+  if (insumoSeleccionado) {
+    setInsumosSeleccionados((prev) => [...prev, insumoSeleccionado]);
+    setInsumosAgregados((prev) => [...prev, id]);
+  }
+};
+
 return (
   <div className="max-w-4xl mx-auto p-4">
    <section className="content">
@@ -307,14 +325,14 @@ return (
           </div>
 
         <div className="form-group mb-2">
-          <label htmlFor="iva_compra" className="block text-sm font-medium text-gray-900 dark:text-white">Descuento:</label>
+          <label htmlFor="descuento_compra" className="block text-sm font-medium text-gray-900 dark:text-white">Descuento:</label>
           <input
             type="number"
             id="descuento_compra"
             value={descuento_compra}
             onChange={(e) => handleDescuentoChange(parseFloat(e.target.value))}
             className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
-            placeholder="IVA" disabled/>
+            placeholder="Descuento"/>
         </div>
 
         <div className="form-group mb-2">
@@ -543,11 +561,12 @@ return (
       <ModalDetalleInsumos 
         open={modalAbierto} 
         handleClose={cerrarModal} 
-        title="Agregar insumos" 
-        onSubmit={handleAgregarDetalleCompra} 
-        insumos={insumos} 
-        setInsumosSeleccionados={setInsumosSeleccionados} 
-        insumosSeleccionados={insumosSeleccionados} 
+        title="Seleccionar Insumos"
+        insumos={insumos}
+        insumosSeleccionados={insumosSeleccionados}
+        setInsumosSeleccionados={setInsumosSeleccionados}
+        insumosAgregados={insumosAgregados}
+        setInsumosAgregados={setInsumosAgregados} 
       />
 
 </section>
@@ -600,7 +619,7 @@ return (
           onChange={handleChange}
         />    
 </div>
-    );
+ );
 }
 
 export default CrearCompra;
