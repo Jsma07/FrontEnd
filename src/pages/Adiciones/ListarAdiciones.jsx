@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import TablePrueba from "../../components/consts/Tabla";
-import ModalDinamico from "../../components/consts/modal";
+import ModalDinamico from "../../components/consts/Modaladi";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import Fab from "@mui/material/Fab";
@@ -56,7 +56,7 @@ const ListarAdiciones = () => {
 
       // Enviar datos al servidor
       const response = await axios.post(
-        "http://localhost:5000/Jackenail/endpoint",
+        "http://localhost:5000/Jackenail/Registraradiciones",
         formDataToSend,
         {
           headers: {
@@ -64,6 +64,9 @@ const ListarAdiciones = () => {
           },
         }
       );
+
+      // Asegúrate de que response.data tenga la estructura esperada
+      console.log("Datos recibidos del servidor:", response.data);
 
       // Actualizar la lista de adiciones
       setAdiciones((prevAdiciones) => [...prevAdiciones, response.data]);
@@ -115,7 +118,6 @@ const ListarAdiciones = () => {
       ),
     },
     { field: "NombreAdiciones", headerName: "Nombre" },
-   
     { field: "Precio", headerName: "Precio", type: "number" },
     {
       field: "Estado",
@@ -205,7 +207,7 @@ const ListarAdiciones = () => {
       .catch((error) => {
         toast.error("Error al obtener las adiciones");
       });
-  }, []);
+  }, []); // Dependencias vacías para que se ejecute solo una vez al montar el componente
 
   return (
     <div>
@@ -231,7 +233,7 @@ const ListarAdiciones = () => {
       <ModalDinamico
         open={openModal}
         handleClose={() => setOpenModal(false)}
-        title="Agregar/Editar Adición"
+        title="Agregar"
         fields={[
           {
             name: "NombreAdiciones",
@@ -251,27 +253,24 @@ const ListarAdiciones = () => {
             value: formData.Precio,
             onChange: handleInputChange,
             inputProps: {
-              style: precioError ? { borderColor: "red" } : {}, // Resaltar en rojo si hay un error
-              onKeyPress: (e) => {
-                if (!/[0-9]/.test(e.key)) {
-                  e.preventDefault();
-                }
-              },
+              min: 5000,
+              step: 100,
             },
           },
           {
             name: "Img",
             label: "Imagen",
             type: "file",
-            onChange: (e) =>
+            onChange: (e) => {
               setFormData((prevData) => ({
                 ...prevData,
                 Img: e.target.files[0],
-              })),
+              }));
+            },
           },
         ]}
         onSubmit={handleFormSubmit}
-        seleccionado={selectedAdicion}
+        precioError={precioError}
       />
     </div>
   );
