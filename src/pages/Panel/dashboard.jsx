@@ -171,7 +171,6 @@ const Dashboard = () => {
                 />
             </div>
     
-            {/* Contenedor para la gráfica */}
             <div style={{ 
                  width: '300px', 
                  height: '370px', 
