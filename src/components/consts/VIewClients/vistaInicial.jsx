@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import NavbarClient from "./Navbarclient";
+import Footer from "./Footer";
 
 const VistaInicial = () => {
   // Hook para manejar la visibilidad de los elementos en la vista
@@ -207,37 +208,9 @@ const VistaInicial = () => {
           </div>
         </div>
       </section>
-
-      <section id="contact">
-        <div className="container">
-          <h4>Contactanos</h4>
-          <p>Santo Domingo Savio, Medellin</p>
-          <p>+ (57) 300 564 85 34</p>
-          <p>info.jakenails@gmail.com</p>
-        </div>
-      </section>
-
-      <footer>
-        <p className="copy-right">
-          <img
-            src="https://res.cloudinary.com/de8cuyd0n/image/upload/v1520412543/E-commerce%20landing%20page/icons/copy-right-img_1x.png"
-            alt="copy right image"
-          />
-          2017 all rights reserved
-        </p>
-        <p>Privacy Policy</p>
-        <p>License</p>
-      </footer>
-
-      <div className="back-to-top">
-        <a href="#nav">
-          <img
-            title="Back to Top."
-            src="https://res.cloudinary.com/de8cuyd0n/image/upload/v1520412541/E-commerce%20landing%20page/icons/back_-_top_1x.png"
-            alt="back to top"
-          />
-        </a>
-      </div>
+      <br /><br />
+      
+     | <Footer />
     </div>
   );
 };
