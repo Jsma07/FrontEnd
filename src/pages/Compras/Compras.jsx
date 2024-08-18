@@ -19,7 +19,15 @@ const Compras = () => {
   const fetchCompras = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/compras');
-      setCompras(response.data);
+      const data = response.data;
+      
+      data.sort((a, b) => {
+        const fechaA = new Date(a.fecha_compra.split('/').reverse().join('-'));
+        const fechaB = new Date(b.fecha_compra.split('/').reverse().join('-'));
+        return fechaB - fechaA; 
+      });
+
+      setCompras(data);
     } catch (error) {
       console.error('Error fetching Compras:', error);
     }
@@ -215,6 +223,7 @@ const Compras = () => {
       </Fab>
     </div>
   );
+  
 };
 
 export default Compras;

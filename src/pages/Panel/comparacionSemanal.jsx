@@ -92,8 +92,7 @@ const ComparacionSemanal = () => {
     };
 
     return (
-        <div>
-            <h2>Compras VS Ventas</h2>
+        <div style={{ width: '100%', height: '300px', maxWidth: '400px', margin: '0 auto' }}>
             <Bar data={data} options={config.options} />
         </div>
     );

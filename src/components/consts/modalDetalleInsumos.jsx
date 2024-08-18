@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Modal, Typography, Button, Divider } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 
@@ -9,18 +9,14 @@ const ModalInsumos = ({
   insumos,
   setInsumosSeleccionados,
   insumosSeleccionados,
+  insumosAgregados,
+  setInsumosAgregados,
 }) => {
-  const [insumosAgregados, setInsumosAgregados] = useState([]);
 
   const handleAdd = (id) => {
     const insumoSeleccionado = insumos.find((insumo) => insumo.IdInsumos === id);
-
     if (insumoSeleccionado) {
-      const nuevoDetalleCompra = {
-        ...insumoSeleccionado,
-      };
-
-      setInsumosSeleccionados([...insumosSeleccionados, nuevoDetalleCompra]);
+      setInsumosSeleccionados([...insumosSeleccionados, insumoSeleccionado]);
       setInsumosAgregados([...insumosAgregados, id]);
     }
   };
@@ -44,7 +40,7 @@ const ModalInsumos = ({
       </style>
       <Modal open={open} onClose={handleClose}>
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-          <div className="bg-white text-black rounded-lg shadow-lg p-6 w-[90%] h-full max-h-[90%] flex flex-col relative">
+          <div   style={{ width: '35%' }} className="bg-white text-black rounded-lg shadow-lg p-6 w-[90%] h-full max-h-[90%] flex flex-col relative">
             <button
               onClick={handleClose}
               className="absolute top-2 right-2 p-2 text-black hover:text-gray-600"

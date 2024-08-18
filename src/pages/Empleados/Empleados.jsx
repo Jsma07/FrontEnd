@@ -449,19 +449,10 @@ const Empleados = () => {
               type: "select",
               required: true,
               options: [
-                { value: "DNI", label: "DNI" },
-                { value: "Cedula Ciudadania", label: "Cedula Ciudadania" },
+                { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
+                { value: "C.E", label: "Cédula de extranjería (C.E)" },
 
-                {
-                  value: "Tarjeta de Identidad",
-                  label: "Tarjeta de Identidad",
-                },
-
-                { value: "Pasaporte", label: "Pasaporte" },
-                {
-                  value: "Carné de extranjería",
-                  label: "Carné de extranjería",
-                },
+               
               ],
             },
             {
@@ -525,19 +516,8 @@ const Empleados = () => {
               type: "select",
               required: true,
               options: [
-                { value: "DNI", label: "DNI" },
-                { value: "Cedula Ciudadania", label: "Cedula Ciudadania" },
-
-                {
-                  value: "Tarjeta de Identidad",
-                  label: "Tarjeta de Identidad",
-                },
-
-                { value: "Pasaporte", label: "Pasaporte" },
-                {
-                  value: "Carné de extranjería",
-                  label: "Carné de extranjería",
-                },
+                { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
+                        { value: "C.E", label: "Cédula de extranjería (C.E)" },
               ],
             },
             {

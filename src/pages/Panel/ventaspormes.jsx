@@ -77,9 +77,22 @@ const VentasPorMes = () => {
     };
 
     return (
-        <div>
-            <h2>Total de Ventas por Mes</h2>
-            <Bar data={data} options={config.options} />
+        <div style={{ width: '100%', height: '300px', maxWidth: '400px', margin: '0 auto' }}>
+            <Bar data={data} options={{ 
+                responsive: true, 
+                maintainAspectRatio: true, // Cambiar a true para mantener proporciones 
+                plugins: { 
+                    legend: { position: 'top' }, 
+                    tooltip: { callbacks: { label: (context) => `Total: ${context.raw}` } } 
+                }, 
+                scales: { 
+                    x: { beginAtZero: true }, 
+                    y: { 
+                        beginAtZero: true, 
+                        ticks: { precision: 0, stepSize: 1 } 
+                    } 
+                } 
+            }} />
         </div>
     );
 };

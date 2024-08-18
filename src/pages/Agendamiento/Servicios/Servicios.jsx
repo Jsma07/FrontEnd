@@ -377,6 +377,9 @@ const Servicios = () => {
 
 <TablePrueba
   columns={[
+   
+    
+    { field: 'Nombre_Servicio', headerName: 'NOMBRE', width: 'w-36' },
     {
       field: "Imagen",
       headerName: "IMAGEN",
@@ -402,8 +405,6 @@ const Servicios = () => {
         </div>
       ),
     },
-    
-    { field: 'Nombre_Servicio', headerName: 'NOMBRE', width: 'w-36' },
     { field: 'Tiempo_Servicio', headerName: 'TIEMPO EN HORAS', width: 'w-36' },
     {
   field: 'Precio_Servicio',
