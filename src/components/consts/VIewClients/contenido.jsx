@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import NavbarClient from "./Navbarclient";
 import Footer from "./Footer";
-
 import { motion } from "framer-motion";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
@@ -12,9 +11,11 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Contenidoitems() {
   const [servicios, setServicios] = useState([]);
+  const navigate = useNavigate();
   const [filter, setFilter] = useState({ nombre: "", precio: "", hora: "" });
 
   useEffect(() => {
@@ -45,11 +46,15 @@ function Contenidoitems() {
     );
   });
 
+  const handleRedirect = () => {
+    navigate("/solicitarCita"); 
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       <NavbarClient />
 
-      <header id="header-hero" className="text-center py-12">
+      <header id="header-hero" className="text-center py-20">
         <motion.div
           initial={{ opacity: 0, y: -50, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -58,36 +63,36 @@ function Contenidoitems() {
           <div
             className="header-bg relative bg-gradient-to-r from-purple-400 to-indigo-400 p-8 rounded-xl"
             style={{
-              boxShadow: "0px 1.5px 3px rgba(0, 0, 0, 0.5)", // Sombra negra de 1.5
+              boxShadow: "0px 1.5px 3px rgba(0, 0, 0, 0.5)", 
+              paddingTop: "4rem", 
+              paddingBottom: "4rem", 
             }}
           >
-            <h2
-              style={{ marginTop: "4rem" }}
-              className="text-3xl font-bold text-white"
-            >
-              BIENVENIDOS A UN MUNDO LLENO DE ESTILO
+            <h2 className="text-3xl font-bold text-white">
+              CATALOGO DE NUESTROS SERVICIOS
             </h2>
 
             <p className="text-lg text-white mt-4">
               Servicios de manicure con estilos únicos y modernos, diseñados
               para resaltar tu belleza y personalidad.
             </p>
-            <button className="mt-6 bg-white text-purple-500 font-semibold px-6 py-3 rounded-full shadow-lg transform hover:scale-105 transition duration-300">
+            {/* <button className="mt-6 bg-white text-purple-500 font-semibold px-6 py-3 rounded-full shadow-lg transform hover:scale-105 transition duration-300">
               <p className="flex items-center justify-center">
                 <i className="bx bxs-right-arrow-circle mr-2 text-xl"></i>
                 Ver servicios
               </p>
-            </button>
+            </button> */}
           </div>
         </motion.div>
       </header>
+
 
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-around",
           alignItems: "center",
-          mt: -2,
+          mt: -1,
           mb: 2,
           py: 3,
           backgroundColor: "#f3f3f3",
@@ -98,11 +103,11 @@ function Contenidoitems() {
           transition={{ duration: 0.3 }}
           style={{ textAlign: "center", color: "#8A2BE2", maxWidth: 200 }}
         >
-          <i className="bx bxs-paint" style={{ fontSize: "48px" }}></i>
-          <Typography variant="h6" sx={{ mt: 2, fontWeight: "bold" }}>
+          <i className="bx bxs-paint" style={{ fontSize: "55px" }}></i>
+          <Typography variant="h6" sx={{ mt: 2, fontWeight: "bold", fontFamily: "Franklin Gothic Medium", textTransform: "uppercase" }}>
             Colores Vibrantes
           </Typography>
-          <Typography variant="body2" sx={{ mt: 1 }}>
+          <Typography variant="body2" font-family= "Cambria" sx={{ mt: 1 , fontFamily: "Cambria", fontStyle: "italic"}}>
             Explora una amplia gama de colores que resaltarán tu estilo único y
             personal.
           </Typography>
@@ -112,11 +117,11 @@ function Contenidoitems() {
           transition={{ duration: 0.3 }}
           style={{ textAlign: "center", color: "#8A2BE2", maxWidth: 200 }}
         >
-          <i className="bx bxs-brush" style={{ fontSize: "48px" }}></i>
-          <Typography variant="h6" sx={{ mt: 2, fontWeight: "bold" }}>
+          <i className="bx bxs-brush" style={{ fontSize: "55px" }}></i>
+          <Typography variant="h6" sx={{ mt: 2, fontWeight: "bold", fontFamily: "Franklin Gothic Medium", textTransform: "uppercase" }}>
             Diseños Creativos
           </Typography>
-          <Typography variant="body2" sx={{ mt: 1 }}>
+          <Typography variant="body2" sx={{ mt: 1 , fontFamily: "Cambria", fontStyle: "italic"}}>
             Lleva la creatividad a tus uñas con diseños exclusivos que te
             encantarán.
           </Typography>
@@ -126,11 +131,11 @@ function Contenidoitems() {
           transition={{ duration: 0.3 }}
           style={{ textAlign: "center", color: "#8A2BE2", maxWidth: 200 }}
         >
-          <i className="bx bxs-heart" style={{ fontSize: "48px" }}></i>
-          <Typography variant="h6" sx={{ mt: 2, fontWeight: "bold" }}>
-            Cuidado Profesional
+          <i className="bx bxs-heart" style={{ fontSize: "55px" }}></i>
+          <Typography variant="h6" sx={{ mt: 2, fontWeight: "bold", fontFamily: "Franklin Gothic Medium", textTransform: "uppercase" }}>
+            Buen Cuidado
           </Typography>
-          <Typography variant="body2" sx={{ mt: 1 }}>
+          <Typography variant="body2" sx={{ mt: 1 , fontFamily: "Cambria", fontStyle: "italic"}}>
             Ofrecemos un cuidado completo y profesional para la salud de tus
             uñas.
           </Typography>
@@ -144,6 +149,7 @@ function Contenidoitems() {
             justifyContent: "space-between",
             alignItems: "center",
             mb: 2,
+            mt: 4,
           }}
         >
           <Box sx={{ display: "flex", gap: 2 }}>
@@ -261,6 +267,7 @@ function Contenidoitems() {
                         },
                         borderRadius: 4,
                       }}
+                      onClick={handleRedirect}
                     >
                       <i
                         className="bx bx-calendar"
@@ -275,6 +282,7 @@ function Contenidoitems() {
           ))}
         </Grid>
       </Box>
+      <br /><br />
 
       <Footer />
     </div>

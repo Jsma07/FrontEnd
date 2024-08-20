@@ -128,51 +128,51 @@ const SalidaInsumos = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Tarjetas de insumos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
           {filteredInsumos.map((insumo) => (
             <div
               key={insumo.IdInsumos}
-              className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700"
+              className="max-w-xs bg-white border border-gray-300 rounded-lg shadow-xl dark:bg-gray-900 dark:border-gray-800 transition-transform transform hover:scale-105 mt-6"
             >
               <img
                 src={`http://localhost:5000${insumo.imagen}`}
                 alt={insumo.NombreInsumos}
-                className="h-60 w-full object-cover rounded-t-lg"
+                className="h-52 w-full object-cover rounded-t-lg"
               />
-              <div className="p-5">
-                <div className="mb-1 flex items-center justify-between">
-                  <h5 className="text-lg font-bold text-gray-800">
+              <div className="p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <h5 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                     {insumo.NombreInsumos}
                   </h5>
-                  <span className="font-medium text-sm text-gray-800">
+                  <span className="font-bold text-lg text-gray-900 dark:text-gray-300">
                     ${insumo.PrecioUnitario}
                   </span>
                 </div>
-                <span className="font-medium text-md text-gray-800 mt-1">
+                <p className="font-medium text-sm text-gray-600 dark:text-gray-400">
                   Cantidad en stock: {insumo.Cantidad}
-                </span>
+                </p>
                 <div className="mt-4 flex justify-center">
                   {insumo.Estado !== "Agotado" && insumo.Cantidad > 0 ? (
                     <button
-                      className="px-4 py-2 bg-red-500 text-white rounded-md shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-600 transition"
+                      className="px-4 py-2 text-white rounded-md shadow-md focus:outline-none focus:ring-2 transition"
+                      style={{
+                        backgroundColor: "#8e44ad",
+                        borderColor: "#8e44ad",
+                      }}
                       onClick={() => handleAgregarInsumo(insumo)}
                     >
-                      <i
-                        className="bx bx-plus"
-                        style={{ fontSize: "1.5rem" }}
-                      ></i>
-                      Sacar insumo
+                      <i className="bx bx-plus text-lg align-middle"></i>
+                      <span className="ml-2 align-middle">Sacar insumo</span>
                     </button>
                   ) : (
                     <button
-                      className="px-4 py-2 bg-gray-400 text-white rounded-md shadow cursor-not-allowed"
+                      className="px-4 py-2 text-white rounded-md shadow-md cursor-not-allowed opacity-50"
+                      style={{ backgroundColor: "#8e44ad" }}
                       disabled
                     >
-                      <i
-                        className="bx bx-plus"
-                        style={{ fontSize: "1.5rem" }}
-                      ></i>
-                      Sacar insumo
+                      <i className="bx bx-plus text-lg align-middle"></i>
+                      <span className="ml-2 align-middle">Sacar insumo</span>
                     </button>
                   )}
                 </div>

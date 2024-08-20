@@ -33,7 +33,7 @@ function NavigationMenu() {
   return (
     <ul className="flex justify-end items-center space-x-10">
       <MenuItem href="/vistaInicio" text="Inicio" />
-      <MenuItem href="/servicios" text="Servicios" />
+      <MenuItem href="/Catalogo" text="Servicios" />
       <MenuItem href="/solicitarCita" text="Agendamiento" />
       <MenuItem href="/contacto" text="Contacto" />
     </ul>

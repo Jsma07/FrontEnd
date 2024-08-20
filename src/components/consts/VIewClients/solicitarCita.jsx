@@ -153,17 +153,31 @@ const SolicitarCita = () => {
   const handleContinue = () => {
     if (activeStep === 2) {
       const selectedService = services.find(service => service.IdServicio === selectedServiceId);
-      
-      // Aquí se realiza la petición para crear la cita
+
       const appointmentData = {
-        IdCliente: user?.clienteId, // Usa el ID del cliente logueado
         IdServicio: selectedServiceId,
         IdEmpleado: selectedEmployeeId,
         Fecha: selectedDay.format("YYYY-MM-DD"),
         Hora: selectedHour,
+        EstadoAgenda: 1,
       };
 
-      axios.post("http://localhost:5000/api/crearAgenda", appointmentData)
+      // Imprime los datos en la consola para verificar
+      console.log("Datos de la cita que se enviarán:", appointmentData);
+
+      // Verificar si alguno de los campos es null o undefined
+      if (!appointmentData.IdServicio || !appointmentData.IdEmpleado || !appointmentData.Fecha || !appointmentData.Hora) {
+        console.error("Hay datos faltantes en la solicitud:", appointmentData);
+        Swal.fire({
+          title: "Error",
+          text: "Faltan datos en la solicitud. Verifica e intenta nuevamente.",
+          icon: "error",
+          confirmButtonText: "OK"
+        });
+        return;
+      }
+
+      axios.post("http://localhost:5000/api/agendas/crearAgenda", appointmentData)
         .then(response => {
           Swal.fire({
             title: "Cita Confirmada",
@@ -181,12 +195,15 @@ const SolicitarCita = () => {
             icon: "error",
             confirmButtonText: "OK"
           });
-          console.error("Error al confirmar la cita:", error); // Esto te ayudará a entender mejor el error
+
+          // Imprime más detalles del error
+          console.error("Error al confirmar la cita:", error.response ? error.response.data : error);
         });
     } else {
       setActiveStep((prevStep) => prevStep + 1);
     }
   };
+
   const handleStepClick = (stepIndex) => {
     setActiveStep(stepIndex);
   };

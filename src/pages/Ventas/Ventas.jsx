@@ -2,17 +2,38 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import Tabla from "../../components/consts/Tabla";
+import ModalAdiciones from "../../components/consts/AggAdiciones";
 import Fab from "@mui/material/Fab";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { toast } from "react-toastify";
+
 import "react-toastify/dist/ReactToastify.css";
 import EditIcon from "@mui/icons-material/Edit";
 import Swal from "sweetalert2";
 
 const Ventas = () => {
   const [ventas, setVentas] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [adicionesSeleccionadas, setAdicionesSeleccionadas] = useState([]);
+  const [adiciones, setAdiciones] = useState([]);
   const [ventaIdToDelete, setVentaIdToDelete] = useState(null);
+  const [ventaSeleccionada, setVentaSeleccionada] = useState({
+    idVentas: null,
+  });
+
+  const handleCloseModal = () => setOpenModal(false);
+
+  const handleOpenModal = (idVentas) => {
+    console.log("ID de venta recibido:", idVentas);
+    if (idVentas) {
+      setVentaSeleccionada(idVentas);
+      setOpenModal(true);
+    } else {
+      console.log("Venta no encontrada");
+    }
+  };
+
   useEffect(() => {
     const fetchVentas = async () => {
       try {
@@ -23,22 +44,19 @@ const Ventas = () => {
         const ventasConDetalles = response.data.map((venta) => ({
           id: venta.idVentas,
           idServicio: (
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-            <img
-              src={`http://localhost:5000${venta.servicio.ImgServicio}`}
-              alt={venta.servicio.Nombre_Servicio}
-              style={{
-                width: '3rem',
-                height: '3rem',
-                borderRadius: '50%',
-                marginRight: '1rem' 
-              }}
-            />
-            <h1 style={{ margin: 0 }}>
-              {venta.servicio.Nombre_Servicio}
-            </h1>
-          </div>
-          
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img
+                src={`http://localhost:5000${venta.servicio.ImgServicio}`}
+                alt={venta.servicio.Nombre_Servicio}
+                style={{
+                  width: "3rem",
+                  height: "3rem",
+                  borderRadius: "50%",
+                  marginRight: "1rem",
+                }}
+              />
+              <h1 style={{ margin: 0 }}>{venta.servicio.Nombre_Servicio}</h1>
+            </div>
           ),
           IdCliente: `${venta.cliente.Nombre} ${venta.cliente.Apellido}`,
           idEmpleado: `${venta.empleado?.Nombre || ""} ${
@@ -64,9 +82,11 @@ const Ventas = () => {
 
                   {venta.Estado === 2 && (
                     <Fab
+                      key={venta.idVentas}
                       size="small"
                       aria-label="edit"
                       className="flex items-center justify-center w-10 h-10 rounded-full bg-green-700 text-white"
+                      onClick={() => handleOpenModal(venta.idVentas)}
                     >
                       <EditIcon />
                     </Fab>
@@ -162,6 +182,21 @@ const Ventas = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchAdiciones = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/Jackenail/Listarventas/adiciones"
+        );
+        setAdiciones(response.data);
+      } catch (error) {
+        console.error("Error al obtener las adiciones:", error);
+      }
+    };
+
+    fetchAdiciones();
+  }, []);
+
   const cambiarEstadoVenta = async (ventaId, nuevoEstado) => {
     try {
       const response = await axios.put(
@@ -187,6 +222,7 @@ const Ventas = () => {
       });
     }
   };
+
   const handleOpenAlert = (ventaId) => {
     setVentaIdToDelete(ventaId);
 
@@ -216,22 +252,25 @@ const Ventas = () => {
       );
 
       if (response.data.success) {
+        const updatedVenta = response.data.venta;
         setVentas((prevVentas) =>
           prevVentas.map((venta) =>
             venta.id === ventaId
-              ? { ...venta, Estado: renderEstadoButton(3), Acciones: null } // Remover Acciones si el estado es Anulado
+              ? {
+                  ...venta,
+                  Estado: renderEstadoButton(updatedVenta.Estado),
+                  Acciones: null,
+                } // Remover Acciones si el estado es Anulado
               : venta
           )
         );
         toast.success("Venta anulada con éxito");
       } else {
-        // Mostrar el mensaje de error recibido del backend
         toast.error(
           response.data.error || "Error desconocido al anular la venta"
         );
       }
     } catch (error) {
-      // Manejar errores de red u otros problemas
       console.error("Error al anular la venta:", error);
       toast.error(
         error.response?.data?.error || "Hubo un problema al anular la venta"
@@ -273,6 +312,19 @@ const Ventas = () => {
           <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
         </Fab>
       </Link>
+
+      {ventaSeleccionada && (
+        <ModalAdiciones
+          open={openModal}
+          handleClose={handleCloseModal}
+          title="Seleccionar Adiciones"
+          adiciones={adiciones}
+          setAdicionesSeleccionadas={setAdicionesSeleccionadas}
+          adicionesSeleccionadas={adicionesSeleccionadas}
+          idVentas={ventaSeleccionada} // Pasar el id de la venta seleccionada
+          setVentas={setVentas}
+        />
+      )}
     </div>
   );
 };

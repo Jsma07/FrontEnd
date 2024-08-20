@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import NavbarClient from "./Navbarclient";
+import Footer from "./Footer";
 
 const VistaInicial = () => {
-  // Hook para manejar la visibilidad de los elementos en la vista
+  const [productos, setProductos] = useState([]);
+
   const [headerRef, headerInView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
@@ -29,6 +32,19 @@ const VistaInicial = () => {
     triggerOnce: false,
     threshold: 0.2,
   });
+
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/masagendados');
+        setProductos(response.data); 
+      } catch (error) {
+        console.error('Error al obtener los productos:', error);
+      }
+    };
+
+    fetchProductos();
+  }, []);
 
   return (
     <div>
@@ -142,102 +158,62 @@ const VistaInicial = () => {
       <section id="products">
         <div className="container">
           <div className="products-header">
-            <h2>Tecnicas de uñas mas populares</h2>
-            <p>Estas son las tecnicas mas populares de nuestro negocio.</p>
+            <h2 ref={headerRef}>
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={headerInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6 }}
+              >
+                Técnicas de uñas más populares
+              </motion.div>
+            </h2>
+            <p>Estas son las técnicas más populares de nuestro negocio.</p>
           </div>
-          <div className="product product-1">
-            <motion.figure
-              ref={product1Ref} // Referencia para detectar el scroll
-              initial={{ opacity: 0, y: 20 }}
-              animate={product1InView ? { opacity: 1, y: 0 } : {}} // Anima solo cuando es visible
-              transition={{ duration: 0.6 }}
-            >
-              <img
-                src="https://i.pinimg.com/736x/aa/6b/6c/aa6b6c50b738427eef8b1328149175c1.jpg"
-                alt="product-image"
-              />
-              <figcaption>Uñas Acrilicas</figcaption>
-              <figcaption>$ 56.000</figcaption>
-            </motion.figure>
-          </div>
-          <div className="product product-2">
-            <motion.figure
-              ref={product2Ref} // Referencia para detectar el scroll
-              initial={{ opacity: 0, y: 20 }}
-              animate={product2InView ? { opacity: 1, y: 0 } : {}} // Anima solo cuando es visible
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <img
-                src="https://www.tiendasemilac.com/modules/ph_simpleblog/covers/16.jpg"
-                alt="product-image"
-              />
-              <figcaption>Uñas Semipermanentes</figcaption>
-              <figcaption>$ 84.000</figcaption>
-            </motion.figure>
-          </div>
-          <div className="product product-3">
-            <motion.figure
-              ref={product3Ref} // Referencia para detectar el scroll
-              initial={{ opacity: 0, y: 20 }}
-              animate={product3InView ? { opacity: 1, y: 0 } : {}} // Anima solo cuando es visible
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <img
-                src="https://www.diariodepuertomontt.cl/files/64377718de625.png"
-                alt="product-image"
-              />
-              <figcaption>Uñas Press On</figcaption>
-              <figcaption>$ 48.000</figcaption>
-            </motion.figure>
-          </div>
-          <div className="product product-4">
-            <motion.figure
-              ref={product4Ref} // Referencia para detectar el scroll
-              initial={{ opacity: 0, y: 20 }}
-              animate={product4InView ? { opacity: 1, y: 0 } : {}} // Anima solo cuando es visible
-              transition={{ duration: 0.6, delay: 0.6 }}
-            >
-              <img
-                src="https://i.pinimg.com/564x/a6/3a/9f/a63a9f083db8a508683b1ee2700cafec.jpg"
-                alt="product-image"
-              />
-              <figcaption>Uñas Poly Gel</figcaption>
-              <figcaption>$ 89.000</figcaption>
-            </motion.figure>
-          </div>
+
+          {productos.map((producto, index) => (
+            <div key={producto.IdServicio} className={`product product-${index + 1}`}>
+              <motion.figure
+                ref={
+                  index === 0
+                    ? product1Ref
+                    : index === 1
+                    ? product2Ref
+                    : index === 2
+                    ? product3Ref
+                    : product4Ref
+                }
+                initial={{ opacity: 0, y: 20 }}
+                animate={
+                  (index === 0 && product1InView) ||
+                  (index === 1 && product2InView) ||
+                  (index === 2 && product3InView) ||
+                  (index === 3 && product4InView)
+                    ? { opacity: 1, y: 0 }
+                    : {}
+                }
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+              >
+                <img
+                  src={`http://localhost:5000${producto.ImgServicio}`|| 'default-image-url.jpg'}
+                  alt={producto.Nombre_Servicio}
+                />
+                <figcaption>{producto.Nombre_Servicio}</figcaption>
+                <figcaption>
+                  {new Intl.NumberFormat('es-CO', { 
+                    style: 'currency', 
+                    currency: 'COP',
+                    minimumFractionDigits: 0, 
+                    maximumFractionDigits: 0  
+                  }).format(producto.Precio_servicio)}
+                </figcaption>
+              </motion.figure>
+            </div>
+          ))}
         </div>
       </section>
-
-      <section id="contact">
-        <div className="container">
-          <h4>Contactanos</h4>
-          <p>Santo Domingo Savio, Medellin</p>
-          <p>+ (57) 300 564 85 34</p>
-          <p>info.jakenails@gmail.com</p>
-        </div>
-      </section>
-
-      <footer>
-        <p className="copy-right">
-          <img
-            src="https://res.cloudinary.com/de8cuyd0n/image/upload/v1520412543/E-commerce%20landing%20page/icons/copy-right-img_1x.png"
-            alt="copy right image"
-          />
-          2017 all rights reserved
-        </p>
-        <p>Privacy Policy</p>
-        <p>License</p>
-      </footer>
-
-      <div className="back-to-top">
-        <a href="#nav">
-          <img
-            title="Back to Top."
-            src="https://res.cloudinary.com/de8cuyd0n/image/upload/v1520412541/E-commerce%20landing%20page/icons/back_-_top_1x.png"
-            alt="back to top"
-          />
-        </a>
-      </div>
+      <br /><br />
+      
+     | <Footer />
     </div>
   );
 };
