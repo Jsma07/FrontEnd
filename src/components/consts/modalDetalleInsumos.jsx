@@ -40,7 +40,7 @@ const ModalInsumos = ({
       </style>
       <Modal open={open} onClose={handleClose}>
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-          <div className="bg-white text-black rounded-lg shadow-lg p-6 w-[90%] h-full max-h-[90%] flex flex-col relative">
+          <div   style={{ width: '35%' }} className="bg-white text-black rounded-lg shadow-lg p-6 w-[90%] h-full max-h-[90%] flex flex-col relative">
             <button
               onClick={handleClose}
               className="absolute top-2 right-2 p-2 text-black hover:text-gray-600"

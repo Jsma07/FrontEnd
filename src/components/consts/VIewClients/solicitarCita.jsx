@@ -155,13 +155,13 @@ const SolicitarCita = () => {
   const handleContinue = () => {
     if (activeStep === 2) {
       const selectedService = services.find(service => service.IdServicio === selectedServiceId);
-      
-      // Aquí se realiza la petición para crear la cita
+
       const appointmentData = {
         IdServicio: selectedServiceId,
         IdEmpleado: selectedEmployeeId,
         Fecha: selectedDay.format("YYYY-MM-DD"),
         Hora: selectedHour,
+        EstadoAgenda: 1,
       };
 
       axios.post("http://localhost:5000/api/agendas/crearAgenda", appointmentData)
@@ -182,12 +182,15 @@ const SolicitarCita = () => {
             icon: "error",
             confirmButtonText: "OK"
           });
-          console.error("Error al confirmar la cita:", error); // Esto te ayudará a entender mejor el error
+
+          // Imprime más detalles del error
+          console.error("Error al confirmar la cita:", error.response ? error.response.data : error);
         });
     } else {
       setActiveStep((prevStep) => prevStep + 1);
     }
   };
+
   const handleStepClick = (stepIndex) => {
     setActiveStep(stepIndex);
   };

@@ -212,6 +212,12 @@ const Login = () => {
                     Registrate
                   </a>
                 </p>
+                <p className="text-gray-400 text-center">
+                  ¿Olvidaste tu contraseña?{' '}
+                  <a href="/recuperarContrasena" className="text-sm text-purple-700 hover:text-purple-700">
+                  Click aquí
+                  </a>
+                </p>
               </div>
             </form>
           </div>

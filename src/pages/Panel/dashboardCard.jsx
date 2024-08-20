@@ -18,6 +18,7 @@ const DashboardCard = ({ title, count, iconClass, onClick }) => {
             border: '1px solid rgba(0, 0, 0, 0.2)',
             cursor: 'pointer',
             position: 'relative',
+            left: '40px',
         }}
         onClick={onClick}
         onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'} // Aumenta el tamaño al pasar el ratón

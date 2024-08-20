@@ -177,6 +177,7 @@ const Dashboard = () => {
           {/* Contenedor para las gráficas */}
           <div style={{
             display: 'flex',
+            justifyContent: 'center', 
             flexWrap: 'wrap',
             gap: '10px',
             width: '100%'
@@ -239,7 +240,7 @@ const Dashboard = () => {
 
         <div style={{ 
             display: 'flex', 
-            justifyContent: 'flex-start', 
+            justifyContent: 'center', 
             gap: '10px', 
             flexWrap: 'wrap' 
             }}>
@@ -271,7 +272,6 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Tarjeta para AgendasPorMes */}
             <div style={{ 
                 width: '490px', 
                 height: '370px', 
