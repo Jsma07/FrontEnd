@@ -235,7 +235,7 @@ const FechasTrabajo = () => {
                         </Avatar>
                         <Box textAlign="center" flexGrow={1}>
                           <Typography variant="h6" component="div">
-                            {dayjs(horario.fecha).format("DD/MM/YYYY")}
+                            {dayjs(horario.fecha).format("D MMMM")}
                           </Typography>
                           <Typography variant="body2">
                             Estado: {horario.estado}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -7,8 +7,10 @@ import { styled } from "@mui/material/styles";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";  // Importa el icono de calendario
-import AccessTimeIcon from "@mui/icons-material/AccessTime";  // Importa el icono de reloj
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday"; // Importa el icono de calendario
+import AccessTimeIcon from "@mui/icons-material/AccessTime"; // Importa el icono de reloj
+import { UserContext } from "../../../../context/ContextoUsuario"; // Ajusta la ruta según sea necesario
+import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 
 // Define un tema personalizado con tipografía
 const theme = createTheme({
@@ -145,6 +147,16 @@ const ImageContainer = styled(Box)({
   height: "69px",
 });
 
+const WelcomeText = styled(Typography)({
+  fontSize: "14px",
+  fontWeight: 700,
+  color: "#666",
+  display: "flex",
+  alignItems: "center",
+  marginBottom: "-19px",
+  marginTop: "-30px", // Añade margen superior para ajustar la posición
+});
+
 const Sidebar = ({
   business,
   cart,
@@ -156,6 +168,8 @@ const Sidebar = ({
   selectedDay,
   selectedHour,
 }) => {
+  const { user } = useContext(UserContext); // Obtén el usuario del contexto
+
   const [selectedServiceId, setSelectedServiceId] = useState(null);
 
   const navigate = useNavigate();
@@ -198,6 +212,13 @@ const Sidebar = ({
             </Box>
           </Box>
 
+          {user && (
+            <WelcomeText variant="h6" component="h3">
+              <PermIdentityIcon sx={{ mr: 1 }} />
+              Tu: {user.nombre || user.Nombre}
+            </WelcomeText>
+          )}
+
           <Box mt={3}>
             {cart.length === 0 ? (
               <>
@@ -223,17 +244,19 @@ const Sidebar = ({
               </>
             ) : (
               <>
+
+              
                 {cart.map((item) => (
                   <CartItem
                     key={item.id}
                     selected={item.id === selectedServiceId}
                     onClick={() => setSelectedServiceId(item.id)}
                   >
-                    {/* Muestra la fecha y hora seleccionadas */}
+                  
                     {selectedDay && (
                       <SelectedDayText variant="h6" component="h3">
                         <CalendarTodayIcon sx={{ mr: 1 }} />
-                         {dayjs(selectedDay).format("dddd D MMMM")}
+                        {dayjs(selectedDay).format("dddd D MMMM")}
                       </SelectedDayText>
                     )}
                     {selectedHour && (
@@ -242,6 +265,7 @@ const Sidebar = ({
                         Hora seleccionada: {selectedHour}
                       </SelectedHourText>
                     )}
+                    
 
                     <ItemHeader>
                       <ServiceText variant="body2">
@@ -281,7 +305,10 @@ const Sidebar = ({
         </Box>
         <Box mt={2} display="flex" flexDirection="column">
           <Box mt={1}>
-            <CustomButton onClick={handleContinueClick} disabled={cart.length === 0}>
+            <CustomButton
+              onClick={handleContinueClick}
+              disabled={cart.length === 0}
+            >
               Continuar
             </CustomButton>
           </Box>

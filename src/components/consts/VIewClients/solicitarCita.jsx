@@ -9,7 +9,8 @@ import ServiceCard from "./components/ServiceCard";
 import Sidebar from "./components/Sidebar";
 import Grid from "@mui/material/Grid";
 import dayjs from "dayjs";
-import { UserContext } from '../../../context/ContextoUsuario';
+import Pagination from "@mui/material/Pagination";
+
 
 
 import { EmployeeCard, EmployeeSelection } from "./components/EmployeeCard";
@@ -66,7 +67,6 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
 }));
 
 const SolicitarCita = () => {
-  const { user } = useContext(UserContext);
   const [services, setServices] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -85,7 +85,8 @@ const SolicitarCita = () => {
     const fetchServices = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/servicios");
-        setServices(response.data);
+        const activeServices = response.data.filter(services => services.EstadoServicio === 1)
+        setServices(activeServices);
       } catch (error) {
         console.error("Error al obtener los servicios", error);
       }
@@ -96,7 +97,8 @@ const SolicitarCita = () => {
         const response = await axios.get(
           "http://localhost:5000/jackenail/Listar_Empleados"
         );
-        setEmployees(response.data);
+        const manicuristasActivos = response.data.filter(employees => employees.Estado === 1)
+        setEmployees(manicuristasActivos);
       } catch (error) {
         console.error("Error al obtener los empleados", error);
       }
@@ -156,14 +158,13 @@ const SolicitarCita = () => {
       
       // Aquí se realiza la petición para crear la cita
       const appointmentData = {
-        IdCliente: user?.clienteId, // Usa el ID del cliente logueado
         IdServicio: selectedServiceId,
         IdEmpleado: selectedEmployeeId,
         Fecha: selectedDay.format("YYYY-MM-DD"),
         Hora: selectedHour,
       };
 
-      axios.post("http://localhost:5000/api/crearAgenda", appointmentData)
+      axios.post("http://localhost:5000/api/agendas/crearAgenda", appointmentData)
         .then(response => {
           Swal.fire({
             title: "Cita Confirmada",

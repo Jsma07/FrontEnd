@@ -81,7 +81,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
       const file = files[0];
       
       // Validar que el archivo sea una imagen
-      if (!file.type.startsWith('image/')) {
+      if (!file.type.startsWith('image/') && file.type !== 'image/gif') {
         setAlertOpen(true);
         setAlertMessage("Solo se permiten archivos de imagen.");
         setTimeout(() => {
@@ -93,7 +93,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
   
       const reader = new FileReader();
       reader.onload = () => {
-        const maxSizeBytes = 5 * 1024 * 1024; // 1 MB
+        const maxSizeBytes = 1 * 1024 * 1024; // 1 MB
         if (file.size > maxSizeBytes) {
           setAlertOpen(true);
           setAlertMessage("El tamaño del archivo excede el límite permitido (1 MB).");
@@ -330,6 +330,33 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
             </Select>
           </div>
         );
+        case "textarea": // Nuevo case para la descripción
+        return (
+          <TextField
+            id={name}
+            name={name}
+            label={label}
+            variant="outlined"
+            onChange={handleChange}
+            onBlur={handleBlur}
+            fullWidth
+            multiline
+            rows={4} // Establece la altura inicial
+            size="medium"
+            type="text"
+            style={{ marginBottom: '0.5rem', textAlign: 'center' }}
+            value={formValues[name] || ''}
+            error={!!errors[name]}
+            helperText={errors[name]}
+            disabled={disabled}
+            InputProps={{
+              style: {
+                resize: "both", // Permite que el campo de texto se ajuste en ambas direcciones
+              },
+            }}
+          />
+        );
+
       case "file":
         return (
           <div className="flex items-center justify-center w-full relative">
@@ -398,6 +425,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
             )}
           </div>
         );
+        
       default:
         return null;
     }
