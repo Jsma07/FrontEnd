@@ -1,17 +1,6 @@
 import React, { useState } from "react";
-import {
-  Modal,
-  Typography,
-  Grid,
-  Button,
-  Card,
-  CardHeader,
-  CardContent,
-  CardActions,
-  IconButton,
-} from "@mui/material";
-import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
-import Tooltip from "@mui/material/Tooltip";
+import { Modal, Typography, Button, Divider } from "@mui/material";
+import { Close as CloseIcon } from "@mui/icons-material";
 
 const ModalAdiciones = ({
   open,
@@ -27,77 +16,110 @@ const ModalAdiciones = ({
     const adicionSeleccionada = adiciones.find(
       (adicion) => adicion.IdAdiciones === id
     );
-    setAdicionesSeleccionadas([...adicionesSeleccionadas, adicionSeleccionada]);
-    setAdicionesAgregadas([...adicionesAgregadas, id]);
+    if (adicionSeleccionada) {
+      setAdicionesSeleccionadas([...adicionesSeleccionadas, adicionSeleccionada]);
+      setAdicionesAgregadas([...adicionesAgregadas, id]);
+    }
   };
 
-  // Función para verificar si una adición ya ha sido agregada
   const isAdicionAgregada = (id) => {
     return adicionesAgregadas.includes(id);
   };
 
+  // Verificar si el botón debe estar deshabilitado
+  const isDisabled = (estado) => estado !== 1;
+
   return (
-    <Modal open={open} onClose={handleClose}>
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 w-full max-w-[80%] overflow-auto">
-        <Typography variant="h5" gutterBottom className="text-center mb-6">
-          {title}
-        </Typography>
-        <Grid container spacing={3}>
-          {adiciones &&
-            adiciones.map((adicion) => (
-              <Grid item xs={12} sm={6} md={3} key={adicion.IdAdiciones}>
-                <Card>
-                  <CardHeader
-                    title={adicion.NombreAdiciones}
-                    subheader={adicion.Estado}
-                    action={
-                      <Tooltip title={`Precio: $${adicion.Precio}`} arrow>
-                        <IconButton>
-                          <RemoveRedEyeIcon />
-                        </IconButton>
-                      </Tooltip>
-                    }
-                  />
-                  <CardContent>
-                    <img
-                      src={`http://localhost:5000${adicion.Img}`}
-                      alt={adicion.NombreAdiciones}
-                      style={{
-                        maxWidth: "100%",
-                        height: "auto",
-                        width: "100%",
-                        borderRadius: "4px",
-                      }}
-                    />
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      className="mt-2"
+    <>
+      <style>
+        {`
+          .disabled-button {
+            background-color: rgba(255, 255, 255, 0.5) !important;
+            cursor: not-allowed;
+          }
+          .disabled-button i {
+            color: rgba(0, 0, 0, 0.2) !important;
+          }
+        `}
+      </style>
+      <Modal open={open} onClose={handleClose}>
+        <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center">
+          <div style={{ width: '40%' }} className="bg-white text-black rounded-lg shadow-lg p-6 max-w-[1600px] h-full max-h-[90%] flex flex-col relative">
+            <button
+              onClick={handleClose}
+              className="absolute top-2 right-2 p-2 text-black hover:text-gray-600"
+            >
+              <CloseIcon />
+            </button>
+            <Typography variant="h5" gutterBottom className="text-center mb-6">
+              {title}
+            </Typography>
+            <Divider sx={{ mt: 2 }} />
+            <div className="flex-grow overflow-auto">
+              <div className="flex flex-col space-y-4">
+                {adiciones &&
+                  adiciones.map((adicion) => (
+                    <div
+                      key={adicion.IdAdiciones}
+                      className="w-full p-4 bg-white border border-gray-200 rounded-lg shadow"
                     >
-                      Estado: {adicion.Estado}
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button
-                      variant="contained"
-                      onClick={() => handleAdd(adicion.IdAdiciones)}
-                      disabled={isAdicionAgregada(adicion.IdAdiciones)}
-                      fullWidth
-                    >
-                      Agregar
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))}
-        </Grid>
-        <div className="flex justify-center mt-6">
-          <Button variant="contained" onClick={handleClose} className="w-1/2">
-            Cerrar
-          </Button>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center">
+                          <img
+                            className="w-20 h-20 rounded-full"
+                            src={`http://localhost:5000${adicion.Img}`}
+                            alt={adicion.NombreAdiciones}
+                          />
+                          <div className="flex-1 min-w-0 ms-4">
+                            <p className="text-lg font-bold text-gray-900 truncate">
+                              {adicion.NombreAdiciones}
+                            </p>
+                           
+                            <p className="text-sm text-gray-500 truncate">
+                              Precio: ${adicion.Precio}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center mt-6">
+                          {/* Mostrar botón solo si el estado es 1 */}
+                          {!isDisabled(adicion.Estado) && (
+                            <button
+                              onClick={() => handleAdd(adicion.IdAdiciones)}
+                              className={`w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full ${
+                                isAdicionAgregada(adicion.IdAdiciones) ? 'disabled-button' : ''
+                              }`}
+                              disabled={isAdicionAgregada(adicion.IdAdiciones)}
+                            >
+                              <i
+                                className={`bx bxs-plus-circle text-xl ${isAdicionAgregada(adicion.IdAdiciones) ? 'text-gray-500' : 'text-white'}`}
+                                style={{ fontSize: '24px' }}
+                              ></i>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+            <div className="flex justify-center mt-4">
+              <Button
+                variant="contained"
+                onClick={handleClose}
+                className="w-1/2 text-sm"
+                style={{
+                  backgroundColor: "#EF5A6F",
+                  color: "#fff",
+                  "&:hover": { backgroundColor: "#e6455c" },
+                }}
+              >
+                Cerrar
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-    </Modal>
+      </Modal>
+    </>
   );
 };
 
