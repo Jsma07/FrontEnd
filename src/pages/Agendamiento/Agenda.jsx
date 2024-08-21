@@ -131,7 +131,10 @@ const Agendamientos = () => {
             agendamiento.id === agendamientoId
               ? {
                   ...agendamiento,
-                  EstadoAgenda: renderEstadoButton(nuevoEstado, agendamientoId), // Renderiza el botón con el nuevo estado
+                  EstadoAgenda: renderEstadoButton(nuevoEstado, agendamientoId),
+                  Acciones: null,
+                  // Renderiza el botón con el nuevo estado
+
                 }
               : agendamiento
           )

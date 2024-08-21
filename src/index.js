@@ -34,6 +34,8 @@ import Panel from './pages/Panel/dashboard';
 import Contrasena from "./components/consts/recuperarContrasena";
 import PrivateRoute from "./context/verificarSesion";
 import SolicitarCita from "./components/consts/VIewClients/solicitarCita";
+import ListarCitas from "./components/consts/VIewClients/ListarCitas/ListarCitas";
+
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -48,6 +50,7 @@ root.render(
           <Route path="/Catalogo" element={<Contendioitems />} />
           <Route path="/vistaInicio" element={<VistaInicial />} />
           <Route path="/solicitarCita" element={<SolicitarCita />} />
+          <Route path="/misCitas" element={<ListarCitas />}/>
 
 
         <Route path="/" element={<App />}>

@@ -47,7 +47,7 @@ function NavigationMenu() {
   return (
     <ul className="flex justify-end items-center space-x-10">
       <MenuItem href="/vistaInicio" text="Inicio" />
-      <MenuItem href="/servicios" text="Servicios" />
+      <MenuItem href="/catalogo" text="Servicios" />
       <li
         className="relative"
         onMouseEnter={handleMenuOpen}
