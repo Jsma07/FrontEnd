@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, Close as CloseIcon } from '@mui/icons-material';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import dayjs from 'dayjs';
-import Swal from 'sweetalert2'; // Asegúrate de tener SweetAlert2 instalado
+import Swal from 'sweetalert2';
 
 const generateTimeOptions = () => {
     const times = [];
