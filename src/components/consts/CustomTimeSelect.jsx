@@ -9,43 +9,34 @@ import Tooltip from '@mui/material/Tooltip';
 
 export default function CustomTimeSelect({ selectedTime, setSelectedTime, selectedDate }) {
   const [occupiedTimes, setOccupiedTimes] = useState([]);
+  const [inactiveTimes, setInactiveTimes] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isInactive, setIsInactive] = useState(false);
+  const [isInactiveDay, setIsInactiveDay] = useState(false);
 
   useEffect(() => {
-    const fetchOccupiedTimes = async () => {
+    const fetchTimes = async () => {
       if (selectedDate) {
+        // Restablece los estados antes de realizar nuevas solicitudes
         setLoading(true);
+        setOccupiedTimes([]);
+        setInactiveTimes([]);
+        setIsInactiveDay(false);
+
         try {
-          console.log("Fetching hours for date:", selectedDate.format('YYYY-MM-DD'));
-          const response = await axios.get('http://localhost:5000/api/agendas/horasOcupadas', {
+          // Obtener las horas ocupadas para la fecha seleccionada
+          const occupiedResponse = await axios.get('http://localhost:5000/api/agendas/horasOcupadas', {
             params: { fecha: selectedDate.format('YYYY-MM-DD') },
           });
-          console.log("Response from backend:", response.data);
-  
-          const formattedOccupiedTimes = response.data;
-  
-          setOccupiedTimes(formattedOccupiedTimes);
-          console.log("Occupied times set:", formattedOccupiedTimes);
-          
-        } catch (error) {
-          console.error("Error fetching occupied times", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-  
-    const checkInactiveDay = async () => {
-      if (selectedDate) {
-        try {
-          const response = await axios.get('http://localhost:5000/api/horarios');
-          const inactiveDays = response.data
+          setOccupiedTimes(occupiedResponse.data);
+
+          // Verificar si el día seleccionado es inactivo
+          const inactiveDayResponse = await axios.get('http://localhost:5000/api/horarios');
+          const inactiveDays = inactiveDayResponse.data
             .filter(horario => horario.estado === 'inactivo')
             .map(horario => dayjs(horario.fecha));
           const isDayInactive = inactiveDays.some(inactiveDate => inactiveDate.isSame(selectedDate, 'day'));
-          setIsInactive(isDayInactive);
-  
+          setIsInactiveDay(isDayInactive);
+
           if (isDayInactive) {
             Swal.fire({
               title: 'Día Inactivo',
@@ -54,23 +45,31 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
               confirmButtonText: 'OK'
             });
           }
+
+          // Obtener las horas inactivas para la fecha seleccionada
+          const inactiveTimesResponse = await axios.get('http://localhost:5000/api/horarios/listarFechasConHorasInactivas');
+          const inactiveDateInfo = inactiveTimesResponse.data.find(info => dayjs(info.fecha).isSame(selectedDate, 'day'));
+
+          if (inactiveDateInfo) {
+            setInactiveTimes(inactiveDateInfo.horas_inactivas);
+          }
+
         } catch (error) {
-          console.error("Error checking inactive days", error);
+          console.error("Error fetching data", error);
+        } finally {
+          setLoading(false);
         }
       }
     };
-  
-    fetchOccupiedTimes();
-    checkInactiveDay();
+
+    fetchTimes();
   }, [selectedDate]);
 
   const generateTimeOptions = () => {
     const times = [];
-    // Horario de trabajo 8 AM - 11 AM
     for (let hour = 8; hour <= 11; hour++) {
       times.push(dayjs().hour(hour).minute(0).format('HH:mm'));
     }
-    // Horario de trabajo 1 PM - 4 PM
     for (let hour = 13; hour <= 16; hour++) {
       times.push(dayjs().hour(hour).minute(0).format('HH:mm'));
     }
@@ -78,7 +77,7 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
   };
 
   const handleChange = (time) => {
-    if (!occupiedTimes.includes(time)) {
+    if (!occupiedTimes.includes(time) && !inactiveTimes.includes(time)) {
       setSelectedTime(time);
     }
   };
@@ -101,7 +100,7 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 150 }}>
             <CircularProgress color="primary" />
           </Box>
-        ) : isInactive ? (
+        ) : isInactiveDay ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 150 }}>
             <Typography variant="h6" color="error">
               Opps, no puedes crear citas en este día.
@@ -110,11 +109,24 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
         ) : (
           <List>
             {generateTimeOptions().map((time, index) => (
-              <Tooltip key={index} TransitionProps={{ timeout: 650 }} disableInteractive followCursor title={occupiedTimes.includes(time) ? "Hora ocupada" : ""} arrow>
+              <Tooltip
+                key={index}
+                TransitionProps={{ timeout: 650 }}
+                disableInteractive
+                followCursor
+                title={
+                  occupiedTimes.includes(time)
+                    ? "Hora ocupada"
+                    : inactiveTimes.includes(time)
+                    ? "Hora inactiva"
+                    : ""
+                }
+                arrow
+              >
                 <ListItem disablePadding>
                   <ListItemButton
                     onClick={() => handleChange(time)}
-                    disabled={occupiedTimes.includes(time)}
+                    disabled={occupiedTimes.includes(time) || inactiveTimes.includes(time)}
                     sx={{
                       borderRadius: '18px',
                       margin: '1px 0',
@@ -130,13 +142,29 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        backgroundColor: occupiedTimes.includes(time) ? '#ffcdd2' : (time === selectedTime ? '#bbdefb' : 'transparent'),
+                        backgroundColor: occupiedTimes.includes(time)
+                          ? '#ffcdd2'
+                          : inactiveTimes.includes(time)
+                          ? '#e0e0e0'
+                          : time === selectedTime
+                          ? '#bbdefb'
+                          : 'transparent',
                         border: time === selectedTime ? '1px solid #3f51b5' : '1px solid #ccc',
                         borderRadius: '20px',
-                        boxShadow: occupiedTimes.includes(time) ? '0px 5px 12px rgba(255, 0, 0, 0.5)' : (time === selectedTime ? '0px 5px 12px rgba(0, 0, 0, 0.2)' : 'none'),
+                        boxShadow: occupiedTimes.includes(time)
+                          ? '0px 5px 12px rgba(255, 0, 0, 0.5)'
+                          : time === selectedTime
+                          ? '0px 5px 12px rgba(0, 0, 0, 0.2)'
+                          : 'none',
                       }}
                     >
-                      <ListItemText primary={time} sx={{ textAlign: 'center', color: occupiedTimes.includes(time) ? '#000000' : 'inherit' }} />
+                      <ListItemText
+                        primary={time}
+                        sx={{
+                          textAlign: 'center',
+                          color: occupiedTimes.includes(time) ? '#000000' : 'inherit',
+                        }}
+                      />
                     </Box>
                   </ListItemButton>
                 </ListItem>

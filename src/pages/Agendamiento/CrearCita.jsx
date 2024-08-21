@@ -33,7 +33,8 @@ const CrearCitas = () => {
     const fetchServicios = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/servicios");
-        setServicios(response.data);
+        const activeServices = response.data.filter(servicios => servicios.EstadoServicio ===1)
+        setServicios(activeServices);
       } catch (error) {
         console.error("Error fetching servicios:", error);
       }
@@ -42,7 +43,8 @@ const CrearCitas = () => {
     const fetchEmpleados = async () => {
       try {
         const response = await axios.get("http://localhost:5000/jackenail/Listar_Empleados");
-        setEmpleados(response.data);
+        const activeManicuristas = response.data.filter(empleados => empleados.Estado === 1)
+        setEmpleados(activeManicuristas);
       } catch (error) {
         console.error("Error fetching empleados:", error);
       }
@@ -50,8 +52,10 @@ const CrearCitas = () => {
 
     const fetchClientes = async () => {
       try {
+        
         const response = await axios.get("http://localhost:5000/jackenail/Listar_Clientes");
-        setClientes(response.data);
+        const activeClient = response.data.filter(clientes => clientes.Estado ===1)
+        setClientes(activeClient);
       } catch (error) {
         console.error("Error fetching clientes:", error);
       }

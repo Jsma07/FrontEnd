@@ -1,10 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import { Menu as MuiMenu, MenuItem as MuiMenuItem } from '@mui/material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { UserContext } from '../../../context/ContextoUsuario';
-import { useNavigate } from 'react-router-dom'; 
-import ModalPerfil from '../perfil'; 
+import { useNavigate } from 'react-router-dom';
+import ModalPerfil from '../perfil';
 
 function NavbarClient() {
   return (
@@ -30,11 +30,43 @@ function Logo() {
 }
 
 function NavigationMenu() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  const handleMenuOpen = () => {
+    setMenuOpen(true);
+  };
+
+  const handleMenuClose = (event) => {
+    // Cierra el menú si el cursor no está dentro del menú
+    if (menuRef.current && !menuRef.current.contains(event.relatedTarget)) {
+      setMenuOpen(false);
+    }
+  };
+
   return (
     <ul className="flex justify-end items-center space-x-10">
       <MenuItem href="/vistaInicio" text="Inicio" />
       <MenuItem href="/servicios" text="Servicios" />
-      <MenuItem href="/solicitarCita" text="Agendamiento" />
+      <li
+        className="relative"
+        onMouseEnter={handleMenuOpen}
+        onMouseLeave={handleMenuClose}
+        ref={menuRef}
+      >
+        <a
+          href="/solicitarCita"
+          className="text-black hover:text-purple-900 transition duration-300 ease-in-out flex items-center"
+        >
+          <span className="uppercase">Agendamiento</span>
+        </a>
+        {menuOpen && (
+          <div className="menu-dropdown">
+            <MenuItem href="/solicitarCita" text="Agendar Cita" />
+            <MenuItem href="/misCitas" text="Mis Citas" />
+          </div>
+        )}
+      </li>
       <MenuItem href="/contacto" text="Contacto" />
     </ul>
   );
@@ -45,7 +77,7 @@ function MenuItem({ href, text }) {
     <li>
       <a
         href={href}
-        className="text-black hover:text-purple-900 transition duration-300 ease-in-out"
+        className="text-black hover:text-purple-900 transition duration-300 ease-in-out block px-4 py-2"
       >
         <span className="uppercase">{text}</span>
       </a>
@@ -63,7 +95,7 @@ function Auth() {
     if (user) {
       setAnchorEl(event.currentTarget);
     } else {
-      navigate('/iniciarSesion'); 
+      navigate('/iniciarSesion');
     }
   };
 
@@ -74,7 +106,7 @@ function Auth() {
   const handleLogout = () => {
     logout();
     handleMenuClose();
-    navigate('/iniciarSesion'); 
+    navigate('/iniciarSesion');
   };
 
   const handleSettingsClose = () => {
@@ -84,15 +116,7 @@ function Auth() {
 
   const handleProfileClick = () => {
     setOpenProfileModal(true);
-    setAnchorEl(null); 
-  };
-
-  const menuStyle = {
-    '&:hover': {
-      backgroundColor: '#8C09FF',
-      color: 'white',
-      borderRadius: '10px'
-    }
+    setAnchorEl(null);
   };
 
   const open = Boolean(anchorEl);
@@ -104,7 +128,9 @@ function Auth() {
         onClick={handleMenuClick}
         className="text-black hover:text-purple-900 transition duration-300 ease-in-out flex items-center ml-4 lg:ml-2 cursor-pointer"
       >
-        <span className="uppercase"> {user ? `Bienvenid@, ${user.nombre || user.Nombre}` : 'Iniciar Sesión'} </span>
+        <span className="uppercase">
+          {user ? `Bienvenid@, ${user.nombre || user.Nombre}` : 'Iniciar Sesión'}
+        </span>
         <i className="bx bxs-user-circle text-4xl text-black-700 ml-2"></i>
       </span>
       {user && (
@@ -115,10 +141,10 @@ function Auth() {
             open={open}
             onClose={handleMenuClose}
           >
-            <MuiMenuItem sx={menuStyle} onClick={handleProfileClick}>
+            <MuiMenuItem onClick={handleProfileClick}>
               <AccountCircleIcon sx={{ marginRight: '10px' }} /> Perfil
             </MuiMenuItem>
-            <MuiMenuItem sx={menuStyle} onClick={handleLogout}>
+            <MuiMenuItem onClick={handleLogout}>
               <ExitToAppIcon sx={{ marginRight: '5px' }} /> Cerrar Sesión
             </MuiMenuItem>
           </MuiMenu>
