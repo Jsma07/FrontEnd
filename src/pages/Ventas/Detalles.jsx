@@ -15,10 +15,29 @@ const InsumoDetalle = () => {
         const response = await axios.get(
           `http://localhost:5000/Buscardetalle/${id}`
         );
-        setVenta(response.data[0]); // Suponiendo que response.data es un array y queremos el primer elemento
+        const ventaData = response.data;
+
+        if (Array.isArray(ventaData)) {
+          // Maneja el caso de múltiples ventas o detalles
+          const venta = ventaData[0]; // Suponiendo que el backend devuelve un array con un solo objeto de venta
+          setVenta({
+            venta: venta.venta,
+            adiciones: Array.isArray(venta.adiciones) ? venta.adiciones : [], // Asegúrate de que `adiciones` sea un array
+          });
+        } else {
+          // Maneja el caso de respuesta directa si no es un array
+          setVenta({
+            venta: ventaData.venta,
+            adiciones: Array.isArray(ventaData.adiciones)
+              ? ventaData.adiciones
+              : [], // Asegúrate de que `adiciones` sea un array
+          });
+        }
+
         setLoading(false);
       } catch (error) {
-        setError(error);
+        console.error("Error al obtener los detalles de la venta:", error);
+        setError("Ocurrió un error al obtener los detalles de la venta.");
         setLoading(false);
       }
     };
@@ -155,10 +174,9 @@ const InsumoDetalle = () => {
               </tbody>
             </table>
           </div>
-
           {venta.adiciones && venta.adiciones.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {venta.adiciones.map((Adiciones, index) => (
+              {venta.adiciones.map((adicion, index) => (
                 <div
                   key={index}
                   className="max-w-xs bg-white border-2 border-gray-300 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700"
@@ -166,16 +184,16 @@ const InsumoDetalle = () => {
                   <div className="overflow-hidden rounded-full mx-auto mt-4 w-24 h-24">
                     <img
                       className="object-cover w-full h-full"
-                      src={`http://localhost:5000${Adiciones.Img}`}
-                      alt={Adiciones.NombreAdiciones}
+                      src={`http://localhost:5000${adicion.Img}`}
+                      alt={adicion.NombreAdiciones}
                     />
                   </div>
                   <div className="p-4 text-center">
                     <h5 className="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-                      {Adiciones.NombreAdiciones}
+                      {adicion.NombreAdiciones}
                     </h5>
                     <p className="text-gray-700 dark:text-gray-400">
-                      Precio unitario: ${Adiciones.Precio.toFixed(2)}
+                      Precio unitario: ${adicion.Precio.toFixed(2)}
                     </p>
                   </div>
                 </div>
