@@ -119,6 +119,11 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
       if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9ñÑ\s]*$/.test(value)) {
           error = 'El nombre del insumo debe contener al menos una letra y no puede contener caracteres especiales.';
       }
+    }else if (name === "nombre_categoria") {
+      if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9ñÑ\s]*$/.test(value)) {
+        error =
+          "El nombre de la categoria debe contener al menos una letra y no puede contener caracteres especiales.";
+      }
     }else if (name === 'empresa_proveedor') {
       if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9ñÑ\s]*$/.test(value)) {
           error = 'El nombre de la empresa debe contener al menos una letra y no puede contener caracteres especiales.';

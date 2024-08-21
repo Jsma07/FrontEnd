@@ -86,10 +86,10 @@ const VistaInicial = () => {
 
       <section id="summer-collection">
         <motion.div
-          ref={summerCollectionRef} // Referencia para detectar el scroll
+          ref={summerCollectionRef} 
           className="container"
           initial={{ opacity: 0, scale: 0.8 }}
-          animate={summerCollectionInView ? { opacity: 1, scale: 1 } : {}} // Anima solo cuando es visible
+          animate={summerCollectionInView ? { opacity: 1, scale: 1 } : {}} 
           transition={{ duration: 0.8 }}
         >
           <div className="sc-content">

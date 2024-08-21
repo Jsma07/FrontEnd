@@ -8,7 +8,7 @@ import ModalPerfil from '../perfil';
 
 function NavbarClient() {
   return (
-    <nav className="bg-white shadow-md py-4 font-sans fixed w-full top-0 z-50">
+    <nav className="bg-white shadow-lg py-4 font-sans fixed w-full top-0 z-50 rounded-2xl border border-gray-900">
       <div className="container mx-auto flex justify-between items-center">
         <Logo />
         <NavigationMenu />
@@ -22,8 +22,8 @@ function NavbarClient() {
 
 function Logo() {
   return (
-    <div className="flex items-center ml-4 lg:ml-10">
-      <img src="/jacke.png" alt="Logo" className="h-12 w-12 mr-2" />
+    <div className=" flex items-center ml-4 lg:ml-10">
+      <img src="/jacke.png" alt="Logo" className="h-12 w-12 mr-2 rounded-full" />
       <span className="text-lg font-bold text-black">Jake Nails</span>
     </div>
   );
@@ -45,29 +45,10 @@ function NavigationMenu() {
   };
 
   return (
-    <ul className="flex justify-end items-center space-x-10">
+    <ul className="edu-vic-wa-nt-beginner-custom flex justify-end items-center space-x-10">
       <MenuItem href="/vistaInicio" text="Inicio" />
-      <MenuItem href="/catalogo" text="Servicios" />
-      <li
-        className="relative"
-        onMouseEnter={handleMenuOpen}
-        onMouseLeave={handleMenuClose}
-        ref={menuRef}
-      >
-        <a
-          href="/solicitarCita"
-          className="text-black hover:text-purple-900 transition duration-300 ease-in-out flex items-center"
-        >
-          <span className="uppercase">Agendamiento</span>
-        </a>
-        {menuOpen && (
-          <div className="menu-dropdown">
-            <MenuItem href="/solicitarCita" text="Agendar Cita" />
-            <MenuItem href="/misCitas" text="Mis Citas" />
-          </div>
-        )}
-      </li>
-      <MenuItem href="/contacto" text="Contacto" />
+      <MenuItem href="/Catalogo" text="Servicios" />
+      <MenuItem href="/solicitarCita" text="Agendamiento" />
     </ul>
   );
 }
@@ -77,7 +58,7 @@ function MenuItem({ href, text }) {
     <li>
       <a
         href={href}
-        className="text-black hover:text-purple-900 transition duration-300 ease-in-out block px-4 py-2"
+        className="edu-vic-wa-nt-beginner-custom text-black hover:text-purple-900 transition duration-300 ease-in-out"
       >
         <span className="uppercase">{text}</span>
       </a>
@@ -126,12 +107,10 @@ function Auth() {
     <div>
       <span
         onClick={handleMenuClick}
-        className="text-black hover:text-purple-900 transition duration-300 ease-in-out flex items-center ml-4 lg:ml-2 cursor-pointer"
+        className="edu-vic-wa-nt-beginner-custom text-black hover:text-purple-900 transition duration-300 ease-in-out flex items-center ml-4 lg:ml-2 cursor-pointer"
       >
-        <span className="uppercase">
-          {user ? `Bienvenid@, ${user.nombre || user.Nombre}` : 'Iniciar Sesión'}
-        </span>
-        <i className="bx bxs-user-circle text-4xl text-black-700 ml-2"></i>
+        <i className="bx bxs-user-circle text-4xl text-black-700 ml-2"></i> 
+        <span className="edu-vic-wa-nt-beginner-custom uppercase"> {user ? `${user.nombre || user.Nombre} ${user.apellido || user.Apellido} ` : 'Iniciar Sesión'} </span>
       </span>
       {user && (
         <>
