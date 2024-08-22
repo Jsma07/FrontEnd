@@ -18,19 +18,19 @@ const Ventas = () => {
   const [adicionesSeleccionadas, setAdicionesSeleccionadas] = useState([]);
   const [adiciones, setAdiciones] = useState([]);
   const [ventaIdToDelete, setVentaIdToDelete] = useState(null);
-  const [ventaSeleccionada, setVentaSeleccionada] = useState(null);
+  const [ventaSeleccionada, setVentaSeleccionada] = useState({
+    idVentas: null,
+  });
 
   const handleCloseModal = () => setOpenModal(false);
-  const handleOpenModal = (idVenta) => {
-    console.log("ID de venta recibido:", idVenta);
-    const venta = ventas.find((v) => v.id === idVenta); // Asegúrate de que `id` es el correcto
-    console.log("Venta encontrada:", venta);
 
-    if (venta) {
-      setVentaSeleccionada(venta);
+  const handleOpenModal = (idVentas) => {
+    console.log("ID de venta recibido:", idVentas);
+    if (idVentas) {
+      setVentaSeleccionada(idVentas);
       setOpenModal(true);
     } else {
-      console.log("Venta no encontrada o datos incompletos");
+      console.log("Venta no encontrada");
     }
   };
 
@@ -39,69 +39,89 @@ const Ventas = () => {
       const response = await axios.get(
         "http://localhost:5000/Jackenail/Listarventas"
       );
-      const ventasConDetalles = response.data.map((venta) => ({
-        id: venta.idVentas,
-        idServicio: (
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <img
-              src={`http://localhost:5000${venta.servicio.ImgServicio}`}
-              alt={venta.servicio.Nombre_Servicio}
-              style={{
-                width: "3rem",
-                height: "3rem",
-                borderRadius: "50%",
-                marginRight: "1rem",
-              }}
-            />
-            <h1 style={{ margin: 0 }}>{venta.servicio.Nombre_Servicio}</h1>
-          </div>
-        ),
-        IdCliente: `${venta.cliente.Nombre} ${venta.cliente.Apellido}`,
-        idEmpleado: `${venta.empleado?.Nombre || ""} ${
-          venta.empleado?.Apellido || ""
-        }`,
-        Fecha: venta.Fecha,
-        Total: venta.Total,
-        Estado: (
-          <div className="flex space-x-2">
-            {renderEstadoButton(venta.Estado)}
-          </div>
-        ),
-        Acciones: (
-          <div className="flex space-x-2">
-            <Link
-              to={`/Detalleventa/${venta.idVentas}`}
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white"
-            >
-              <RemoveRedEyeIcon />
-            </Link>
-            {venta.Estado === 2 && (
-              <Fab
-                key={venta.idVentas}
-                size="small"
-                aria-label="edit"
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-green-700 text-white"
-                onClick={() => handleOpenModal(venta.idVentas)}
-              >
-                <EditIcon />
-              </Fab>
-            )}
-            {venta.Estado !== 3 && (
-              <Fab
-                size="small"
-                aria-label="delete"
-                onClick={() => handleOpenAlert(venta.idVentas)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-red-500 text-white"
-              >
-                <DeleteIcon />
-              </Fab>
-            )}
-          </div>
-        ),
-        estiloFila: venta.Estado === 3 ? "bg-gray-200" : "",
-      }));
+      const ventasConDetalles = response.data.map((venta) => {
+        // Formatear la fecha a 'YYYY-MM-DD' solo para visualización
+        const fechaFormateada = new Date(venta.Fecha)
+          .toISOString()
+          .split("T")[0];
 
-      ventasConDetalles.sort((a, b) => new Date(b.Fecha) - new Date(a.Fecha));
+        // Formatear el precio en pesos colombianos
+        const precioFormateado = new Intl.NumberFormat("es-CO", {
+          style: "currency",
+          currency: "COP",
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(venta.Total);
+
+        return {
+          id: venta.idVentas,
+          idServicio: (
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img
+                src={`http://localhost:5000${venta.servicio.ImgServicio}`}
+                alt={venta.servicio.Nombre_Servicio}
+                style={{
+                  width: "3rem",
+                  height: "3rem",
+                  borderRadius: "50%",
+                  marginRight: "1rem",
+                }}
+              />
+              <h1 style={{ margin: 0 }}>{venta.servicio.Nombre_Servicio}</h1>
+            </div>
+          ),
+          IdCliente: `${venta.cliente.Nombre} ${venta.cliente.Apellido}`,
+          idEmpleado: `${venta.empleado?.Nombre || ""} ${
+            venta.empleado?.Apellido || ""
+          }`,
+          Fecha: fechaFormateada, // Usar la fecha formateada para mostrar
+          FechaCompleta: new Date(venta.Fecha), // Guardar la fecha completa para ordenar
+          Total: precioFormateado,
+          Estado: (
+            <div className="flex space-x-2">
+              {renderEstadoButton(venta.Estado)}
+            </div>
+          ),
+          Acciones: (
+            <div className="flex space-x-2">
+              <Link
+                to={`/Detalleventa/${venta.idVentas}`}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white"
+              >
+                <RemoveRedEyeIcon />
+              </Link>
+
+              {venta.Estado === 2 && (
+                <Fab
+                  key={venta.idVentas}
+                  size="small"
+                  aria-label="edit"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-green-700 text-white"
+                  onClick={() => handleOpenModal(venta.idVentas)}
+                >
+                  <EditIcon />
+                </Fab>
+              )}
+
+              {venta.Estado !== 3 && (
+                <Fab
+                  size="small"
+                  aria-label="delete"
+                  onClick={() => handleOpenAlert(venta.idVentas)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-red-500 text-white"
+                >
+                  <DeleteIcon />
+                </Fab>
+              )}
+            </div>
+          ),
+          estiloFila: venta.Estado === 3 ? "bg-gray-200" : "",
+        };
+      });
+
+      // Ordenar las ventas por la fecha completa, de más reciente a más antigua
+      ventasConDetalles.sort((a, b) => b.FechaCompleta - a.FechaCompleta);
+
       setVentas(ventasConDetalles);
       toast.success("Ventas cargadas exitosamente");
     } catch (error) {
@@ -354,6 +374,7 @@ const Ventas = () => {
           <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
         </Fab>
       </Link>
+
       {ventaSeleccionada && (
         <ModalAdiciones
           open={openModal}
@@ -362,9 +383,8 @@ const Ventas = () => {
           adiciones={adiciones}
           setAdicionesSeleccionadas={setAdicionesSeleccionadas}
           adicionesSeleccionadas={adicionesSeleccionadas}
-          idVentas={ventaSeleccionada.idVentas}
+          idVentas={ventaSeleccionada}
           setVentas={setVentas}
-          precioServicio={ventaSeleccionada.servicio?.Precio_Servicio || 0} // Usa encadenamiento opcional
         />
       )}
     </div>

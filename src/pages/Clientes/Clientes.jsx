@@ -47,6 +47,7 @@ const Clientes = () => {
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -65,12 +66,15 @@ const Clientes = () => {
   const handleOpenModal = (data) => {
     setModalData(data);
   };
+
   const columns = [
+    { field: "tipoDocumento", headerName: "tipoDocumento" },
+    { field: "Documento", headerName: "Documento" },
+
     { field: "Nombre", headerName: "Nombre" },
     { field: "Apellido", headerName: "Apellido" },
     { field: "Correo", headerName: "Correo" },
     { field: "Telefono", headerName: "Teléfono" },
-    { field: "Documento", headerName: "Documento" },
     {
       field: "Acciones",
       headerName: "Acciones",
@@ -570,49 +574,35 @@ const Clientes = () => {
                   fields={[
                     {
                       label: "Tip_Documento",
-                      name: "Tip_Documento",
+                      name: "tipoDocumento",
                       type: "select",
                       required: true,
                       options: [
-                        { value: "DNI", label: "DNI" },
-                        {
-                          value: "Cedula Ciudadania",
-                          label: "Cedula Ciudadania",
-                        },
-
-                        {
-                          value: "Tarjeta de Identidad",
-                          label: "Tarjeta de Identidad",
-                        },
-
-                        { value: "Pasaporte", label: "Pasaporte" },
-                        {
-                          value: "Carné de extranjería",
-                          label: "Carné de extranjería",
-                        },
+                        { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
+                        { value: "C.E", label: "Cédula de extranjería (C.E)" },
                       ],
                     },
                     {
                       label: "Nombre",
-                      name: "Nombre", // Nombre ajustado a "Nombre"
+                      name: "Nombre",
                       type: "text",
                       required: true,
                     },
                     {
                       label: "Apellido",
-                      name: "Apellido", // Nombre ajustado a "Apellido"
+                      name: "Apellido",
                       type: "text",
                       required: true,
                     },
                     {
                       label: "Correo",
-                      name: "Correo", // Nombre ajustado a "Correo"
+                      name: "Correo",
                       type: "text",
                       required: true,
                     },
                     {
                       label: "Teléfono",
-                      name: "Telefono", // Nombre ajustado a "Telefono"
+                      name: "Telefono",
                       type: "text",
                       required: true,
                     },

@@ -13,7 +13,7 @@ const ModalAdiciones = ({
   adiciones,
   setAdicionesSeleccionadas,
   adicionesSeleccionadas,
-  idVentas, // Asegúrate de que esta prop se esté utilizando correctamente
+  idVentas,
   setVentas, // Prop para actualizar el estado de las ventas
 }) => {
   console.log("ID de venta en el Modal:", idVentas);
@@ -213,7 +213,7 @@ const ModalAdiciones = ({
                   "&:hover": { backgroundColor: "#e6455c" },
                 }}
               >
-                Guardar
+                Terminar venta
               </Button>
               <Button
                 variant="contained"

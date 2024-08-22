@@ -15,7 +15,7 @@ const TablePrueba = ({ title, columns, data, roles = [] }) => {
   const filteredData = useMemo(() => {
     return data.filter((row) => {
       const matchesRole =
-        selectedRole === "" || row.rolId === parseInt(selectedRole);
+        selectedRole === "" || row.rolId === Number(selectedRole);
       const matchesSearch = Object.values(row).some((val) =>
         String(val).toLowerCase().includes(searchTerm.toLowerCase())
       );
