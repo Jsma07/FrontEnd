@@ -94,9 +94,8 @@ const Empleados = () => {
   const handleOpenModal = (data) => {
     console.log("Datos del empleado al abrir el modal:", data);
     setModalData({
-      seleccionado: {
+
         ...data,
-      },
     });
   };
   
