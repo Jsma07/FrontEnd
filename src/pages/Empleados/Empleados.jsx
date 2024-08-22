@@ -11,14 +11,30 @@ const Empleados = () => {
   const [empleados, setEmpleados] = useState([]);
   const [empleado, setEmpleado] = useState([]);
   const [filtro, setFiltro] = useState("");
-  const [roles, setRoles] = useState([]);
   const [openPasswordModal, setOpenPasswordModal] = useState(false);
   const [seleccionado, setSeleccionado] = useState(null); // Estado para almacenar el empleado seleccionado
+  const [roles, setRoles] = useState([]); // hook donde se guardan los roles traidos de la api
 
   const [passwordForm, setPasswordForm] = useState({
     newPassword: "",
     confirmPassword: "",
   });
+
+  useEffect(() => {
+    //Traer los roles desde la api
+    const fetchRoles = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/roles");
+        console.log("Roles response:", response.data);
+        setRoles(response.data);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+        setRoles([]);
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   const handlePasswordChangeClick = (IdEmpleado) => {
     const empleadoSeleccionado = empleados.find(
@@ -42,6 +58,7 @@ const Empleados = () => {
   };
 
   const [modalData, setModalData] = useState(null);
+
   useEffect(() => {
     const fetchRoles = async () => {
       try {
@@ -61,7 +78,11 @@ const Empleados = () => {
         const response = await axios.get(
           "http://localhost:5000/jackenail/Listar_Empleados"
         );
-        setEmpleados(response.data);
+        const empleadosConRol = response.data.map((empleado) => ({
+          ...empleado,
+          Rol: empleado.role?.nombre || "Sin rol", // Añade el nombre del rol directamente
+        }));
+        setEmpleados(empleadosConRol);
       } catch (error) {
         console.error("Error al obtener los datos de empleados:", error);
       }
@@ -71,9 +92,14 @@ const Empleados = () => {
   }, []);
 
   const handleOpenModal = (data) => {
-    setModalData(data);
+    console.log("Datos del empleado al abrir el modal:", data);
+    setModalData({
+      ...data,
+    });
   };
+
   const columns = [
+    { field: "Tip_Documento", headerName: "Tipo de Documento" }, // Tipo de Documento primero
     { field: "Nombre", headerName: "Nombre" },
     { field: "Apellido", headerName: "Apellido" },
     { field: "Correo", headerName: "Correo" },
@@ -81,12 +107,16 @@ const Empleados = () => {
     { field: "Documento", headerName: "Documento" },
     { field: "Direccion", headerName: "Dirección" },
     {
+      field: "Rol", // Un nombre de campo simple
+      headerName: "Rol",
+      valueGetter: (params) => params.row.role?.nombre || "Sin rol",
+    },
+    {
       field: "Acciones",
       headerName: "Acciones",
       width: "w-48",
       renderCell: (params) => (
         <div className="flex justify-center space-x-4">
-          {/* Botón de Editar */}
           {params.row.Estado === 1 && (
             <button
               onClick={() =>
@@ -118,6 +148,7 @@ const Empleados = () => {
       ),
     },
   ];
+
   const handleSubmit = async (formData) => {
     try {
       // Verificar si el correo electrónico está duplicado
@@ -155,7 +186,7 @@ const Empleados = () => {
             Correo: formData.Correo,
             Telefono: formData.Telefono,
             Estado: 1,
-            IdRol: 2, // Asignar rol por defecto
+            IdRol: formData.Rol,
             Documento: formData.Documento,
             Direccion: formData.Direccion,
             Tip_Documento: formData.Tip_Documento,
@@ -271,27 +302,25 @@ const Empleados = () => {
         return;
       }
 
-      // Convertir campos de texto a números si es necesario
+      // Verificar que se haya seleccionado un rol nuevo si el usuario cambió la selección
+      const rolSeleccionado = formData.Rol || modalData.seleccionado.IdRol;
+
       const formDataNumerico = {
         ...formData,
         Telefono: parseInt(formData.Telefono, 10),
-        IdRol: formData.IdRol || 2, // Rol por defecto si no se proporciona
+        IdRol: rolSeleccionado, // Asegurarse de que el rol seleccionado se pase aquí
       };
 
-      // Determinar la URL de la API para actualizar el empleado
       const url = `http://localhost:5000/Jackenail/ActualizarEmpleados/${formDataNumerico.IdEmpleado}`;
 
-      // Realizar la solicitud de actualización a la API utilizando axios.put
       await axios.put(url, formDataNumerico);
 
-      // Actualizar el empleado en la lista localmente
       const empleadosActualizados = empleados.map((empleado) =>
         empleado.IdEmpleado === formDataNumerico.IdEmpleado
-          ? { ...empleado, ...formDataNumerico } // Actualiza el empleado con los nuevos datos
+          ? { ...empleado, ...formDataNumerico }
           : empleado
       );
 
-      // Actualizar el estado con la lista de empleados actualizada
       setEmpleados(empleadosActualizados);
 
       Swal.fire({
@@ -300,14 +329,11 @@ const Empleados = () => {
         text: "El empleado se ha actualizado correctamente.",
       }).then((result) => {
         if (result.isConfirmed || result.dismiss === Swal.DismissReason.close) {
-          // Limpiar los datos del modal
           setModalData(null);
         }
       });
     } catch (error) {
       console.error("Error al actualizar el empleado:", error);
-
-      // Mostrar una alerta de error si ocurre algún problema durante la actualización
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -330,6 +356,10 @@ const Empleados = () => {
     const documentoLower = empleado.Documento
       ? empleado.Documento.toLowerCase()
       : "";
+    const rolLower =
+      empleado.role && empleado.role.nombre
+        ? empleado.role.nombre.toLowerCase()
+        : "";
 
     return (
       nombreLower.includes(filtroLower) ||
@@ -339,7 +369,8 @@ const Empleados = () => {
       empleado.Telefono.toString().includes(filtro) ||
       (empleado.Estado === 1 ? "Activo" : "Inactivo")
         .toLowerCase()
-        .includes(filtroLower)
+        .includes(filtroLower) ||
+      rolLower.includes(filtroLower) // Filtro por rol
     );
   });
 
@@ -431,13 +462,13 @@ const Empleados = () => {
       className="w-full mx-auto max-w-full"
     >
       <TablePrueba
-        title="Gestion de Empleados"
+        title="Gestión de Empleados"
         columns={columns}
-        data={empleados}
+        data={empleadosFiltrados} // Usa los datos filtrados aquí
         roles={roles}
       />
 
-      {modalData && modalData && (
+      {modalData && !modalData.modo && (
         <ModalDinamico
           open={true}
           handleClose={() => setModalData(null)}
@@ -451,8 +482,6 @@ const Empleados = () => {
               options: [
                 { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
                 { value: "C.E", label: "Cédula de extranjería (C.E)" },
-
-               
               ],
             },
             {
@@ -485,9 +514,8 @@ const Empleados = () => {
               type: "text",
               required: true,
             },
-
             {
-              label: "Direccion",
+              label: "Dirección",
               name: "Direccion",
               type: "text",
               required: true,
@@ -498,9 +526,19 @@ const Empleados = () => {
               type: "password",
               required: true,
             },
+            {
+              label: "Rol",
+              name: "Rol",
+              type: "select",
+              required: true,
+              options: roles.map((role) => ({
+                value: role.idRol,
+                label: role.nombre,
+              })),
+            },
           ]}
           onSubmit={handleSubmit}
-          seleccionado={modalData}
+          seleccionado={modalData.seleccionado} // Asegúrate de que `modalData.seleccionado` tiene el rol seleccionado
         />
       )}
 
@@ -517,7 +555,7 @@ const Empleados = () => {
               required: true,
               options: [
                 { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
-                        { value: "C.E", label: "Cédula de extranjería (C.E)" },
+                { value: "C.E", label: "Cédula de extranjería (C.E)" },
               ],
             },
             {
@@ -551,6 +589,17 @@ const Empleados = () => {
               required: true,
             },
             {
+              label: "Rol",
+              name: "IdRol",
+              type: "select",
+              required: true,
+              options: roles.map((role) => ({
+                value: role.idRol, // ID del rol como valor
+                label: role.nombre, // Nombre del rol como texto visible
+              })),
+              defaultValue: modalData.seleccionado.IdRol, // Usa el ID del rol como valor por defecto
+            },
+            {
               label: "Direccion",
               name: "Direccion",
               type: "text",
@@ -561,6 +610,7 @@ const Empleados = () => {
           seleccionado={modalData.seleccionado}
         />
       )}
+
       <Modal
         open={openPasswordModal}
         handleClose={handlePasswordModalClose}

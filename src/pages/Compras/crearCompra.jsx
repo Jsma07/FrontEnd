@@ -60,6 +60,7 @@ const CrearCompra = () => {
     fetchInsumos();
     fetchCategorias();
     fetchProveedores();
+    setFechaCompra(maxDate);
   }, []);
 
 const fetchCompras = async () => {
@@ -127,8 +128,8 @@ const calcularTotal = (totalValorInsumos, descuento) => {
 const actualizarTotales = (detalles, descuento) => {
   const totalValorInsumos = calcularSubtotal(detalles);
   const iva = calcularIva(totalValorInsumos);
+  const subtotalCompra = totalValorInsumos - iva;
   const totalCompra = calcularTotal(totalValorInsumos, descuento);
-  const subtotalCompra = totalValorInsumos - iva; 
   console.log("Total Valor Insumos:", totalValorInsumos);
   console.log("IVA:", iva);
   console.log("Subtotal Compra:", subtotalCompra);
@@ -137,31 +138,6 @@ const actualizarTotales = (detalles, descuento) => {
   setSubtotalCompra(subtotalCompra);
   setIvaCompra(iva);
   setTotalCompra(totalCompra);
-};
-
-const handleInputChange = (insumoId, field, value) => {
-  if (value < 0) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Valor no permitido',
-      text: 'No se permiten números negativos en los campos de cantidad o precio unitario.',
-    });
-    return;
-  }
-
-  if (field === 'cantidad_insumo') {
-    setCantidadInsumo((prevState) => {
-      const updatedCantidad = { ...prevState, [insumoId]: value };
-      actualizarDetallesCompra(updatedCantidad, precio_unitario);
-      return updatedCantidad;
-    });
-  } else {
-    setPrecioUnitario((prevState) => {
-      const updatedPrecio = { ...prevState, [insumoId]: value };
-      actualizarDetallesCompra(cantidad_insumo, updatedPrecio);
-      return updatedPrecio;
-    });
-  }
 };
 
 const actualizarDetallesCompra = (nuevaCantidadInsumo, nuevoPrecioUnitario) => {
@@ -194,13 +170,42 @@ const handleAgregarDetalleCompra = () => {
   actualizarTotales(nuevosDetallesCompra, descuento_compra);
 };
 
-const handleDescuentoChange = (value) => {
-  setDescuentoCompra(value);
-  actualizarTotales(detallesCompra, value);
-};
-
 const handleAddCompra = async () => {
     handleAgregarDetalleCompra();
+
+     if (detallesCompra.length === 0) {
+      Swal.fire({
+          icon: 'error',
+          title: 'Sin insumos',
+          text: 'Debe haber al menos un insumo asociado a la compra.',
+      });
+      return;
+    }
+
+     if (descuento_compra > total_compra) {
+      Swal.fire({
+          icon: 'error',
+          title: 'Descuento inválido',
+          text: 'El descuento no puede ser mayor que el total de la compra.',
+      });
+      return; 
+  }
+
+   // Validar que los campos cantidad y precio sean numéricos válidos
+   const invalidDetalles = detallesCompra.some(detalle => {
+    const cantidad = parseFloat(detalle.cantidad_insumo);
+    const precio = parseFloat(detalle.precio_unitario);
+    return isNaN(cantidad) || isNaN(precio) || cantidad <= 0 || precio <= 0;
+});
+
+if (invalidDetalles) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Datos inválidos',
+        text: 'Por favor, ingrese valores válidos para cantidad y precio unitario en los detalles de la compra.',
+    });
+    return;
+}
 
     const formData = {fecha_compra, descuento_compra: parseFloat(descuento_compra), iva_compra: parseFloat(iva_compra),subtotal_compra: parseFloat(subtotal_compra),estado_compra,
         detallesCompra: detallesCompra.map(detalle => ({
@@ -248,6 +253,36 @@ const handleAddCompra = async () => {
     }
 };
 
+const handleInputChange = (insumoId, field, value) => {
+  if (value < 0) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Valor no permitido',
+      text: 'No se permiten números negativos en los campos de cantidad o precio unitario.',
+    });
+    return;
+  }
+
+  if (field === 'cantidad_insumo') {
+    setCantidadInsumo((prevState) => {
+      const updatedCantidad = { ...prevState, [insumoId]: value };
+      actualizarDetallesCompra(updatedCantidad, precio_unitario);
+      return updatedCantidad;
+    });
+  } else {
+    setPrecioUnitario((prevState) => {
+      const updatedPrecio = { ...prevState, [insumoId]: value };
+      actualizarDetallesCompra(cantidad_insumo, updatedPrecio);
+      return updatedPrecio;
+    });
+  }
+};
+
+const handleDescuentoChange = (value) => {
+  setDescuentoCompra(value);
+  actualizarTotales(detallesCompra, value);
+};
+
 const handleChange = (name, value) => {
   setInsumoSeleccionado((prevInsumo) => ({
     ...prevInsumo,
@@ -268,24 +303,17 @@ const getFormattedDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-const today = new Date();
-const maxDate = getFormattedDate(today);
-
-const minDate = new Date();
-minDate.setDate(today.getDate() - 5);
-const minDateFormatted = getFormattedDate(minDate);
+ // Obtener la fecha de hoy
+ const today = new Date();
+ const maxDate = getFormattedDate(today);
+ // Calcular la fecha mínima permitida (5 días antes)
+ const minDate = new Date();
+ minDate.setDate(today.getDate() - 5);
+ const minDateFormatted = getFormattedDate(minDate);
 
 const handleRemove = (id) => {
   setInsumosSeleccionados(insumosSeleccionados.filter((insumo) => insumo.IdInsumos !== id));
   setInsumosAgregados(insumosAgregados.filter((insumoId) => insumoId !== id));
-};
-
-const handleAdd = (id) => {
-  const insumoSeleccionado = insumos.find((insumo) => insumo.IdInsumos === id);
-  if (insumoSeleccionado) {
-    setInsumosSeleccionados((prev) => [...prev, insumoSeleccionado]);
-    setInsumosAgregados((prev) => [...prev, id]);
-  }
 };
 
 return (
@@ -321,7 +349,7 @@ return (
               className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500" 
               min={minDateFormatted}
               max={maxDate}
-              />
+            />
           </div>
 
         <div className="form-group mb-2">

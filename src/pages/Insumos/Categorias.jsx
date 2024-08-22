@@ -47,16 +47,6 @@ const Categorias = () => {
         return;
       }
   
-      const nombreCategoria = formData['nombre_categoria'];
-      if (!/^[a-zA-ZñÑ\s]+$/.test(nombreCategoria)) {
-        window.Swal.fire({
-          icon: 'error',
-          title: 'Nombre de categoría inválido',
-          text: 'El nombre de la categoría no debe contener números ni caracteres especiales.',
-        });
-        return;
-      }
-  
       formData.estado_categoria = 1;
       try {
         await axios.post('http://localhost:5000/api/categorias/guardarCategoria', formData);
@@ -100,7 +90,7 @@ const Categorias = () => {
         if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos de la categoría.')) {
             return;
         }
-
+  
         const formatNombreCategoria = (nombre) => {
             const nombreSinEspacios = nombre.trim();
             const nombreMinusculas = nombreSinEspacios.toLowerCase();

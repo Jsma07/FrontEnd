@@ -119,16 +119,6 @@ const Insumos = () => {
         return;
       }
   
-      const NombreInsumos = formData["NombreInsumos"];
-      if (!/^[a-zA-Z0-9\s]+$/.test(NombreInsumos)) {
-        window.Swal.fire({
-          icon: "error",
-          title: "Nombre del insumo inválido",
-          text: "El nombre del insumo no debe contener caracteres especiales.",
-        });
-        return;
-      }
-  
       const confirmation = await window.Swal.fire({
         title: "¿Estás seguro?",
         text: "¿Quieres actualizar este insumo?",

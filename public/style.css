@@ -379,7 +379,7 @@ body {
 }
 
 #products .container .product figure img:hover {
-    transform: scale(1.2); /* Escala la imagen al 120% cuando el mouse está sobre ella */
+    transform: scale(1.2); 
 }
 
 #products .container .product figure figcaption {
@@ -405,8 +405,16 @@ body {
 
 #products .container .product:hover figure figcaption,
 #products .container .product:hover .price {
-    transform: translateY(20px); /* Mueve el figcaption y el precio hacia abajo */
+    transform: translateY(20px); 
 }
+.edu-vic-wa-nt-beginner-custom {
+	font-family: "Edu VIC WA NT Beginner", cursive;
+	font-optical-sizing: auto;
+	font-weight: 500; /* Cambia este valor a 400, 500, 600, o 700 según tus necesidades */
+	font-style: normal;
+	color: 'Black'
+  }
+  
 
 
 @media only screen and (max-width: 1024px) {
@@ -445,7 +453,7 @@ body {
   
   #features .container .feature {
 	width: 30%;
-	border: 3px solid #8A2BE2;
+	border: 3px solid #ae81d6;
 	padding: 1rem;
 	text-align: center;
 	font-family: "Lato", sans-serif;
@@ -454,7 +462,7 @@ body {
   
   #features .container .feature i {
 	font-size: 5rem; 
-	color: #8A2BE2;
+	color: #ae81d6;
 	margin-bottom: 1rem;
   }
   
@@ -494,5 +502,4 @@ body {
 	}
   }
   
-/* vista del Dashboard */
 

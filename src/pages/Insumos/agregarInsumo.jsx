@@ -11,16 +11,6 @@ const handleAddInsumo = async (formData, handleCloseModalAgregar, fetchInsumos) 
         if (!CamposObligatorios(formData, camposObligatorios, "Por favor, complete todos los campos del insumo.")) {
             return;
         }
-
-        if (!/^[a-zA-Z0-9\s]+$/.test(NombreInsumos)) {
-            Swal.fire({
-                icon: "error",
-                title: "Nombre del insumo inválido",
-                text: "El nombre del insumo no debe contener caracteres especiales.",
-            });
-            return;
-        }
-
         const formDataToSend = new FormData();
         formDataToSend.append("NombreInsumos", NombreInsumos);
         formDataToSend.append("Idproveedor", Idproveedor);

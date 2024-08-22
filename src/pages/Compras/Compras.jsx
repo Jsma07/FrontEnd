@@ -16,23 +16,19 @@ const Compras = () => {
     fetchCompras();
   }, []);
 
-  const fetchCompras = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/compras');
-      const data = response.data;
-      
-      data.sort((a, b) => {
-        const fechaA = new Date(a.fecha_compra.split('/').reverse().join('-'));
-        const fechaB = new Date(b.fecha_compra.split('/').reverse().join('-'));
-        return fechaB - fechaA; 
-      });
+const fetchCompras = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/compras');
+    const data = response.data;
 
-      setCompras(data);
-    } catch (error) {
-      console.error('Error fetching Compras:', error);
-    }
-  };
-
+    // Ordenar por IdCompra en orden descendente
+    data.sort((a, b) => b.IdCompra - a.IdCompra);
+    setCompras(data); 
+  } catch (error) {
+    console.error('Error fetching Compras:', error);
+  }
+};
+  
   const filtrar = compras.filter(compra => {
     return (
       (compra.fecha_compra && compra.fecha_compra.toLowerCase().includes(buscar.toLowerCase())) ||
