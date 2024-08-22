@@ -94,7 +94,6 @@ const Empleados = () => {
   const handleOpenModal = (data) => {
     console.log("Datos del empleado al abrir el modal:", data);
     setModalData({
-      modo: "actualizacion",
       seleccionado: {
         ...data,
       },
@@ -475,7 +474,7 @@ const Empleados = () => {
         <ModalDinamico
           open={true}
           handleClose={() => setModalData(null)}
-          title="Registrar empleadoss"
+          title="Registrar empleados"
           fields={[
             {
               label: "Tip_Documento",
