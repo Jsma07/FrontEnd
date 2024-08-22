@@ -472,7 +472,7 @@ const Empleados = () => {
         <ModalDinamico
           open={true}
           handleClose={() => setModalData(null)}
-          title="Registrar empleados"
+          title="Registrar empleadoss"
           fields={[
             {
               label: "Tip_Documento",
