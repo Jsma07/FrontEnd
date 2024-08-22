@@ -27,7 +27,6 @@ const ModalDinamico = ({
     if (seleccionado) {
       setFormData(seleccionado);
     } else {
-      // Limpiar el formulario cuando no hay un usuario seleccionado
       setFormData({});
     }
   }, [seleccionado]);
@@ -43,7 +42,7 @@ const ModalDinamico = ({
     }));
 
     // Imprimir en consola el valor seleccionado en el select de rol
-    if (name === "Rol") {
+    if (name === "IdRol") {
       console.log("Rol seleccionado:", value);
     }
   };
@@ -144,14 +143,15 @@ const ModalDinamico = ({
                         textAlign: "center",
                       }}
                     >
-                      {field.options.map((option, index) => (
-                        <MenuItem key={index} value={option.value}>
+                      {field.options.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
                           {option.label}
                         </MenuItem>
                       ))}
                     </Select>
                   </div>
                 )}
+                
                 {field.type === "switch" && (
                   <FormControlLabel
                     control={

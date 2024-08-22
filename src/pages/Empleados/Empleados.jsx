@@ -94,9 +94,13 @@ const Empleados = () => {
   const handleOpenModal = (data) => {
     console.log("Datos del empleado al abrir el modal:", data);
     setModalData({
-      ...data,
+      modo: "actualizacion",
+      seleccionado: {
+        ...data,
+      },
     });
   };
+  
 
   const columns = [
     { field: "Tip_Documento", headerName: "Tipo de Documento" }, // Tipo de Documento primero
@@ -292,7 +296,7 @@ const Empleados = () => {
             empleado.Documento === formData.Documento) &&
           empleado.IdEmpleado !== formData.IdEmpleado
       );
-
+  
       if (empleadoExistente) {
         Swal.fire({
           icon: "error",
@@ -301,28 +305,25 @@ const Empleados = () => {
         });
         return;
       }
-
-      // Verificar que se haya seleccionado un rol nuevo si el usuario cambió la selección
-      const rolSeleccionado = formData.Rol || modalData.seleccionado.IdRol;
-
+  
       const formDataNumerico = {
         ...formData,
         Telefono: parseInt(formData.Telefono, 10),
-        IdRol: rolSeleccionado, // Asegurarse de que el rol seleccionado se pase aquí
+        IdRol: formData.IdRol,
       };
-
+  
       const url = `http://localhost:5000/Jackenail/ActualizarEmpleados/${formDataNumerico.IdEmpleado}`;
-
       await axios.put(url, formDataNumerico);
-
+  
+      // Actualizar la lista de empleados con los datos actualizados
       const empleadosActualizados = empleados.map((empleado) =>
         empleado.IdEmpleado === formDataNumerico.IdEmpleado
           ? { ...empleado, ...formDataNumerico }
           : empleado
       );
-
+  
       setEmpleados(empleadosActualizados);
-
+  
       Swal.fire({
         icon: "success",
         title: "¡Actualización exitosa!",
@@ -342,6 +343,8 @@ const Empleados = () => {
       });
     }
   };
+  
+  
 
   const empleadosFiltrados = empleados.filter((empleado) => {
     // Convertir el filtro a minúsculas una vez
