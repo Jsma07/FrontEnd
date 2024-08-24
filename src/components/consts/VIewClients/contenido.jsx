@@ -201,7 +201,7 @@ function Contenidoitems() {
           {filteredServicios.map((servicio) => (
             <Grid item xs={12} sm={6} md={3} key={servicio.IdServicio}>
               <motion.div
-                initial={{ opacity: 0, y: 50 }} // Animación de entrada desde abajo
+                initial={{ opacity: 0, y: 50 }} // Animación de entrada desde abajooo
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, type: "spring", stiffness: 300 }}
                 whileHover={{ scale: 1.05 }}
