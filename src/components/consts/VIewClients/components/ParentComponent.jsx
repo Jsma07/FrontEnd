@@ -76,7 +76,7 @@ const StyledDayButton = styled(Button)(({ theme, selected, inactive }) => ({
   transition: "all 0.3s ease",
   "&:hover": {
     backgroundColor: selected ? "#5c4ace" : "#A6A6A6",
-    transform: "scale(1.5)",
+    transform: "scale(1.2)",
   },
   display: "flex",
   flexDirection: "column",

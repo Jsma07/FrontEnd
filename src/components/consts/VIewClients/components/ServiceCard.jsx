@@ -50,7 +50,7 @@ const ServiceCard = ({ service, onAddToCart, isSelected }) => {
           display: "flex",
           alignItems: "flex-start",
           cursor: "pointer",
-          height: "15%",
+          height: "auto",
           width: "calc(100% - 195px)",
           margin: "0 auto 16px",
           position: "relative",
@@ -188,7 +188,7 @@ const ServiceCard = ({ service, onAddToCart, isSelected }) => {
           <Button
             onClick={handleClose}
             color="primary"
-            sx={{ margin: "0 auto", display: "block" }}
+            sx={{ margin: "0 auto", display: "block", borderRadius: '20px'}}
           >
             Cerrar
           </Button>

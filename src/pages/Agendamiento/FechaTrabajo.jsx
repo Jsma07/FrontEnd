@@ -1,7 +1,21 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import {Container,Typography,Card,CardContent,Fab,Tooltip,Box,Avatar,Input,Pagination,CardActionArea,IconButton,} from "@mui/material";
+import {
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  Fab,
+  Tooltip,
+  Box,
+  Avatar,
+  Input,
+  Pagination,
+  CardActionArea,
+  IconButton,
+  Button,
+} from "@mui/material";
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
 import ModalInactivarFecha from "../../components/consts/ModalInactivarFecha";
@@ -11,6 +25,9 @@ import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Swal from "sweetalert2";
 import InactivarHorasModal from "../../components/InactivarHorasModal"; // Ajusta la ruta según sea necesario
+import StoreMallDirectoryIcon from '@mui/icons-material/StoreMallDirectory';
+import AlarmOffIcon from '@mui/icons-material/AlarmOff';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
 
 dayjs.locale("es");
 
@@ -29,6 +46,7 @@ const FechasTrabajo = () => {
   const [fechasConHorasInactivas, setFechasConHorasInactivas] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filtroSeleccionado, setFiltroSeleccionado] = useState("todos"); // Nuevo estado
   const [selectedEstado, setSelectedEstado] = useState("");
   const [page, setPage] = useState(1);
   const [cardsPerPage] = useState(9);
@@ -84,8 +102,8 @@ const FechasTrabajo = () => {
   };
 
   const handleFechaInactivada = async () => {
-    await fetchHorarios(); 
-    await fetchFechasConHorasInactivas(); 
+    await fetchHorarios();
+    await fetchFechasConHorasInactivas();
   };
 
   const handleSearchChange = (event) => {
@@ -113,8 +131,8 @@ const FechasTrabajo = () => {
           .then(() => {
             setHorarios(horarios.filter((horario) => horario.id !== id));
             Swal.fire("Eliminado!", "El horario ha sido eliminado.", "success");
-            fetchHorarios(); 
-            fetchFechasConHorasInactivas(); 
+            fetchHorarios();
+            fetchFechasConHorasInactivas();
           })
           .catch((error) => {
             console.error("Error al eliminar el horario:", error);
@@ -152,7 +170,20 @@ const FechasTrabajo = () => {
     const matchesEstado = selectedEstado
       ? horario.estado === selectedEstado
       : true;
-    return matchesSearchTerm && matchesEstado;
+
+    if (filtroSeleccionado === "diasInactivos") {
+      return (
+        matchesSearchTerm && matchesEstado && horario.estado === "inactivo"
+      );
+    } else if (filtroSeleccionado === "horasInactivas") {
+      return (
+        matchesSearchTerm &&
+        matchesEstado &&
+        fechasConHorasInactivas.some((f) => f.fecha === horario.fecha)
+      );
+    } else {
+      return matchesSearchTerm && matchesEstado;
+    }
   });
 
   const indexOfLastCard = page * cardsPerPage;
@@ -204,18 +235,55 @@ const FechasTrabajo = () => {
             </div>
           </div>
 
+
+          <Box display="flex" justifyContent="space-between" mb={2}>
+            <Button
+              variant={
+                filtroSeleccionado === "diasInactivos"
+                  ? "contained"
+                  : "outlined"
+              }
+              onClick={() => setFiltroSeleccionado("diasInactivos")}
+              startIcon={<EventBusyIcon/>}
+            >
+              Días Inactivos
+            </Button>
+            <Button
+              variant={
+                filtroSeleccionado === "horasInactivas"
+                  ? "contained"
+                  : "outlined"
+              }
+              onClick={() => setFiltroSeleccionado("horasInactivas")}
+              startIcon={<AlarmOffIcon/>}
+            >
+              Días con Horas Inactivas
+            </Button>
+            <Button
+              variant={
+                filtroSeleccionado === "todos" ? "contained" : "outlined"
+              }
+              onClick={() => setFiltroSeleccionado("todos")}
+              startIcon={<StoreMallDirectoryIcon/>}
+            >
+              Mostrar Todo
+            </Button>
+          </Box>
+
           <Box
             display="grid"
-            gridTemplateColumns="repeat(3, 1fr)" 
+            gridTemplateColumns="repeat(3, 1fr)"
             gap={2}
             mb={2}
           >
             {currentCards.map((horario) => (
               <motion.div
                 key={horario.id}
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                whileTap={{ scale: 1.0 }}
+                initial={{ opacity: 0, y: 50 }} // Comienza invisible y desplazado hacia abajo
+                animate={{ opacity: 1, y: 0 }} // Aparece con opacidad 1 y sin desplazamiento
+                transition={{ duration: 0.5, }} // Duración y retardo para crear un efecto de escalonamiento
+                whileHover={{ scale: 1.05 }} // Efecto de hover (ya lo tenías implementado)
+                whileTap={{ scale: 1.0 }} // Efecto al hacer clic (ya lo tenías implementado)
               >
                 <Card sx={{ backgroundColor: "#E3F2FD", borderRadius: 2 }}>
                   <CardActionArea>
@@ -329,16 +397,16 @@ const FechasTrabajo = () => {
                 right: "50px",
                 zIndex: 1000,
               }}
-              onClick={handleOpenInactivarHorasModal} 
+              onClick={handleOpenInactivarHorasModal}
             >
               <UpdateDisabledIcon style={{ fontSize: "2.3rem" }} />
             </Fab>
           </Tooltip>
 
           <InactivarHorasModal
-          open={modalInactivarHorasOpen}
-          onClose={() => setModalInactivarHorasOpen(false)}
-          onHoursInactivated={handleFechaInactivada}
+            open={modalInactivarHorasOpen}
+            onClose={() => setModalInactivarHorasOpen(false)}
+            onHoursInactivated={handleFechaInactivada}
           />
         </div>
       </div>
