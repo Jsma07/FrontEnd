@@ -9,6 +9,7 @@ import {
   MenuItem,
   InputLabel,
   IconButton,
+  TextareaAutosize,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
@@ -108,7 +109,7 @@ const ModalDinamico = ({
       const file = files[0];
 
       // Validar que el archivo sea una imagen
-      if (!file.type.startsWith("image/")) {
+      if (!file.type.startsWith('image/') && file.type !== 'image/gif') {
         setAlertOpen(true);
         setAlertMessage("Solo se permiten archivos de imagen.");
         setTimeout(() => {
@@ -120,7 +121,7 @@ const ModalDinamico = ({
 
       const reader = new FileReader();
       reader.onload = () => {
-        const maxSizeBytes = 5 * 1024 * 1024; // 1 MB
+        const maxSizeBytes = 1 * 1024 * 1024; // 1 MB
         if (file.size > maxSizeBytes) {
           setAlertOpen(true);
           setAlertMessage(
@@ -216,6 +217,11 @@ const ModalDinamico = ({
       if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9ñÑ\s]*$/.test(value)) {
         error =
           "El nombre del insumo debe contener al menos una letra y no puede contener caracteres especiales.";
+      }
+    } else if (name === "nombre_categoria") {
+      if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9ñÑ\s]*$/.test(value)) {
+        error =
+          "El nombre de la categoria debe contener al menos una letra y no puede contener caracteres especiales.";
       }
     } else if (name === "empresa_proveedor") {
       if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9ñÑ\s]*$/.test(value)) {
@@ -370,6 +376,22 @@ const ModalDinamico = ({
             </Select>
           </div>
         );
+        case "textarea":
+        return (
+          <TextareaAutosize
+            id={name}
+            name={name}
+            label={label}
+            variant="outlined"
+            onChange={handleChange}
+            onBlur={handleBlur}
+            style={{ width: "100%", padding: "0.5rem", fontSize: "16px", resize: "vertical", minHeight: "100px", maxHeight: "300px" }}
+            value={formValues[name] || ""}
+            disabled={disabled}
+            placeholder={label}
+          />
+        );
+
       case "file":
         return (
           <div className="flex items-center justify-center w-full relative">
@@ -440,6 +462,7 @@ const ModalDinamico = ({
             )}
           </div>
         );
+        
       default:
         return null;
     }

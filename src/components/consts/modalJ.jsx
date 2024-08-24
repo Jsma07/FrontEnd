@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel, FormControlLabel, Checkbox } from '@mui/material';
+import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel, FormControlLabel, Switch } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
@@ -10,7 +10,6 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
   const [modalSize, setModalSize] = useState({ width: 0, height: 0 });
   const [errores, setErrores] = useState({});
-
 
   useEffect(() => {
     if (fields && fields.length > 0) {
@@ -39,6 +38,7 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
       }
     }
   }, [fields, open]);
+
   const formatNombreApellido = (value) => {
     // Elimina espacios adicionales al principio y al final
     const trimmedValue = value.trim();
@@ -47,15 +47,13 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
     const formattedValue = trimmedValue.charAt(0).toUpperCase() + trimmedValue.slice(1).toLowerCase();
 
     const words = formattedValue.split(' ');
-  if (words.length > 2) {
-    // Si hay más de dos palabras, solo toma las dos primeras
-    return words.slice(0, 2).join(' ');
-  }
+    if (words.length > 2) {
+      // Si hay más de dos palabras, solo toma las dos primeras
+      return words.slice(0, 2).join(' ');
+    }
 
     return formattedValue;
   };
-  
-  
   
   const formatCorreo = (value) => {
     const trimmedValue = value.trim().toLowerCase();
@@ -100,7 +98,6 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
     let newValue = type === 'checkbox' ? checked : value;
   
     switch (name) {
-     
       case 'correo':
         newValue = formatCorreo(newValue);
         break;
@@ -139,21 +136,19 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
     validateField(name, trimmedValue); // Llamar a validateField con el valor limpio
   };
   
-  
-
   const validateField = (name, value) => {
     let errorMessage = '';
     switch (name) {
       case 'nombre':
       case 'apellido':
         const validacionNombreApellido = /^[a-zA-ZÀ-ÿ\s]{1,40}$/;
-      // Verifica que solo haya dos palabras
-      const palabras = value.trim().split(' ');
-      if (palabras.length > 2) {
-        errorMessage = 'El campo debe contener solo dos palabras.';
-      } else if (!validacionNombreApellido.test(value)) {
-        errorMessage = 'El campo debe contener solo letras y espacios.';
-      }
+        // Verifica que solo haya dos palabras
+        const palabras = value.trim().split(' ');
+        if (palabras.length > 2) {
+          errorMessage = 'El campo debe contener solo dos palabras.';
+        } else if (!validacionNombreApellido.test(value)) {
+          errorMessage = 'El campo debe contener solo letras y espacios.';
+        }
         break;
       case 'Documento':
         const validacionDocumento = /^[0-9]{10,17}$/; // Rango de 10 a 17 caracteres numéricos
@@ -257,46 +252,41 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
             fullWidth
             size="medium"
             type={type}
-            style={{ marginBottom: '0.5rem', textAlign: 'center' }}
+            style={{ marginBottom: '16px' }}
             value={formValues[name] || ''}
           />
         );
       case "select":
         return (
-          <div>
-            <InputLabel id={`${name}-label`}>{label}</InputLabel>
-            <Select
-              labelId={`${name}-label`}
-              id={name}
-              name={name}
-              variant="outlined"
-              onChange={handleChange}
-              onBlur={handleBlur}
-              disabled={field.disabled}
-              fullWidth
-              size="medium"
-              value={formValues[name] || ''}
-              label={label}
-              style={{ marginBottom: "0.5rem", textAlign: "center" }}
-            >
-              {options &&
-                options.map((option, index) => (
-                  <MenuItem key={index} value={option.value}>
+          <FormControlLabel
+            control={
+              <Select
+                id={name}
+                name={name}
+                value={formValues[name] || ''}
+                onChange={handleChange}
+                fullWidth
+                style={{ marginBottom: '16px' }}
+              >
+                {options.map((option, i) => (
+                  <MenuItem key={i} value={option.value}>
                     {option.label}
                   </MenuItem>
                 ))}
-            </Select>
-          </div>
+              </Select>
+            }
+            label={label}
+          />
         );
-      case 'checkbox':
+      case "checkbox":
         return (
           <FormControlLabel
             control={
-              <Checkbox
-                checked={!!formValues[name]}
-                onChange={handleChange}
-                onBlur={handleBlur}
+              <Switch
+                id={name}
                 name={name}
+                checked={formValues[name] || false}
+                onChange={handleChange}
               />
             }
             label={label}
@@ -309,62 +299,53 @@ const ModalDinamico = ({ open, handleClose, title = '', fields, onSubmit, onChan
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <div 
+      <div
         id="modal-container"
-        style={{ 
-          position: 'absolute', 
-          top: `${position.y}px`, 
-          left: `${position.x}px`, 
-          backgroundColor: 'white', 
-          borderRadius: '0.375rem', 
-          width: '80%', 
-          maxWidth: '50rem', 
-          maxHeight: '80%', 
-          overflow: 'auto', 
-          padding: '1.5rem', 
-          cursor: dragging ? 'grabbing' : 'grab',
-          zIndex: 9999
+        style={{
+          position: 'absolute',
+          top: position.y,
+          left: position.x,
+          width: '600px',
+          height: 'auto',
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          boxShadow: '0px 4px 8px rgba(0,0,0,0.2)',
+          padding: '16px',
+          zIndex: 1300, // Asegura que el modal esté encima de otros elementos
+          overflow: 'auto',
         }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        <Typography variant="h5" gutterBottom style={{ textAlign: 'center', marginBottom: '1.5rem', position: 'relative' }}>
-          <DragIndicatorIcon style={{ 
-            position: 'absolute', 
-            top: '-0.5rem', 
-            left: '0', 
-            fontSize: '2rem' 
-          }} /> 
-          {title}
-        </Typography>
         <Grid container spacing={2}>
+          <Grid item xs={12} style={{ cursor: dragging ? 'move' : 'default' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+              <Typography variant="h6" style={{ flex: 1 }}>
+                {title}
+              </Typography>
+              <DragIndicatorIcon style={{ cursor: 'move' }} />
+            </div>
+          </Grid>
           {renderFields()}
+          <Grid item xs={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSubmit}
+              startIcon={<SendIcon />}
+              style={{ marginRight: '8px' }}
+            >
+              Enviar
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={handleCancel}
+            >
+              Cancelar
+            </Button>
+          </Grid>
         </Grid>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "right",
-            marginTop: "1.5rem",
-          }}
-        >
-           <Button
-            onClick={handleCancel}
-            color="secondary"
-            variant="contained"
-            style={{ marginRight: '1rem' }}
-          >
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            color="primary"
-            variant="contained"
-            endIcon={<SendIcon />}
-          >
-            Enviar
-          </Button>
-        </div>
       </div>
     </Modal>
   );

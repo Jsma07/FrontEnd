@@ -1,14 +1,14 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import { Menu as MuiMenu, MenuItem as MuiMenuItem } from '@mui/material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { UserContext } from '../../../context/ContextoUsuario';
-import { useNavigate } from 'react-router-dom'; 
-import ModalPerfil from '../perfil'; 
+import { useNavigate } from 'react-router-dom';
+import ModalPerfil from '../perfil';
 
 function NavbarClient() {
   return (
-    <nav className="bg-white shadow-md py-4 font-sans fixed w-full top-0 z-50">
+    <nav className="bg-white shadow-lg py-4 font-sans fixed w-full top-0 z-50 rounded-2xl border border-gray-900">
       <div className="container mx-auto flex justify-between items-center">
         <Logo />
         <NavigationMenu />
@@ -22,20 +22,33 @@ function NavbarClient() {
 
 function Logo() {
   return (
-    <div className="flex items-center ml-4 lg:ml-10">
-      <img src="/jacke.png" alt="Logo" className="h-12 w-12 mr-2" />
+    <div className=" flex items-center ml-4 lg:ml-10">
+      <img src="/jacke.png" alt="Logo" className="h-12 w-12 mr-2 rounded-full" />
       <span className="text-lg font-bold text-black">Jake Nails</span>
     </div>
   );
 }
 
 function NavigationMenu() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  const handleMenuOpen = () => {
+    setMenuOpen(true);
+  };
+
+  const handleMenuClose = (event) => {
+    // Cierra el menú si el cursor no está dentro del menú
+    if (menuRef.current && !menuRef.current.contains(event.relatedTarget)) {
+      setMenuOpen(false);
+    }
+  };
+
   return (
-    <ul className="flex justify-end items-center space-x-10">
+    <ul className="edu-vic-wa-nt-beginner-custom flex justify-end items-center space-x-10">
       <MenuItem href="/vistaInicio" text="Inicio" />
       <MenuItem href="/Catalogo" text="Servicios" />
       <MenuItem href="/solicitarCita" text="Agendamiento" />
-      <MenuItem href="/contacto" text="Contacto" />
     </ul>
   );
 }
@@ -45,7 +58,7 @@ function MenuItem({ href, text }) {
     <li>
       <a
         href={href}
-        className="text-black hover:text-purple-900 transition duration-300 ease-in-out"
+        className="edu-vic-wa-nt-beginner-custom text-black hover:text-purple-900 transition duration-300 ease-in-out"
       >
         <span className="uppercase">{text}</span>
       </a>
@@ -63,7 +76,7 @@ function Auth() {
     if (user) {
       setAnchorEl(event.currentTarget);
     } else {
-      navigate('/iniciarSesion'); 
+      navigate('/iniciarSesion');
     }
   };
 
@@ -74,7 +87,7 @@ function Auth() {
   const handleLogout = () => {
     logout();
     handleMenuClose();
-    navigate('/iniciarSesion'); 
+    navigate('/iniciarSesion');
   };
 
   const handleSettingsClose = () => {
@@ -84,15 +97,7 @@ function Auth() {
 
   const handleProfileClick = () => {
     setOpenProfileModal(true);
-    setAnchorEl(null); 
-  };
-
-  const menuStyle = {
-    '&:hover': {
-      backgroundColor: '#8C09FF',
-      color: 'white',
-      borderRadius: '10px'
-    }
+    setAnchorEl(null);
   };
 
   const open = Boolean(anchorEl);
@@ -102,10 +107,10 @@ function Auth() {
     <div>
       <span
         onClick={handleMenuClick}
-        className="text-black hover:text-purple-900 transition duration-300 ease-in-out flex items-center ml-4 lg:ml-2 cursor-pointer"
+        className="edu-vic-wa-nt-beginner-custom text-black hover:text-purple-900 transition duration-300 ease-in-out flex items-center ml-4 lg:ml-2 cursor-pointer"
       >
-        <span className="uppercase"> {user ? `Bienvenid@, ${user.nombre || user.Nombre}` : 'Iniciar Sesión'} </span>
-        <i className="bx bxs-user-circle text-4xl text-black-700 ml-2"></i>
+        <i className="bx bxs-user-circle text-4xl text-black-700 ml-2"></i> 
+        <span className="edu-vic-wa-nt-beginner-custom uppercase"> {user ? `${user.nombre || user.Nombre} ${user.apellido || user.Apellido} ` : 'Iniciar Sesión'} </span>
       </span>
       {user && (
         <>
@@ -115,10 +120,10 @@ function Auth() {
             open={open}
             onClose={handleMenuClose}
           >
-            <MuiMenuItem sx={menuStyle} onClick={handleProfileClick}>
+            <MuiMenuItem onClick={handleProfileClick}>
               <AccountCircleIcon sx={{ marginRight: '10px' }} /> Perfil
             </MuiMenuItem>
-            <MuiMenuItem sx={menuStyle} onClick={handleLogout}>
+            <MuiMenuItem onClick={handleLogout}>
               <ExitToAppIcon sx={{ marginRight: '5px' }} /> Cerrar Sesión
             </MuiMenuItem>
           </MuiMenu>

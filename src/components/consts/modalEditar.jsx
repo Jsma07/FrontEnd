@@ -119,6 +119,11 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
       if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9ñÑ\s]*$/.test(value)) {
           error = 'El nombre del insumo debe contener al menos una letra y no puede contener caracteres especiales.';
       }
+    }else if (name === "nombre_categoria") {
+      if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9ñÑ\s]*$/.test(value)) {
+        error =
+          "El nombre de la categoria debe contener al menos una letra y no puede contener caracteres especiales.";
+      }
     }else if (name === 'empresa_proveedor') {
       if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9ñÑ\s]*$/.test(value)) {
           error = 'El nombre de la empresa debe contener al menos una letra y no puede contener caracteres especiales.';
@@ -205,6 +210,26 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
                 ))}
             </Select>
           </div>
+        );
+        case 'textarea':
+        return (
+          <TextField
+            id={name}
+            name={name}
+            label={label}
+            variant="outlined"
+            onChange={handleChange}
+            onBlur={handleBlur}
+            fullWidth
+            size="medium"
+            multiline
+            rows={4}
+            style={{ marginBottom: '0.5rem', textAlign: 'center' }}
+            value={formData[name] || ''}
+            error={!!errors[name]}
+            helperText={errors[name]}
+            disabled={readOnly}
+          />
         );
       case 'file':
         return (

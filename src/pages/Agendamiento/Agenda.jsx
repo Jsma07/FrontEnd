@@ -34,7 +34,7 @@ const Agendamientos = () => {
           Fecha: dayjs(agendamiento.Fecha).format('DD/MM/YYYY'),
           Hora: agendamiento.Hora,
           EstadoAgenda: renderEstadoButton(agendamiento.EstadoAgenda, agendamiento.IdAgenda), // Asegúrate de usar renderEstadoButton aquí
-          Acciones: agendamiento.EstadoAgenda !== 2 && agendamiento.EstadoAgenda !== 3 && (
+          Acciones: agendamiento.EstadoAgenda !== 2 && agendamiento.EstadoAgenda !== 3 && agendamiento.EstadoAgenda !== 4 && ( // Verificar que el estado no sea "Desconocido"
             <div className="flex space-x-2">
               <Fab
                 size="small"
@@ -131,7 +131,10 @@ const Agendamientos = () => {
             agendamiento.id === agendamientoId
               ? {
                   ...agendamiento,
-                  EstadoAgenda: renderEstadoButton(nuevoEstado, agendamientoId), // Renderiza el botón con el nuevo estado
+                  EstadoAgenda: renderEstadoButton(nuevoEstado, agendamientoId),
+                  Acciones: null,
+                  // Renderiza el botón con el nuevo estado
+
                 }
               : agendamiento
           )

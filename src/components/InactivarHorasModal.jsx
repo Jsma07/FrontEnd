@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Close as CloseIcon } from '@mui/icons-material';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import dayjs from 'dayjs';
+import Swal from 'sweetalert2';
 
 const generateTimeOptions = () => {
     const times = [];
@@ -34,51 +35,82 @@ const InactivarHorasModal = ({ open, onClose, onHoursInactivated }) => {
     };
 
     const handleSubmit = async () => {
-        try {
-            if (!selectedDate || selectedHours.length === 0) {
-                window.Swal.fire({
-                    icon: 'warning',
-                    title: 'Campos vacíos',
-                    text: 'Por favor, selecciona una fecha y al menos una hora.',
-                });
-                return;
-            }
-
-            const confirmation = await window.Swal.fire({
-                title: '¿Estás seguro?',
-                text: '¿Quieres inactivar las horas seleccionadas?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, inactivar',
-                cancelButtonText: 'Cancelar'
+        // Validar campos vacíos
+        if (!selectedDate || selectedHours.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campos vacíos',
+                text: 'Por favor, selecciona una fecha y al menos una hora.',
             });
+            return;
+        }
 
-            if (!confirmation.isConfirmed) {
-                return; 
-            }
+        // Confirmación de inactivación
+        const confirmation = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: '¿Quieres inactivar las horas seleccionadas?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, inactivar',
+            cancelButtonText: 'Cancelar'
+        });
 
-            const response = await axios.post('http://localhost:5000/api/horarios/inactivarHoras', {
+        if (!confirmation.isConfirmed) {
+            return; // Salir si el usuario cancela
+        }
+
+        try {
+            // Enviar solicitud al servidor
+            await axios.post('http://localhost:5000/api/horarios/inactivarHoras', {
                 fecha: selectedDate,
                 horas: selectedHours
             });
 
+            // Confirmar éxito y cerrar modal
             if (typeof onHoursInactivated === 'function') {
                 onHoursInactivated(); 
             } else {
                 console.warn('onHoursInactivated no es una función');
             }
-            window.Swal.fire('¡Horas inactivadas!', 'Las horas han sido registradas como inactivas con éxito.', 'success');
+            Swal.fire('¡Horas inactivadas!', 'Las horas han sido registradas como inactivas con éxito.', 'success');
             onClose();
 
         } catch (error) {
             console.error('Error al inactivar horas', error);
-            window.Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Hubo un error al inactivar las horas. Por favor, inténtalo de nuevo más tarde.',
-            });
+
+            if (error.response) {
+                // Manejar errores específicos basados en la respuesta del backend
+                switch (error.response.status) {
+                    case 400:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error.response.data.error || 'Error al procesar la solicitud.',
+                        });
+                        break;
+                    case 500:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error en el servidor. Inténtalo de nuevo más tarde.',
+                        });
+                        break;
+                    default:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Hubo un problema con la solicitud. Por favor, inténtalo de nuevo.',
+                        });
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error en la conexión. Por favor, revisa tu conexión a Internet.',
+                });
+            }
         }
     };
 
@@ -185,14 +217,13 @@ const InactivarHorasModal = ({ open, onClose, onHoursInactivated }) => {
                     </IconButton>
                 </Box>
                 <Box mt={2} display="flex" justifyContent="space-between">
-                    <Button ariant="contained" color="primary" onClick={handleSubmit} sx={{ marginRight: 2 }} >
+                    <Button variant="contained" color="primary" onClick={handleSubmit} sx={{ marginRight: 2 }} >
                         Inactivar
                     </Button>
                     <Button variant="outlined" color="secondary" onClick={onClose}>
                         Cancelar
                     </Button>
                 </Box>
-
             </Box>
         </Modal>
     );

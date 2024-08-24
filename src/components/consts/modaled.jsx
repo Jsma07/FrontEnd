@@ -27,65 +27,24 @@ const ModalDinamico = ({
     if (seleccionado) {
       setFormData(seleccionado);
     } else {
-      // Limpiar el formulario cuando no hay un usuario seleccionado
       setFormData({});
     }
   }, [seleccionado]);
-  const handleEmailValidation = (e) => {
-    const { name, value } = e.target;
-    const validacionCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-    if (name === "Correo" && !validacionCorreo.test(value)) {
-      window.Swal.fire({
-        icon: "error",
-        title: "Correo inválido",
-        text: `El campo ${
-          name.charAt(0).toUpperCase() + name.slice(1)
-        } tiene un formato inválido.`,
-      });
-    }
-  };
 
   // Función para manejar el cambio en los campos del formulario
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
     const newValue = type === "checkbox" ? checked : value;
-    const maxNumeros = 15;
-    const CaracteresEspeciales = /^[a-zA-Z\s]*$/;
-
-    if (name === "Nombre" || name === "Apellido") {
-      if (!CaracteresEspeciales.test(newValue)) {
-        window.Swal.fire({
-          icon: "error",
-          title: `${name.charAt(0).toUpperCase() + name.slice(1)} inválido`,
-          text: `El campo ${
-            name.charAt(0).toUpperCase() + name.slice(1)
-          } no puede contener caracteres especiales ni números.`,
-        });
-        return; // No actualizar el estado si el valor no es válido
-      }
-    }
-    if (name === "Telefono") {
-      const validacionNumeros = /^[0-9]+$/;
-      if (!validacionNumeros.test(newValue)) {
-        return;
-      }
-      if (newValue.length > maxNumeros) {
-        window.Swal.fire({
-          icon: "error",
-          title: "Teléfono inválido",
-          text: `El campo ${
-            name.charAt(0).toUpperCase() + name.slice(1)
-          } no puede exceder ${maxNumeros} caracteres.`,
-        });
-        return;
-      }
-    }
 
     setFormData((prevData) => ({
       ...prevData,
       [name]: newValue,
     }));
+
+    // Imprimir en consola el valor seleccionado en el select de rol
+    if (name === "IdRol") {
+      console.log("Rol seleccionado:", value);
+    }
   };
 
   // Función para manejar el envío del formulario
@@ -137,7 +96,6 @@ const ModalDinamico = ({
                     label={field.label}
                     variant="outlined"
                     onChange={handleChange}
-                    onBlur={handleEmailValidation}
                     fullWidth
                     size="small"
                     type="text"
@@ -185,14 +143,15 @@ const ModalDinamico = ({
                         textAlign: "center",
                       }}
                     >
-                      {field.options.map((option, index) => (
-                        <MenuItem key={index} value={option.value}>
+                      {field.options.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
                           {option.label}
                         </MenuItem>
                       ))}
                     </Select>
                   </div>
                 )}
+                
                 {field.type === "switch" && (
                   <FormControlLabel
                     control={
@@ -211,16 +170,16 @@ const ModalDinamico = ({
         </Grid>
         <div
           style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            marginTop: '1rem'
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "1rem",
           }}
         >
           <Button
             onClick={handleCancel}
             color="secondary"
             variant="contained"
-            style={{ marginRight: '1rem' }}
+            style={{ marginRight: "1rem" }}
           >
             Cancelar
           </Button>
