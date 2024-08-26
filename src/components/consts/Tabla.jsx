@@ -100,7 +100,11 @@ const TablePrueba = ({ title, columns, data, roles = [] }) => {
 
           <div className="relative overflow-hidden bg-white shadow-md sm:rounded-lg">
             <div className="w-full overflow-x-auto">
-              <table className="w-full table-auto text-sm text-center text-gray-500">
+              {/* Forzando el re-renderizado de la tabla */}
+              <table
+                key={JSON.stringify(currentRows)}
+                className="w-full table-auto text-sm text-center text-gray-500"
+              >
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                   <tr>
                     {columns.map((column) => (
