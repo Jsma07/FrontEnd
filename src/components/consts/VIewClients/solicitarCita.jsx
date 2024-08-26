@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
@@ -9,24 +9,12 @@ import ServiceCard from "./components/ServiceCard";
 import Sidebar from "./components/Sidebar";
 import Grid from "@mui/material/Grid";
 import dayjs from "dayjs";
-import Pagination from "@mui/material/Pagination";
 
-
-
-import { EmployeeCard, EmployeeSelection } from "./components/EmployeeCard";
+import { EmployeeCard } from "./components/EmployeeCard";
 import axios from "axios";
 import { styled } from "@mui/material/styles";
 import Swal from "sweetalert2";
-import {
-  Stepper,
-  Step,
-  StepLabel,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from "@mui/material";
+import TextField from "@mui/material/TextField";
 
 import ParentComponent from "./components/ParentComponent";
 
@@ -37,14 +25,14 @@ const StepperContainer = styled(Box)(({ alignment }) => ({
   margin: "20px 0",
 }));
 
-const StepperItem = styled(Box)(({ theme, active }) => ({
+const StepperItem = styled(Box)(({ theme, active, isDisabled }) => ({
   display: "flex",
   alignItems: "center",
   fontWeight: active ? "bold" : "normal",
-  color: active ? "#000000" : "#888888",
+  color: active ? "#000000" : isDisabled ? "#CCCCCC" : "#888888",
   fontFamily: "Arial, sans-serif",
   fontSize: "14px",
-  cursor: "pointer", // Cambia el cursor al pasar por encima
+  cursor: isDisabled ? "default" : "pointer", // Desactiva el cursor si el paso está deshabilitado
   "&:not(:last-child)": {
     marginRight: theme.spacing(1),
   },
@@ -74,6 +62,8 @@ const SolicitarCita = () => {
   const [selectedServiceId, setSelectedServiceId] = useState(null);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [filteredServices, setFilteredServices] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [total, setTotal] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
   const [selectedDay, setSelectedDay] = useState(null);
@@ -85,8 +75,11 @@ const SolicitarCita = () => {
     const fetchServices = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/servicios");
-        const activeServices = response.data.filter(services => services.EstadoServicio === 1)
+        const activeServices = response.data.filter(
+          (services) => services.EstadoServicio === 1
+        );
         setServices(activeServices);
+        setFilteredServices(activeServices); // Inicialmente, muestra todos los servicios
       } catch (error) {
         console.error("Error al obtener los servicios", error);
       }
@@ -97,12 +90,20 @@ const SolicitarCita = () => {
         const response = await axios.get(
           "http://localhost:5000/jackenail/Listar_Empleados"
         );
-        const manicuristasActivos = response.data.filter(employees => employees.Estado === 1)
+        const manicuristasActivos = response.data.filter(
+          (employees) => employees.Estado === 1 && employees.IdRol === 2
+        );
         setEmployees(manicuristasActivos);
+        if (manicuristasActivos.length > 0) {
+          const firstEmployeeId = manicuristasActivos[0].IdEmpleado;
+          setSelectedEmployeeId(firstEmployeeId);
+          setSelectedEmployee(manicuristasActivos[0]); // Establecer el primer empleado como seleccionado
+        }
       } catch (error) {
         console.error("Error al obtener los empleados", error);
       }
     };
+
 
     fetchServices();
     fetchEmployees();
@@ -111,6 +112,17 @@ const SolicitarCita = () => {
 
   const handleBackClick = () => {
     navigate(-1);
+  };
+
+  // Actualiza el término de búsqueda y filtra los servicios
+  const handleSearchChange = (event) => {
+    const term = event.target.value.toLowerCase();
+    setSearchTerm(term);
+    setFilteredServices(
+      services.filter((service) =>
+        service.Nombre_Servicio.toLowerCase().includes(term)
+      )
+    );
   };
 
   const handleAddToCart = (service) => {
@@ -154,7 +166,9 @@ const SolicitarCita = () => {
 
   const handleContinue = () => {
     if (activeStep === 2) {
-      const selectedService = services.find(service => service.IdServicio === selectedServiceId);
+      const selectedService = services.find(
+        (service) => service.IdServicio === selectedServiceId
+      );
 
       const appointmentData = {
         IdServicio: selectedServiceId,
@@ -164,27 +178,31 @@ const SolicitarCita = () => {
         EstadoAgenda: 1,
       };
 
-      axios.post("http://localhost:5000/api/agendas/crearAgenda", appointmentData)
-        .then(response => {
+      axios
+        .post("http://localhost:5000/api/agendas/crearAgenda", appointmentData)
+        .then((response) => {
           Swal.fire({
             title: "Cita Confirmada",
             text: "Tu cita ha sido confirmada con éxito.",
             icon: "success",
-            confirmButtonText: "OK"
+            confirmButtonText: "OK",
           }).then(() => {
             navigate("/vistaInicio");
           });
         })
-        .catch(error => {
+        .catch((error) => {
           Swal.fire({
             title: "Error",
             text: "Hubo un problema al confirmar tu cita. Inténtalo nuevamente.",
             icon: "error",
-            confirmButtonText: "OK"
+            confirmButtonText: "OK",
           });
 
           // Imprime más detalles del error
-          console.error("Error al confirmar la cita:", error.response ? error.response.data : error);
+          console.error(
+            "Error al confirmar la cita:",
+            error.response ? error.response.data : error
+          );
         });
     } else {
       setActiveStep((prevStep) => prevStep + 1);
@@ -192,9 +210,11 @@ const SolicitarCita = () => {
   };
 
   const handleStepClick = (stepIndex) => {
-    setActiveStep(stepIndex);
+    // Solo permite retroceder, es decir, ir a pasos anteriores
+    if (stepIndex <= activeStep) {
+      setActiveStep(stepIndex);
+    }
   };
-
   const handleDateSelect = (day) => {
     setSelectedDay(dayjs(day)); // Convertir a un objeto dayjs
   };
@@ -279,15 +299,44 @@ const SolicitarCita = () => {
 
       <Box className="p-4 mt-4 flex">
         <Box className="w-2/3">
-          {activeStep === 0 &&
-            services.map((service) => (
-              <ServiceCard
-                key={service.IdServicio}
-                service={service}
-                onAddToCart={() => handleAddToCart(service)}
-                isSelected={selectedServiceId === service.IdServicio}
-              />
-            ))}
+        {activeStep === 0 && (
+      <>
+        <TextField
+          type="search"
+          id="outlined-search"
+          label="Buscar servicios"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          style={{ width: "500px" }}
+          sx={{
+            mb: 4,
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused fieldset": {
+                borderColor: "#ccc", // Cambia esto al color que prefieras para el borde enfocado
+              },
+              "& fieldset": {
+                borderRadius: "20px", // Bordes redondeados
+              },
+            },
+            "& .MuiInputBase-input": {
+              "&:focus": {
+                outline: "none", // Elimina el borde de enfoque predeterminado
+              },
+            },
+          }}
+        />
+
+        <Grid container spacing={1}>
+          {filteredServices.map((service) => (
+            <ServiceCard
+              service={service}
+              onAddToCart={() => handleAddToCart(service)}
+              isSelected={selectedServiceId === service.IdServicio}
+            />
+          ))}
+        </Grid>
+      </>
+    )}
           {activeStep === 1 && (
             <Box className="p-20 mt-0 flex">
               <Grid container spacing={2}>

@@ -92,7 +92,9 @@ const Empleados = () => {
   const handleOpenModal = (data) => {
     console.log("Datos del empleado al abrir el modal:", data);
     setModalData({
-      ...data,
+      seleccionado: {
+        ...data,
+      },
     });
   };
 
@@ -301,13 +303,17 @@ const Empleados = () => {
       }
 
       // Verificar que se haya seleccionado un rol nuevo si el usuario cambió la selección
-      const rolSeleccionado = formData.Rol || modalData.seleccionado.IdRol;
+      const rolSeleccionado =modalData.seleccionado.IdRol;
+
+      console.log(rolSeleccionado);
 
       const formDataNumerico = {
         ...formData,
         Telefono: parseInt(formData.Telefono, 10),
         IdRol: rolSeleccionado, // Asegurarse de que el rol seleccionado se pase aquí
       };
+console.log("datosss");
+      console.log("Datos del formulario numéricos:", formDataNumerico);
 
       const url = `http://localhost:5000/Jackenail/ActualizarEmpleados/${formDataNumerico.IdEmpleado}`;
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Fab from "@mui/material/Fab";
 import dayjs from 'dayjs';
 import { Container, Typography, Stepper, Step, StepLabel, Button, Box, Paper, Select, MenuItem, FormControl, InputLabel, Grid, Dialog, DialogTitle, DialogContent, IconButton } from "@mui/material";
 import StaticDatePickerLandscape from "../../components/consts/StaticDatePickerLandscape";
@@ -7,6 +8,8 @@ import CustomTimeSelect from "../../components/consts/CustomTimeSelect";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CloseIcon from '@mui/icons-material/Close';
+import ReplyIcon from '@mui/icons-material/Reply';
+
 import { useNavigate } from 'react-router-dom';
 
 const steps = ["Seleccione Fecha y Hora", "Servicio", "Terminar"];
@@ -43,7 +46,7 @@ const CrearCitas = () => {
     const fetchEmpleados = async () => {
       try {
         const response = await axios.get("http://localhost:5000/jackenail/Listar_Empleados");
-        const activeManicuristas = response.data.filter(empleados => empleados.Estado === 1)
+        const activeManicuristas = response.data.filter(empleados => empleados.Estado === 1 && empleados.IdRol === 2)
         setEmpleados(activeManicuristas);
       } catch (error) {
         console.error("Error fetching empleados:", error);
@@ -54,7 +57,7 @@ const CrearCitas = () => {
       try {
         
         const response = await axios.get("http://localhost:5000/jackenail/Listar_Clientes");
-        const activeClient = response.data.filter(clientes => clientes.Estado ===1)
+        const activeClient = response.data.filter(clientes => clientes.Estado ===1 )
         setClientes(activeClient);
       } catch (error) {
         console.error("Error fetching clientes:", error);
@@ -130,6 +133,7 @@ const CrearCitas = () => {
   const handleDateChange = (newDate) => {
     setDate(newDate);
   };
+  
 
   const servicioSeleccionado = servicios.find((servicio) => servicio.IdServicio === selectedServicio);
   const empleadoSeleccionado = empleados.find((empleado) => empleado.IdEmpleado === selectedEmpleado);
@@ -143,7 +147,7 @@ const CrearCitas = () => {
 
   return (
     <Container>
-      <Typography variant="h4" component="h1" align="center" gutterBottom sx={{ marginTop: 6 }}>
+      <Typography variant="h4" component="h1" align="center" gutterBottom sx={{ marginTop: -3 }}>
         Registrar citas!
       </Typography>
       <Stepper activeStep={activeStep} alternativeLabel sx={{ marginTop: 4 }}>
@@ -254,55 +258,55 @@ const CrearCitas = () => {
       </Grid>
 
       {/* Información de la cita */}
-      <Grid item xs={12} md={8} style={{ padding: '5px' }}>
-        <Typography variant="h6" component="h2" align="center" gutterBottom>
-          Confirmar Cita
+      <Grid item xs={12} md={8} style={{ padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '12px' }}>
+  <Typography variant="h6" component="h2" align="center" gutterBottom style={{ fontFamily: 'Poppins, sans-serif', color: '#6b4e80' }}>
+    Confirmar Cita
+  </Typography>
+  <Grid container spacing={2}>
+  {[
+    { label: 'Cliente', value: clienteSeleccionado ? `${clienteSeleccionado.Nombre} ${clienteSeleccionado.Apellido}` : '' },
+    { label: 'Empleado', value: empleadoSeleccionado ? `${empleadoSeleccionado.Nombre} ${empleadoSeleccionado.Apellido}` : '' },
+    { label: 'Servicio', value: servicioSeleccionado ? servicioSeleccionado.Nombre_Servicio : '' },
+    { label: 'Fecha', value: dayjs(date).format('D MMMM YYYY') },
+    { label: 'Hora Inicio', value: selectedTime },
+    { label: 'Precio del Servicio', value: precioServicio ? `$${precioServicio}` : '' },
+    { label: 'Tiempo del Servicio', value: tiempoServicio ? `${tiempoServicio} minutos` : '' }
+  ].map((item, index) => (
+    <Grid item xs={12} sm={6} key={index}>
+      <Paper elevation={1} style={{ padding: '16px', backgroundColor: '#ffffff', borderRadius: '8px', display: 'flex', alignItems: 'center' }}>
+        <Typography variant="body1" style={{ fontFamily: 'Poppins, sans-serif', color: '#333' }}>
+          <strong>{item.label}:</strong> {item.value}
         </Typography>
-        <Grid container spacing={1}>
-          {[
-            { label: 'Cliente', value: clienteSeleccionado ? `${clienteSeleccionado.Nombre} ${clienteSeleccionado.Apellido}` : '' },
-            { label: 'Empleado', value: empleadoSeleccionado ? `${empleadoSeleccionado.Nombre} ${empleadoSeleccionado.Apellido}` : '' },
-            { label: 'Servicio', value: servicioSeleccionado ? servicioSeleccionado.Nombre_Servicio : '' },
-            { label: 'Fecha', value: dayjs(date).format('DD/MM/YYYY') },
-            { label: 'Hora Inicio', value: selectedTime },
-            { label: 'Precio del Servicio', value: precioServicio ? `$${precioServicio}` : '' },
-            { label: 'Tiempo del Servicio', value: tiempoServicio ? `${tiempoServicio} minutos` : '' }
-          ].map((item, index) => (
-            <Grid item xs={12} key={index}>
-              <Paper elevation={5} style={{ padding: '12px', marginBottom: '8px' }}>
-                <Typography variant="body1">
-                  <strong>{item.label}:</strong> {item.value}
-                </Typography>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
+      </Paper>
+    </Grid>
+  ))}
+</Grid>
       </Grid>
     </Grid>
 
     {/* Diálogo de imagen */}
     {imagenServicio && (
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>
-          <IconButton
-            edge="end"
-            color="inherit"
-            onClick={handleClose}
-            aria-label="close"
-            sx={{ position: 'absolute', right: 8, top: 8 }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <img
-            src={`http://localhost:5000${imagenServicio}`}
-            alt="Servicio"
-            style={{ width: '100%', height: 'auto' }}
-          />
-        </DialogContent>
-      </Dialog>
-    )}
+    <Dialog open={open} onClose={handleClose}>
+      <DialogTitle>
+        <IconButton
+          edge="end"
+          color="inherit"
+          onClick={handleClose}
+          aria-label="close"
+          sx={{ position: 'absolute', right: 8, top: 8 }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent>
+        <img
+          src={`http://localhost:5000${imagenServicio}`}
+          alt="Servicio"
+          style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
+        />
+      </DialogContent>
+    </Dialog>
+  )}
   </Paper>
 )}
 
@@ -322,6 +326,21 @@ const CrearCitas = () => {
             {activeStep === steps.length - 1 ? "Finalizar" : "Siguiente"}
           </Button>
         </Box>
+
+        <Fab
+          aria-label="add"
+          style={{
+            border: "0.9px solid grey",
+            backgroundColor: "#94CEF2",
+            position: "fixed",
+            bottom: "50px",
+            right: "50px",
+            zIndex: 1000
+          }}
+          onClick={() => navigate('/agendamiento')}
+        >
+          <ReplyIcon style={{ fontSize: "2.5rem" }} />
+        </Fab>
       </div>
     </Container>
   );

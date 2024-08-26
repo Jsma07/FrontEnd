@@ -372,11 +372,13 @@ const Servicios = () => {
           },
           { name: "Nombre_Servicio", label: "Nombre", type: "text" },
           {
-            name: "Tiempo_Servicio",
-            label: "Tiempo",
-            type: "select",
-            options: opcionesTiempoServicio,
-          },
+      name: "Tiempo_Servicio",
+      label: "Tiempo",
+      type: "select",
+      options: opcionesTiempoServicio,
+    },
+          { name: "Descripcion_Servicio", label: "Descripcion", type: "textarea" }, 
+
           { name: "Precio_Servicio", label: "Precio", type: "number" }, // Asegúrate de que 'type' sea 'number'
           { name: "ImgServicio", label: "Imagen", type: "file" },
         ]}

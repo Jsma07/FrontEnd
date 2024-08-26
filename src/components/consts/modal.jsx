@@ -9,6 +9,7 @@ import {
   MenuItem,
   InputLabel,
   IconButton,
+  TextareaAutosize,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
@@ -375,30 +376,19 @@ const ModalDinamico = ({
             </Select>
           </div>
         );
-        case "textarea": // Nuevo case para la descripción
+        case "textarea":
         return (
-          <TextField
+          <TextareaAutosize
             id={name}
             name={name}
             label={label}
             variant="outlined"
             onChange={handleChange}
             onBlur={handleBlur}
-            fullWidth
-            multiline
-            rows={4} // Establece la altura inicial
-            size="medium"
-            type="text"
-            style={{ marginBottom: '0.5rem', textAlign: 'center' }}
-            value={formValues[name] || ''}
-            error={!!errors[name]}
-            helperText={errors[name]}
+            style={{ width: "100%", padding: "0.5rem", fontSize: "16px", resize: "vertical", minHeight: "100px", maxHeight: "300px" }}
+            value={formValues[name] || ""}
             disabled={disabled}
-            InputProps={{
-              style: {
-                resize: "both", // Permite que el campo de texto se ajuste en ambas direcciones
-              },
-            }}
+            placeholder={label}
           />
         );
 
