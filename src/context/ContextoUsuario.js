@@ -28,11 +28,13 @@ export const UserProvider = ({ children }) => {
   // Efecto para cargar el usuario desde el almacenamiento local al montar el componente
   useEffect(() => {
     const token = localStorage.getItem('token');
+    console.log('Token cargado del localStorage:', token);
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
+  
       axios.get('http://localhost:5000/api/usuario')
         .then(response => {
+          console.log('Datos del usuario:', response.data);
           setUser(response.data.user);
           setPermissions(response.data.permisos);
         })
@@ -42,7 +44,7 @@ export const UserProvider = ({ children }) => {
         });
     }
   }, []);
-
+  
   return (
     <UserContext.Provider value={{ user, permissions, login, logout }}>
       {children}
