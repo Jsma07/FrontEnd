@@ -48,13 +48,12 @@ const Proveedores = () => {
 
   const handleEditProveedor = async (formData) => {
     try {
-      const { NIT, correo_proveedor, telefono_proveedor, direccion_proveedor, empresa_proveedor } = formData;
+      const { NIT, correo_proveedor, telefono_proveedor, empresa_proveedor } = formData;
       const response = await axios.get('http://localhost:5000/api/proveedores');
       const proveedores = response.data;
       const proveedorExistenteNIT = proveedores.find(proveedor => proveedor.NIT === NIT && proveedor.IdProveedor !== formData.IdProveedor);
       const proveedorExistenteCorreo = proveedores.find(proveedor => proveedor.correo_proveedor === correo_proveedor && proveedor.IdProveedor !== formData.IdProveedor);
       const proveedorExistenteTelefono = proveedores.find(proveedor => proveedor.telefono_proveedor === telefono_proveedor && proveedor.IdProveedor !== formData.IdProveedor);
-      const proveedorExistenteDireccion = proveedores.find(proveedor => proveedor.direccion_proveedor === direccion_proveedor && proveedor.IdProveedor !== formData.IdProveedor);
       const proveedorExistenteEmpresa = proveedores.find(proveedor => proveedor.empresa_proveedor === empresa_proveedor && proveedor.IdProveedor !== formData.IdProveedor);
   
       const camposObligatorios = ['NIT','nombre_proveedor', 'correo_proveedor', 'telefono_proveedor', 'direccion_proveedor', 'empresa_proveedor'];
@@ -105,17 +104,7 @@ const Proveedores = () => {
         });
         return;
       }
-  
-      if (proveedorExistenteDireccion) {
-        console.log('Dirección ya registrada');
-        window.Swal.fire({
-          icon: 'warning',
-          title: 'Dirección ya registrada',
-          text: 'La dirección ingresada ya está registrada para otro proveedor.',
-        });
-        return;
-      }
-  
+
       if (proveedorExistenteEmpresa) {
         console.log('Empresa ya registrada');
         window.Swal.fire({

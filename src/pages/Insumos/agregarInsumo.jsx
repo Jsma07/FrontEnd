@@ -5,15 +5,14 @@ import CamposObligatorios from '../../components/consts/camposVacios';
 
 const handleAddInsumo = async (formData, handleCloseModalAgregar, fetchInsumos) => {
     try {
-        const { NombreInsumos, IdCategoria, Idproveedor, Imagen } = formData;
+        const { NombreInsumos, IdCategoria, Imagen } = formData;
 
-        const camposObligatorios = ["NombreInsumos", "Imagen", "IdCategoria", "Idproveedor"];
+        const camposObligatorios = ["NombreInsumos", "Imagen", "IdCategoria"];
         if (!CamposObligatorios(formData, camposObligatorios, "Por favor, complete todos los campos del insumo.")) {
             return;
         }
         const formDataToSend = new FormData();
         formDataToSend.append("NombreInsumos", NombreInsumos);
-        formDataToSend.append("Idproveedor", Idproveedor);
         formDataToSend.append("IdCategoria", IdCategoria);
         formDataToSend.append("Imagen", Imagen);
 

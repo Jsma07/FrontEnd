@@ -21,6 +21,7 @@ const CrearCompra = () => {
   const [insumos, setInsumos] = useState([]);
   const [proveedores, setProveedores] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  const [idProveedor, setIdProveedor] = useState('');
   const [fecha_compra, setFechaCompra] = useState('');
   const [descuento_compra, setDescuentoCompra] = useState(0);
   const [iva_compra, setIvaCompra] = useState(0);
@@ -81,10 +82,6 @@ const fetchInsumos = async () => {
     }
 };
 
-const handleSubmitInsumos = (formData) => {
-  handleAddInsumo(formData, handleCloseModalAgregar, fetchInsumos);
-};
-
 const fetchCategorias = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/categorias');
@@ -102,6 +99,10 @@ const fetchProveedores = async () => {
     } catch (error) {
       console.error("Error fetching proveedores:", error);
     }
+};
+
+const handleSubmitInsumos = (formData) => {
+  handleAddInsumo(formData, handleCloseModalAgregar, fetchInsumos);
 };
 
 const handleSubmitProveedor = (formData) => {
@@ -207,13 +208,13 @@ if (invalidDetalles) {
     return;
 }
 
-    const formData = {fecha_compra, descuento_compra: parseFloat(descuento_compra), iva_compra: parseFloat(iva_compra),subtotal_compra: parseFloat(subtotal_compra),estado_compra,
+    const formData = {fecha_compra, descuento_compra: parseFloat(descuento_compra), iva_compra: parseFloat(iva_compra),subtotal_compra: parseFloat(subtotal_compra),estado_compra, IdProveedor: idProveedor,
         detallesCompra: detallesCompra.map(detalle => ({
             ...detalle, cantidad_insumo: parseInt(detalle.cantidad_insumo),precio_unitario: parseFloat(detalle.precio_unitario),totalValorInsumos: parseFloat(detalle.totalValorInsumos),
         })),
     };
     console.log("Datos enviados al backend:", formData);
-    const camposObligatorios = ['fecha_compra', 'descuento_compra', 'iva_compra', 'estado_compra'];
+    const camposObligatorios = ['fecha_compra', 'descuento_compra', 'iva_compra', 'estado_compra', 'IdProveedor'];
 
     if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos de la compra.')) {
         return;
@@ -351,6 +352,24 @@ return (
               max={maxDate}
             />
           </div>
+
+          <div className="form-group mb-2">
+            <label htmlFor="estado_compra" className="block text-sm font-medium text-gray-900 dark:text-white">Proveedor:</label>
+            <select
+                id="estado_compra"
+                className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
+                value={idProveedor} 
+                onChange={(e) => setIdProveedor(e.target.value)}  
+                required
+            >
+                <option value="">Seleccione un proveedor</option>
+                {proveedores.map((proveedor) => (
+                    <option key={proveedor.IdProveedor} value={proveedor.IdProveedor}>
+                        {proveedor.empresa_proveedor} | {proveedor.nombre_proveedor}
+                    </option>
+                ))}
+            </select>
+        </div>
 
         <div className="form-group mb-2">
           <label htmlFor="descuento_compra" className="block text-sm font-medium text-gray-900 dark:text-white">Descuento:</label>
@@ -604,17 +623,7 @@ return (
         onSubmit={handleSubmitInsumos}
         title="Crear Nuevo Insumo"
         fields={[
-          {
-            name: "Idproveedor",
-            label: "Proveedor",
-            type: "select",
-            options: proveedores
-              .filter((proveedor) => proveedor.estado_proveedor === 1)
-              .map((proveedor) => ({
-                value: proveedor.IdProveedor,
-                label: proveedor.nombre_proveedor,
-              })),
-          },
+          { name: "NombreInsumos", label: "Nombre insumo", type: "text" },
           {
             name: "IdCategoria",
             label: "Categoria insumo",
@@ -626,7 +635,6 @@ return (
                 label: categoria.nombre_categoria,
               })),
           },
-          { name: "NombreInsumos", label: "Nombre insumo", type: "text" },
           { name: "Imagen", label: "Imagen", type: "file" },
         ]}
         onChange={handleChange}

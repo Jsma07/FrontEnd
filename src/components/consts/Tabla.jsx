@@ -8,7 +8,6 @@ const TablePrueba = ({ title, columns, data, roles = [] }) => {
   const [rowsPerPage] = useState(5);
 
   const handleSearchChange = (event) => setSearchTerm(event.target.value);
-
   const handleRoleFilterChange = (event) => setSelectedRole(event.target.value);
 
   // Filtrar datos usando useMemo para optimizar el rendimiento
