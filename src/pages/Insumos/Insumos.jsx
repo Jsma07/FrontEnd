@@ -13,14 +13,12 @@ const Insumos = () => {
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [insumos, setInsumos] = useState([]);
   const [categorias, setCategorias] = useState([]);
-  const [proveedores, setProveedores] = useState([]);
   const [insumoSeleccionado, setInsumoSeleccionado] = useState(null);
   const [buscar, setBuscar] = useState("");
 
   useEffect(() => {
     fetchInsumos();
     fetchCategorias();
-    fetchProveedores();
   }, []);
 
   const fetchInsumos = async () => {
@@ -42,35 +40,18 @@ const Insumos = () => {
     }
   };
 
-  const fetchProveedores = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/api/proveedores");
-      console.log("proveedores fetched:", response.data); 
-      setProveedores(response.data);
-    } catch (error) {
-      console.error("Error fetching proveedores:", error);
-    }
-  };
-
   const filtrar = insumos.filter((insumo) => {
-    const {NombreInsumos,Cantidad,PrecioUnitario,Idproveedor,IdCategoria,IdInsumos,Estado,} = insumo;
+    const {NombreInsumos,Cantidad,PrecioUnitario,IdCategoria,IdInsumos,Estado,} = insumo;
     const terminoABuscar = buscar.toLowerCase();
 
     const IdInsumoString = IdInsumos?.toString() || "";
     const PrecioUnitarioString = PrecioUnitario?.toString() || "";
     const CantidadString = Cantidad?.toString() || "";
     const IdCategoriaString = IdCategoria?.toString() || "";
-    const IdproveedorString = Idproveedor?.toString() || "";
-
 
     const categoria = categorias.find((c) => c.IdCategoria === IdCategoria);
     const nombreCategoria = categoria
       ? categoria.nombre_categoria.toLowerCase()
-      : "";
-
-    const proveedor = proveedores.find((c) => c.Idproveedor === Idproveedor);
-    const nombreProveedor = proveedor
-      ? proveedor.nombre_proveedor.toLowerCase()
       : "";
 
     return (
@@ -78,7 +59,6 @@ const Insumos = () => {
       Estado.toLowerCase().includes(terminoABuscar) ||
       PrecioUnitarioString.includes(terminoABuscar) ||
       CantidadString.includes(terminoABuscar) ||
-      nombreProveedor.includes(terminoABuscar) ||
       nombreCategoria.includes(terminoABuscar) ||
       IdInsumoString.includes(terminoABuscar)
     );
@@ -86,7 +66,7 @@ const Insumos = () => {
 
   const handleEditInsumo = async (formData) => {
     try {
-      const camposObligatorios = ["NombreInsumos","Imagen","Idcategoria","Idproveedor",];
+      const camposObligatorios = ["NombreInsumos","Imagen","Idcategoria"];
 
       if (
         !CamposObligatorios(
@@ -136,7 +116,6 @@ const Insumos = () => {
         formDataWithNumbers.append("Imagen", formData.Imagen); 
         formDataWithNumbers.append("Estado", formData.Estado);
         formDataWithNumbers.append("IdCategoria", formData.Idcategoria);
-        formDataWithNumbers.append("Idproveedor", formData.Idproveedor);
 
   
         const response = await axios.put(
@@ -150,7 +129,7 @@ const Insumos = () => {
         );
   
         handleCloseModalEditar();
-        fetchInsumos(); // Recargar la lista de insumos después de la actualización
+        fetchInsumos(); 
         window.Swal.fire("¡Insumo actualizado!", "", "success");
       }
     } catch (error) {
@@ -194,17 +173,7 @@ const Insumos = () => {
         onSubmit={handleSubmit}
         title="Crear Nuevo Insumo"
         fields={[
-          {
-            name: "Idproveedor",
-            label: "Proveedor",
-            type: "select",
-            options: proveedores
-              .filter((proveedor) => proveedor.estado_proveedor === 1)
-              .map((proveedor) => ({
-                value: proveedor.IdProveedor,
-                label: proveedor.nombre_proveedor,
-              })),
-          },
+          { name: "NombreInsumos", label: "Nombre insumo", type: "text" },
           {
             name: "IdCategoria",
             label: "Categoria insumo",
@@ -216,7 +185,6 @@ const Insumos = () => {
                 label: categoria.nombre_categoria,
               })),
           },
-          { name: "NombreInsumos", label: "Nombre insumo", type: "text" },
           { name: "Imagen", label: "Imagen", type: "file" },
         ]}
         onChange={handleChange}
@@ -243,17 +211,6 @@ const Insumos = () => {
               .map((categoria) => ({
                 value: categoria.IdCategoria,
                 label: categoria.nombre_categoria,
-              })),
-          },
-          {
-            name: "Idproveedor",
-            label: "Proveedor",
-            type: "select",
-            options: proveedores
-              .filter((proveedor) => proveedor.estado_proveedor === 1)
-              .map((proveedor) => ({
-                value: proveedor.IdProveedor,
-                label: proveedor.nombre_proveedor,
               })),
           },
           { name: "Imagen", label: "Imagen", type: "file" },
@@ -291,7 +248,6 @@ const Insumos = () => {
             headerName: "INSUMO",
             width: "w-36",
           },
-          { field: "nombre_proveedor", headerName: "PROVEEDOR", width: "w-36" },
           { field: "Cantidad", headerName: "CANTIDAD", width: "w-36" },
           {
             field: 'Precio_Servicio',

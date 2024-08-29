@@ -6,13 +6,12 @@ import CamposObligatorios from '../../components/consts/camposVacios';
 
 const handleAddProveedor = async (formData, handleCloseModalAgregar, fetchProveedores) => {
     try {
-      const { NIT, correo_proveedor, telefono_proveedor, direccion_proveedor, empresa_proveedor } = formData;
+      const { NIT, correo_proveedor, telefono_proveedor, empresa_proveedor } = formData;
       const response = await axios.get('http://localhost:5000/api/proveedores');
       const proveedores = response.data;
       const proveedorExistenteNIT = proveedores.find(proveedor => proveedor.NIT === NIT);
       const proveedorExistenteCorreo = proveedores.find(proveedor => proveedor.correo_proveedor === correo_proveedor);
       const proveedorExistenteTelefono = proveedores.find(proveedor => proveedor.telefono_proveedor === telefono_proveedor);
-      const proveedorExistenteDireccion = proveedores.find(proveedor => proveedor.direccion_proveedor === direccion_proveedor);
       const proveedorExistenteEmpresa = proveedores.find(proveedor => proveedor.empresa_proveedor === empresa_proveedor);
   
       const camposObligatorios = ['NIT','nombre_proveedor', 'correo_proveedor', 'telefono_proveedor', 'direccion_proveedor', 'empresa_proveedor'];
@@ -64,15 +63,6 @@ const handleAddProveedor = async (formData, handleCloseModalAgregar, fetchProvee
           icon: 'warning',
           title: 'Teléfono ya registrado',
           text: 'El número de teléfono ingresado ya está registrado para otro proveedor.',
-        });
-        return;
-      }
-
-      if (proveedorExistenteDireccion) {
-        window.Swal.fire({
-          icon: 'warning',
-          title: 'Direccion ya registrada',
-          text: 'La direccion ingresada ya está registrado para otro proveedor.',
         });
         return;
       }

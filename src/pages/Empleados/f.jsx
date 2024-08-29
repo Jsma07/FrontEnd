@@ -105,7 +105,7 @@ const Empleados = () => {
     { field: "Documento", headerName: "Documento" },
     { field: "Direccion", headerName: "Dirección" },
     {
-      field: "Rol",
+      field: "Rol", // Un nombre de campo simple
       headerName: "Rol",
       valueGetter: (params) => params.row.role?.nombre || "Sin rol",
     },
@@ -283,6 +283,7 @@ const Empleados = () => {
 
   const handleActualizacionSubmit = async (formData) => {
     try {
+      // Verificar si el correo o el documento están siendo utilizados por otro empleado
       const empleadoExistente = empleados.find(
         (empleado) =>
           (empleado.Correo === formData.Correo ||
@@ -299,32 +300,26 @@ const Empleados = () => {
         return;
       }
 
+      // Verificar que se haya seleccionado un rol nuevo si el usuario cambió la selección
+      const rolSeleccionado = formData.Rol || modalData.seleccionado.IdRol;
+
       const formDataNumerico = {
         ...formData,
         Telefono: parseInt(formData.Telefono, 10),
+        IdRol: rolSeleccionado, // Asegurarse de que el rol seleccionado se pase aquí
       };
 
       const url = `http://localhost:5000/Jackenail/ActualizarEmpleados/${formDataNumerico.IdEmpleado}`;
 
       await axios.put(url, formDataNumerico);
 
-      // Actualiza la lista de empleados
-      setEmpleados((prevEmpleados) =>
-        prevEmpleados.map((empleado) =>
-          empleado.IdEmpleado === formDataNumerico.IdEmpleado
-            ? {
-                ...empleado,
-                ...formDataNumerico,
-                role: {
-                  idRol: formDataNumerico.Rol,
-                  nombre: roles.find(
-                    (role) => role.idRol === formDataNumerico.Rol
-                  )?.nombre,
-                },
-              }
-            : empleado
-        )
+      const empleadosActualizados = empleados.map((empleado) =>
+        empleado.IdEmpleado === formDataNumerico.IdEmpleado
+          ? { ...empleado, ...formDataNumerico }
+          : empleado
       );
+
+      setEmpleados(empleadosActualizados);
 
       Swal.fire({
         icon: "success",

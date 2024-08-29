@@ -20,40 +20,32 @@ const Ventas = () => {
   const [ventaIdToDelete, setVentaIdToDelete] = useState(null);
   const [ventaSeleccionada, setVentaSeleccionada] = useState({
     idVentas: null,
+    total: 0, // Añadir el campo total
   });
 
   const handleCloseModal = () => setOpenModal(false);
 
-  const handleOpenModal = (idVentas) => {
-    console.log("ID de venta recibido:", idVentas);
-    if (idVentas) {
-      setVentaSeleccionada(idVentas);
+  const handleOpenModal = (venta) => {
+    console.log("Venta recibida:", venta);
+    if (venta) {
+      setVentaSeleccionada({
+        idVentas: venta.idVentas,
+        total: venta.Total, // Asegúrate de pasar el total también
+      });
       setOpenModal(true);
     } else {
       console.log("Venta no encontrada");
     }
   };
 
-  const fetchVentas = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:5000/Jackenail/Listarventas"
-      );
-      const ventasConDetalles = response.data.map((venta) => {
-        // Formatear la fecha a 'YYYY-MM-DD' solo para visualización
-        const fechaFormateada = new Date(venta.Fecha)
-          .toISOString()
-          .split("T")[0];
+  useEffect(() => {
+    const fetchVentas = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/Jackenail/Listarventas"
+        );
 
-        // Formatear el precio en pesos colombianos
-        const precioFormateado = new Intl.NumberFormat("es-CO", {
-          style: "currency",
-          currency: "COP",
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(venta.Total);
-
-        return {
+        const ventasConDetalles = response.data.map((venta) => ({
           id: venta.idVentas,
           idServicio: (
             <div style={{ display: "flex", alignItems: "center" }}>
@@ -74,65 +66,94 @@ const Ventas = () => {
           idEmpleado: `${venta.empleado?.Nombre || ""} ${
             venta.empleado?.Apellido || ""
           }`,
-          Fecha: fechaFormateada, // Usar la fecha formateada para mostrar
-          FechaCompleta: new Date(venta.Fecha), // Guardar la fecha completa para ordenar
-          Total: precioFormateado,
+          Fecha: venta.Fecha,
+          Total: venta.Total,
           Estado: (
             <div className="flex space-x-2">
-              {renderEstadoButton(venta.Estado)}
+              {renderEstadoButton(venta.Estado, venta.idVentas)}
             </div>
           ),
           Acciones: (
             <div className="flex space-x-2">
-              <Link
-                to={`/Detalleventa/${venta.idVentas}`}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white"
-              >
-                <RemoveRedEyeIcon />
-              </Link>
-
-              {venta.Estado === 2 && (
-                <Fab
-                  key={venta.idVentas}
-                  size="small"
-                  aria-label="edit"
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-green-700 text-white"
-                  onClick={() => handleOpenModal(venta.idVentas)}
-                >
-                  <EditIcon />
-                </Fab>
-              )}
-
               {venta.Estado !== 3 && (
-                <Fab
-                  size="small"
-                  aria-label="delete"
-                  onClick={() => handleOpenAlert(venta.idVentas)}
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-red-500 text-white"
-                >
-                  <DeleteIcon />
-                </Fab>
+                <>
+                  <Link
+                    to={`/Detalleventa/${venta.idVentas}`}
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white"
+                  >
+                    <RemoveRedEyeIcon />
+                  </Link>
+                  {venta.Estado === 2 && (
+                    <Fab
+                      key={venta.idVentas}
+                      size="small"
+                      aria-label="edit"
+                      className="flex items-center justify-center w-10 h-10 rounded-full bg-green-700 text-white"
+                      onClick={() => handleOpenModal(venta)}
+                    >
+                      <EditIcon />
+                    </Fab>
+                  )}
+
+                  <Fab
+                    size="small"
+                    aria-label="delete"
+                    onClick={() => handleOpenAlert(venta.idVentas)}
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-red-500 text-white"
+                  >
+                    <DeleteIcon />
+                  </Fab>
+                </>
               )}
             </div>
           ),
           estiloFila: venta.Estado === 3 ? "bg-gray-200" : "",
-        };
-      });
+        }));
 
-      // Ordenar las ventas por la fecha completa, de más reciente a más antigua
-      ventasConDetalles.sort((a, b) => b.FechaCompleta - a.FechaCompleta);
+        // Ordenar las ventas por fecha de forma descendente
+        ventasConDetalles.sort((a, b) => new Date(b.Fecha) - new Date(a.Fecha));
 
-      setVentas(ventasConDetalles);
-      toast.success("Ventas cargadas exitosamente");
-    } catch (error) {
-      console.error("Error al obtener los datos de ventas:", error);
-      toast.error("Error al cargar las ventas");
-    }
-  };
+        setVentas(ventasConDetalles);
+        toast.success("Ventas cargadas exitosamente");
+      } catch (error) {
+        console.error("Error al obtener los datos de ventas:", error);
+        toast.error("Error al cargar las ventas");
+      }
+    };
 
-  useEffect(() => {
     fetchVentas();
   }, []);
+
+  const renderEstadoButton = (estado, ventaId) => {
+    let buttonClass, estadoTexto;
+
+    switch (estado) {
+      case 1: // Vendido
+        buttonClass = "bg-green-500";
+        estadoTexto = "Vendido";
+        break;
+      case 2: // En Preparación
+        buttonClass = "bg-purple-500";
+        estadoTexto = "En Preparación";
+        break;
+      case 3: // Anulado
+        buttonClass = "bg-red-500";
+        estadoTexto = "Anulado";
+        break;
+      default:
+        buttonClass = "bg-gray-500";
+        estadoTexto = "Desconocido";
+    }
+
+    return (
+      <button
+        className={`px-3 py-1.5 text-white text-sm font-medium rounded-lg shadow-md focus:outline-none ${buttonClass}`}
+        onClick={() => handleEstadoClick(ventaId, estado)}
+      >
+        {estadoTexto}
+      </button>
+    );
+  };
 
   const handleEstadoClick = async (ventaId, estadoActual) => {
     // Validaciones de cambio de estado
@@ -185,64 +206,23 @@ const Ventas = () => {
         `http://localhost:5000/Jackenail/CambiarEstado/${ventaId}`,
         { Estado: nuevoEstado }
       );
-
-      if (response.data.success) {
-        setVentas((prevVentas) =>
-          prevVentas.map((venta) =>
-            venta.id === ventaId
-              ? {
-                  ...venta,
-                  Estado: nuevoEstado,
-                  Acciones: (
-                    <div className="flex space-x-2">
-                      <Link
-                        to={`/Detalleventa/${venta.id}`}
-                        className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white"
-                      >
-                        <RemoveRedEyeIcon />
-                      </Link>
-
-                      {nuevoEstado === 2 && (
-                        <Fab
-                          size="small"
-                          aria-label="edit"
-                          className="flex items-center justify-center w-10 h-10 rounded-full bg-green-700 text-white"
-                          onClick={() => handleOpenModal(venta.id)}
-                        >
-                          <EditIcon />
-                        </Fab>
-                      )}
-
-                      {nuevoEstado !== 3 && (
-                        <Fab
-                          size="small"
-                          aria-label="delete"
-                          onClick={() => handleOpenAlert(venta.id)}
-                          className="flex items-center justify-center w-10 h-10 rounded-full bg-red-500 text-white"
-                        >
-                          <DeleteIcon />
-                        </Fab>
-                      )}
-                    </div>
-                  ),
-                }
-              : venta
-          )
-        );
-        toast.success("Estado cambiado con éxito", {
-          position: "bottom-right",
-          autoClose: 3000,
-        });
-      } else {
-        toast.error(
-          response.data.error || "Error desconocido al cambiar el estado"
-        );
-      }
+      // Actualizar el estado local de la venta
+      setVentas((prevVentas) =>
+        prevVentas.map((venta) =>
+          venta.id === ventaId ? { ...venta, Estado: nuevoEstado } : venta
+        )
+      );
+      console.log("Estado cambiado con éxito:", response.data);
+      toast.success("Estado cambiado con éxito", {
+        position: "bottom-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
+      });
     } catch (error) {
       console.error("Error al cambiar el estado:", error);
-      toast.error(
-        error.response?.data?.error || "Hubo un problema al cambiar el estado"
-      );
+      toast.error("Hubo un problema al cambiar el estado", {
+        position: "top-right",
+        autoClose: 3000, // Cierra automáticamente después de 3 segundos
+      });
     }
   };
 
@@ -275,23 +255,15 @@ const Ventas = () => {
       );
 
       if (response.data.success) {
+        const updatedVenta = response.data.venta;
         setVentas((prevVentas) =>
           prevVentas.map((venta) =>
             venta.id === ventaId
               ? {
                   ...venta,
-                  Estado: renderEstadoButton(3), // Actualiza el estado a 3 (anulado)
-                  Acciones: (
-                    <div className="flex space-x-2">
-                      <Link
-                        to={`/Detalleventa/${venta.id}`}
-                        className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white"
-                      >
-                        <RemoveRedEyeIcon />
-                      </Link>
-                    </div>
-                  ), // Mantiene solo el botón de visualizar
-                }
+                  Estado: renderEstadoButton(updatedVenta.Estado),
+                  Acciones: null,
+                } // Remover Acciones si el estado es Anulado
               : venta
           )
         );
@@ -307,37 +279,6 @@ const Ventas = () => {
         error.response?.data?.error || "Hubo un problema al anular la venta"
       );
     }
-  };
-
-  const renderEstadoButton = (estado, ventaId) => {
-    let buttonClass, estadoTexto;
-
-    switch (estado) {
-      case 1: // Vendido
-        buttonClass = "bg-green-500";
-        estadoTexto = "Vendido";
-        break;
-      case 2: // En Preparación
-        buttonClass = "bg-purple-500";
-        estadoTexto = "En Preparación";
-        break;
-      case 3: // Anulado
-        buttonClass = "bg-red-500";
-        estadoTexto = "Anulado";
-        break;
-      default:
-        buttonClass = "bg-gray-500";
-        estadoTexto = "Desconocido";
-    }
-
-    return (
-      <button
-        className={`px-3 py-1.5 text-white text-sm font-medium rounded-lg shadow-md focus:outline-none ${buttonClass}`}
-        onClick={() => handleEstadoClick(ventaId, estado)}
-      >
-        {estadoTexto}
-      </button>
-    );
   };
 
   const columns = [
@@ -383,7 +324,8 @@ const Ventas = () => {
           adiciones={adiciones}
           setAdicionesSeleccionadas={setAdicionesSeleccionadas}
           adicionesSeleccionadas={adicionesSeleccionadas}
-          idVentas={ventaSeleccionada}
+          idVentas={ventaSeleccionada.idVentas}
+          totalVenta={ventaSeleccionada.total} // Pasar el total de la venta
           setVentas={setVentas}
         />
       )}
