@@ -5,14 +5,26 @@ import Tabla from "../../components/consts/Tabla";
 import Fab from "@mui/material/Fab";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
-import { Modal, Typography, Button } from "@mui/material";
+import {
+  Modal,
+  Typography,
+  Button,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 
 const Salida = () => {
   const [salidas, setSalidas] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [descripcion, setDescripcion] = useState("");
+  const [detalleSalida, setDetalleSalida] = useState({});
 
   useEffect(() => {
     const fetchSalidas = async () => {
@@ -27,9 +39,7 @@ const Salida = () => {
                 src={`http://localhost:5000${salida.insumo.Imagen}`}
                 alt={salida.insumo.NombreInsumos}
                 style={{
-                  maxWidth: "100%",
-                  height: "auto",
-                  width: "3rem",
+                  maxWidth: "3rem",
                   height: "3rem",
                   borderRadius: "50%",
                 }}
@@ -129,7 +139,7 @@ const Salida = () => {
   };
 
   const handleOpenModal = (salida) => {
-    setDescripcion(salida.Descripcion || "Descripción no disponible");
+    setDetalleSalida(salida);
     setOpenModal(true);
   };
 
@@ -171,26 +181,129 @@ const Salida = () => {
           <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
         </Fab>
       </Link>
-
       <Modal open={openModal} onClose={handleCloseModal}>
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-          <div className="bg-white text-black rounded-lg shadow-lg p-6 w-[80%] max-w-lg">
-            <Typography variant="h6" gutterBottom>
-              Descripción de la Salida
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {descripcion}
-            </Typography>
-            <Button
-              onClick={handleCloseModal}
-              sx={{
-                backgroundColor: "#EF5A6F",
-                color: "#fff",
-                "&:hover": { backgroundColor: "#e6455c" },
-              }}
-            >
-              Cerrar
-            </Button>
+          <div
+            className="bg-white text-black rounded-lg shadow-lg p-6 w-[90%] max-w-4xl"
+            style={{ maxHeight: "80vh", overflowY: "auto" }}
+          >
+            {/* Encabezado centrado */}
+            <div className="text-center mb-4">
+              <Typography variant="h6" gutterBottom>
+                Detalle de la Salida
+              </Typography>
+            </div>
+
+            {/* Contenedor de tarjeta y tabla en la misma fila */}
+            <div className="flex flex-wrap gap-6">
+              {/* Card para mostrar la información del insumo */}
+              <div
+                className="bg-white border border-gray-200 rounded-lg shadow-md"
+                style={{
+                  maxWidth: "220px",
+                  flex: "1 1 auto",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                  borderRadius: "10px", // Borde suavizado
+                }}
+              >
+                <div className="relative">
+                  <img
+                    src={`http://localhost:5000${detalleSalida.insumo?.Imagen}`}
+                    alt={
+                      detalleSalida.insumo?.NombreInsumos || "Imagen del insumo"
+                    }
+                    className="w-full object-cover rounded-t-lg"
+                    style={{
+                      height: "300px", // Ajusta esta altura según sea necesario
+                      borderTopLeftRadius: "10px",
+                      borderTopRightRadius: "10px",
+                    }}
+                  />
+                  {/* Agrega un padding para más espacio debajo de la imagen */}
+                  <div className="absolute inset-x-0 bottom-0 h-6 bg-white"></div>
+                </div>
+                <div className="p-4">
+                  <div className="flex flex-col gap-2">
+                    <h5 className="text-lg font-semibold text-gray-800">
+                      {detalleSalida.insumo?.NombreInsumos ||
+                        "Nombre no disponible"}
+                    </h5>
+                    <span className="font-bold text-md text-gray-900">
+                      $
+                      {detalleSalida.insumo?.PrecioUnitario ||
+                        "Precio no disponible"}
+                    </span>
+                    <p className="font-medium text-xs text-gray-600">
+                      Cantidad en stock:{" "}
+                      {detalleSalida.insumo?.Cantidad ||
+                        "Cantidad no disponible"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tabla para la información adicional */}
+              <Box mb={4} flex="1">
+                <Typography variant="h6" gutterBottom>
+                  Información Adicional
+                </Typography>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: "bold" }}>Campo</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>Valor</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell>Fecha de Salida</TableCell>
+                        <TableCell>
+                          {detalleSalida.Fecha_salida || "Fecha no disponible"}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>Cantidad</TableCell>
+                        <TableCell>
+                          {detalleSalida.Cantidad || "Cantidad no disponible"}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>Estado</TableCell>
+                        <TableCell>
+                          {detalleSalida.Estado === "Terminado"
+                            ? "Terminado"
+                            : detalleSalida.Estado === "Anulado"
+                            ? "Anulado"
+                            : "Desconocido"}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>Descripción</TableCell>
+                        <TableCell>
+                          {detalleSalida.Descripcion ||
+                            "Descripción no disponible"}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Box>
+            </div>
+
+            {/* Botón de cerrar en la parte inferior derecha */}
+            <div className="flex justify-end mt-4">
+              <Button
+                onClick={handleCloseModal}
+                sx={{
+                  backgroundColor: "#EF5A6F",
+                  color: "#fff",
+                  "&:hover": { backgroundColor: "#e6455c" },
+                }}
+              >
+                Cerrar
+              </Button>
+            </div>
           </div>
         </div>
       </Modal>
