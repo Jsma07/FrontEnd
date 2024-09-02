@@ -111,16 +111,21 @@ const TimeSelect = ({
   inactiveHours = [],
   handleHourChange,
   loading,
+  selectedDay,
 }) => {
   const [selectedHour, setSelectedHour] = useState(null);
+  const horaActual = dayjs().format('HH:mm');
+  const esHoy = selectedDay === dayjs().format('YYYY-MM-DD');
 
   const handleClick = (hour) => {
     setSelectedHour(hour);
     handleHourChange(hour);
   };
 
-  // Filtrar horas inactivas
-  const filteredHours = hours.filter((hour) => !inactiveHours.includes(hour));
+  const filteredHours = hours.filter(hour => 
+    (!inactiveHours.includes(hour) && 
+    (!esHoy || hour >= horaActual) // Filtrar las horas anteriores a la hora actual si es hoy
+  ));
 
   return (
     <>
@@ -151,6 +156,8 @@ const TimeSelect = ({
     </>
   );
 };
+
+
 const DaySelect = ({
   days = [],
   handleDayChange,
@@ -313,16 +320,27 @@ const ParentComponent = ({ onDateSelect, onHourSelect }) => {
         const horariosResponse = await axios.get(
           "http://localhost:5000/api/horarios"
         );
-        const inactiveDays = horariosResponse.data
+        let inactiveDays = horariosResponse.data
           .filter((horario) => horario.estado === "inactivo")
           .map((horario) => horario.fecha);
+          
+        // Añadir el día actual como inactivo si ya pasó la última hora disponible
+        const horaActual = dayjs().format('HH:mm');
+        const times = generateTimeOptions();
+        const lastAvailableHour = times[times.length - 1];
+        const today = dayjs().format('YYYY-MM-DD');
+        
+        if (today === selectedDay && horaActual > lastAvailableHour) {
+          inactiveDays.push(today);
+        }
+  
         setInactiveDays(inactiveDays);
-
+  
         // Obtener todos los días del mes
         const startDate = dayjs();
         const endDate = startDate.add(1, "month").endOf("month");
         const days = [];
-
+  
         for (
           let date = startDate;
           date.isBefore(endDate) || date.isSame(endDate);
@@ -330,15 +348,15 @@ const ParentComponent = ({ onDateSelect, onHourSelect }) => {
         ) {
           days.push(date.format("YYYY-MM-DD"));
         }
-
+  
         setDaysOfWeek(days);
       } catch (error) {
         console.error("Error al obtener los días inactivos:", error);
       }
     };
-
+  
     fetchData();
-  }, []);
+  }, [selectedDay]);
 
   useEffect(() => {
     const fetchOccupiedHours = async () => {
@@ -420,6 +438,7 @@ const ParentComponent = ({ onDateSelect, onHourSelect }) => {
           occupiedHours={occupiedHours}
           inactiveHours={inactiveHours}
           handleHourChange={handleHourChange}
+          selectedDay={selectedDay} // Pasar selectedDay al TimeSelect
           loading={loading}
         />
       </Grid>

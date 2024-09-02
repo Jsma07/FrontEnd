@@ -501,5 +501,11 @@ body {
 	  width: 100%;
 	}
   }
+
+  .fc-disabled-day {
+	background-color: #f0f0f0 !important; /* Gris claro */
+	color: #a0a0a0; /* Color de texto gris */
+	pointer-events: none; /* Deshabilita la interactividad */
+  }
   
 
