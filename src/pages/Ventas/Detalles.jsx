@@ -223,20 +223,7 @@ const InsumoDetalle = () => {
                 <ul className="divide-y divide-gray-200">
                   <li className="py-4 flex items-center space-x-4">
                     <div className="flex-shrink-0">
-                      <svg
-                        className="w-6 h-6 text-gray-500"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M8.25 4.75h7.5m-12 12.25h16.5m-16.5 0h16.5M3 8.25l6 5.25 6-5.25"
-                        />
-                      </svg>
+                      <i className="bx bx-calendar w-10 h-10 text-gray-500"></i>{" "}
                     </div>
                     <div>
                       <p className="text-base font-semibold text-gray-800">
@@ -249,20 +236,7 @@ const InsumoDetalle = () => {
                   </li>
                   <li className="py-4 flex items-center space-x-4">
                     <div className="flex-shrink-0">
-                      <svg
-                        className="w-6 h-6 text-gray-500"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M2.25 3h19.5m-19.5 0h19.5m-18 18h16.5m-16.5 0h16.5"
-                        />
-                      </svg>
+                      <i className="bx bx-dollar w-10 h-10 text-gray-500"></i>{" "}
                     </div>
                     <div>
                       <p className="text-base font-semibold text-gray-800">
@@ -278,49 +252,8 @@ const InsumoDetalle = () => {
                   </li>
                   <li className="py-4 flex items-center space-x-4">
                     <div className="flex-shrink-0">
-                      <svg
-                        className="w-6 h-6 text-gray-500"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M8.25 4.75h7.5m-12 12.25h16.5m-16.5 0h16.5M3 8.25l6 5.25 6-5.25"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-base font-semibold text-gray-800">
-                        IVA:
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        $
-                        {venta.venta.Iva !== undefined
-                          ? venta.venta.Iva.toFixed(2)
-                          : "0.00"}
-                      </p>
-                    </div>
-                  </li>
-                  <li className="py-4 flex items-center space-x-4">
-                    <div className="flex-shrink-0">
-                      <svg
-                        className="w-6 h-6 text-gray-500"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M8.25 4.75h7.5m-12 12.25h16.5m-16.5 0h16.5M3 8.25l6 5.25 6-5.25"
-                        />
-                      </svg>
+                      <i className="bx bx-gift w-10 h-10 text-gray-500"></i>{" "}
+                      {/* Cambié el icono */}
                     </div>
                     <div>
                       <p className="text-base font-semibold text-gray-800">
@@ -336,20 +269,7 @@ const InsumoDetalle = () => {
                   </li>
                   <li className="py-4 flex items-center space-x-4">
                     <div className="flex-shrink-0">
-                      <svg
-                        className="w-6 h-6 text-gray-500"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M8.25 4.75h7.5m-12 12.25h16.5m-16.5 0h16.5M3 8.25l6 5.25 6-5.25"
-                        />
-                      </svg>
+                      <i className="bx bx-wallet w-10 h-10 text-gray-500"></i>{" "}
                     </div>
                     <div>
                       <p className="text-base font-semibold text-gray-800">
@@ -381,10 +301,8 @@ const InsumoDetalle = () => {
                 <a href="/ventas">
                   <button
                     type="button"
-                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-                    style={{
-                      fontSize: "25px",
-                    }}
+                    className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                    style={{ fontSize: "25px" }}
                   >
                     <i className="bx bx-arrow-back"></i>
                   </button>
