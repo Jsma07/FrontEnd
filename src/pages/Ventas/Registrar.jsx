@@ -36,9 +36,9 @@ const Registrar = () => {
           "http://localhost:5000/jackenail/Listar_Empleados"
         );
 
-        // Filtrar empleados para incluir solo aquellos con estado 1
+        // Filtrar empleados para incluir solo aquellos con estado 1 y rol 2
         const empleadosFiltrados = response.data.filter(
-          (empleado) => empleado.Estado === 1
+          (empleado) => empleado.Estado === 1 && empleado.IdRol === 2
         );
 
         setEmpleados(empleadosFiltrados);

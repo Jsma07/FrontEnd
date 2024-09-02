@@ -1,92 +1,33 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import TablePrueba from "../../components/consts/Tabla";
-import ModalDinamico from "../../components/consts/Modaladi";
+import ModalAgregarAdicion from "../../components/consts/Modaladi";
 import { toast } from "react-toastify";
-import Swal from "sweetalert2";
 import Fab from "@mui/material/Fab";
+import Swal from "sweetalert2";
 
 const ListarAdiciones = () => {
   const [adiciones, setAdiciones] = useState([]);
-  const [selectedAdicion, setSelectedAdicion] = useState(null);
-  const [formData, setFormData] = useState({
-    NombreAdiciones: "",
-    Precio: "",
-    Img: null,
-  });
-  const [precioError, setPrecioError] = useState(false);
   const [openModal, setOpenModal] = useState(false);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "Precio") {
-      // Limitar el valor a números enteros positivos
-      const cleanValue = value.replace(/[^0-9]/g, "");
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: cleanValue,
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
+  const fetchAdiciones = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/Jackenail/Listarventas/adiciones"
+      );
+      setAdiciones(response.data);
+    } catch (error) {
+      toast.error("Error al obtener las adiciones");
     }
   };
 
-  const handleFormSubmit = async (e) => {
-    e.preventDefault(); // Asegúrate de que este evento sea del formulario
+  useEffect(() => {
+    fetchAdiciones();
+  }, []); // Dependencias vacías para que se ejecute solo una vez al montar el componente
 
-    const precio = Number(formData.Precio);
-
-    if (isNaN(precio) || precio < 5000) {
-      setPrecioError(true);
-      toast.error("El precio debe ser un número mayor o igual a 5000.");
-      return;
-    }
-
-    try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("NombreAdiciones", formData.NombreAdiciones);
-      formDataToSend.append("Precio", formData.Precio);
-      if (formData.Img) {
-        formDataToSend.append("Img", formData.Img);
-      }
-
-      // Enviar datos al servidor
-      const response = await axios.post(
-        "http://localhost:5000/Jackenail/Registraradiciones",
-        formDataToSend,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      // Asegúrate de que response.data tenga la estructura esperada
-      console.log("Datos recibidos del servidor:", response.data);
-
-      // Actualizar la lista de adiciones
-      setAdiciones((prevAdiciones) => [...prevAdiciones, response.data]);
-
-      // Limpiar los datos del formulario después de enviar
-      setFormData({
-        NombreAdiciones: "",
-        Precio: "",
-        Img: null,
-      });
-
-      setPrecioError(false);
-      setOpenModal(false);
-      toast.success("Adición guardada correctamente");
-    } catch (error) {
-      console.error("Error al enviar el formulario:", error);
-      toast.error(
-        "Error al enviar el formulario. Por favor, inténtelo de nuevo."
-      );
-    }
+  const handleModalClose = () => {
+    setOpenModal(false);
+    fetchAdiciones(); // Refresca la lista de adiciones
   };
 
   const columns = [
@@ -193,22 +134,6 @@ const ListarAdiciones = () => {
     });
   };
 
-  const handleCrearUsuarioClick = () => {
-    setSelectedAdicion(null);
-    setOpenModal(true);
-  };
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/Jackenail/Listarventas/adiciones")
-      .then((response) => {
-        setAdiciones(response.data);
-      })
-      .catch((error) => {
-        toast.error("Error al obtener las adiciones");
-      });
-  }, []); // Dependencias vacías para que se ejecute solo una vez al montar el componente
-
   return (
     <div>
       <TablePrueba
@@ -226,51 +151,15 @@ const ListarAdiciones = () => {
           right: "16px",
           zIndex: 1000,
         }}
-        onClick={handleCrearUsuarioClick}
+        onClick={() => setOpenModal(true)}
       >
         <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
       </Fab>
-      <ModalDinamico
+      <ModalAgregarAdicion
         open={openModal}
-        handleClose={() => setOpenModal(false)}
-        title="Agregar"
-        fields={[
-          {
-            name: "NombreAdiciones",
-            label: "Nombre",
-            type: "text",
-            value: formData.NombreAdiciones,
-            onChange: handleInputChange,
-            inputProps: {
-              pattern: "^[A-Za-zñÑ]+$",
-              title: "El nombre solo puede contener letras y la letra ñ.",
-            },
-          },
-          {
-            name: "Precio",
-            label: "Precio",
-            type: "number",
-            value: formData.Precio,
-            onChange: handleInputChange,
-            inputProps: {
-              min: 5000,
-              step: 100,
-            },
-          },
-          {
-            name: "Img",
-            label: "Imagen",
-            type: "file",
-            onChange: (e) => {
-              setFormData((prevData) => ({
-                ...prevData,
-                Img: e.target.files[0],
-              }));
-            },
-          },
-        ]}
-        onSubmit={handleFormSubmit}
-        precioError={precioError}
+        handleClose={handleModalClose}
+        adiciones={adiciones}
+        setAdiciones={setAdiciones}
       />
     </div>
   );
