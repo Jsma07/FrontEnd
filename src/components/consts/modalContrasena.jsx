@@ -26,10 +26,32 @@ const ModalContrasena = ({ open, handleClose, handleSubmit }) => {
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
-        <div style={{ backgroundColor: "white", borderRadius: "8px", padding: "20px", minWidth: "300px", maxWidth: "400px" }}>
-          <Typography variant="h5" gutterBottom style={{ textAlign: "center", marginBottom: "1.5rem" }}>
-            <LockIcon fontSize="large" style={{ verticalAlign: "middle", marginRight: "8px" }} />
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: "white",
+            borderRadius: "8px",
+            padding: "20px",
+            minWidth: "300px",
+            maxWidth: "400px",
+          }}
+        >
+          <Typography
+            variant="h5"
+            gutterBottom
+            style={{ textAlign: "center", marginBottom: "1.5rem" }}
+          >
+            <LockIcon
+              fontSize="large"
+              style={{ verticalAlign: "middle", marginRight: "8px" }}
+            />
             Cambiar Contraseña
           </Typography>
           <form onSubmit={handleFormSubmit}>
@@ -61,8 +83,13 @@ const ModalContrasena = ({ open, handleClose, handleSubmit }) => {
                 />
               </Grid>
             </Grid>
-            <div style={{ display: "flex", justifyContent: "center", marginTop: "1.5rem" }}>
-
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "1.5rem",
+              }}
+            >
               <Button
                 color="secondary"
                 variant="contained"
@@ -76,7 +103,6 @@ const ModalContrasena = ({ open, handleClose, handleSubmit }) => {
                 color="primary"
                 type="submit"
                 style={{ width: "45%" }}
-
                 startIcon={<SendIcon />}
               >
                 Enviar

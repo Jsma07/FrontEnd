@@ -30,56 +30,78 @@ const Salida = () => {
     const fetchSalidas = async () => {
       try {
         const response = await axios.get("http://localhost:5000/ListarSalidas");
-        const salidasConDetalles = response.data.map((salida) => ({
-          id: salida.IdSalida,
-          categoria: salida.insumo.categoria.nombre_categoria,
-          idInsumo: (
-            <div>
-              <img
-                src={`http://localhost:5000${salida.insumo.Imagen}`}
-                alt={salida.insumo.NombreInsumos}
-                style={{
-                  maxWidth: "3rem",
-                  height: "3rem",
-                  borderRadius: "50%",
-                }}
-              />
-            </div>
-          ),
-          NombreInsumo: salida.insumo.NombreInsumos,
-          Fecha: salida.Fecha_salida,
-          Cantidad: salida.Cantidad,
-          Estado:
-            salida.Estado === "Terminado"
-              ? "Terminado"
-              : salida.Estado === "Anulado"
-              ? "Anulado"
-              : "Desconocido",
-          Acciones: (
-            <div className="flex space-x-2">
-              <Fab
-                size="small"
-                aria-label="view"
-                onClick={() => handleOpenModal(salida)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white"
+        const salidasConDetalles = response.data.map((salida) => {
+          let estadoButton;
+          if (salida.Estado === "Terminado") {
+            estadoButton = (
+              <button className="px-3 py-1.5 text-white text-sm font-medium rounded-lg shadow-md focus:outline-none bg-green-500">
+                Terminado
+              </button>
+            );
+          } else if (salida.Estado === "Anulado") {
+            estadoButton = (
+              <button className="px-3 py-1.5 text-white text-sm font-medium rounded-lg shadow-md focus:outline-none bg-red-500">
+                Anulado
+              </button>
+            );
+          } else {
+            estadoButton = (
+              <Button
+                className="px-3 py-1.5 text-white text-sm font-medium rounded-lg shadow-md focus:outline-none bg-gray-500"
+                variant="contained"
+                style={{ backgroundColor: "#9e9e9e", color: "white" }}
               >
-                <RemoveRedEyeIcon />
-              </Fab>
+                Desconocido
+              </Button>
+            );
+          }
 
-              {salida.Estado !== "Anulado" && (
+          return {
+            id: salida.IdSalida,
+            categoria: salida.insumo.categoria.nombre_categoria,
+            idInsumo: (
+              <div>
+                <img
+                  src={`http://localhost:5000${salida.insumo.Imagen}`}
+                  alt={salida.insumo.NombreInsumos}
+                  style={{
+                    maxWidth: "3rem",
+                    height: "3rem",
+                    borderRadius: "50%",
+                  }}
+                />
+              </div>
+            ),
+            NombreInsumo: salida.insumo.NombreInsumos,
+            Fecha: salida.Fecha_salida,
+            Cantidad: salida.Cantidad,
+            Estado: estadoButton,
+            Acciones: (
+              <div className="flex space-x-2">
                 <Fab
                   size="small"
-                  aria-label="anular"
-                  onClick={() => handleAnular(salida)}
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-yellow-500 text-white"
+                  aria-label="view"
+                  onClick={() => handleOpenModal(salida)}
+                  style={{ backgroundColor: "#3b82f6", color: "white" }}
                 >
-                  <DeleteIcon />
+                  <RemoveRedEyeIcon />
                 </Fab>
-              )}
-            </div>
-          ),
-          estiloFila: salida.Estado === "Terminado" ? "bg-gray-200" : "",
-        }));
+
+                {salida.Estado !== "Anulado" && (
+                  <Fab
+                    size="small"
+                    aria-label="anular"
+                    onClick={() => handleAnular(salida)}
+                    style={{ backgroundColor: "#ef4444", color: "white" }}
+                  >
+                    <DeleteIcon />
+                  </Fab>
+                )}
+              </div>
+            ),
+            estiloFila: salida.Estado === "Terminado" ? "bg-gray-200" : "",
+          };
+        });
         setSalidas(salidasConDetalles);
       } catch (error) {
         console.error("Error al obtener los datos de salidas:", error);
@@ -111,14 +133,34 @@ const Salida = () => {
           // Restaura la cantidad en los insumos
           await axios.put(
             `http://localhost:5000/api/existenciainsumos/editar/${salida.insumo.IdInsumos}`,
-            { Cantidad: salida.insumo.Cantidad + salida.Cantidad } // Devuelve la cantidad a la existencia
+            { Cantidad: salida.insumo.Cantidad + salida.Cantidad }
           );
 
-          // Actualiza el estado local
+          // Actualiza el estado local con los nuevos detalles y elimina el botón de anular
           setSalidas((prevSalidas) =>
             prevSalidas.map((item) =>
               item.id === salida.IdSalida
-                ? { ...item, Estado: "Anulado", estiloFila: "bg-gray-200" }
+                ? {
+                    ...item,
+                    Estado: (
+                      <button className="px-3 py-1.5 text-white text-sm font-medium rounded-lg shadow-md focus:outline-none bg-red-500">
+                        Anulado
+                      </button>
+                    ),
+                    Acciones: (
+                      <div className="flex space-x-2">
+                        <Fab
+                          size="small"
+                          aria-label="view"
+                          onClick={() => handleOpenModal(salida)}
+                          style={{ backgroundColor: "#3b82f6", color: "white" }}
+                        >
+                          <RemoveRedEyeIcon />
+                        </Fab>
+                      </div>
+                    ),
+                    estiloFila: "bg-gray-200",
+                  }
                 : item
             )
           );

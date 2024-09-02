@@ -45,6 +45,16 @@ const Ventas = () => {
           "http://localhost:5000/Jackenail/Listarventas"
         );
 
+        // Función para formatear la fecha para mostrar
+        const formatDate = (dateString) => {
+          const date = new Date(dateString);
+          const day = String(date.getDate()).padStart(2, "0");
+          const month = String(date.getMonth() + 1).padStart(2, "0"); // Los meses empiezan en 0
+          const year = date.getFullYear();
+          return `${day}/${month}/${year}`;
+        };
+
+        // Crear una copia de las ventas y agregar el formato de fecha para mostrar
         const ventasConDetalles = response.data.map((venta) => ({
           id: venta.idVentas,
           idServicio: (
@@ -66,7 +76,8 @@ const Ventas = () => {
           idEmpleado: `${venta.empleado?.Nombre || ""} ${
             venta.empleado?.Apellido || ""
           }`,
-          Fecha: venta.Fecha,
+          Fecha: formatDate(venta.Fecha), // Fecha formateada para mostrar
+          FechaOriginal: new Date(venta.Fecha), // Fecha original para ordenar
           Total: venta.Total,
           Estado: (
             <div className="flex space-x-2">
@@ -75,17 +86,17 @@ const Ventas = () => {
           ),
           Acciones: (
             <div className="flex space-x-2">
+              <Link
+                to={`/Detalleventa/${venta.idVentas}`}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white"
+              >
+                <RemoveRedEyeIcon />
+              </Link>
+              {/* Muestra el botón de editar solo si el estado no es Anulado */}
               {venta.Estado !== 3 && (
                 <>
-                  <Link
-                    to={`/Detalleventa/${venta.idVentas}`}
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white"
-                  >
-                    <RemoveRedEyeIcon />
-                  </Link>
                   {venta.Estado === 2 && (
                     <Fab
-                      key={venta.idVentas}
                       size="small"
                       aria-label="edit"
                       className="flex items-center justify-center w-10 h-10 rounded-full bg-green-700 text-white"
@@ -94,7 +105,6 @@ const Ventas = () => {
                       <EditIcon />
                     </Fab>
                   )}
-
                   <Fab
                     size="small"
                     aria-label="delete"
@@ -110,10 +120,15 @@ const Ventas = () => {
           estiloFila: venta.Estado === 3 ? "bg-gray-200" : "",
         }));
 
-        // Ordenar las ventas por fecha de forma descendente
-        ventasConDetalles.sort((a, b) => new Date(b.Fecha) - new Date(a.Fecha));
+        // Ordenar las ventas por fecha original de forma descendente
+        ventasConDetalles.sort((a, b) => b.FechaOriginal - a.FechaOriginal);
 
-        setVentas(ventasConDetalles);
+        // Eliminar la propiedad FechaOriginal antes de establecer el estado
+        const ventasFinales = ventasConDetalles.map(
+          ({ FechaOriginal, ...rest }) => rest
+        );
+
+        setVentas(ventasFinales);
         toast.success("Ventas cargadas exitosamente");
       } catch (error) {
         console.error("Error al obtener los datos de ventas:", error);
@@ -124,7 +139,7 @@ const Ventas = () => {
     fetchVentas();
   }, []);
 
-  const renderEstadoButton = (estado, ventaId) => {
+  const renderEstadoButton = (estado) => {
     let buttonClass, estadoTexto;
 
     switch (estado) {
@@ -146,12 +161,11 @@ const Ventas = () => {
     }
 
     return (
-      <button
-        className={`px-3 py-1.5 text-white text-sm font-medium rounded-lg shadow-md focus:outline-none ${buttonClass}`}
-        onClick={() => handleEstadoClick(ventaId, estado)}
+      <span
+        className={`px-3 py-1.5 text-white text-sm font-medium rounded-lg shadow-md ${buttonClass}`}
       >
         {estadoTexto}
-      </button>
+      </span>
     );
   };
 
@@ -261,12 +275,33 @@ const Ventas = () => {
             venta.id === ventaId
               ? {
                   ...venta,
-                  Estado: renderEstadoButton(updatedVenta.Estado),
-                  Acciones: null,
-                } // Remover Acciones si el estado es Anulado
+                  Estado: updatedVenta.Estado,
+                  Acciones: (
+                    <div className="flex space-x-2">
+                      <Link
+                        to={`/Detalleventa/${ventaId}`}
+                        className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white"
+                      >
+                        <RemoveRedEyeIcon />
+                      </Link>
+                      {/* Aquí agregamos el ícono de eliminar solo si el estado no es Anulado */}
+                      {updatedVenta.Estado !== 3 && (
+                        <Fab
+                          size="small"
+                          aria-label="delete"
+                          onClick={() => handleOpenAlert(ventaId)}
+                          className="flex items-center justify-center w-10 h-10 rounded-full bg-red-500 text-white"
+                        >
+                          <DeleteIcon />
+                        </Fab>
+                      )}
+                    </div>
+                  ),
+                }
               : venta
           )
         );
+
         toast.success("Venta anulada con éxito");
       } else {
         toast.error(
