@@ -11,6 +11,8 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday"; // Importa el
 import AccessTimeIcon from "@mui/icons-material/AccessTime"; // Importa el icono de reloj
 import { UserContext } from "../../../../context/ContextoUsuario"; // Ajusta la ruta según sea necesario
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
+import { motion } from "framer-motion"; // Importa framer-motion
+
 
 // Define un tema personalizado con tipografía
 const theme = createTheme({
@@ -244,28 +246,36 @@ const Sidebar = ({
               </>
             ) : (
               <>
-
-              
                 {cart.map((item) => (
                   <CartItem
                     key={item.id}
                     selected={item.id === selectedServiceId}
                     onClick={() => setSelectedServiceId(item.id)}
                   >
-                  
                     {selectedDay && (
-                      <SelectedDayText variant="h6" component="h3">
+                      <SelectedDayText
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 2 }}
+                        transition={{ duration: 2.5 }}
+                        variant="h6"
+                        component="h3"
+                      >
                         <CalendarTodayIcon sx={{ mr: 1 }} />
                         {dayjs(selectedDay).format("dddd D MMMM")}
                       </SelectedDayText>
                     )}
                     {selectedHour && (
-                      <SelectedHourText variant="h6" component="h3">
+                      <SelectedHourText
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                        variant="h6"
+                        component="h3"
+                      >
                         <AccessTimeIcon sx={{ mr: 1 }} />
                         Hora seleccionada: {selectedHour}
                       </SelectedHourText>
                     )}
-                    
 
                     <ItemHeader>
                       <ServiceText variant="body2">
