@@ -180,6 +180,19 @@ const ModalDinamico = ({
   const validateField = (name, value, type) => {
     let error = "";
 
+    
+
+       // Validación específica para la descripción del servicio
+       if (name === "Descripcion_Servicio") {
+        if (!value.trim()) {
+          return "La descripción está vacía.";
+        } else if (value.trim().length < 20) {
+          return "La descripción debe tener al menos 20 caracteres.";
+        }
+        // No aplicar otras validaciones para este campo
+        return error;
+      }
+
     if (name === "correo_proveedor") {
       if (!/^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value)) {
         error = "El correo electrónico no es válido.";
@@ -235,6 +248,11 @@ const ModalDinamico = ({
     } else {
       switch (type) {
         case "text":
+          if (!/^[a-zA-ZñÑ\s]*$/.test(value)) {
+            error = "El campo solo puede contener letras y espacios.";
+          }
+          break;
+          case "textarea":
           if (!/^[a-zA-ZñÑ\s]*$/.test(value)) {
             error = "El campo solo puede contener letras y espacios.";
           }
@@ -335,21 +353,29 @@ const ModalDinamico = ({
       case "number":
         return (
           <TextField
-            id={name}
-            name={name}
-            label={label}
-            variant="outlined"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            fullWidth
-            size="medium"
-            type={type}
-            style={{ marginBottom: "0.5rem", textAlign: "center" }}
-            value={formValues[name] || ""}
-            error={!!errors[name]}
-            helperText={errors[name]}
-            disabled={disabled}
-          />
+          id={name}
+          name={name}
+          label={label}
+          variant="outlined"
+          onChange={handleChange}
+          onBlur={handleBlur}
+          fullWidth
+          size="medium"
+          type={type}
+          value={formValues[name] || ""}
+          error={!!errors[name]}
+          helperText={errors[name]}
+          multiline={name === "Descripcion_Servicio"}
+          minRows={name === "Descripcion_Servicio" ? 4 : 1} // Altura mínima para la descripción
+          maxRows={name === "Descripcion_Servicio" ? 4 : undefined} // Altura máxima antes de que aparezca el scroll
+          disabled={disabled}
+          InputProps={{
+            style: {
+              maxHeight: name === "Descripcion_Servicio" ? "200px" : "auto", // Limitar la altura máxima
+              overflowY: "auto", // Añadir scroll vertical si es necesario
+            },
+          }}
+        />
         );
       case "select":
         return (
@@ -376,22 +402,6 @@ const ModalDinamico = ({
             </Select>
           </div>
         );
-        case "textarea":
-        return (
-          <TextareaAutosize
-            id={name}
-            name={name}
-            label={label}
-            variant="outlined"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            style={{ width: "100%", padding: "0.5rem", fontSize: "16px", resize: "vertical", minHeight: "100px", maxHeight: "300px" }}
-            value={formValues[name] || ""}
-            disabled={disabled}
-            placeholder={label}
-          />
-        );
-
       case "file":
         return (
           <div className="flex items-center justify-center w-full relative">

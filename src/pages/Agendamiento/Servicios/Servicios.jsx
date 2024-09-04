@@ -314,6 +314,7 @@ const Servicios = () => {
     { value: "300", label: "5:00 horas" },
     { value: "360", label: "6:00 horas" },
   ];
+  
 
   return (
     <div>
@@ -351,7 +352,7 @@ const Servicios = () => {
             type: "select",
             options: opcionesTiempoServicio,
           },
-          { name: "Descripcion_Servicio", label: "Descripcion", type: "textarea" },
+          { name: "Descripcion_Servicio", label: "Descripcion", type: "text" },
           { name: "Precio_Servicio", label: "Precio", type: "number" }, 
           { name: "ImgServicio", label: "Imagen", type: "file" },
         ]}

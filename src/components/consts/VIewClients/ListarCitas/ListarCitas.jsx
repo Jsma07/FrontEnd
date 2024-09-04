@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { UserContext } from "../../../../context/ContextoUsuario";
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, Button } from "@mui/material";
 import NavbarClient from "../Navbarclient";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -10,6 +10,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import esLocale from "@fullcalendar/core/locales/es";
 import EventModal from "../components/EventModal";
 import dayjs from "dayjs";
+import { Link } from 'react-router-dom';
 
 const MisCitas = () => {
   const [citas, setCitas] = useState([]);
@@ -30,7 +31,13 @@ const MisCitas = () => {
             },
           }
         );
-        setCitas(response.data);
+
+        if (Array.isArray(response.data)) {
+          setCitas(response.data);
+        } else {
+          setCitas([]);
+        }
+
         setLoading(false);
       } catch (error) {
         setError("Hubo un problema al cargar las citas.");
@@ -95,7 +102,24 @@ const MisCitas = () => {
         }}
       >
         {citas.length === 0 ? (
-          <Typography variant="body1">No tienes citas programadas.</Typography>
+          <Box
+          >
+            <Typography variant="h6" component="div" sx={{ mb: 2 }}>
+              🗓️ No tienes citas
+            </Typography>
+            <Typography variant="body1" sx={{ textAlign: "center" }}>
+              ¡No te preocupes! Intenta <Link to="/solicitarCita">agendar una cita</Link> para disfrutar de nuestros servicios 😊
+            </Typography>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              sx={{ mt: 2 }}
+              component={Link} 
+              to="/solicitarCita"
+            >
+              Registrar cita ahora
+            </Button>
+          </Box>
         ) : (
           <Box
             sx={{
@@ -112,12 +136,11 @@ const MisCitas = () => {
               locale={esLocale}
               events={eventos}
               eventContent={(eventInfo) => {
-                const startTime = dayjs(eventInfo.event.start).format("HH:mm"); // Formato de 24 horas
+                const startTime = dayjs(eventInfo.event.start).format("HH:mm");
                 const endTime = dayjs(eventInfo.event.end).format("HH:mm");
 
                 return (
                   <div style={{ position: "relative" }}>
-                    {/* Emoji de uñas */}
                     <div
                       style={{
                         position: "absolute",
@@ -129,7 +152,6 @@ const MisCitas = () => {
                     >
                       💅✨
                     </div>
-                    {/* Título del evento con hora de inicio y fin */}
                     <div>
                       <strong>{truncateTitle(eventInfo.event.title)}</strong>
                       <br />
