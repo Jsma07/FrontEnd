@@ -38,6 +38,11 @@ const Ventas = () => {
     }
   };
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(amount);
+  };
+  
+
   useEffect(() => {
     const fetchVentas = async () => {
       try {
@@ -78,7 +83,7 @@ const Ventas = () => {
           }`,
           Fecha: formatDate(venta.Fecha), // Fecha formateada para mostrar
           FechaOriginal: new Date(venta.Fecha), // Fecha original para ordenar
-          Total: venta.Total,
+          Total: formatCurrency(venta.Total), // Total formateado como moneda
           Estado: (
             <div className="flex space-x-2">
               {renderEstadoButton(venta.Estado, venta.idVentas)}
