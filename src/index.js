@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route, Router } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate  } from "react-router-dom";
 import "./index.css";
 import App from "./App";
 import Roles from "./pages/Roles/Roles";
@@ -54,12 +54,19 @@ root.render(
 
 
         <Route path="/" element={<App />}>
-           <Route index path="/panel/dashboard" 
-             element={
-              <PrivateRoute requiredPermissions={["Usuarios"]}>
-                <Panel />
-              </PrivateRoute>
-            }
+        <Route
+              index
+              element={
+                <Navigate to="/panel/dashboard" />
+              }
+            />
+              <Route
+              path="/panel/dashboard"
+              element={
+                <PrivateRoute requiredPermissions={["Usuarios"]}>
+                  <Panel />
+                </PrivateRoute>
+              }
             />
             <Route
               path="/configuracion/roles"

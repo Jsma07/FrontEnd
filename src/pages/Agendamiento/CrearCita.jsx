@@ -46,7 +46,7 @@ const CrearCitas = () => {
     const fetchEmpleados = async () => {
       try {
         const response = await axios.get("http://localhost:5000/jackenail/Listar_Empleados");
-        const activeManicuristas = response.data.filter(empleados => empleados.Estado === 1)
+        const activeManicuristas = response.data.filter(empleados => empleados.Estado === 1 && empleados.IdRol === 2)
         setEmpleados(activeManicuristas);
       } catch (error) {
         console.error("Error fetching empleados:", error);
@@ -57,7 +57,7 @@ const CrearCitas = () => {
       try {
         
         const response = await axios.get("http://localhost:5000/jackenail/Listar_Clientes");
-        const activeClient = response.data.filter(clientes => clientes.Estado ===1)
+        const activeClient = response.data.filter(clientes => clientes.Estado ===1 )
         setClientes(activeClient);
       } catch (error) {
         console.error("Error fetching clientes:", error);

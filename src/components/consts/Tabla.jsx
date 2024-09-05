@@ -1,14 +1,14 @@
 import React, { useState, useMemo } from "react";
-import { Pagination, Box } from "@mui/material";
+import { Pagination, Box, useMediaQuery } from "@mui/material";
 
 const TablePrueba = ({ title, columns, data, roles = [] }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(5);
+  const isSmallScreen = useMediaQuery("(max-width: 768px)");
 
   const handleSearchChange = (event) => setSearchTerm(event.target.value);
-
   const handleRoleFilterChange = (event) => setSelectedRole(event.target.value);
 
   // Filtrar datos usando useMemo para optimizar el rendimiento
@@ -47,7 +47,7 @@ const TablePrueba = ({ title, columns, data, roles = [] }) => {
           width: "calc(100% - 100px)",
         }}
       >
-        <div className="bg-white rounded-lg  p-8">
+        <div className="bg-white rounded-lg p-8">
           <div className="flex justify-between items-center mb-4">
             <h4 className="text-3xl font-bold text-left">{title}</h4>
 
@@ -98,41 +98,70 @@ const TablePrueba = ({ title, columns, data, roles = [] }) => {
             )}
           </div>
 
-          <div className="relative overflow-hidden bg-white shadow-md sm:rounded-lg">
-            <div className="w-full overflow-x-auto">
-              <table className="w-full table-auto text-sm text-center text-gray-500">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                  <tr>
-                    {columns.map((column) => (
-                      <th key={column.field} className="px-6 py-3 text-center">
-                        {column.headerName}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentRows.map((row, rowIndex) => (
-                    <tr key={rowIndex} className="border-b hover:bg-gray-100">
-                      {columns.map((column, colIndex) => (
-                        <td
-                          key={colIndex}
-                          className="px-6 py-3 text-center whitespace-nowrap"
+          {isSmallScreen ? (
+            <div className="grid grid-cols-1 gap-4">
+              {currentRows.map((row, rowIndex) => (
+                <div
+                  key={rowIndex}
+                  className="border rounded-lg p-4 shadow-md bg-white"
+                >
+                  {columns.map((column, colIndex) => (
+                    <div key={colIndex} className="mb-2">
+                      <strong>{column.headerName}: </strong>
+                      {column.field === "rolId"
+                        ? roles.find((role) => role.idRol === row[column.field])
+                            ?.nombre || "Desconocido"
+                        : column.renderCell
+                        ? column.renderCell({ row })
+                        : row[column.field]}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="relative overflow-hidden bg-white shadow-md sm:rounded-lg">
+              <div className="w-full overflow-x-auto">
+                <table
+                  key={JSON.stringify(currentRows)}
+                  className="w-full table-auto text-sm text-center text-gray-500"
+                >
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                      {columns.map((column) => (
+                        <th
+                          key={column.field}
+                          className="px-6 py-3 text-center"
                         >
-                          {column.field === "rolId"
-                            ? roles.find(
-                                (role) => role.idRol === row[column.field]
-                              )?.nombre || "Desconocido"
-                            : column.renderCell
-                            ? column.renderCell({ row })
-                            : row[column.field]}
-                        </td>
+                          {column.headerName}
+                        </th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {currentRows.map((row, rowIndex) => (
+                      <tr key={rowIndex} className="border-b hover:bg-gray-100">
+                        {columns.map((column, colIndex) => (
+                          <td
+                            key={colIndex}
+                            className="px-6 py-3 text-center whitespace-nowrap"
+                          >
+                            {column.field === "rolId"
+                              ? roles.find(
+                                  (role) => role.idRol === row[column.field]
+                                )?.nombre || "Desconocido"
+                              : column.renderCell
+                              ? column.renderCell({ row })
+                              : row[column.field]}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
 
           <Box display="flex" justifyContent="center" mt={2}>
             <Pagination

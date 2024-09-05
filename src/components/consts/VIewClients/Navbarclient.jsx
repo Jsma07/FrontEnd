@@ -49,6 +49,7 @@ function NavigationMenu() {
       <MenuItem href="/vistaInicio" text="Inicio" />
       <MenuItem href="/Catalogo" text="Servicios" />
       <MenuItem href="/solicitarCita" text="Agendamiento" />
+      <MenuItem href="/misCitas" text="Mis citas" />
     </ul>
   );
 }

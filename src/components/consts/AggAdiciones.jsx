@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Typography, Button, Divider } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
-import axios from "axios"; // Importa axios si no lo has hecho
+import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 
 const ModalAdiciones = ({
@@ -14,10 +14,24 @@ const ModalAdiciones = ({
   setAdicionesSeleccionadas,
   adicionesSeleccionadas,
   idVentas,
-  setVentas, // Prop para actualizar el estado de las ventas
+  totalVenta,
+  setVentas,
 }) => {
-  console.log("ID de venta en el Modal:", idVentas);
   const [adicionesAgregadas, setAdicionesAgregadas] = useState([]);
+  const [totalConAdiciones, setTotalConAdiciones] = useState(totalVenta);
+
+  // Recalcular el total cada vez que cambien las adiciones agregadas
+  useEffect(() => {
+    const calcularTotal = () => {
+      const totalAdiciones = adicionesAgregadas.reduce((acc, id) => {
+        const adicion = adiciones.find((ad) => ad.IdAdiciones === id);
+        return adicion ? acc + adicion.Precio : acc;
+      }, 0);
+      setTotalConAdiciones(totalVenta + totalAdiciones);
+    };
+
+    calcularTotal();
+  }, [adicionesAgregadas, adiciones, totalVenta]);
 
   const handleAdd = (id) => {
     const adicionSeleccionada = adiciones.find(
@@ -29,7 +43,7 @@ const ModalAdiciones = ({
         adicionSeleccionada,
       ]);
       setAdicionesAgregadas([...adicionesAgregadas, id]);
-      toast.success("Adición agregada con éxito"); // Mostrar alerta de éxito
+      toast.success("Adición agregada con éxito");
     }
   };
 
@@ -45,7 +59,6 @@ const ModalAdiciones = ({
         `http://localhost:5000/Jackenail/CambiarEstado/${ventaId}`,
         { Estado: nuevoEstado }
       );
-      // Actualizar el estado local de la venta
       setVentas((prevVentas) =>
         prevVentas.map((venta) =>
           venta.id === ventaId ? { ...venta, Estado: nuevoEstado } : venta
@@ -54,13 +67,13 @@ const ModalAdiciones = ({
       console.log("Estado cambiado con éxito:", response.data);
       toast.success("Estado cambiado con éxito", {
         position: "bottom-right",
-        autoClose: 3000, // Cierra automáticamente después de 3 segundos
+        autoClose: 3000,
       });
     } catch (error) {
       console.error("Error al cambiar el estado:", error);
       toast.error("Hubo un problema al cambiar el estado", {
         position: "top-right",
-        autoClose: 3000, // Cierra automáticamente después de 3 segundos
+        autoClose: 3000,
       });
     }
   };
@@ -79,6 +92,17 @@ const ModalAdiciones = ({
 
     if (result.isConfirmed) {
       try {
+        // Actualizar el total de la venta
+        await axios.put(`http://localhost:5000/Jackenail/Totales/${idVentas}`, {
+          Subtotal: totalVenta,
+          Descuento: 0,
+          Total: totalConAdiciones,
+        });
+
+        // Verificar los datos antes de enviarlos
+        console.log("Adiciones seleccionadas:", adicionesSeleccionadas);
+
+        // Guardar los detalles de la venta
         const response = await fetch(
           "http://localhost:5000/Jackenail/Detalleregistrar",
           {
@@ -98,15 +122,14 @@ const ModalAdiciones = ({
         const data = await response.json();
 
         if (response.ok) {
-          // Cambiar el estado de la venta a 'Terminado' (1)
           await cambiarEstadoVenta(idVentas, 1);
-          toast.success("Detalles de venta guardados con éxito"); // Mostrar alerta de éxito
+          toast.success("Detalles de venta guardados con éxito");
           handleClose();
         } else {
-          toast.error(`Error: ${data.mensaje}`); // Mostrar alerta de error
+          toast.error(`Error: ${data.mensaje}`);
         }
       } catch (error) {
-        toast.error("Error al guardar los detalles de venta"); // Mostrar alerta de error
+        toast.error("Error al guardar los detalles de venta");
         console.error("Error al guardar detalles de venta:", error);
       }
     }
@@ -141,7 +164,6 @@ const ModalAdiciones = ({
               {title}
             </Typography>
 
-            {/* Mostrar el ID de la Venta */}
             <Typography
               variant="body1"
               gutterBottom
@@ -202,6 +224,10 @@ const ModalAdiciones = ({
                   ))}
               </div>
             </div>
+            <Divider sx={{ mt: 2 }} />
+            <Typography variant="h6" gutterBottom className="text-center mt-4">
+              Total con Adiciones: ${totalConAdiciones.toFixed(2)}
+            </Typography>
             <div className="flex justify-center mt-4">
               <Button
                 variant="contained"
@@ -210,22 +236,10 @@ const ModalAdiciones = ({
                 style={{
                   backgroundColor: "#EF5A6F",
                   color: "#fff",
-                  "&:hover": { backgroundColor: "#e6455c" },
+                  "&:hover": { backgroundColor: "#e6455e" },
                 }}
               >
-                Terminar venta
-              </Button>
-              <Button
-                variant="contained"
-                onClick={handleClose}
-                className="w-1/2 text-sm ml-2"
-                style={{
-                  backgroundColor: "#ccc",
-                  color: "#000",
-                  "&:hover": { backgroundColor: "#bbb" },
-                }}
-              >
-                Cerrar
+                Guardar
               </Button>
             </div>
           </div>

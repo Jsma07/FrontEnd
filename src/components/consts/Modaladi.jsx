@@ -4,6 +4,7 @@ import { Close as CloseIcon } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
+import "tailwindcss/tailwind.css"; // Asegúrate de que Tailwind CSS esté importado
 
 const ModalAgregarAdicion = ({
   open,
@@ -18,6 +19,9 @@ const ModalAgregarAdicion = ({
     Img: null,
   });
 
+  const [precioError, setPrecioError] = useState(false);
+  const [nombreError, setNombreError] = useState(false);
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith("image/")) {
@@ -30,10 +34,19 @@ const ModalAgregarAdicion = ({
     }
   };
 
-  const [precioError, setPrecioError] = useState(false);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "NombreAdiciones") {
+      const isValidName = /^[a-zA-Z0-9\s]+$/.test(value);
+      setNombreError(!isValidName);
+    }
+
+    if (name === "Precio") {
+      const isValidPrice = /^[0-9]+$/.test(value);
+      setPrecioError(!isValidPrice);
+    }
+
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -48,35 +61,73 @@ const ModalAgregarAdicion = ({
     };
   }, [formData.Img]);
 
+  const handleAddAdicion = async () => {
+    const { NombreAdiciones, Precio } = formData;
+
+    const existeAdicion = adiciones.some(
+      (adicion) => adicion.NombreAdiciones === NombreAdiciones
+    );
+
+    if (existeAdicion) {
+      toast.error("Ya existe una adición con ese nombre");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/Jackenail/AddAdicion",
+        {
+          NombreAdiciones,
+          Precio,
+        }
+      );
+
+      setAdiciones((prev) => [...prev, response.data]);
+      handleClose();
+      toast.success("Adición agregada correctamente");
+    } catch (error) {
+      toast.error("Error al agregar la adición");
+    }
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    const precio = Number(formData.Precio);
 
-    if (isNaN(precio) || precio < 5000) {
+    const precio = Number(formData.Precio);
+    const nombre = formData.NombreAdiciones;
+
+    if (precio < 5000 || isNaN(precio) || !Number.isInteger(precio)) {
       setPrecioError(true);
-      toast.error("El precio debe ser un número mayor o igual a 5000.");
+      toast.error("El precio debe ser un número entero mayor o igual a 5000.");
+      return;
+    }
+
+    if (nombreError) {
+      toast.error("El nombre solo puede contener letras y números.");
+      return;
+    }
+
+    const existeAdicion = adiciones.some(
+      (adicion) => adicion.NombreAdiciones === nombre
+    );
+    if (existeAdicion) {
+      toast.error("Ya existe una adición con ese nombre");
       return;
     }
 
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append("NombreAdiciones", formData.NombreAdiciones);
-      formDataToSend.append("Precio", formData.Precio);
+      formDataToSend.append("NombreAdiciones", nombre);
+      formDataToSend.append("Precio", precio);
       if (formData.Img) {
         formDataToSend.append("Img", formData.Img);
       }
 
       const response = await axios.post(
         "http://localhost:5000/Jackenail/Registraradiciones",
-        formDataToSend,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        formDataToSend
       );
 
-      // Actualizar la lista de adiciones en tiempo real
       setAdiciones((prevAdiciones) => [...prevAdiciones, response.data]);
 
       setFormData({
@@ -86,6 +137,7 @@ const ModalAgregarAdicion = ({
       });
 
       setPrecioError(false);
+      setNombreError(false);
       handleClose();
       toast.success("Adición guardada correctamente");
     } catch (error) {
@@ -98,100 +150,79 @@ const ModalAgregarAdicion = ({
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center">
-        <div
-          style={{ width: "60%" }}
-          className="bg-white text-black rounded-lg shadow-lg p-6 max-w-[1600px] h-auto max-h-[90%] flex flex-col relative"
-        >
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="bg-white text-black rounded-lg shadow-lg p-6 max-w-lg w-full relative">
           <button
             onClick={handleClose}
-            className="absolute top-2 right-2 p-2 text-black hover:text-gray-600"
+            className="absolute top-3 right-3 p-2 text-gray-700 hover:text-gray-900 transition"
           >
             <CloseIcon />
           </button>
-          <Typography variant="h5" gutterBottom className="text-center mb-6">
-            {title}
+          <Typography variant="h6" gutterBottom className="text-center">
+            {title || "Agregar Adición"}
           </Typography>
-          <Divider sx={{ mt: 2 }} />
-          <form onSubmit={handleFormSubmit} className="flex flex-col space-y-4">
-            <div className="flex justify-between items-center">
-              <div className="w-full">
-                <label className="block">
-                  Nombre:
-                  <input
-                    type="text"
-                    name="NombreAdiciones"
-                    value={formData.NombreAdiciones}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full mt-1 p-2 border rounded"
-                  />
-                </label>
-              </div>
-              <div className="w-full ml-4">
-                <label className="block">
-                  Precio:
-                  <input
-                    type="number"
-                    name="Precio"
-                    value={formData.Precio}
-                    onChange={handleInputChange}
-                    style={{ borderColor: precioError ? "red" : "" }}
-                    required
-                    className="w-full mt-1 p-2 border rounded"
-                  />
-                </label>
-              </div>
-            </div>
-            <Divider sx={{ mt: 2 }} />
-            <div className="mt-4">
-              <label className="block">
-                Imagen:
-                <input
-                  type="file"
-                  name="Img"
-                  onChange={handleFileChange}
-                  accept="image/*"
-                  className="mt-1"
-                />
-              </label>
-              {formData.Img && (
-                <div className="mt-4">
-                  <Typography variant="subtitle2">Vista previa:</Typography>
-                  <div className="relative mt-2 max-w-[200px] h-[200px] overflow-hidden border rounded">
-                    <img
-                      src={URL.createObjectURL(formData.Img)}
-                      alt="Vista previa"
-                      className="absolute top-0 left-0 w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
+          <Divider className="mb-4" />
+          <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
+            <label className="flex flex-col">
+              <span className="font-semibold">Nombre:</span>
+              <input
+                type="text"
+                name="NombreAdiciones"
+                value={formData.NombreAdiciones}
+                onChange={handleInputChange}
+                required
+                className={`w-full p-3 border border-gray-300 rounded-md transition ${
+                  nombreError ? "border-red-500" : "border-gray-300"
+                } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              />
+              {nombreError && (
+                <p className="text-red-500 text-sm mt-1">
+                  El nombre solo puede contener letras y números.
+                </p>
               )}
-            </div>
-            <div className="flex justify-between mt-4">
+            </label>
+            <label className="flex flex-col">
+              <span className="font-semibold">Precio:</span>
+              <input
+                type="number"
+                name="Precio"
+                value={formData.Precio}
+                onChange={handleInputChange}
+                required
+                className={`w-full p-3 border border-gray-300 rounded-md transition ${
+                  precioError ? "border-red-500" : "border-gray-300"
+                } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              />
+              {precioError && (
+                <p className="text-red-500 text-sm mt-1">
+                  El precio debe ser un número entero mayor o igual a 5000.
+                </p>
+              )}
+            </label>
+            <label className="flex flex-col">
+              <span className="font-semibold">Imagen:</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="w-full p-2 border border-gray-300 rounded-md transition"
+              />
+              {formData.Img && (
+                <img
+                  src={URL.createObjectURL(formData.Img)}
+                  alt="Vista previa"
+                  className="mt-2 w-32 h-32 object-cover rounded-md border border-gray-300"
+                />
+              )}
+            </label>
+            <div className="flex justify-end mt-4">
               <Button
-                variant="contained"
                 type="submit"
-                className="w-1/2 text-sm"
-                style={{
-                  backgroundColor: "#EF5A6F",
-                  color: "#fff",
-                  "&:hover": { backgroundColor: "#e6455c" },
-                }}
+                variant="contained"
+                color="primary"
+                className="px-6 py-2"
               >
                 Guardar
-              </Button>
-              <Button
-                variant="contained"
-                onClick={handleClose}
-                className="w-1/2 text-sm ml-2"
-                style={{
-                  backgroundColor: "#ccc",
-                  color: "#000",
-                  "&:hover": { backgroundColor: "#bbb" },
-                }}
-              >
-                Cerrar
               </Button>
             </div>
           </form>

@@ -33,6 +33,7 @@ const Agendamientos = () => {
           empleado: `${agendamiento.empleado.Nombre} ${agendamiento.empleado.Apellido}`,
           Fecha: dayjs(agendamiento.Fecha).format('DD/MM/YYYY'),
           Hora: agendamiento.Hora,
+          HoraFin: agendamiento.HoraFin, // Aquí
           EstadoAgenda: renderEstadoButton(agendamiento.EstadoAgenda, agendamiento.IdAgenda), // Asegúrate de usar renderEstadoButton aquí
           Acciones: agendamiento.EstadoAgenda !== 2 && agendamiento.EstadoAgenda !== 3 && agendamiento.EstadoAgenda !== 4 && ( // Verificar que el estado no sea "Desconocido"
             <div className="flex space-x-2">
@@ -221,6 +222,7 @@ const Agendamientos = () => {
     { field: "nombreServicio", headerName: "Servicio" },
     { field: "Fecha", headerName: "Fecha" },
     { field: "Hora", headerName: "Hora" },
+    { field: "HoraFin", headerName: "Hora Fin" }, // Nueva columna
     { field: "empleado", headerName: "Empleado" },
     { field: "cliente", headerName: "Cliente" },
     { field: "EstadoAgenda", headerName: "Estado" },

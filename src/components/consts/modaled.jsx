@@ -10,6 +10,7 @@ import {
   InputLabel,
   Switch,
   FormControlLabel,
+  Box,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 
@@ -22,6 +23,7 @@ const ModalDinamico = ({
   seleccionado,
 }) => {
   const [formData, setFormData] = useState({});
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (seleccionado) {
@@ -31,7 +33,54 @@ const ModalDinamico = ({
     }
   }, [seleccionado]);
 
-  // Función para manejar el cambio en los campos del formulario
+  const validateForm = () => {
+    let isValid = true;
+    let newErrors = {};
+
+    // Validaciones por campo
+    if (!/^[0-9]{10,15}$/.test(formData.Documento || "")) {
+      newErrors.Documento = "El documento debe contener entre 10 y 15 números.";
+      isValid = false;
+    }
+
+    if (!/^[0-9]{7,15}$/.test(formData.Telefono || "")) {
+      newErrors.Telefono = "El teléfono debe contener entre 7 y 15 números.";
+      isValid = false;
+    }
+
+    if (!/^[a-zA-ZñÑ\s]*$/.test(formData.Nombre || "")) {
+      newErrors.Nombre = "El nombre solo puede contener letras y la letra ñ.";
+      isValid = false;
+    }
+
+    if (!/^[a-zA-ZñÑ\s]*$/.test(formData.Apellido || "")) {
+      newErrors.Apellido =
+        "El apellido solo puede contener letras y la letra ñ.";
+      isValid = false;
+    }
+
+    const validacionCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!validacionCorreo.test(formData.Correo || "")) {
+      newErrors.Correo = "Ingrese un correo electrónico válido.";
+      isValid = false;
+    }
+
+    if (
+      fields.some((field) => field.name === "Contrasena") &&
+      formData.Contrasena
+    ) {
+      const validacionContrasena = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+      if (!validacionContrasena.test(formData.Contrasena)) {
+        newErrors.Contrasena =
+          "La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula y un número.";
+        isValid = false;
+      }
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
     const newValue = type === "checkbox" ? checked : value;
@@ -40,20 +89,20 @@ const ModalDinamico = ({
       ...prevData,
       [name]: newValue,
     }));
+  };
 
-    // Imprimir en consola el valor seleccionado en el select de rol
-    if (name === "IdRol") {
-      console.log("Rol seleccionado:", value);
+  const handleSubmit = () => {
+    const isValid = validateForm();
+    console.log("Form Valid:", isValid);
+    console.log("Form Data:", formData);
+    console.log("Errors:", errors);
+
+    if (isValid) {
+      onSubmit(formData);
+      handleClose();
     }
   };
 
-  // Función para manejar el envío del formulario
-  const handleSubmit = () => {
-    onSubmit(formData);
-    handleClose();
-  };
-
-  // Función para cancelar y cerrar el modal
   const handleCancel = () => {
     handleClose();
   };
@@ -83,12 +132,10 @@ const ModalDinamico = ({
           {title}
         </Typography>
         <Grid container spacing={2}>
-          {/* Renderizar los campos en grupos de dos */}
           {fields &&
             fields.length > 0 &&
             fields.map((field, index) => (
               <Grid item xs={12} sm={6} key={index}>
-                {/* Manejar los diferentes tipos de campos */}
                 {field.type === "text" && (
                   <TextField
                     id={field.name}
@@ -99,11 +146,10 @@ const ModalDinamico = ({
                     fullWidth
                     size="small"
                     type="text"
-                    style={{
-                      marginBottom: "0.5rem",
-                      textAlign: "center",
-                    }}
+                    style={{ marginBottom: "0.5rem" }}
                     value={formData[field.name] || ""}
+                    error={!!errors[field.name]}
+                    helperText={errors[field.name]}
                   />
                 )}
                 {field.type === "password" && (
@@ -116,15 +162,14 @@ const ModalDinamico = ({
                     fullWidth
                     size="small"
                     type="password"
-                    style={{
-                      marginBottom: "0.5rem",
-                      textAlign: "center",
-                    }}
+                    style={{ marginBottom: "0.5rem" }}
                     value={formData[field.name] || ""}
+                    error={!!errors[field.name]}
+                    helperText={errors[field.name]}
                   />
                 )}
                 {field.type === "select" && (
-                  <div>
+                  <Box>
                     <InputLabel id={`${field.name}-label`}>
                       {field.label}
                     </InputLabel>
@@ -138,10 +183,7 @@ const ModalDinamico = ({
                       size="small"
                       value={formData[field.name] || ""}
                       label={field.label}
-                      style={{
-                        marginBottom: "0.5rem",
-                        textAlign: "center",
-                      }}
+                      style={{ marginBottom: "0.5rem" }}
                     >
                       {field.options.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
@@ -149,9 +191,13 @@ const ModalDinamico = ({
                         </MenuItem>
                       ))}
                     </Select>
-                  </div>
+                    {errors[field.name] && (
+                      <Typography color="error" variant="body2">
+                        {errors[field.name]}
+                      </Typography>
+                    )}
+                  </Box>
                 )}
-                
                 {field.type === "switch" && (
                   <FormControlLabel
                     control={
@@ -163,6 +209,7 @@ const ModalDinamico = ({
                       />
                     }
                     label={field.label}
+                    style={{ marginBottom: "0.5rem" }}
                   />
                 )}
               </Grid>

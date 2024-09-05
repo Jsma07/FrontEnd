@@ -6,30 +6,32 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Box, List, ListItem, ListItemButton, ListItemText, Paper, Typography, CircularProgress } from '@mui/material';
 import Swal from 'sweetalert2';
 import Tooltip from '@mui/material/Tooltip';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+
 
 export default function CustomTimeSelect({ selectedTime, setSelectedTime, selectedDate }) {
   const [occupiedTimes, setOccupiedTimes] = useState([]);
   const [inactiveTimes, setInactiveTimes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isInactiveDay, setIsInactiveDay] = useState(false);
+  
+  const horaActual = dayjs().format('HH:mm');
+  const esHoy = selectedDate && selectedDate.isSame(dayjs(), 'day');
 
   useEffect(() => {
     const fetchTimes = async () => {
       if (selectedDate) {
-        // Restablece los estados antes de realizar nuevas solicitudes
         setLoading(true);
         setOccupiedTimes([]);
         setInactiveTimes([]);
         setIsInactiveDay(false);
 
         try {
-          // Obtener las horas ocupadas para la fecha seleccionada
           const occupiedResponse = await axios.get('http://localhost:5000/api/agendas/horasOcupadas', {
             params: { fecha: selectedDate.format('YYYY-MM-DD') },
           });
           setOccupiedTimes(occupiedResponse.data);
 
-          // Verificar si el día seleccionado es inactivo
           const inactiveDayResponse = await axios.get('http://localhost:5000/api/horarios');
           const inactiveDays = inactiveDayResponse.data
             .filter(horario => horario.estado === 'inactivo')
@@ -46,7 +48,6 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
             });
           }
 
-          // Obtener las horas inactivas para la fecha seleccionada
           const inactiveTimesResponse = await axios.get('http://localhost:5000/api/horarios/listarFechasConHorasInactivas');
           const inactiveDateInfo = inactiveTimesResponse.data.find(info => dayjs(info.fecha).isSame(selectedDate, 'day'));
 
@@ -73,7 +74,9 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
     for (let hour = 13; hour <= 16; hour++) {
       times.push(dayjs().hour(hour).minute(0).format('HH:mm'));
     }
-    return times;
+
+    // Filtrar horas pasadas si es el día actual
+    return times.filter(time => !esHoy || time >= horaActual);
   };
 
   const handleChange = (time) => {
@@ -102,8 +105,16 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
           </Box>
         ) : isInactiveDay ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 150 }}>
-            <Typography variant="h6" color="error">
+            <Typography variant="h6" sx={{ color: '#FF69B4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ErrorOutlineIcon sx={{ mr: 1 }} />
               Opps, no puedes crear citas en este día.
+            </Typography>
+          </Box>
+        ) : generateTimeOptions().length === 0 && esHoy ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 150 }}>
+            <Typography variant="h6" sx={{ color: '#FF69B4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ErrorOutlineIcon sx={{ mr: 1 }} />
+              Ya no puedes registrar una cita el día de hoy. Por favor, elige otra fecha o el día siguiente.
             </Typography>
           </Box>
         ) : (
