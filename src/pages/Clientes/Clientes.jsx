@@ -68,9 +68,30 @@ const Clientes = () => {
   };
 
   const columns = [
-    { field: "tipoDocumento", headerName: "tipoDocumento" },
+    { field: "tipoDocumento", headerName: "Tipo Documento" },
     { field: "Documento", headerName: "Documento" },
-
+    {
+      field: "Img",
+      headerName: "Imagen",
+      width: 100,
+      renderCell: (params) => {
+        // Construir la URL completa de la imagen
+        <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
+        <img
+          src={`http://localhost:5000${params.row.Img}`}  
+          alt="Imagen"
+          style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
+        />
+      </div>
+      },
+    },
     { field: "Nombre", headerName: "Nombre" },
     { field: "Apellido", headerName: "Apellido" },
     { field: "Correo", headerName: "Correo" },
@@ -78,7 +99,7 @@ const Clientes = () => {
     {
       field: "Acciones",
       headerName: "Acciones",
-      width: "w-48",
+      width: 200,
       renderCell: (params) => (
         <div className="flex justify-center space-x-4">
           {params.row.Estado === 1 && (
@@ -111,7 +132,8 @@ const Clientes = () => {
       ),
     },
   ];
-
+  
+  
   const handleSubmit = async (formData) => {
     try {
       // Mostrar confirmación antes de registrar al cliente
@@ -123,8 +145,11 @@ const Clientes = () => {
         confirmButtonText: "Sí",
         cancelButtonText: "Cancelar",
       });
-
+  
       if (result.isConfirmed) {
+        // Crear un objeto FormData
+        const data = new FormData();
+
         const formDataNumerico = {
           Nombre: formData.Nombre,
           Apellido: formData.Apellido,
@@ -133,55 +158,55 @@ const Clientes = () => {
           Documento: formData.Documento,
           tipoDocumento: formData.Tip_Documento,
           Contrasena: formData.Contrasena,
-          Estado: 1,
+          Img: formData.Img,
+          Estado: 2,
           IdRol: 4,
         };
-
-        console.log("Datos del formulario numéricos:", formDataNumerico);
-
+        
+        console.log("Datos del formulario con imagen:", formDataNumerico);
+  
         // Enviar los datos al backend
         const response = await axios.post(
-          "http://localhost:5000/Jackenail/RegistrarClientes", // Asegúrate de que la URL sea correcta
-          formDataNumerico
+          "http://localhost:5000/Jackenail/crearClientesedu",
+          formDataNumerico,
+          { headers: { "Content-Type": "multipart/form-data" } }
         );
-
+  
         const NuevoCliente = response.data;
-        console.log("Nuevo empleado:", NuevoCliente);
-        setClientes((prevCliete) => [...prevCliete, NuevoCliente]);
-
+        console.log("Nuevo cliente:", NuevoCliente);
+        setClientes((prevClient) => [...prevClient, NuevoCliente]);
+  
         // Mostrar una alerta de éxito si el registro es exitoso
         toast.success("El cliente se ha registrado correctamente.", {
           position: "top-right",
-          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+          autoClose: 3000,
         });
-
-        // Cerrar el modal después de enviar el formulario
+  
         setModalData(null);
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        // Mostrar alertas usando react-toastify en lugar de Swal
         const errores = error.response.data.errores || [
           { mensaje: error.response.data.mensaje },
         ];
-
+  
         errores.forEach((error) => {
           toast.error(`Error: ${error.mensaje}`, {
             position: "top-right",
-            autoClose: 5000, // Cierra automáticamente después de 5 segundos
+            autoClose: 5000,
           });
         });
       } else {
         console.error("Error al registrar el cliente:", error);
-
-        // Mostrar una alerta de error si ocurre algún problema durante el registro
+  
         toast.error("Ocurrió un error al registrar el cliente.", {
           position: "bottom-right",
-          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+          autoClose: 3000,
         });
       }
     }
   };
+  
 
   const handleToggleSwitch = async (id) => {
     if (!id) {

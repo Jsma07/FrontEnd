@@ -33,7 +33,9 @@ const TablePrueba = ({ title, columns, data, roles = [] }) => {
   const handleChangePage = (event, value) => setPage(value);
 
   return (
-    <section>
+    <section
+     
+    >
       <div
         className="fixed bg-white rounded-lg shadow-md"
         style={{
@@ -41,64 +43,69 @@ const TablePrueba = ({ title, columns, data, roles = [] }) => {
           margin: "0 auto",
           borderRadius: "30px",
           marginTop: "20px",
-          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.3)",
+          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.5)",
           left: "82px",
           top: "70px",
           width: "calc(100% - 100px)",
         }}
       >
-        <div className="bg-white rounded-lg  p-8">
-          <div className="flex justify-between items-center mb-4">
-            <h4 className="text-3xl font-bold text-left">{title}</h4>
+        <div className="p-8">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+            <h4 className="text-2xl font-bold mb-4 md:mb-0">{title}</h4>
 
-            <div className="relative w-80">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg
-                  className="w-5 h-5 text-gray-500"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                  />
-                </svg>
-              </div>
-              <input
-                type="search"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Buscar"
-                aria-label="Buscar"
-              />
-            </div>
-
-            {roles.length > 0 && (
+            <div className="flex items-center space-x-4">
               <div className="relative w-80">
-                <select
-                  value={selectedRole}
-                  onChange={handleRoleFilterChange}
-                  className="block w-full p-4 pl-3 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-                  aria-label="Filtrar por rol"
-                >
-                  <option value="">Filtrar por rol</option>
-                  {roles.map((role) => (
-                    <option key={role.idRol} value={role.idRol}>
-                      {role.nombre}
-                    </option>
-                  ))}
-                </select>
+                <input
+                  type="search"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Buscar"
+                  aria-label="Buscar"
+                />
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <svg
+                    className="w-5 h-5 text-gray-500"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                    />
+                  </svg>
+                </div>
               </div>
-            )}
+
+              {roles.length > 0 && (
+                <div className="relative w-80">
+                  <select
+                    value={selectedRole}
+                    onChange={handleRoleFilterChange}
+                    className="block w-full p-4 pl-3 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                    aria-label="Filtrar por rol"
+                  >
+                    <option value="">Filtrar por rol</option>
+                    {roles.map((role) => (
+                      <option key={role.idRol} value={role.idRol}>
+                        {role.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="relative overflow-hidden bg-white shadow-md sm:rounded-lg">
+          <div
+            className="relative overflow-hidden bg-white shadow-md sm:rounded-lg"
+            style={{ backgroundColor: "#FFFFFF" }} // Mantener el fondo blanco de la tabla
+          >
             <div className="w-full overflow-x-auto">
               {/* Forzando el re-renderizado de la tabla */}
               <table

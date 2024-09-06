@@ -486,12 +486,15 @@ const Empleados = () => {
               name: "Documento",
               type: "text",
               required: true,
+              icon: "bx-id-card",
             },
             {
               label: "Nombre",
               name: "Nombre",
               type: "text",
               required: true,
+              icon: "bx-user", // Icono para el nombre
+
             },
             {
               label: "Apellido",
@@ -510,12 +513,16 @@ const Empleados = () => {
               name: "Telefono",
               type: "text",
               required: true,
+              icon: "bx-phone", // Icono para el teléfono
+
             },
             {
               label: "Dirección",
               name: "Direccion",
               type: "text",
               required: true,
+              icon: "bx-home", // Icono para la dirección
+
             },
             {
               label: "Contraseña",
