@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import ModalDinamico from "../../components/consts/modalJ";
+import ModalDinamico from "./ModalBase";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 

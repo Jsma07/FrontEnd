@@ -22,6 +22,9 @@ import SettingsMenu from "./consts/sesion";
 import { UserContext } from "../context/ContextoUsuario";
 import { motion } from 'framer-motion';
 import { NavbarItems } from "./consts/navbarItems";
+import ModalPerfil from '../components/consts/perfil'; // Ajusta la ruta si es necesario
+import { useState } from 'react';
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 const drawerWidth = 240;
 
@@ -96,11 +99,25 @@ export default function MiniDrawer() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
+  const [openProfileModal, setOpenProfileModal] = useState(false);
   const [openCategory, setOpenCategory] = React.useState(null);
   const { user, permissions } = React.useContext(UserContext);
+  const { logout } = React.useContext(UserContext);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/iniciarSesion");
+  };
 
   const handleDrawerOpen = () => {
     setOpen(true);
+  };
+  const handleProfileClick = () => {
+    setOpenProfileModal(true); // Abrir modal cuando se haga clic en el nombre del usuario
+  };
+
+  const handleCloseModal = () => {
+    setOpenProfileModal(false); // Cerrar modal
   };
 
   const handleDrawerClose = () => {
@@ -123,6 +140,7 @@ export default function MiniDrawer() {
       <CssBaseline />
       <AppBar position="fixed" open={open} sx={{ backgroundColor: "#FFFEF1" }}>
         <Toolbar>
+          {/* Botón de menú */}
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -140,32 +158,49 @@ export default function MiniDrawer() {
           >
             <MenuIcon />
           </IconButton>
+  
+          {/* Logo de la empresa */}
           <img
             src="/jacke.png"
             alt="logo"
             style={{ width: "48px", height: "48px", marginRight: "16px" }}
           />
+  
+          {/* Nombre de la empresa */}
           <Typography variant="h6" noWrap component="div">
             Jake Nails
           </Typography>
+  
+          {/* Margen para empujar los elementos de la derecha */}
           <div style={{ marginLeft: "auto" }}></div>
-          <Notifications
-            sx={{
-              backgroundColor: "#FFE0E3",
-              padding: "20px",
-              borderRadius: "10px",
-              color: "black",
-              fontSize: "40px",
-              marginRight: "20px",
-              "&:hover": {
-                backgroundColor: "#F291B5",
-                color: "white",
-              },
-            }}
-          />
-          <SettingsMenu />
+  
+          {/* Nombre del usuario */}
+          <Typography
+            variant="body1"
+            noWrap
+            component="div"
+            sx={{ marginLeft: "auto", cursor: "pointer", fontWeight: 500, color: "black" }}
+            onClick={handleProfileClick}
+          >
+           <div style={{
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px' // Ajusta el espacio entre el icono y el texto si es necesario
+}}>
+  <i className='bx bxs-user-circle' style={{ fontSize: '25px' }}></i>
+  <span>
+    {user ? `${user.nombre || user.Nombre} ${user.apellido || ''}` : 'Usuario'}
+  </span>
+</div>
+
+          </Typography>
+          <ModalPerfil open={openProfileModal} handleClose={handleCloseModal} />
+
+          {/* <SettingsMenu />*/}
+          
         </Toolbar>
       </AppBar>
+      
       <DrawerComponent
         variant="permanent"
         open={open}
@@ -180,7 +215,7 @@ export default function MiniDrawer() {
             )}
           </IconButton>
         </DrawerHeader>
-
+  
         <List>
           {filteredNavbarItems.map((item) => (
             <React.Fragment key={item.id}>
@@ -188,7 +223,7 @@ export default function MiniDrawer() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10,duration: 0.1 }} // Incrementado a 0.5 segundos
+                transition={{ type: "spring", stiffness: 400, damping: 10, duration: 0.1 }}
                 whileHover={{ scale: 1.1 }}
               >
                 <ListItem
@@ -222,7 +257,7 @@ export default function MiniDrawer() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.5 }} // Incrementado a 0.5 segundos
+                  transition={{ duration: 0.5 }}
                 >
                   <List sx={{ pl: 1, paddingRight: "10px" }}>
                     {item.subitems.filter(subitem => subitem.requiredPermissions.some(perm => permissions.includes(perm)))
@@ -258,11 +293,68 @@ export default function MiniDrawer() {
             </React.Fragment>
           ))}
         </List>
+  
+        <Box sx={{ flexGrow: 1 }} />
+        <List sx={{ position: 'absolute', bottom: 0, width: '100%' }}>
+  <ListItem
+    sx={{
+      display: 'flex',
+      justifyContent: 'center',
+      width: '100%',
+      padding: 0,
+    }}
+  >
+    <ListItemButton
+      onClick={handleLogout}
+      sx={{
+        justifyContent: 'center',
+        backgroundColor: "#EFD4F5",
+        color: "black",
+        borderRadius: '5px',
+        padding: '10px 20px',
+        width: '100%',
+        maxWidth: '200px',
+        textAlign: 'center',
+        margin: '0 auto',
+        display: 'flex',
+        alignItems: 'center',
+        "&:hover": { 
+          backgroundColor: "#FF3B3B",
+          color: "white",
+          "& .MuiListItemIcon-root": {
+            color: "white",
+          },
+          "& .MuiListItemText-primary": {
+            color: "white",
+          },
+        },
+      }}
+    >
+      <ListItemIcon
+        sx={{ minWidth: '40px', display: 'flex', justifyContent: 'center' }}
+      >
+        <ExitToAppIcon />
+      </ListItemIcon>
+      <ListItemText 
+        primary="Cerrar sesión" 
+        sx={{
+          display: open ? 'block' : 'none',
+          marginLeft: open ? '16px' : '0',
+        }} 
+      />
+    </ListItemButton>
+  </ListItem>
+</List>
+
+
+
+
       </DrawerComponent>
 
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}> 
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
       </Box>
     </Box>
   );
+  
 }

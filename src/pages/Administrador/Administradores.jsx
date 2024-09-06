@@ -408,15 +408,15 @@ const Usuarios = () => {
     { field: "apellido", headerName: "Apellido", width: "w-50" },
     { field: "correo", headerName: "Correo", width: "w-50" },
     { field: "telefono", headerName: "Teléfono", width: "w-50" },
-    {
-      field: "rolId",
-      headerName: "Rol",
-      width: "w-36",
-      renderCell: (params) => {
-        const rol = roles.find((role) => role.id === params.value);
-        return rol.nombre;
-      },
-    },
+    // {
+    //   field: "rolId",
+    //   headerName: "Rol",
+    //   width: "w-36",
+    //   renderCell: (params) => {
+    //     const rol = roles.find((role) => role.id === params.value);
+    //     return rol.nombre;
+    //   },
+    // },
     {
       field: "Acciones",
       headerName: "Acciones",
@@ -425,23 +425,36 @@ const Usuarios = () => {
          
         <div className="flex justify-center space-x-4">
           {params.row.estado === 1 && (
-          <button
+          <Fab
+          style={{
+            fontSize: '16px', 
+            width: '40px',  
+            height: '40px',   
+            backgroundColor: '#F0F0F0'  
+          }}
             onClick={() => handleEditClick(params.row.id)}
             className="text-yellow-500"
           >
-            <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
-          </button>
+            <i className="bx bx-edit" style={{ fontSize: "23px", color: "#F0AC00" }}></i>
+          </Fab>
           )}
           {params.row.estado === 1  && (
-          <button
+          <Fab
+          style={{
+            fontSize: '16px', 
+            width: '40px',  
+            height: '40px',   
+            backgroundColor: '#F0F0F0',
+          }}
             onClick={() => {
               handlePasswordChangeClick(params.row.id); // Abrir el modal de contraseña al hacer clic
             }}
             className="text-black-500"
           >
             <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>{" "}
-          </button>
+          </Fab>
           )}
+          
           <CustomSwitch
             active={params.row.estado === 1}
             onToggle={() => handleToggleSwitch(params.row.id)}
@@ -543,12 +556,12 @@ const Usuarios = () => {
           />
         
       </div>
-      <Table title="Gestion de administradores" columns={columns} data={filtrar} roles={roles} />
+      <Table title="Gestión de administradores" columns={columns} data={filtrar}  />
       <Fab
         aria-label="add"
         style={{
           border: "0.5px solid grey",
-          backgroundColor: "#94CEF2",
+          backgroundColor: "#389EFF",
           position: "fixed",
           bottom: "16px",
           right: "16px",

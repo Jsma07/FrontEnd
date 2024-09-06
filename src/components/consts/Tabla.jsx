@@ -45,6 +45,7 @@ const TablePrueba = ({ title, columns, data, roles = [] }) => {
           left: "82px",
           top: "70px",
           width: "calc(100% - 100px)",
+          
         }}
       >
         <div className="bg-white rounded-lg p-8">
@@ -124,7 +125,7 @@ const TablePrueba = ({ title, columns, data, roles = [] }) => {
               <div className="w-full overflow-x-auto">
                 <table
                   key={JSON.stringify(currentRows)}
-                  className="w-full table-auto text-sm text-center text-gray-500"
+                  className="w-full table-auto text-sm text-center text-gray-500 border border-gray-200"
                 >
                   <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                     <tr>
@@ -132,6 +133,8 @@ const TablePrueba = ({ title, columns, data, roles = [] }) => {
                         <th
                           key={column.field}
                           className="px-6 py-3 text-center"
+                          style={{ backgroundColor: "#FFE4FF", fontWeight: "bold", fontSize:'13px' }} // Add this line
+
                         >
                           {column.headerName}
                         </th>
@@ -144,6 +147,7 @@ const TablePrueba = ({ title, columns, data, roles = [] }) => {
                         {columns.map((column, colIndex) => (
                           <td
                             key={colIndex}
+                            style={{color: '#616161'}}
                             className="px-6 py-3 text-center whitespace-nowrap"
                           >
                             {column.field === "rolId"
