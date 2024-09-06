@@ -76,12 +76,6 @@ function Contenidoitems() {
               Servicios de manicure con estilos únicos y modernos, diseñados
               para resaltar tu belleza y personalidad.
             </p>
-            {/* <button className="mt-6 bg-white text-purple-500 font-semibold px-6 py-3 rounded-full shadow-lg transform hover:scale-105 transition duration-300">
-              <p className="flex items-center justify-center">
-                <i className="bx bxs-right-arrow-circle mr-2 text-xl"></i>
-                Ver servicios
-              </p>
-            </button> */}
           </div>
         </motion.div>
       </header>

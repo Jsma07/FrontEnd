@@ -246,7 +246,13 @@ if (invalidDetalles) {
             const postResponse = await axios.post('http://localhost:5000/api/compras/guardarCompra', formData);
             console.log('Respuesta del servidor:', postResponse.data);
             fetchCompras();
-            Swal.fire('¡Compra agregada!', '', 'success');
+            Swal.fire({
+              title: '¡Compra agregada!',
+              icon: 'success',
+              showConfirmButton: false,
+              timer: 1500 
+          });
+            window.location.href = "/compras";
         }
     } catch (error) {
         console.error('Error al agregar la compra:', error);
