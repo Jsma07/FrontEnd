@@ -423,18 +423,17 @@ const Clientes = () => {
   return (
     <section className="bg-gray-50 dark:bg-gray-900 py-3 sm:py-5">
       <div
+        className="fixed bg-white rounded-lg shadow-md"
         style={{
-          paddingTop: "5px",
+          padding: "5px",
           margin: "0 auto",
-          borderRadius: "40px",
+          borderRadius: "30px",
           marginTop: "20px",
-          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.1)",
-          position: "fixed",
-          left: "90px",
-          top: "80px",
+          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.5)",
+          left: "82px",
+          top: "70px",
           width: "calc(100% - 100px)",
         }}
-        className="w-full mx-auto max-w-full"
       >
         <div className="bg-white rounded-lg shadow-md p-8">
           <div className="flex justify-between items-center mb-4">

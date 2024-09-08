@@ -7,6 +7,10 @@ import Roles from "./pages/Roles/Roles";
 import Admin from "./pages/Administrador/Administradores";
 import Usuarios2 from "./pages/Usuarios2/Usuarios2";
 import Ventas from "./pages/Ventas/Ventas";
+import Verificacion from "./components/consts/VerificarCliente ";
+
+import Cambiarcontraseña from "./components/consts/Cambiarcontraseña";
+
 import Insumos from "./pages/Insumos/Insumos";
 import Categorias from "./pages/Insumos/Categorias";
 import Compras from "./pages/Compras/Compras";
@@ -51,6 +55,9 @@ root.render(
           <Route path="/vistaInicio" element={<VistaInicial />} />
           <Route path="/solicitarCita" element={<SolicitarCita />} />
           <Route path="/misCitas" element={<ListarCitas />}/>
+          <Route path="/Verificacion" element={<Verificacion />}/>
+          <Route path="/cambiarContrasena/:idCliente" element={<Cambiarcontraseña />}/>
+
 
 
         <Route path="/" element={<App />}>
@@ -199,6 +206,9 @@ root.render(
               </PrivateRoute>
             }
             />
+           
+
+
             <Route path="/RegistrarAgendamiento" 
            element={
             <PrivateRoute requiredPermissions={["Agenda"]}>
@@ -207,6 +217,8 @@ root.render(
           }
            />
           </Route>
+
+          
         </Routes>
       </BrowserRouter>
     </UserProvider>

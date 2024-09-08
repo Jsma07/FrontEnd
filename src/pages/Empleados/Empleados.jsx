@@ -189,6 +189,8 @@ const Empleados = () => {
             Direccion: formData.Direccion,
             Tip_Documento: formData.Tip_Documento,
             Contrasena: formData.Contrasena,
+            Img: formData.Img,
+
           };
 
           console.log("Datos del formulario numéricos:", formDataNumerico);
@@ -302,6 +304,7 @@ const Empleados = () => {
       const formDataNumerico = {
         ...formData,
         Telefono: parseInt(formData.Telefono, 10),
+        
       };
 
       const url = `http://localhost:5000/Jackenail/ActualizarEmpleados/${formDataNumerico.IdEmpleado}`;
