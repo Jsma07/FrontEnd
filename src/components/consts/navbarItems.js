@@ -17,17 +17,17 @@ import AutoDeleteIcon from "@mui/icons-material/AutoDelete";
 export const NavbarItems = [
   {
     id: 0,
-    icon: <SettingsSuggestIcon />,
-    label: "Panel",
+    icon:<i class='bx bx-line-chart'  style={{fontSize:'27px'}} ></i>,
+    label: "Dashboard",
     requiredPermissions: ["Usuarios", "Dashboard"],
     subitems: [
       {
-        label: "Dashboard",
+        label: "Gráficas",
         route: "/panel/dashboard",
         icon: (
-          <i className="bx bx-shield-quarter" style={{ fontSize: "24px" }}></i>
+          <i class='bx bxs-doughnut-chart' style={{ fontSize: "24px" }}></i>
         ),
-        requiredPermissions: ["Usuarios, Dashboard"],
+        requiredPermissions: ["Usuarios", "Dashboard"],
       },
     ],
   },
@@ -121,7 +121,7 @@ export const NavbarItems = [
     id: 5,
     icon: <Calendar />,
     label: "Agendamiento",
-    requiredPermissions: ["Agenda", "Servicios", "Adiciones"],
+    requiredPermissions: ["Agenda", "Servicios", "Adiciones", "Horario"],
     subitems: [
       {
         label: "Agenda",
@@ -145,7 +145,7 @@ export const NavbarItems = [
         label: "No Disponibilidad",
         route: "/FechasTrabajadas",
         icon: <AutoDeleteIcon />,
-        requiredPermissions: ["Ho"],
+        requiredPermissions: ["Horario"],
         // },{
         //   label: 'Inactivar Horas',
         //   route: '/InactivarHoras',

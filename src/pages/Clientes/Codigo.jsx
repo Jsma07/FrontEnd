@@ -61,32 +61,74 @@ const VerificarCodigo = () => {
     }
   };
   
-
   return (
-    <div className="flex flex-col items-center p-6 max-w-md mx-auto bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Verificar Código</h2>
-      <form onSubmit={handleSubmit} className="w-full">
-        <div className="flex gap-2 mb-4">
-          {Array(NUMBER_OF_BOXES).fill('').map((_, index) => (
-            <input
-              key={index}
-              type="text"
-              maxLength="1"
-              value={code[index]}
-              onChange={(e) => handleChange(index, e)}
-              ref={(el) => (inputsRef.current[index] = el)}
-              className="w-12 h-12 text-center text-xl border border-gray-300 rounded-md shadow-sm"
-            />
-          ))}
-        </div>
-        {error && <p className="text-red-600 mb-4">{error}</p>}
-        <button 
-          type="submit" 
-          className="w-full bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md py-2 px-4"
-        >
-          Verificar Código
-        </button>
-      </form>
+    <div 
+      className="flex flex-col items-center justify-center min-h-screen bg-gray-100"
+      style={{ 
+        backgroundImage: "url('/fondo2.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
+    >     
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.3)', // Ajusta el color y la opacidad aquí
+          zIndex: 1,
+        }}
+      ></div>
+      <div 
+        style={{
+          borderRadius:'25px', 
+          zIndex: 2, 
+          boxShadow: '0 10px 15px rgba(0, 0, 0, 0.4)', 
+          backgroundColor: '#F2EBFF',
+        }} 
+        className="p-10 max-w-md w-full bg-white shadow-md rounded-xl border border-gray-600"
+      >
+        <img 
+          src="/jacke.png" 
+          alt="Logo" 
+          className="w-32 h-32 rounded-full mx-auto mb-8"
+        />
+        <h2 className="text-2xl mb-6 text-center text-gray-800 mb-12"><i className='bx bx-lock'></i> Verificar Código</h2>
+        <form onSubmit={handleSubmit} className="w-full">
+          <div className="flex gap-2 mb-4 justify-center">
+            {Array(NUMBER_OF_BOXES).fill('').map((_, index) => (
+              <input
+              style={{borderRadius:'18px'}}
+                key={index}
+                type="text"
+                maxLength="1"
+                value={code[index]}
+                onChange={(e) => handleChange(index, e)}
+                ref={(el) => (inputsRef.current[index] = el)}
+                className="w-12 h-12 text-center text-xl border border-gray-300 rounded-md shadow-sm"
+              />
+            ))}
+          </div>
+          {error && <p className="text-red-600 mb-4">{error}</p>}
+          <button 
+                     style={{borderRadius:'20px'}}
+
+  type="submit" 
+  className="w-full bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md py-2 px-4 flex items-center justify-center gap-2 mt-12"
+>
+  Enviar código <i className='bx bx-send' style={{fontSize: '20px'}}></i>
+</button>
+          <a 
+  href="/iniciarSesion"
+  className="inline-flex items-center bg-gray-100 text-gray-700 hover:bg-gray-300 rounded-md px-4 py-2 text-center font-medium transition-colors mt-8"
+>
+  <i className='bx bx-chevron-left' style={{fontSize: '24px', marginRight: '8px'}}></i>
+  Volver
+</a>
+        </form>
+      </div>
     </div>
   );
 };

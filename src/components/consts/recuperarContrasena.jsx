@@ -26,11 +26,24 @@ const RecuperarContrasena = () => {
     <div 
     className="flex flex-col items-center justify-center min-h-screen bg-gray-100"
     style={{ 
-      backgroundImage: "url('/fondo.jpg')",
+      backgroundImage: "url('/fondo2.jpg')",
       backgroundSize: 'cover',
       backgroundPosition: 'center'
     }}
-  >      <div style={{borderRadius:'25px'}} className="p-10 max-w-md w-full bg-white shadow-md rounded-xl border border-gray-900">
+  >     
+  <div
+    style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.3)', // Ajusta el color y la opacidad aquí
+      zIndex: 1,
+    }}
+  ></div>
+   <div style={{borderRadius:'25px', zIndex: 2, boxShadow: '0 10px 15px rgba(0, 0, 0, 0.4)', backgroundColor: '#F2EBFF', /* Ajusta el tamaño, desplazamiento y color de la sombra */
+  }} className="p-10 max-w-md w-full bg-white shadow-md rounded-xl border border-gray-600">
         <img 
           src="/jacke.png" 
           alt="Logo" 
@@ -45,6 +58,7 @@ const RecuperarContrasena = () => {
 </label>
 
             <input
+            style={{borderRadius:'20px'}}
               id="correo"
               type="email"
               value={correo}
@@ -57,6 +71,8 @@ const RecuperarContrasena = () => {
           {mensaje && <p className="text-green-600 mb-4">{mensaje}</p>}
           {error && <p className="text-red-600 mb-4">{error}</p>}
           <button 
+                     style={{borderRadius:'20px'}}
+
   type="submit" 
   className="w-full bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md py-2 px-4 flex items-center justify-center gap-2 mb-8"
 >
@@ -64,7 +80,7 @@ const RecuperarContrasena = () => {
 </button>
 <a 
   href="/iniciarSesion"
-  className="inline-flex items-center bg-gray-200 text-gray-700 hover:bg-gray-300 rounded-md px-4 py-2 text-center font-medium transition-colors"
+  className="inline-flex items-center bg-gray-100 text-gray-700 hover:bg-gray-300 rounded-md px-4 py-2 text-center font-medium transition-colors"
 >
   <i className='bx bx-chevron-left' style={{fontSize: '24px', marginRight: '8px'}}></i>
   Volver

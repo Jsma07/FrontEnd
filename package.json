@@ -34,11 +34,13 @@
     "react": "^18.2.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.1",
+    "react-flagkit": "^2.0.4",
     "react-intersection-observer": "^9.13.0",
     "react-rnd": "^10.4.11",
     "react-router": "^6.22.0",
     "react-router-dom": "^6.24.0",
     "react-scripts": "5.0.1",
+    "react-select": "^5.8.0",
     "react-toastify": "^10.0.5",
     "sweetalert2": "^11.11.1",
     "web-vitals": "^2.1.4"
