@@ -1,31 +1,52 @@
-import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import CustomSwitch from "../../components/consts/switch";
-import ModalAgregarProveedor from "../../components/consts/modal";
-import ModalEditarProveedor from "../../components/consts/modalEditar";
-import handleAddProveedor from '../Compras/agregarProveedor';
-import Table from "../../components/consts/Tabla";
-import CamposObligatorios from "../../components/consts/camposVacios";
 import Fab from '@mui/material/Fab';
+import { toast } from "react-toastify";
+import { Avatar, DataGrid } from '@mui/material'; 
+import Table from "../../components/consts/Tabla";
+import React, { useState, useEffect } from "react";
+import PersonIcon from '@mui/icons-material/Person';
+import BusinessIcon from '@mui/icons-material/Business'; 
+import CustomSwitch from "../../components/consts/switch";
+import ModalProveedor from "../../components/consts/modal";
+import handleAddProveedor from '../Compras/agregarProveedor';
+import CamposObligatorios from "../../components/consts/camposVacios";
+import ModalEditarProveedor from "../../components/consts/modalEditar";
 
 const Proveedores = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [openModalAgregar, setOpenModalAgregar] = useState(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [proveedores, setProveedores] = useState([]);
+  const [compras, setCompras] = useState([]);
   const [proveedorSeleccionado, setProveedorSeleccionado] = useState(null);
   const [buscar, setBuscar] = useState('')
 
   useEffect(() => {
     fetchProveedores();
+    fetchCompras();
   }, []);
 
   const fetchProveedores = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/proveedores');
+      console.log('Datos de proveedores:', response.data); // Verifica la estructura de los datos
       setProveedores(response.data);
+      toast.success("Proveedores cargados exitosamente");
     } catch (error) {
       console.error('Error fetching Proveedores:', error);
+    }
+  };
+  
+
+  const fetchCompras = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/compras');
+      const data = response.data;
+      // Ordenar por IdCompra en orden descendente
+      data.sort((a, b) => b.IdCompra - a.IdCompra);
+      setCompras(data); 
+    } catch (error) {
+      console.error('Error fetching Compras:', error);
     }
   };
 
@@ -162,6 +183,14 @@ const Proveedores = () => {
         return;
     }
 
+      // Verificar si hay alguna compra relacionada con este proveedor
+      const estaRelacionadoConCompra = compras.some(compra => compra.IdProveedor === id);
+
+      if (estaRelacionadoConCompra) {
+          toast.error('No se puede inactivar esta proveedor porque está relacionado con una compra.');
+          return; // Detener el proceso si está relacionada
+      }
+
     const newEstado = proveedor.estado_proveedor === 1 ? 0 : 1;
 
     const result = await window.Swal.fire({
@@ -212,11 +241,35 @@ const Proveedores = () => {
     setProveedorSeleccionado(null);
   };
 
+  const renderEmpresa = (value) => {
+    const empresa = value ? value.trim() : 'Sin empresa';
+    return (
+      <div className="flex items-center">
+        <Avatar style={{ backgroundColor: '#FF5722', color: '#FFFFFF' }}> {/* Cambia #FF5722 al color que desees */}
+          <BusinessIcon />
+        </Avatar>
+        <span className="ml-2">{empresa}</span>
+      </div>
+    );
+  };
+  
+  const NombreProveedorCell = ({ value }) => {
+    const nombre = value ? value.trim() : 'Sin nombre';
+    return (
+      <div className="flex items-center">
+        <Avatar style={{ backgroundColor: '#3F51B5', color: '#FFFFFF' }}> {/* Cambia #3F51B5 al color que desees */}
+          <PersonIcon />
+        </Avatar>
+        <span className="ml-2">{nombre}</span>
+      </div>
+    );
+  };
+  
 return (
 <div>
 <div className="container mx-auto p-4 relative">   
   </div>
-      <ModalAgregarProveedor
+      <ModalProveedor
           open={openModalAgregar}
           handleClose={handleCloseModalAgregar}
           onSubmit={(formData) => handleSubmitProveedor(formData)} 
@@ -231,13 +284,12 @@ return (
           ]}
           onChange={handleChange}
         />
-        <ModalEditarProveedor
+        <ModalProveedor
           open={openModalEditar}
           handleClose={handleCloseModalEditar}
           onSubmit={handleEditProveedor}
           title="Editar Proveedor"
           fields={[
-            { name: 'IdProveedor', label: 'Identificador', type: 'number', readOnly: true }, 
             { name: 'NIT', label: 'NIT', type: 'text' },
             { name: 'empresa_proveedor', label: 'Empresa', type: 'text' },
             { name: 'nombre_proveedor', label: 'Nombre', type: 'text' },
@@ -252,8 +304,18 @@ return (
       <Table
         columns={[
           { field: 'NIT', headerName: 'NIT', width: 'w-36' },
-          { field: 'empresa_proveedor', headerName: 'EMPRESA', width: 'w-36' },
-          { field: 'nombre_proveedor', headerName: 'NOMBRE', width: 'w-36' },
+          {
+            field: 'empresa_proveedor',
+            headerName: 'EMPRESA',
+            width: 'w-36',
+            renderCell: (params) => renderEmpresa(params.row.empresa_proveedor),
+          },
+          {
+            field: 'nombre_proveedor',
+            headerName: 'NOMBRE',
+            width: 'w-36',
+            renderCell: (params) => <NombreProveedorCell value={params.row.nombre_proveedor} />,
+          },
           { field: 'correo_proveedor', headerName: 'CORREO', width: 'w-36' },
           { field: 'telefono_proveedor', headerName: 'TELEFONO', width: 'w-36' },
           { field: 'direccion_proveedor', headerName: 'DIRECCION', width: 'w-36' },
