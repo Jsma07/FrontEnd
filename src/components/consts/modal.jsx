@@ -1,30 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Button,
-  Modal,
-  Typography,
-  Grid,
-  TextField,
-  Select,
-  MenuItem,
-  InputLabel,
-  IconButton,
-  TextareaAutosize,
-} from "@mui/material";
+import { Button, Modal, Typography, Grid, TextField, Select, MenuItem, InputLabel, IconButton, FormControl,TextareaAutosize,} from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import CloseIcon from "@mui/icons-material/Close";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 
 const ModalDinamico = ({
-  open,
-  handleClose,
-  title = "",
-  fields,
-  onSubmit,
-  onChange,
-  entityData,
+  open, handleClose, title = "", fields, onSubmit, onChange, entityData,
 }) => {
   const [formValues, setFormValues] = useState({});
   const [dragging, setDragging] = useState(false);
@@ -33,10 +17,12 @@ const ModalDinamico = ({
   const [extraFields, setExtraFields] = useState([]);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const [progressVisible, setProgressVisible] = useState(false); // Nuevo estado para la barra de progreso
+  const [progressVisible, setProgressVisible] = useState(false);
   const [errors, setErrors] = useState({});
   const modalContainerRef = useRef(null);
   const startPositionRef = useRef({ x: 0, y: 0 });
+  const [imagePreview, setImagePreview] = useState(null);
+  const isEditing = !!imagePreview;
 
   useEffect(() => {
     if (fields && fields.length > 0) {
@@ -75,6 +61,28 @@ const ModalDinamico = ({
       };
     }
   };
+
+  useEffect(() => {
+    if (entityData) {
+      const initialData = {
+        ...entityData,
+        Precio_Servicio: parseFloat(entityData.Precio_Servicio) || '', 
+      };
+      setFormValues(initialData);
+
+      if (entityData.ImgServicio) {
+        setImagePreview(`http://localhost:5000${entityData.ImgServicio}`);
+      } else if (entityData.image_preview) {
+        setImagePreview(entityData.image_preview);
+      } else {
+        setImagePreview(null);
+      }
+
+      if (entityData.imagen) {
+        setImagePreview(`http://localhost:5000${entityData.imagen}`);
+      }
+    }
+  }, [entityData]);
 
   const handleMouseMove = (e) => {
     if (dragging) {
@@ -165,10 +173,9 @@ const ModalDinamico = ({
       const newFormValues = { ...prevFormValues };
       delete newFormValues[name];
       delete newFormValues[`${name}_preview`];
-      // No eliminar los campos adicionales ya que no se están creando
       return newFormValues;
     });
-
+    setImagePreview(null);
     setExtraFields((prevExtraFields) =>
       prevExtraFields.filter(
         (field) =>
@@ -180,18 +187,17 @@ const ModalDinamico = ({
   const validateField = (name, value, type) => {
     let error = "";
 
-    
-
-       // Validación específica para la descripción del servicio
-       if (name === "Descripcion_Servicio") {
-        if (!value.trim()) {
-          return "La descripción está vacía.";
-        } else if (value.trim().length < 20) {
-          return "La descripción debe tener al menos 20 caracteres.";
-        }
-        // No aplicar otras validaciones para este campo
-        return error;
-      }
+// Validaciones para Descripcion_Servicio
+if (name === "Descripcion_Servicio") {
+  if (!value.trim()) {
+    error = "La descripción está vacía.";
+  } else if (value.trim().length < 20) {
+    error = "La descripción debe tener al menos 20 caracteres.";
+  } else if ((value.match(/[a-zA-ZñÑ]/g) || []).length < 10) {
+    error = "La descripción debe contener al menos 10 letras.";
+  }
+  return error;
+}
 
     if (name === "correo_proveedor") {
       if (!/^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value)) {
@@ -224,25 +230,25 @@ const ModalDinamico = ({
       }
     } else if (name === "NIT") {
       if (!/^\d+(-\d+)?$/.test(value)) {
-        error = 'El NIT solo puede contener números y un solo guion "-".';
+        error = 'El NIT solo puede contener números.';
       }
-    } else if (name === "NombreInsumos") {
-      if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9ñÑ\s]*$/.test(value)) {
-        error =
-          "El nombre del insumo debe contener al menos una letra y no puede contener caracteres especiales.";
-      }
-    } else if (name === "nombre_categoria") {
-      if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9ñÑ\s]*$/.test(value)) {
-        error =
-          "El nombre de la categoria debe contener al menos una letra y no puede contener caracteres especiales.";
+    }  else if (name === "NombreInsumos") {
+      if (!/[a-zA-ZñÑ]/.test(value)) {
+        error = "El nombre de la categoría debe contener al menos una letra.";
+      } 
+      else if (/[^a-zA-Z0-9ñÑ\s]/.test(value)) {
+        error = "El nombre de la categoría no puede contener caracteres especiales.";
       }
     } else if (name === "empresa_proveedor") {
-      if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9ñÑ\s]*$/.test(value)) {
-        error =
-          "El nombre de la empresa debe contener al menos una letra y no puede contener caracteres especiales.";
+      if (!/[a-zA-ZñÑ]/.test(value)) {
+        error = "El nombre de la empresa debe contener al menos una letra.";
+      } 
+
+      else if (/[^a-zA-Z0-9ñÑ\s]/.test(value)) {
+        error = "El nombre de la empresa no puede contener caracteres especiales.";
       }
-    } else if (name === "Precio_Servicio") {
-      if (value <= 20000) {
+    }else if (name === "Precio_Servicio") {
+      if (value < 20000) {
         error = "El precio debe ser minimo de $20.000.";
       }
     } else {
@@ -281,7 +287,7 @@ const ModalDinamico = ({
 
   const handleSubmit = async () => {
     try {
-      setProgressVisible(true); // Mostrar la barra de progreso al enviar el formulario
+      setProgressVisible(true); 
       if (typeof onSubmit === "function") {
         let hasErrors = false;
 
@@ -344,6 +350,45 @@ const ModalDinamico = ({
     ));
   };
 
+  const handleImageChange = (e, name) => {
+    const { files } = e.target;
+    const file = files[0];
+  
+    if (file) {
+      if (!file.type.startsWith('image/') && file.type !== 'image/gif') {
+        setAlertOpen(true);
+        setAlertMessage("Solo se permiten archivos de imagen.");
+        setTimeout(() => {
+          setAlertOpen(false);
+          setAlertMessage("");
+        }, 3000);
+        return;
+      }
+  
+      const reader = new FileReader();
+      reader.onload = () => {
+        const maxSizeBytes = 1 * 1024 * 1024; // 1 MB
+        if (file.size > maxSizeBytes) {
+          setAlertOpen(true);
+          setAlertMessage("El tamaño del archivo excede el límite permitido (1 MB).");
+          setTimeout(() => {
+            setAlertOpen(false);
+            setAlertMessage("");
+          }, 3000);
+          return;
+        }
+  
+        setFormValues((prevFormValues) => ({
+          ...prevFormValues,
+          [name]: file,
+          [`${name}_preview`]: reader.result,
+        }));
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
   const renderFieldByType = (field) => {
     const { name, label, type, options, disabled } = field;
 
@@ -366,113 +411,206 @@ const ModalDinamico = ({
           error={!!errors[name]}
           helperText={errors[name]}
           multiline={name === "Descripcion_Servicio"}
-          minRows={name === "Descripcion_Servicio" ? 4 : 1} // Altura mínima para la descripción
-          maxRows={name === "Descripcion_Servicio" ? 4 : undefined} // Altura máxima antes de que aparezca el scroll
+          minRows={name === "Descripcion_Servicio" ? 4 : 1} 
+          maxRows={name === "Descripcion_Servicio" ? 4 : undefined} 
           disabled={disabled}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '8px',
+            },
+            '& .MuiFormLabel-root': {
+              color: 'text.primary',
+            },
+            '& .MuiFormHelperText-root': {
+              color: 'error.main',
+            },
+          }}
           InputProps={{
             style: {
-              maxHeight: name === "Descripcion_Servicio" ? "200px" : "auto", // Limitar la altura máxima
-              overflowY: "auto", // Añadir scroll vertical si es necesario
+              maxHeight: name === "Descripcion_Servicio" ? "200px" : "auto", 
+              overflowY: "auto", 
             },
           }}
         />
         );
-      case "select":
-        return (
-          <div>
-            <InputLabel id={`${name}-label`}>{label}</InputLabel>
-            <Select
-              labelId={`${name}-label`}
-              id={name}
-              name={name}
-              variant="outlined"
-              onChange={handleChange}
-              fullWidth
-              size="medium"
-              value={formValues[name] || ""}
-              label={label}
-              style={{ marginBottom: "0.5rem", textAlign: "center" }}
-            >
-              {options &&
-                options.map((option, index) => (
-                  <MenuItem key={index} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-            </Select>
-          </div>
-        );
-      case "file":
-        return (
-          <div className="flex items-center justify-center w-full relative">
-            {formValues[`${name}_preview`] ? (
-              <div style={{ position: "relative", display: "inline-block" }}>
-                <img
-                  src={formValues[`${name}_preview`]}
-                  alt="Preview"
-                  style={{
-                    width: "100%",
-                    maxWidth: "10000px",
-                    height: "auto",
-                    maxHeight: "200px",
-                    objectFit: "contain",
-                    borderRadius: "8px",
-                  }}
-                />
-                <IconButton
-                  size="small"
-                  style={{
-                    position: "absolute",
-                    top: "5px",
-                    right: "5px",
-                    backgroundColor: "rgba(255, 255, 255, 0.7)",
-                  }}
-                  onClick={() => handleRemoveImage(name)}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </div>
-            ) : (
-              <label
-                htmlFor={`dropzone-file-${name}`}
-                className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:border-gray-500"
-                style={{ width: "100%", height: "150px" }}
+          case "textarea": // Añadido para el tipo textarea
+      return (
+        <TextareaAutosize
+          id={name}
+          name={name}
+          minRows={4}
+          placeholder={label}
+          style={{
+            width: '100%',
+            padding: '8px',
+            borderRadius: '8px',
+            borderColor: '#ccc',
+            fontFamily: 'inherit',
+            fontSize: '16px',
+          }}
+          onChange={handleChange}
+          value={formValues[name] || ""}
+          disabled={disabled}
+        />
+      );
+        case "select":
+          return (
+            <FormControl fullWidth variant="outlined" size="medium">
+              <InputLabel id={`${name}-label`} sx={{ color: 'text.primary' }}>{label}</InputLabel>
+              <Select
+                labelId={`${name}-label`}
+                id={name}
+                name={name}
+                onChange={handleChange}
+                value={formValues[name] || ""}
+                label={label}
+                sx={{
+                  marginBottom: "0.5rem",
+                  textAlign: "center",
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '8px', // Bordes redondeados
+                  },
+                  '& .MuiSelect-select': {
+                    textAlign: "center",
+                  }
+                }}
+                InputLabelProps={{
+                  shrink: true, // La etiqueta estará dentro del Select
+                }}
               >
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <svg
-                    className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 20 16"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                    />
-                  </svg>
-                  <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                    <span className="font-semibold">
-                      Click para elegir imagen
-                    </span>
-                  </p>
-                </div>
-                <input
-                  id={`dropzone-file-${name}`}
-                  type="file"
-                  name={name}
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleChange}
-                />
-              </label>
-            )}
-          </div>
-        );
-        
+                {options &&
+                  options.map((option, index) => (
+                    <MenuItem key={index} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          );
+        case "file":
+          return (
+            <div className="flex items-center justify-center w-full relative">
+      {isEditing ? (
+        <>
+          {imagePreview ? (
+            <div style={{ position: 'relative', display: 'inline-block', textAlign: 'center' }}>
+              <img
+                src={imagePreview}
+                alt="Preview"
+                style={{
+                  width: '100%',
+                  maxWidth: '500px',
+                  height: 'auto',
+                  maxHeight: '200px',
+                  objectFit: 'contain',
+                  borderRadius: '8px',
+                }}
+              />
+              <IconButton
+                size="small"
+                style={{
+                  position: 'absolute',
+                  top: '5px',
+                  right: '5px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                }}
+                onClick={() => handleRemoveImage(name)}
+              >
+                <CloseIcon />
+              </IconButton>
+            </div>
+          ) : (
+            <label
+              htmlFor={`file-input-${name}`}
+              className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+              style={{ width: '100%', height: '150px', maxWidth: '500px', textAlign: 'center', marginBottom: '0.5rem', position: 'relative' }}
+            >
+              <CameraAltIcon
+                style={{
+                  fontSize: '4rem',
+                  color: '#9e9e9e',
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                }}
+              />
+              <Typography variant="body1" style={{ fontWeight: 'bold', marginTop: '2rem' }}>
+                Click para seleccionar una imagen
+              </Typography>
+              <input
+                id={`file-input-${name}`}
+                type="file"
+                name={name}
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleImageChange(e, name)}
+              />
+            </label>
+          )}
+        </>
+      ) : (
+        <>
+          {formValues[`${name}_preview`] ? (
+            <div style={{ position: 'relative', display: 'inline-block', textAlign: 'center' }}>
+              <img
+                src={formValues[`${name}_preview`]}
+                alt="Preview"
+                style={{
+                  width: '100%',
+                  maxWidth: '500px',
+                  height: 'auto',
+                  maxHeight: '200px',
+                  objectFit: 'contain',
+                  borderRadius: '8px',
+                }}
+              />
+              <IconButton
+                size="small"
+                style={{
+                  position: 'absolute',
+                  top: '5px',
+                  right: '5px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                }}
+                onClick={() => handleRemoveImage(name)}
+              >
+                <CloseIcon />
+              </IconButton>
+            </div>
+          ) : (
+            <label
+              htmlFor={`file-input-${name}`}
+              className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+              style={{ width: '100%', height: '150px', maxWidth: '500px', textAlign: 'center', marginBottom: '0.5rem', position: 'relative' }}
+            >
+              <CameraAltIcon
+                style={{
+                  fontSize: '4rem',
+                  color: '#9e9e9e',
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                }}
+              />
+              <Typography variant="body1" style={{ fontWeight: 'bold', marginTop: '6rem' }}>
+                Click para seleccionar una imagen
+              </Typography>
+              <input
+                id={`file-input-${name}`}
+                type="file"
+                name={name}
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleImageChange(e, name)}
+              />
+            </label>
+          )}
+        </>
+      )}
+    </div>
+  );
       default:
         return null;
     }
@@ -489,6 +627,7 @@ const ModalDinamico = ({
           backgroundColor: "white",
           borderRadius: "0.375rem",
           width: "80%",
+          borderRadius: "8px",
           maxWidth: "50rem",
           maxHeight: "80%",
           overflow: "auto",
@@ -542,7 +681,9 @@ const ModalDinamico = ({
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
         >
-          <Typography variant="h6">{title}</Typography>
+           <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+            {title}
+          </Typography>
           <DragIndicatorIcon />
         </div>
         <Grid container spacing={2} style={{ marginTop: "1rem" }}>
@@ -559,7 +700,7 @@ const ModalDinamico = ({
             onClick={handleCancel}
             color="secondary"
             variant="contained"
-            style={{ marginRight: "1rem" }}
+            style={{ marginRight: "1rem", borderRadius: '8px' }}
           >
             Cancelar
           </Button>
@@ -568,6 +709,7 @@ const ModalDinamico = ({
             color="primary"
             variant="contained"
             endIcon={<SendIcon />}
+            sx={{ borderRadius: '8px' }}
           >
             Enviar
           </Button>
