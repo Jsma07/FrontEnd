@@ -15,7 +15,7 @@ const AddRoleModal = ({ open, handleClose, setRoles }) => {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/roles');
+      const response = await axios.get('https://back-bb2i.onrender.com/api/roles');
       if (response.data && Array.isArray(response.data)) {
         const rolesWithPermissions = response.data.map(role => ({
           ...role,
@@ -33,7 +33,7 @@ const AddRoleModal = ({ open, handleClose, setRoles }) => {
 
   const fetchPermisos = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/permisos");
+      const response = await axios.get("https://back-bb2i.onrender.com/api/permisos");
       if (response.data) {
         const permisosFromApi = response.data.map(permiso => ({
           ...permiso,
@@ -89,7 +89,7 @@ const AddRoleModal = ({ open, handleClose, setRoles }) => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/roles/crearRol", {
+      const response = await axios.post("https://back-bb2i.onrender.com/api/roles/crearRol", {
         nombre: formData.nombre,
         permisos: permisosSeleccionados,
         EstadoRol: 1

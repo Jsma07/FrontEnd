@@ -13,7 +13,7 @@ const ListarAdiciones = () => {
   const fetchAdiciones = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/Jackenail/Listarventas/adiciones"
+        "https://back-bb2i.onrender.com/Jackenail/Listarventas/adiciones"
       );
       setAdiciones(response.data);
     } catch (error) {
@@ -110,7 +110,7 @@ const ListarAdiciones = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .put(`http://localhost:5000/Jackenail/CambiaEstado/${adicionId}`, {
+          .put(`https://back-bb2i.onrender.com/Jackenail/CambiaEstado/${adicionId}`, {
             Estado: nuevoEstado,
           })
           .then((response) => {

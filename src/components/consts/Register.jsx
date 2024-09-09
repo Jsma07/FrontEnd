@@ -142,7 +142,7 @@ const handleSubmit = async (e) => {
       return;
     }
 
-    const response = await axios.post("http://localhost:5000/Jackenail/RegistrarClientes", formData);
+    const response = await axios.post("https://back-bb2i.onrender.com/Jackenail/RegistrarClientes", formData);
 
     toast.success("El cliente se ha registrado correctamente.", {
       position: "bottom-right",

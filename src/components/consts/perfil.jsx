@@ -112,7 +112,7 @@ const PerfilUsuario = ({ open, handleClose }) => {
     }
 
     try {
-      const response = await axios.put(`http://localhost:5000/api/editarPerfil/${user.id}`, {
+      const response = await axios.put(`https://back-bb2i.onrender.com/api/editarPerfil/${user.id}`, {
         nombre,
         apellido,
         telefono,

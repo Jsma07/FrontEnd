@@ -33,7 +33,7 @@ const Registrar = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/jackenail/Listar_Empleados"
+          "https://back-bb2i.onrender.com/jackenail/Listar_Empleados"
         );
 
         // Filtrar empleados para incluir solo aquellos con estado 1 y rol 2
@@ -56,7 +56,7 @@ const Registrar = () => {
 
   const fetchServicios = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/servicios");
+      const response = await axios.get("https://back-bb2i.onrender.com/api/servicios");
       // Filtrar servicios para incluir solo aquellos con estado 1
       const serviciosFiltrados = response.data.filter(
         (servicio) => servicio.EstadoServicio === 1
@@ -71,7 +71,7 @@ const Registrar = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/jackenail/Listar_Clientes"
+          "https://back-bb2i.onrender.com/jackenail/Listar_Clientes"
         );
 
         // Filtrar clientes para incluir solo aquellos con estado 1
@@ -107,7 +107,7 @@ const Registrar = () => {
     const fetchAdiciones = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/Jackenail/Listarventas/adiciones"
+          "https://back-bb2i.onrender.com/Jackenail/Listarventas/adiciones"
         );
         setAdiciones(response.data);
       } catch (error) {
@@ -192,7 +192,7 @@ const Registrar = () => {
     try {
       // Registrar la venta
       const ventaResponse = await axios.post(
-        "http://localhost:5000/Jackenail/RegistrarVenta",
+        "https://back-bb2i.onrender.com/Jackenail/RegistrarVenta",
         ventaData
       );
 
@@ -206,7 +206,7 @@ const Registrar = () => {
 
       // Registrar los detalles de venta en una sola solicitud
       const detallesResponse = await axios.post(
-        "http://localhost:5000/Jackenail/Detalleregistrar",
+        "https://back-bb2i.onrender.com/Jackenail/Detalleregistrar",
         {
           Idventa: ventaResponse.data.idVentas,
           IdAdiciones: detallesVentaData.map((d) => d.IdAdiciones),

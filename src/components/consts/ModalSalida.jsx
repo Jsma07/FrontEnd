@@ -113,7 +113,7 @@ const ModalInsumos = ({
 
       // Enviar la solicitud POST a la API para registrar la salida de insumos
       const response = await axios.post(
-        "http://localhost:5000/salidasInsumos",
+        "https://back-bb2i.onrender.com/salidasInsumos",
         salidaInsumos
       );
 
@@ -126,7 +126,7 @@ const ModalInsumos = ({
         const updatePromises = carrito.map((item) => {
           const nuevaCantidad = item.Cantidad - item.cantidad; // Calcular la nueva cantidad
           return axios.put(
-            `http://localhost:5000/api/existenciainsumos/editar/${item.IdInsumos}`,
+            `https://back-bb2i.onrender.com/api/existenciainsumos/editar/${item.IdInsumos}`,
             { Cantidad: nuevaCantidad }
           );
         });

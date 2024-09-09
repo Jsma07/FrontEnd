@@ -13,7 +13,7 @@ const InsumoDetalle = () => {
     const fetchVenta = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/Buscardetalle/${id}`
+          `https://back-bb2i.onrender.com/Buscardetalle/${id}`
         );
         const ventaData = response.data;
 

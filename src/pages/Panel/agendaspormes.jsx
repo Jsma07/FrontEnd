@@ -12,7 +12,7 @@ const BarChart = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/agendamientospormes');
+        const response = await axios.get('https://back-bb2i.onrender.com/api/agendamientospormes');
         const agendamientos = response.data;
 
         const labels = agendamientos.map(item => `${item.año}-${item.mes.toString().padStart(2, '0')}`);

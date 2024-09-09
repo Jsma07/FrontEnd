@@ -29,7 +29,7 @@ const Salida = () => {
   useEffect(() => {
     const fetchSalidas = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/ListarSalidas");
+        const response = await axios.get("https://back-bb2i.onrender.com/ListarSalidas");
         const salidasConDetalles = response.data.map((salida) => {
           let estadoButton;
           if (salida.Estado === "Terminado") {
@@ -126,13 +126,13 @@ const Salida = () => {
         try {
           // Anula la salida
           await axios.patch(
-            `http://localhost:5000/salidas/${salida.IdSalida}`,
+            `https://back-bb2i.onrender.com/salidas/${salida.IdSalida}`,
             { nuevoEstado: "Anulado" }
           );
 
           // Restaura la cantidad en los insumos
           await axios.put(
-            `http://localhost:5000/api/existenciainsumos/editar/${salida.insumo.IdInsumos}`,
+            `https://back-bb2i.onrender.com/api/existenciainsumos/editar/${salida.insumo.IdInsumos}`,
             { Cantidad: salida.insumo.Cantidad + salida.Cantidad }
           );
 

@@ -5,7 +5,6 @@ import "./index.css";
 import App from "./App";
 import Roles from "./pages/Roles/Roles";
 import Admin from "./pages/Administrador/Administradores";
-import Usuarios2 from "./pages/Usuarios2/Usuarios2";
 import Ventas from "./pages/Ventas/Ventas";
 import Insumos from "./pages/Insumos/Insumos";
 import Categorias from "./pages/Insumos/Categorias";
