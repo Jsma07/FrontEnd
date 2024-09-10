@@ -30,7 +30,7 @@ import { UserProvider } from "./context/ContextoUsuario";
 import CrearCita from "./pages/Agendamiento/CrearCita";
 import FechasTrabajo from './pages/Agendamiento/FechaTrabajo';
 import Panel from './pages/Panel/dashboard';
-// import InactivarHoras from "./pages/Agendamiento/InactivarHoras";
+import Citas from "./pages/Agendamiento/citas";
 import Contrasena from "./components/consts/recuperarContrasena";
 import PrivateRoute from "./context/verificarSesion";
 import SolicitarCita from "./components/consts/VIewClients/solicitarCita";
@@ -146,7 +146,7 @@ root.render(
             />
             <Route path="/FechasTrabajadas" element={<FechasTrabajo />}/>
 
-            {/* <Route path="/InactivarHoras" element={<InactivarHoras />}/> */}
+            <Route path="/citas" element={<Citas />}/>
 
 
 

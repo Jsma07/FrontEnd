@@ -1,91 +1,105 @@
-import React, { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import dayjs from 'dayjs';
+import Swal from 'sweetalert2';
+import {
+  Box,
+  CircularProgress,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Paper,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { Box, List, ListItem, ListItemButton, ListItemText, Paper, Typography, CircularProgress } from '@mui/material';
-import Swal from 'sweetalert2';
-import Tooltip from '@mui/material/Tooltip';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 
-export default function CustomTimeSelect({ selectedTime, setSelectedTime, selectedDate }) {
-  const [occupiedTimes, setOccupiedTimes] = useState([]);
-  const [inactiveTimes, setInactiveTimes] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [isInactiveDay, setIsInactiveDay] = useState(false);
-  
-  const horaActual = dayjs().format('HH:mm');
-  const esHoy = selectedDate && selectedDate.isSame(dayjs(), 'day');
 
-  useEffect(() => {
-    const fetchTimes = async () => {
-      if (selectedDate) {
-        setLoading(true);
-        setOccupiedTimes([]);
-        setInactiveTimes([]);
-        setIsInactiveDay(false);
+  export default function CustomTimeSelect({ selectedTime, setSelectedTime, selectedDate, idEmpleado }) {
+    const [occupiedTimes, setOccupiedTimes] = useState([]);
+    const [inactiveTimes, setInactiveTimes] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [isInactiveDay, setIsInactiveDay] = useState(false);
 
-        try {
-          const occupiedResponse = await axios.get('http://localhost:5000/api/agendas/horasOcupadas', {
-            params: { fecha: selectedDate.format('YYYY-MM-DD') },
-          });
-          setOccupiedTimes(occupiedResponse.data);
+    const horaActual = dayjs().format('HH:mm');
+    const esHoy = selectedDate && selectedDate.isSame(dayjs(), 'day');
 
-          const inactiveDayResponse = await axios.get('http://localhost:5000/api/horarios');
-          const inactiveDays = inactiveDayResponse.data
-            .filter(horario => horario.estado === 'inactivo')
-            .map(horario => dayjs(horario.fecha));
-          const isDayInactive = inactiveDays.some(inactiveDate => inactiveDate.isSame(selectedDate, 'day'));
-          setIsInactiveDay(isDayInactive);
+    useEffect(() => {
+      const fetchTimes = async () => {
+        if (selectedDate && idEmpleado) {
+          setLoading(true);
+          setOccupiedTimes([]);
+          setInactiveTimes([]);
+          setIsInactiveDay(false);
 
-          if (isDayInactive) {
-            Swal.fire({
-              title: 'Día Inactivo',
-              text: 'La fecha seleccionada está inactiva. Por favor, elige otra fecha.',
-              icon: 'warning',
-              confirmButtonText: 'OK'
+          try {
+            // Obtener las horas ocupadas
+            const occupiedResponse = await axios.get('http://localhost:5000/api/agendas/horasOcupadas', {
+              params: { fecha: selectedDate.format('YYYY-MM-DD'), idEmpleado },
             });
+            console.log(occupiedResponse.data)
+            setOccupiedTimes(occupiedResponse.data);
+
+            // Obtener los días inactivos
+            const inactiveDayResponse = await axios.get('http://localhost:5000/api/horarios');
+            const inactiveDays = inactiveDayResponse.data
+              .filter(horario => horario.estado === 'inactivo')
+              .map(horario => dayjs(horario.fecha));
+            const isDayInactive = inactiveDays.some(inactiveDate => inactiveDate.isSame(selectedDate, 'day'));
+            setIsInactiveDay(isDayInactive);
+
+            if (isDayInactive) {
+              Swal.fire({
+                title: 'Día Inactivo',
+                text: 'La fecha seleccionada está inactiva. Por favor, elige otra fecha.',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+              });
+            }
+
+            // Obtener las horas inactivas
+            const inactiveTimesResponse = await axios.get('http://localhost:5000/api/horarios/listarFechasConHorasInactivas');
+            const inactiveDateInfo = inactiveTimesResponse.data.find(info => dayjs(info.fecha).isSame(selectedDate, 'day'));
+
+            if (inactiveDateInfo) {
+              setInactiveTimes(inactiveDateInfo.horas_inactivas);
+            }
+
+          } catch (error) {
+            console.error("Error fetching data", error);
+          } finally {
+            setLoading(false);
           }
-
-          const inactiveTimesResponse = await axios.get('http://localhost:5000/api/horarios/listarFechasConHorasInactivas');
-          const inactiveDateInfo = inactiveTimesResponse.data.find(info => dayjs(info.fecha).isSame(selectedDate, 'day'));
-
-          if (inactiveDateInfo) {
-            setInactiveTimes(inactiveDateInfo.horas_inactivas);
-          }
-
-        } catch (error) {
-          console.error("Error fetching data", error);
-        } finally {
-          setLoading(false);
         }
+      };
+
+      fetchTimes();
+    }, [selectedDate, idEmpleado]);
+
+    const generateTimeOptions = () => {
+      const times = [];
+      for (let hour = 8; hour <= 11; hour++) {
+        times.push(dayjs().hour(hour).minute(0).format('HH:mm'));
+      }
+      for (let hour = 13; hour <= 16; hour++) {
+        times.push(dayjs().hour(hour).minute(0).format('HH:mm'));
+      }
+
+      // Filtrar horas pasadas si es el día actual
+      return times.filter(time => !esHoy || time >= horaActual);
+    };
+
+    const handleChange = (time) => {
+      if (!occupiedTimes.includes(time) && !inactiveTimes.includes(time)) {
+        setSelectedTime(time);
       }
     };
 
-    fetchTimes();
-  }, [selectedDate]);
-
-  const generateTimeOptions = () => {
-    const times = [];
-    for (let hour = 8; hour <= 11; hour++) {
-      times.push(dayjs().hour(hour).minute(0).format('HH:mm'));
-    }
-    for (let hour = 13; hour <= 16; hour++) {
-      times.push(dayjs().hour(hour).minute(0).format('HH:mm'));
-    }
-
-    // Filtrar horas pasadas si es el día actual
-    return times.filter(time => !esHoy || time >= horaActual);
-  };
-
-  const handleChange = (time) => {
-    if (!occupiedTimes.includes(time) && !inactiveTimes.includes(time)) {
-      setSelectedTime(time);
-    }
-  };
-
-  return (
+    return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Paper
         sx={{

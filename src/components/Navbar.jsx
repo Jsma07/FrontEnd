@@ -1,27 +1,30 @@
-import * as React from "react";
-import { styled, useTheme } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import MuiDrawer from "@mui/material/Drawer";
-import MuiAppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import CssBaseline from "@mui/material/CssBaseline";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Tooltip from "@mui/material/Tooltip";
-import Notifications from "@mui/icons-material/NotificationsNone";
-import { useNavigate } from "react-router-dom";
-import SettingsMenu from "./consts/sesion";
-import { UserContext } from "../context/ContextoUsuario";
+import React, { useState } from 'react';
+import { styled, useTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import MuiDrawer from '@mui/material/Drawer';
+import MuiAppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import List from '@mui/material/List';
+import CssBaseline from '@mui/material/CssBaseline';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Tooltip from '@mui/material/Tooltip';
+import Notifications from '@mui/icons-material/NotificationsNone';
+import { useNavigate } from 'react-router-dom';
+import { Badge } from '@mui/material';
+import SettingsMenu from './consts/sesion';
+import { UserContext } from '../context/ContextoUsuario';
+import NotificationMenu from './NotificationMenu';  // Asegúrate de importar NotificationMenu
 import { motion } from 'framer-motion';
-import { NavbarItems } from "./consts/navbarItems";
+import { NavbarItems } from './consts/navbarItems';
+import axios from 'axios';
 
 const drawerWidth = 240;
 
@@ -91,13 +94,29 @@ const DrawerComponent = styled(MuiDrawer, {
     "& .MuiDrawer-paper": closedMixin(theme),
   }),
 }));
-
 export default function MiniDrawer() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
   const [openCategory, setOpenCategory] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);  // Estado para el menú de notificaciones
+  const [notificaciones, setNotificaciones] = useState([]);  // Estado para las notificaciones
+  const [unreadCount, setUnreadCount] = useState(0);  // Estado para el conteo de notificaciones no leídas
   const { user, permissions } = React.useContext(UserContext);
+
+  React.useEffect(() => {
+    const fetchNotificaciones = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/notificaciones');
+        setNotificaciones(response.data);
+        // Asume que unreadCount se puede calcular con la longitud de las notificaciones no leídas
+        setUnreadCount(response.data.filter(notif => !notif.Leido).length);
+      } catch (error) {
+        console.error("Error al obtener las notificaciones", error);
+      }
+    };
+    fetchNotificaciones();
+  }, []);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -110,6 +129,14 @@ export default function MiniDrawer() {
   const handleCategoryClick = (categoryId) => {
     setOpenCategory(openCategory === categoryId ? null : categoryId);
   };
+  const handleClickNotifications = (event) => {
+    setAnchorEl(event.currentTarget);  // Abre el menú de notificaciones
+  };
+
+  const handleCloseNotifications = () => {
+    setAnchorEl(null);  // Cierra el menú de notificaciones
+  };
+
 
   const hasAnyPermission = (requiredPermissions) =>
     requiredPermissions.some((perm) => permissions.includes(perm));
@@ -149,19 +176,24 @@ export default function MiniDrawer() {
             Jake Nails
           </Typography>
           <div style={{ marginLeft: "auto" }}></div>
-          <Notifications
-            sx={{
-              backgroundColor: "#FFE0E3",
-              padding: "20px",
-              borderRadius: "10px",
-              color: "black",
-              fontSize: "40px",
-              marginRight: "20px",
-              "&:hover": {
-                backgroundColor: "#F291B5",
-                color: "white",
-              },
-            }}
+          <Tooltip title="Notificaciones">
+            <IconButton
+              color="inherit"
+              onClick={handleClickNotifications}
+            >
+              <Badge badgeContent={unreadCount} color="error">
+                <Notifications />
+              </Badge>
+            </IconButton>
+          </Tooltip>
+          <NotificationMenu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            handleClose={handleCloseNotifications}
+            setNotificaciones={setNotificaciones}
+            notificaciones={notificaciones}
+            unreadCount={unreadCount}
+            setUnreadCount={setUnreadCount}
           />
           <SettingsMenu />
         </Toolbar>
