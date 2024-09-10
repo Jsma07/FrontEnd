@@ -232,24 +232,29 @@ if (name === "Descripcion_Servicio") {
       if (!/^\d+(-\d+)?$/.test(value)) {
         error = 'El NIT solo puede contener números.';
       }
-    }  else if (name === "NombreInsumos") {
-      if (!/[a-zA-ZñÑ]/.test(value)) {
-        error = "El nombre de la categoría debe contener al menos una letra.";
-      } 
+    }else if(name == "nombre_proveedor"){
+      if (!/[a-zA-ZñÑ]{4,}/.test(value)) {
+        error = "El nombre del proveedor debe contener al menos 4 letras.";
+      }
+
+    }else if (name === "NombreInsumos") {
+      if (!/[a-zA-ZñÑ]{4,}/.test(value)) {
+        error = "El nombre de la categoría debe contener al menos 4 letras.";
+      }      
       else if (/[^a-zA-Z0-9ñÑ\s]/.test(value)) {
         error = "El nombre de la categoría no puede contener caracteres especiales.";
       }
     } else if (name === "empresa_proveedor") {
-      if (!/[a-zA-ZñÑ]/.test(value)) {
-        error = "El nombre de la empresa debe contener al menos una letra.";
-      } 
-
+      if (!/[a-zA-ZñÑ]{4,}/.test(value)) {
+        error = "El nombre de la categoría debe contener al menos 4 letras.";
+      }
+      
       else if (/[^a-zA-Z0-9ñÑ\s]/.test(value)) {
         error = "El nombre de la empresa no puede contener caracteres especiales.";
       }
     }else if (name === "Precio_Servicio") {
       if (value < 20000) {
-        error = "El precio debe ser minimo de $20.000.";
+        error = "El precio debe ser mayor de $20.000.";
       }
     } else {
       switch (type) {

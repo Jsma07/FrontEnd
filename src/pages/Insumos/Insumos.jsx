@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import Table from "../../components/consts/Tabla";
-import ModalInsumo from "../../components/consts/modal";
+import ModalAgregarInsumo from "../../components/consts/modal";
+import ModalEditarInsumo from "../../components/consts/modalEditar";
 import CamposObligatorios from "../../components/consts/camposVacios";
 import handleAddInsumo from './agregarInsumo';
 import Fab from "@mui/material/Fab";
@@ -67,8 +69,8 @@ const Insumos = () => {
 
   const handleEditInsumo = async (formData) => {
     try {
-      const camposObligatorios = ["NombreInsumos","imagen","Idcategoria"];
-
+      const camposObligatorios = ["NombreInsumos", "Imagen", "Idcategoria"];
+  
       if (
         !CamposObligatorios(
           formData,
@@ -78,19 +80,20 @@ const Insumos = () => {
       ) {
         return;
       }
-
+  
       const formatNombreInsumo = (nombre) => {
         const nombreSinEspacios = nombre.trim();
         const nombreMinusculas = nombreSinEspacios.toLowerCase();
         const nombreFormateado = nombreMinusculas.charAt(0).toUpperCase() + nombreMinusculas.slice(1);
         return nombreFormateado;
-    };
-
-    formData.NombreInsumos = formatNombreInsumo(formData.NombreInsumos);
-    const response = await axios.get('http://localhost:5000/api/insumos');
-    const insumos = response.data;
-    const insumoExistente = insumos.find(insumo => insumo.NombreInsumos === formData.NombreInsumos && insumo.IdInsumos !== formData.IdInsumos);
-
+      };
+  
+      formData.NombreInsumos = formatNombreInsumo(formData.NombreInsumos);
+  
+      const response = await axios.get('http://localhost:5000/api/insumos');
+      const insumos = response.data;
+      const insumoExistente = insumos.find(insumo => insumo.NombreInsumos === formData.NombreInsumos && insumo.IdInsumos !== formData.IdInsumos);
+  
       if (insumoExistente) {
         window.Swal.fire({
           icon: "warning",
@@ -114,10 +117,9 @@ const Insumos = () => {
       if (confirmation.isConfirmed) {
         const formDataWithNumbers = new FormData();
         formDataWithNumbers.append("NombreInsumos", formData.NombreInsumos);
-        formDataWithNumbers.append("Imagen", formData.imagen); 
+        formDataWithNumbers.append("Imagen", formData.Imagen);
         formDataWithNumbers.append("Estado", formData.Estado);
         formDataWithNumbers.append("IdCategoria", formData.Idcategoria);
-
   
         const response = await axios.put(
           `http://localhost:5000/api/insumos/editar/${formData.IdInsumos}`,
@@ -138,44 +140,54 @@ const Insumos = () => {
       window.Swal.fire("Error", "Hubo un error al intentar actualizar el insumo", "error");
     }
   };
+  
 
   const handleToggleSwitch = async (id) => {
     const insumo = insumos.find(insumo => insumo.IdInsumos === id);
     if (!insumo) {
-        console.error('insumo no encontrada');
-        return;
+      console.error('Insumo no encontrado');
+      return;
     }
-
+  
     const newEstado = insumo.estado_insumo === 1 ? 0 : 1;
-
+  
     const result = await window.Swal.fire({
-        icon: 'warning',
-        title: '¿Estás seguro?',
-        text: '¿Quieres cambiar el estado del insumo?',
-        showCancelButton: true,
-        confirmButtonText: 'Sí',
-        cancelButtonText: 'Cancelar',
+      icon: 'warning',
+      title: '¿Estás seguro?',
+      text: '¿Quieres cambiar el estado del insumo?',
+      showCancelButton: true,
+      confirmButtonText: 'Sí',
+      cancelButtonText: 'Cancelar',
     });
-
+  
     if (result.isConfirmed) {
-        try {
-            await axios.put(`http://localhost:5000/api/insumos/editar/${id}`, { estado_insumo: newEstado });
-            fetchInsumos(); // Actualiza la lista de categorías después de la actualización
-            window.Swal.fire({
-                icon: 'success',
-                title: 'Estado actualizado',
-                text: 'El estado del insumo ha sido actualizado correctamente.',
-            });
-        } catch (error) {
-            console.error('Error al cambiar el estado del insumo:', error);
-            window.Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Hubo un error al cambiar el estado del insumo. Por favor, inténtalo de nuevo más tarde.',
-            });
+      try {
+        await axios.put(`http://localhost:5000/api/insumos/editar/${id}`, { estado_insumo: newEstado });
+        fetchInsumos(); // Actualiza la lista de insumos después de la actualización
+        window.Swal.fire({
+          icon: 'success',
+          title: 'Estado actualizado',
+          text: 'El estado del insumo ha sido actualizado correctamente.',
+        });
+      } catch (error) {
+        console.error('Error al cambiar el estado del insumo:', error);
+        
+        // Mostrar la alerta específica según el mensaje de error del backend
+        if (error.response && error.response.data && error.response.data.error) {
+          const errorMessage = error.response.data.error;
+          toast.error(errorMessage);
+        } else {
+          window.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un error al cambiar el estado del insumo. Por favor, inténtalo de nuevo más tarde.',
+          });
         }
+      }
     }
-};
+  };
+  
+  
   
   const handleChange = (name, value) => {
     setInsumoSeleccionado((prevInsumo) => ({
@@ -205,7 +217,8 @@ const Insumos = () => {
 
   return (
     <div className="container mx-auto p-4 relative">
-      <ModalInsumo
+
+      <ModalAgregarInsumo
         open={openModalAgregar}
         handleClose={handleCloseModalAgregar}
         onSubmit={handleSubmit}
@@ -227,7 +240,7 @@ const Insumos = () => {
         ]}
         onChange={handleChange}
       />
-      <ModalInsumo
+      <ModalAgregarInsumo
         open={openModalEditar}
         handleClose={handleCloseModalEditar}
         onSubmit={handleEditInsumo}
@@ -245,7 +258,7 @@ const Insumos = () => {
                 label: categoria.nombre_categoria,
               })),
           },
-          { name: "imagen", label: "Imagen", type: "file" },
+          { name: "Imagen", label: "Imagen", type: "file" },
         ]}
         onChange={handleChange}
         entityData={insumoSeleccionado}
@@ -283,7 +296,7 @@ const Insumos = () => {
           { field: "Cantidad", headerName: "CANTIDAD", width: "w-36" },
           {
             field: 'Precio_Servicio',
-            headerName: 'PRECIO UNIDAD',
+            headerName: 'PRECIO',
             width: 'w-36',
             renderCell: (params) => <div>{`${params.row.PrecioUnitario}`}</div>,
           },
@@ -293,18 +306,20 @@ const Insumos = () => {
             width: "w-36",
             readOnly: true,
             renderCell: (params) => (
-              <button
-                className={`px-3 py-1.5 text-white text-sm font-medium rounded-lg shadow-md focus:outline-none ${
-                  params.row.Estado === "Disponible"
-                    ? "bg-green-500"
-                    : "bg-red-500"
-                }`}
-                disabled 
-              >
-                {params.row.Estado}
-              </button>
-            ),
-          },         
+              <div>
+                {params.row.Estado === "Agotado" && (
+                  <span className="bg-red-100 text-red-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
+                    Agotado
+                  </span>
+                )}
+                {params.row.Estado === "Disponible" && (
+                  <span className="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
+                    Disponible
+                  </span>
+                )}
+              </div>
+            )
+          },
           {
             field: "Acciones",
             headerName: "ACCIONES",
@@ -323,7 +338,8 @@ const Insumos = () => {
                 />
               </div>
             ),
-          }          
+          }
+          
         ]}
         data={filtrar}
         title={'Gestion de insumos'}
