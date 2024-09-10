@@ -34,6 +34,7 @@
     "react": "^18.2.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.1",
+    "react-dropzone": "^14.2.3",
     "react-flagkit": "^2.0.4",
     "react-intersection-observer": "^9.13.0",
     "react-rnd": "^10.4.11",

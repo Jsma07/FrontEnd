@@ -3,8 +3,10 @@ import axios from 'axios';
 import { toast, ToastContainer } from "react-toastify";
 import Select, { components } from 'react-select';
 import Flag from "react-flagkit";
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     Nombre: '',
     Apellido: '',
@@ -13,7 +15,7 @@ function Register() {
     Documento: '',
     tipoDocumento: '',
     Contrasena: '',
-    Estado: 1,
+    Estado: 0,
     IdRol: 4
   });
 
@@ -142,12 +144,14 @@ const handleSubmit = async (e) => {
       return;
     }
 
-    const response = await axios.post("http://localhost:5000/Jackenail/RegistrarClientes", formData);
+    const response = await axios.post("http://localhost:5000/Jackenail/crearClientesedu", formData);
 
     toast.success("El cliente se ha registrado correctamente.", {
       position: "bottom-right",
       autoClose: 3000,
     });
+    navigate(`/VerificarCuenta`);
+
 
     setFormData({
       Nombre: '',

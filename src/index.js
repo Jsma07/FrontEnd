@@ -39,6 +39,7 @@ import SolicitarCita from "./components/consts/VIewClients/solicitarCita";
 import ListarCitas from "./components/consts/VIewClients/ListarCitas/ListarCitas";
 import Codigo from "./pages/Clientes/Codigo";
 import NuevaContrasena from "./pages/Clientes/nuevaContrasena"
+import VerificarCuenta from "./pages/Clientes/verificarCuenta";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -49,6 +50,7 @@ root.render(
           <Route path="/recuperarContrasena" element={<Contrasena />} />
           <Route path="/codigo" element={<Codigo />} />
           <Route path="/nuevaContrasena" element={<NuevaContrasena />} />
+          <Route path="/VerificarCuenta" element={<VerificarCuenta />}/>
 
           <Route path="/iniciarSesion" element={<Login />} />
           <Route path="/Registrar" element={<CrearCuenta />} />
