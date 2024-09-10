@@ -204,7 +204,7 @@ const SolicitarCita = () => {
         .catch((error) => {
           Swal.fire({
             title: "Error",
-            text: "Hubo un problema al confirmar tu cita. Inténtalo nuevamente.",
+            text: "Hubo un problema al confirmar tu cita. Esta hora puede ya estar ocupada por un Empleado.",
             icon: "error",
             confirmButtonText: "OK",
           });

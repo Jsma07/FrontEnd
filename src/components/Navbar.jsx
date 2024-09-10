@@ -25,6 +25,9 @@ import NotificationMenu from './NotificationMenu';  // Asegúrate de importar No
 import { motion } from 'framer-motion';
 import { NavbarItems } from './consts/navbarItems';
 import axios from 'axios';
+import ModalPerfil from '../components/consts/perfil'; // Ajusta la ruta si es necesario
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+
 
 const drawerWidth = 240;
 
@@ -104,6 +107,8 @@ export default function MiniDrawer() {
   const [notificaciones, setNotificaciones] = useState([]);  // Estado para las notificaciones
   const [unreadCount, setUnreadCount] = useState(0);  // Estado para el conteo de notificaciones no leídas
   const { user, permissions } = React.useContext(UserContext);
+  const { logout } = React.useContext(UserContext);
+
 
   React.useEffect(() => {
     const fetchNotificaciones = async () => {
@@ -143,6 +148,11 @@ export default function MiniDrawer() {
 
   const handleCloseNotifications = () => {
     setAnchorEl(null);  // Cierra el menú de notificaciones
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/iniciarSesion");
   };
 
 
