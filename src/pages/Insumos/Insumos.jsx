@@ -6,6 +6,8 @@ import ModalEditarInsumo from "../../components/consts/modalEditar";
 import CamposObligatorios from "../../components/consts/camposVacios";
 import handleAddInsumo from './agregarInsumo';
 import Fab from "@mui/material/Fab";
+import CustomSwitch from "../../components/consts/switch";
+
 
 const Insumos = () => {
   const [selectedRows, setSelectedRows] = useState([]);
@@ -137,6 +139,44 @@ const Insumos = () => {
       window.Swal.fire("Error", "Hubo un error al intentar actualizar el insumo", "error");
     }
   };
+
+  const handleToggleSwitch = async (id) => {
+    const insumo = insumos.find(insumo => insumo.IdInsumos === id);
+    if (!insumo) {
+        console.error('insumo no encontrada');
+        return;
+    }
+
+    const newEstado = insumo.estado_insumo === 1 ? 0 : 1;
+
+    const result = await window.Swal.fire({
+        icon: 'warning',
+        title: '¿Estás seguro?',
+        text: '¿Quieres cambiar el estado del insumo?',
+        showCancelButton: true,
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'Cancelar',
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await axios.put(`http://localhost:5000/api/insumos/editar/${id}`, { estado_insumo: newEstado });
+            fetchInsumos(); // Actualiza la lista de categorías después de la actualización
+            window.Swal.fire({
+                icon: 'success',
+                title: 'Estado actualizado',
+                text: 'El estado del insumo ha sido actualizado correctamente.',
+            });
+        } catch (error) {
+            console.error('Error al cambiar el estado del insumo:', error);
+            window.Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un error al cambiar el estado del insumo. Por favor, inténtalo de nuevo más tarde.',
+            });
+        }
+    }
+};
   
   const handleChange = (name, value) => {
     setInsumoSeleccionado((prevInsumo) => ({
@@ -287,9 +327,13 @@ const Insumos = () => {
                 >
                   <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
                 </button>
+                <CustomSwitch
+                  active={params.row.estado_insumo === 1}
+                  onToggle={() => handleToggleSwitch(params.row.IdInsumos)}
+                />
               </div>
             ),
-          },
+          }          
         ]}
         data={filtrar}
         title={'Gestion de insumos'}
