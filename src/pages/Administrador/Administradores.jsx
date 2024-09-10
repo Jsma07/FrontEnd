@@ -183,7 +183,6 @@ const Usuarios = () => {
     });
   };
 
-  //metodo para enviar la nueva contraseña a la api
   const handleSubmitPasswordChange = async (newPassword, confirmPassword) => {
     if (newPassword !== confirmPassword) {
       toast.error("Las contraseñas no coinciden.", {
