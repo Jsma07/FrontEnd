@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import NavbarClient from "./Navbarclient";
 import Footer from "./Footer";
+import Catalogo from "./contenido";
 
 const VistaInicial = () => {
   const [productos, setProductos] = useState([]);
+  const navigate = useNavigate();
+
+  const handleButtonClick = () => {
+    navigate('/Catalogo'); 
+  };
 
   const [headerRef, headerInView] = useInView({
     triggerOnce: true,
@@ -75,7 +82,7 @@ const VistaInicial = () => {
               para resaltar tu belleza y personalidad.
             </p>
             <br></br>
-            <button className="button" type="button">
+            <button className="button" type="button" onClick={handleButtonClick}>
               <p>
                 <i className="bx bxs-right-arrow-circle"></i> Ver servicios
               </p>

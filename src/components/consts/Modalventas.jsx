@@ -67,7 +67,7 @@ const ModalAdiciones = ({
                         <div className="flex items-center">
                           <img
                             className="w-20 h-20 rounded-full"
-                            src={`http://localhost:5000${adicion.Img}`}
+                            src={`https://back-bb2i.onrender.com/${adicion.Img}`}
                             alt={adicion.NombreAdiciones}
                           />
                           <div className="flex-1 min-w-0 ms-4">

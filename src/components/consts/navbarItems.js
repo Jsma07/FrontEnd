@@ -12,23 +12,22 @@ import StoreIcon from "@mui/icons-material/Store";
 import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import CategoryIcon from "@mui/icons-material/Category";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import HourglassDisabledIcon from "@mui/icons-material/HourglassDisabled";
 import AutoDeleteIcon from "@mui/icons-material/AutoDelete";
 
 export const NavbarItems = [
   {
     id: 0,
-    icon: <SettingsSuggestIcon />,
-    label: "Panel",
-    requiredPermissions: ["Configuracion"],
+    icon:<i class='bx bx-line-chart'  style={{fontSize:'27px'}} ></i>,
+    label: "Dashboard",
+    requiredPermissions: ["Usuarios", "Dashboard"],
     subitems: [
       {
-        label: "Dashboard",
+        label: "Gráficas",
         route: "/panel/dashboard",
         icon: (
-          <i className="bx bx-shield-quarter" style={{ fontSize: "24px" }}></i>
+          <i class='bx bxs-doughnut-chart' style={{ fontSize: "24px" }}></i>
         ),
-        requiredPermissions: ["Configuracion"],
+        requiredPermissions: ["Usuarios", "Dashboard"],
       },
     ],
   },
@@ -82,7 +81,7 @@ export const NavbarItems = [
     id: 3,
     icon: <Shopping />,
     label: "Ventas",
-    requiredPermissions: ["Ventas"],
+    requiredPermissions: ["Ventas", "SalidaInsumos"],
     subitems: [
       {
         label: "Ventas",
@@ -102,7 +101,7 @@ export const NavbarItems = [
     id: 4,
     icon: <BusinessIcon />,
     label: "Compras",
-    requiredPermissions: ["Compras"],
+    requiredPermissions: ["Compras", "Proveedores"],
     subitems: [
       {
         label: "Compras",
@@ -122,7 +121,7 @@ export const NavbarItems = [
     id: 5,
     icon: <Calendar />,
     label: "Agendamiento",
-    requiredPermissions: ["Agenda"],
+    requiredPermissions: ["Agenda", "Servicios", "Adiciones", "Horario"],
     subitems: [
       {
         label: "Agenda",
@@ -146,7 +145,7 @@ export const NavbarItems = [
         label: "No Disponibilidad",
         route: "/FechasTrabajadas",
         icon: <AutoDeleteIcon />,
-        requiredPermissions: ["Servicios"],
+        requiredPermissions: ["Horario"],
         // },{
         //   label: 'Inactivar Horas',
         //   route: '/InactivarHoras',
@@ -159,7 +158,7 @@ export const NavbarItems = [
     id: 6,
     icon: <InventoryIcon />,
     label: "Insumos",
-    requiredPermissions: ["Insumos"],
+    requiredPermissions: ["Insumos", "Categorias"],
     subitems: [
       {
         label: "Insumos",
@@ -175,4 +174,5 @@ export const NavbarItems = [
       },
     ],
   },
+ 
 ];
