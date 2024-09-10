@@ -45,7 +45,7 @@ const ListarAdiciones = () => {
           }}
         >
           <img
-            src={`http://localhost:5000/${params.row.Img}`}
+            src={`http://localhost:5000${params.row.Img}`}
             alt={params.row.NombreAdiciones}
             style={{
               maxWidth: "100%",

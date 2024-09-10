@@ -25,7 +25,7 @@ const NewPassword = () => {
         nuevaContrasena: newPassword
       });
 
-      if (response.data.mensaje === 'Contraseña actualizada correctamente') {
+      if (response.data.mensaje === 'Contraseña actualizada exitosamente') {
         navigate('/iniciarSesion'); // Redirigir al inicio de sesión después de cambiar la contraseña
       } else {
         setError(response.data.mensaje || 'Error al actualizar la contraseña');
