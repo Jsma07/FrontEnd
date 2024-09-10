@@ -14,7 +14,7 @@ const PieChart = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://back-bb2i.onrender.com/api/contarestadosAgenda'); 
+        const response = await fetch('http://localhost:5000/api/contarestadosAgenda'); 
         const result = await response.json();
         setData(result);
       } catch (error) {

@@ -54,7 +54,7 @@ const Clientes = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://back-bb2i.onrender.com/jackenail/Listar_Clientes"
+          "http://localhost:5000/jackenail/Listar_Clientes"
         );
         setClientes(response.data);
       } catch (error) {
@@ -143,7 +143,7 @@ const Clientes = () => {
 
         // Enviar los datos al backend
         const response = await axios.post(
-          "https://back-bb2i.onrender.com/Jackenail/RegistrarClientes", // Asegúrate de que la URL sea correcta
+          "ttp://localhost:5000/Jackenail/RegistrarClientes", // Asegúrate de que la URL sea correcta
           formDataNumerico
         );
 
@@ -229,7 +229,7 @@ const Clientes = () => {
       if (result.isConfirmed) {
         // Asegúrate de usar el ID correcto aquí
         await axios.put(
-          `https://back-bb2i.onrender.com/Jackenail/CambiarEstadocliente/${id}`,
+          `ttp://localhost:5000/Jackenail/CambiarEstadocliente/${id}`,
           {
             Estado: updatedCliente.Estado,
           }
@@ -298,7 +298,7 @@ const Clientes = () => {
         };
 
         // Verifica la URL y asegúrate de que IdCliente esté en la URL
-        const url = `https://back-bb2i.onrender.com/Jackenail/Actualizar/${formDataNumerico.IdCliente}`;
+        const url = `ttp://localhost:5000/Jackenail/Actualizar/${formDataNumerico.IdCliente}`;
         console.log("URL de solicitud:", url); // Agrega un log para depuración
 
         // Realizar la solicitud de actualización a la API utilizando axios.put
@@ -354,7 +354,7 @@ const Clientes = () => {
       });
 
       const response = await axios.put(
-        `https://back-bb2i.onrender.com/Jackenail/CambiarContrasena/${seleccionado.IdCliente}`,
+        `ttp://localhost:5000/Jackenail/CambiarContrasena/${seleccionado.IdCliente}`,
         {
           nuevaContrasena: newPassword,
         }

@@ -32,7 +32,7 @@ export const UserProvider = ({ children }) => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   
-      axios.get('https://back-bb2i.onrender.com/api/usuario')
+      axios.get('http://localhost:5000/api/usuario')
         .then(response => {
           console.log('Datos del usuario:', response.data);
           setUser(response.data.user);

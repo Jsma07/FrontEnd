@@ -56,7 +56,7 @@ const ModalAdiciones = ({
   const cambiarEstadoVenta = async (ventaId, nuevoEstado) => {
     try {
       const response = await axios.put(
-        `https://back-bb2i.onrender.com/Jackenail/CambiarEstado/${ventaId}`,
+        `http://localhost:5000/Jackenail/CambiarEstado/${ventaId}`,
         { Estado: nuevoEstado }
       );
       setVentas((prevVentas) =>
@@ -93,7 +93,7 @@ const ModalAdiciones = ({
     if (result.isConfirmed) {
       try {
         // Actualizar el total de la venta
-        await axios.put(`https://back-bb2i.onrender.com/Jackenail/Totales/${idVentas}`, {
+        await axios.put(`http://localhost:5000/Jackenail/Totales/${idVentas}`, {
           Subtotal: totalVenta,
           Descuento: 0,
           Total: totalConAdiciones,
@@ -104,7 +104,7 @@ const ModalAdiciones = ({
 
         // Guardar los detalles de la venta
         const response = await fetch(
-          "https://back-bb2i.onrender.com/Jackenail/Detalleregistrar",
+          "http://localhost:5000/Jackenail/Detalleregistrar",
           {
             method: "POST",
             headers: {

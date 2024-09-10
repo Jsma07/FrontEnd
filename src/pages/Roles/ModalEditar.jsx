@@ -24,7 +24,7 @@ const ModalEditar = ({ open, handleClose, roleId, setRoles }) => {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get("https://back-bb2i.onrender.com/api/roles");
+      const response = await axios.get("http://localhost:5000/api/roles");
       if (response.data && Array.isArray(response.data)) {
         const rolesWithPermissions = response.data.map((role) => ({
           ...role,
@@ -42,7 +42,7 @@ const ModalEditar = ({ open, handleClose, roleId, setRoles }) => {
 
   const fetchRoleData = async () => {
     try {
-      const response = await axios.get(`https://back-bb2i.onrender.com/api/rol/${roleId}`);
+      const response = await axios.get(`http://localhost:5000/api/rol/${roleId}`);
       if (response.data && response.data.rol) {
         const { nombre, permisos: permisosRol } = response.data.rol;
         setRol(nombre);
@@ -62,7 +62,7 @@ const ModalEditar = ({ open, handleClose, roleId, setRoles }) => {
 
   const fetchPermisos = async () => {
     try {
-      const response = await axios.get("https://back-bb2i.onrender.com/api/permisos");
+      const response = await axios.get("http://localhost:5000/api/permisos");
       if (response.data) {
         setPermisos(response.data);
       } else {
@@ -114,7 +114,7 @@ const ModalEditar = ({ open, handleClose, roleId, setRoles }) => {
 
     try {
       const response = await axios.put(
-        `https://back-bb2i.onrender.com/api/editarRol/${roleId}`,
+        `http://localhost:5000/api/editarRol/${roleId}`,
         {
           nombre: formData.nombre,
           permisos: permisosSeleccionados,

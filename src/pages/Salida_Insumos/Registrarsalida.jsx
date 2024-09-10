@@ -12,7 +12,7 @@ const SalidaInsumos = () => {
   useEffect(() => {
     const fetchInsumos = async () => {
       try {
-        const response = await axios.get("https://back-bb2i.onrender.com/api/insumos");
+        const response = await axios.get("http://localhost:5000/api/insumos");
         setInsumos(response.data);
       } catch (error) {
         console.error("Error al obtener los insumos:", error);

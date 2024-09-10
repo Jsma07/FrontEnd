@@ -47,7 +47,7 @@ const Ventas = () => {
     const fetchVentas = async () => {
       try {
         const response = await axios.get(
-          "https://back-bb2i.onrender.com/Jackenail/Listarventas"
+          "http://localhost:5000/Jackenail/Listarventas"
         );
 
         // Función para formatear la fecha para mostrar
@@ -208,7 +208,7 @@ const Ventas = () => {
     const fetchAdiciones = async () => {
       try {
         const response = await axios.get(
-          "https://back-bb2i.onrender.com/Jackenail/Listarventas/adiciones"
+          "http://localhost:5000/Jackenail/Listarventas/adiciones"
         );
         setAdiciones(response.data);
       } catch (error) {
@@ -222,7 +222,7 @@ const Ventas = () => {
   const cambiarEstadoVenta = async (ventaId, nuevoEstado) => {
     try {
       const response = await axios.put(
-        `https://back-bb2i.onrender.com/Jackenail/CambiarEstado/${ventaId}`,
+        `http://localhost:5000/Jackenail/CambiarEstado/${ventaId}`,
         { Estado: nuevoEstado }
       );
       // Actualizar el estado local de la venta
@@ -269,7 +269,7 @@ const Ventas = () => {
   const handleAnularVenta = async (ventaId) => {
     try {
       const response = await axios.put(
-        `https://back-bb2i.onrender.com/Jackenail/CambiarEstado/${ventaId}`,
+        `http://localhost:5000/Jackenail/CambiarEstado/${ventaId}`,
         { Estado: 3 }
       );
 

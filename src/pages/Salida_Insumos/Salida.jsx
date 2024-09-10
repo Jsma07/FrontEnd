@@ -29,7 +29,7 @@ const Salida = () => {
   useEffect(() => {
     const fetchSalidas = async () => {
       try {
-        const response = await axios.get("https://back-bb2i.onrender.com/ListarSalidas");
+        const response = await axios.get("http://localhost:5000/ListarSalidas");
         const salidasConDetalles = response.data.map((salida) => {
           let estadoButton;
           if (salida.Estado === "Terminado") {
@@ -62,7 +62,7 @@ const Salida = () => {
             idInsumo: (
               <div>
                 <img
-                  src={`http://localhost:5000${salida.insumo.Imagen}`}
+                  src={`http://localhost:5000/${salida.insumo.Imagen}`}
                   alt={salida.insumo.NombreInsumos}
                   style={{
                     maxWidth: "3rem",
@@ -126,13 +126,13 @@ const Salida = () => {
         try {
           // Anula la salida
           await axios.patch(
-            `https://back-bb2i.onrender.com/salidas/${salida.IdSalida}`,
+            `http://localhost:5000/salidas/${salida.IdSalida}`,
             { nuevoEstado: "Anulado" }
           );
 
           // Restaura la cantidad en los insumos
           await axios.put(
-            `https://back-bb2i.onrender.com/api/existenciainsumos/editar/${salida.insumo.IdInsumos}`,
+            `http://localhost:5000/api/existenciainsumos/editar/${salida.insumo.IdInsumos}`,
             { Cantidad: salida.insumo.Cantidad + salida.Cantidad }
           );
 
@@ -250,7 +250,7 @@ const Salida = () => {
               >
                 <div className="relative">
                   <img
-                    src={`http://localhost:5000${detalleSalida.insumo?.Imagen}`}
+                    src={`http://localhost:5000/${detalleSalida.insumo?.Imagen}`}
                     alt={
                       detalleSalida.insumo?.NombreInsumos || "Imagen del insumo"
                     }

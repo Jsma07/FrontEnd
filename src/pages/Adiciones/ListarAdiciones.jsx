@@ -13,7 +13,7 @@ const ListarAdiciones = () => {
   const fetchAdiciones = async () => {
     try {
       const response = await axios.get(
-        "https://back-bb2i.onrender.com/Jackenail/Listarventas/adiciones"
+        "http://localhost:5000/Jackenail/Listarventas/adiciones"
       );
       setAdiciones(response.data);
     } catch (error) {
@@ -45,7 +45,7 @@ const ListarAdiciones = () => {
           }}
         >
           <img
-            src={`http://localhost:5000${params.row.Img}`}
+            src={`http://localhost:5000/${params.row.Img}`}
             alt={params.row.NombreAdiciones}
             style={{
               maxWidth: "100%",
@@ -110,7 +110,7 @@ const ListarAdiciones = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .put(`https://back-bb2i.onrender.com/Jackenail/CambiaEstado/${adicionId}`, {
+          .put(`http://localhost:5000/Jackenail/CambiaEstado/${adicionId}`, {
             Estado: nuevoEstado,
           })
           .then((response) => {
