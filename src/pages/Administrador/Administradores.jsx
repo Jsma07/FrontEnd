@@ -125,7 +125,7 @@ const Usuarios = () => {
         });
         setUsers(updatedUsers);
         toast.success("El estado del usuario fue cambiado exitosamente.", {
-          position: "top-right",
+          position: "bottom-right",
           autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
       }
