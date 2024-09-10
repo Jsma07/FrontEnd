@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Table from "../../components/consts/Tabla";
-import ModalAgregarInsumo from "../../components/consts/modal";
-import ModalEditarInsumo from "../../components/consts/modalEditar";
+import ModalInsumo from "../../components/consts/modal";
 import CamposObligatorios from "../../components/consts/camposVacios";
 import handleAddInsumo from './agregarInsumo';
 import Fab from "@mui/material/Fab";
@@ -66,7 +65,7 @@ const Insumos = () => {
 
   const handleEditInsumo = async (formData) => {
     try {
-      const camposObligatorios = ["NombreInsumos","Imagen","Idcategoria"];
+      const camposObligatorios = ["NombreInsumos","imagen","Idcategoria"];
 
       if (
         !CamposObligatorios(
@@ -113,7 +112,7 @@ const Insumos = () => {
       if (confirmation.isConfirmed) {
         const formDataWithNumbers = new FormData();
         formDataWithNumbers.append("NombreInsumos", formData.NombreInsumos);
-        formDataWithNumbers.append("Imagen", formData.Imagen); 
+        formDataWithNumbers.append("Imagen", formData.imagen); 
         formDataWithNumbers.append("Estado", formData.Estado);
         formDataWithNumbers.append("IdCategoria", formData.Idcategoria);
 
@@ -166,8 +165,7 @@ const Insumos = () => {
 
   return (
     <div className="container mx-auto p-4 relative">
-
-      <ModalAgregarInsumo
+      <ModalInsumo
         open={openModalAgregar}
         handleClose={handleCloseModalAgregar}
         onSubmit={handleSubmit}
@@ -189,18 +187,12 @@ const Insumos = () => {
         ]}
         onChange={handleChange}
       />
-      <ModalEditarInsumo
+      <ModalInsumo
         open={openModalEditar}
         handleClose={handleCloseModalEditar}
         onSubmit={handleEditInsumo}
         title="Editar Insumo"
         fields={[
-          {
-            name: "IdInsumos",
-            label: "Identificador",
-            type: "number",
-            readOnly: true,
-          },
           { name: "NombreInsumos", label: "Nombre insumo", type: "text" },
           {
             name: "Idcategoria",
@@ -213,7 +205,7 @@ const Insumos = () => {
                 label: categoria.nombre_categoria,
               })),
           },
-          { name: "Imagen", label: "Imagen", type: "file" },
+          { name: "imagen", label: "Imagen", type: "file" },
         ]}
         onChange={handleChange}
         entityData={insumoSeleccionado}
@@ -251,7 +243,7 @@ const Insumos = () => {
           { field: "Cantidad", headerName: "CANTIDAD", width: "w-36" },
           {
             field: 'Precio_Servicio',
-            headerName: 'PRECIO',
+            headerName: 'PRECIO UNIDAD',
             width: 'w-36',
             renderCell: (params) => <div>{`${params.row.PrecioUnitario}`}</div>,
           },
@@ -261,20 +253,18 @@ const Insumos = () => {
             width: "w-36",
             readOnly: true,
             renderCell: (params) => (
-              <div>
-                {params.row.Estado === "Agotado" && (
-                  <span className="bg-red-100 text-red-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
-                    Agotado
-                  </span>
-                )}
-                {params.row.Estado === "Disponible" && (
-                  <span className="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
-                    Disponible
-                  </span>
-                )}
-              </div>
-            )
-          },
+              <button
+                className={`px-3 py-1.5 text-white text-sm font-medium rounded-lg shadow-md focus:outline-none ${
+                  params.row.Estado === "Disponible"
+                    ? "bg-green-500"
+                    : "bg-red-500"
+                }`}
+                disabled 
+              >
+                {params.row.Estado}
+              </button>
+            ),
+          },         
           {
             field: "Acciones",
             headerName: "ACCIONES",

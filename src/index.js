@@ -29,6 +29,9 @@ import { UserProvider } from "./context/ContextoUsuario";
 import CrearCita from "./pages/Agendamiento/CrearCita";
 import FechasTrabajo from './pages/Agendamiento/FechaTrabajo';
 import Panel from './pages/Panel/dashboard';
+import Cambiarcontraseña from "./components/consts/Cambiarcontraseña";
+import Verificacion from "./components/consts/VerificarCliente ";
+
 // import InactivarHoras from "./pages/Agendamiento/InactivarHoras";
 import Contrasena from "./components/consts/recuperarContrasena";
 import PrivateRoute from "./context/verificarSesion";
@@ -51,6 +54,9 @@ root.render(
           <Route path="/Registrar" element={<CrearCuenta />} />
           <Route path="/Catalogo" element={<Contendioitems />} />
           <Route path="/vistaInicio" element={<VistaInicial />} />
+          <Route path="/Verificacion" element={<Verificacion />}/>
+          <Route path="/cambiarContrasena/:idCliente" element={<Cambiarcontraseña />}/>
+          
           <Route path="/solicitarCita" element={
             <PrivateRoute requiredPermissions={["AgendaCliente"]}>
             <SolicitarCita />

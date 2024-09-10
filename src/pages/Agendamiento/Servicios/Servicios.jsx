@@ -359,18 +359,12 @@ const Servicios = () => {
         onChange={handleChange}
       />
 
-      <ModalEditarServicio
+      <ModalAgregarServicio
         open={openModalEditar}
         handleClose={handleCloseModalEditar}
         onSubmit={handleEditServicio}
         title="Editar Servicio"
         fields={[
-          {
-            name: "IdServicio",
-            label: "Identificador",
-            type: "number",
-            readOnly: true,
-          },
           { name: "Nombre_Servicio", label: "Nombre", type: "text" },
           {
       name: "Tiempo_Servicio",
