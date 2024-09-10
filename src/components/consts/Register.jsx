@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from "react-toastify";
+import Select, { components } from 'react-select';
+import Flag from "react-flagkit";
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     Nombre: '',
     Apellido: '',
@@ -11,10 +15,15 @@ function Register() {
     Documento: '',
     tipoDocumento: '',
     Contrasena: '',
-    Estado: 1,
+    Estado: 0,
     IdRol: 4
   });
 
+  const handleSelectChange = (selectedOption) => {
+    handleChange({
+      target: { name: 'tipoDocumento', value: selectedOption.value },
+    });
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -23,7 +32,26 @@ function Register() {
     });
   };
 
+  const options = [
+    { value: 'C.C', label: 'Cédula de Ciudadanía (C.C)', icon: <Flag country="CO"  /> },
+    { value: 'C.E', label: 'Cédula de extranjería (C.E)', icon:<span role="img" aria-label="Globe">🌍</span> }, // Cambia el código de la bandera según corresponda
+  ];
 
+  const customSingleValue = ({ data }) => (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      {data.icon}
+      <span style={{ marginLeft: 8 }}>{data.label}</span>
+    </div>
+  );
+  
+  const customOption = (props) => (
+    <components.Option {...props}>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {props.data.icon}
+        <span style={{ marginLeft: 8 }}>{props.data.label}</span>
+      </div>
+    </components.Option>
+  );
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -116,12 +144,14 @@ const handleSubmit = async (e) => {
       return;
     }
 
-    const response = await axios.post("http://localhost:5000/Jackenail/RegistrarClientes", formData);
+    const response = await axios.post("http://localhost:5000/Jackenail/crearClientesedu", formData);
 
     toast.success("El cliente se ha registrado correctamente.", {
       position: "bottom-right",
       autoClose: 3000,
     });
+    navigate(`/VerificarCuenta`);
+
 
     setFormData({
       Nombre: '',
@@ -170,111 +200,172 @@ const handleSubmit = async (e) => {
 };
 
 
-  return (
-   
-    <div className="bg-pink-900 absolute top-0 left-0 bg-gradient-to-b from-gray-900 via-gray-900 to-purple-800 bottom-0 leading-5 h-full w-full overflow-hidden">
-      <div className="relative min-h-screen sm:flex sm:flex-row justify-center bg-transparent rounded-3xl shadow-xl">
-        <div className="absolute top-0 left-0 p-4">
-          <img src="/jacke.png" alt="Logo" className="h-16 rounded-full" />
+return (
+  <div
+    style={{
+      backgroundImage: "url('/fondo3.jpg')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}
+    className="bg-purple-900 absolute top-0 left-0 bg-gradient-to-b from-gray-900 via-gray-900 to-purple-800 bottom-0 leading-5 h-full w-full overflow-hidden"
+  >
+    <div className="relative min-h-screen sm:flex sm:flex-row justify-center bg-transparent rounded-3xl shadow-xl">
+      <div className="absolute top-0 left-0 p-4">
+        <img src="/jacke.png" alt="Logo" className="h-24 rounded-full" />
+      </div>
+      <div className="flex-col flex self-center lg:px-14 sm:max-w-4xl xl:max-w-md z-10">
+        <div className="self-start hidden lg:flex flex-col text-gray-900">
+          <h1 className="my-7 font-semibold text-4xl">Jake Nails</h1>
+          <p className="pr-3 text-sm opacity-75">
+           Bienvenid@ a Jake nail, aquí podrás agendar varios de nuestros servicios de manicure.
+          </p>
         </div>
-        <div className="flex-col flex self-center lg:px-14 sm:max-w-4xl xl:max-w-md z-10">
-          <div className="self-start hidden lg:flex flex-col text-gray-300">
-            <h1 className="my-7 font-semibold text-4xl">Jake Nails</h1>
-            <p className="pr-3 text-sm opacity-75">Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups</p>
+      </div>
+      <div className="flex justify-center self-center z-10">
+        <div
+          style={{
+            borderRadius: "25px",
+            boxShadow: "0 15px 25px rgba(0, 0, 0, 0.4)",
+            backgroundColor: "#F2EBFF",
+            border: "0.1px solid gray",
+          }}
+          className="p-12 bg-white mx-auto rounded-3xl w-96"
+        >
+          <div className="mb-7 text-center">
+            <h3 className="font-semibold text-2xl text-gray-800">Regístrate</h3>
           </div>
-        </div>
-        <div className="flex justify-center self-center z-10">
-          <div className="p-12 bg-white mx-auto rounded-3xl w-96">
-            <div className="mb-7 text-center">
-              <h3 className="font-semibold text-2xl text-gray-800">Regístrate</h3>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="flex items-center gap-2">
+              <i className="bx bx-id-card text-xl"></i>
+              <Select
+                  name="tipoDocumento"
+                  value={options.find(option => option.value === formData.tipoDocumento)}
+                  onChange={handleSelectChange}
+                  options={options}
+                  components={{ Option: customOption, SingleValue: customSingleValue }}
+                  className="w-full text-sm"
+                  placeholder="Tipo de documento"
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      borderRadius: '20px',
+                      border: '1px solid gray',
+                    }),
+                    
+                  }}
+      isSearchable={false} // Evita la búsqueda y entrada de texto
+
+                  
+                />
             </div>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <select
-                name="tipoDocumento"
-                value={formData.tipoDocumento}
-                onChange={handleChange}
-                className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
-              >
-                <option value="" disabled>Tipo de documento</option>
-                <option value="C.C">Cédula de ciudadania</option>
-                <option value="C.E">Cédula de extranjeria</option>
-                {/* Añade más opciones según tus necesidades */}
-              </select>
+            <div className="flex items-center gap-2">
+              <i className="bx bx-card text-xl"></i>
               <input
+                style={{ borderRadius: "20px" }}
                 name="Documento"
                 value={formData.Documento}
                 onChange={handleChange}
-                className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+                className="w-full text-sm px-4 py-3 bg-white border border-gray-500 rounded-lg focus:outline-none focus:border-purple-400"
                 type="text"
-                placeholder="Número de documento: "
+                placeholder="Número de documento"
               />
-              <div className="grid grid-cols-2 gap-4">
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-2">
+                <i className="bx bx-user text-xl"></i>
                 <input
+                  style={{ borderRadius: "20px" }}
                   name="Nombre"
                   value={formData.Nombre}
                   onChange={handleChange}
-                  className="text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+                  className="w-full text-sm px-4 py-3 bg-white border border-gray-500 rounded-lg focus:outline-none focus:border-purple-400"
                   type="text"
-                  placeholder="Nombre:"
+                  placeholder="Nombre"
                 />
+              </div>
+              <div className="flex items-center gap-2">
+                <i className="bx bx-user text-xl"></i>
                 <input
+                  style={{ borderRadius: "20px" }}
                   name="Apellido"
                   value={formData.Apellido}
                   onChange={handleChange}
-                  className="text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+                  className="w-full text-sm px-4 py-3 bg-white border border-gray-500 rounded-lg focus:outline-none focus:border-purple-400"
                   type="text"
-                  placeholder="Apellido:"
+                  placeholder="Apellido"
                 />
               </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <i className="bx bx-phone text-xl"></i>
               <input
+                style={{ borderRadius: "20px" }}
                 name="Telefono"
                 value={formData.Telefono}
                 onChange={handleChange}
-                className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+                className="w-full text-sm px-4 py-3 bg-white border border-gray-500 rounded-lg focus:outline-none focus:border-purple-400"
                 type="text"
-                placeholder="Telefono: "
+                placeholder="Teléfono"
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <i className="bx bx-envelope text-xl"></i>
               <input
+                style={{ borderRadius: "20px" }}
                 name="Correo"
                 value={formData.Correo}
                 onChange={handleChange}
-                className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+                className="w-full text-sm px-4 py-3 bg-white border border-gray-500 rounded-lg focus:outline-none focus:border-purple-400"
                 type="email"
-                placeholder="Correo Electrónico: "
+                placeholder="Correo Electrónico"
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <i className="bx bx-lock text-xl"></i>
               <input
+                style={{ borderRadius: "20px" }}
                 name="Contrasena"
                 value={formData.Contrasena}
                 onChange={handleChange}
-                className="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+                className="w-full text-sm px-4 py-3 bg-white border border-gray-500 rounded-lg focus:outline-none focus:border-purple-400"
                 type="password"
-                placeholder="Contraseña:"
+                placeholder="Contraseña"
               />
-              <button
-                type="submit"
-                className="w-full flex justify-center bg-purple-800 hover:bg-purple-700 text-gray-100 p-3 rounded-lg tracking-wide font-semibold cursor-pointer transition ease-in duration-500"
+            </div>
+            <button
+              style={{ borderRadius: "20px" }}
+              type="submit"
+              className="w-full flex justify-center bg-blue-500 hover:bg-blue-700 text-gray-100 p-3 rounded-lg tracking-wide font-semibold cursor-pointer transition ease-in duration-500"
+            >
+              Registrarse
+            </button>
+            <p className="text-gray-400 text-center">
+              ¿Ya tienes una cuenta?{" "}
+              <a
+                href="/iniciarSesion"
+                className="text-sm text-blue-700 hover:text-purple-700"
               >
-                Registrarse
-              </button>
-              <p className="text-gray-400 text-center">¿Ya tienes una cuenta? <a href="/iniciarSesion" className="text-sm text-purple-700 hover:text-purple-700">Inicia sesión</a></p>
-            </form>
-            <ToastContainer
-    position="bottom-right"
-    autoClose={5000}
-    hideProgressBar={false}
-    newestOnTop={false}
-    closeOnClick
-    rtl={false}
-    pauseOnFocusLoss
-    draggable
-    pauseOnHover
-  />
-          </div>
+                Inicia sesión
+              </a>
+            </p>
+          </form>
+          <ToastContainer
+            position="bottom-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
         </div>
       </div>
     </div>
-    
-  );
+  </div>
+);
+
 }
 
 export default Register;

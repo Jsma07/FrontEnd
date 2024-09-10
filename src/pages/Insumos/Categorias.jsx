@@ -1,48 +1,60 @@
-import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import { toast } from "react-toastify";
+import React, { useState, useEffect } from "react";
 import CustomSwitch from "../../components/consts/switch";
-import Table from "../../components/consts/Tabla";
-import ModalAgregarCategoria from "../../components/consts/modal";
-import ModalEditarCategoria from "../../components/consts/modalEditar";
+import ModalCategoria from "../../components/consts/modalCategorias";
 import CamposObligatorios from "../../components/consts/camposVacios";
-import Fab from '@mui/material/Fab';
+import {Container,Typography,Card,CardContent,Fab,Tooltip,Box,Avatar,Input,Pagination,CardActionArea,IconButton, Dialog,
+  DialogTitle, DialogContent, DialogContentText, DialogActions,Button} from "@mui/material";
+import { motion } from "framer-motion";
 
 const Categorias = () => {
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedCategoria, setSelectedCategoria] = useState(null);
   const [selectedRows, setSelectedRows] = useState([]);
   const [openModalAgregar, setOpenModalAgregar] = useState(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [categorias, setCategorias] = useState([]);
+  const [insumos, setInsumos] = useState([]);
   const [categoriaSeleccionado, setCategoriaSeleccionado] = useState(null);
-  const [buscar, setBuscar] = useState('')
+  const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const cardsPerPage = 6;
 
   useEffect(() => {
+    fetchInsumos();
     fetchCategorias();
   }, []);
 
   const fetchCategorias = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/categorias');
-      setCategorias(response.data);
+      const categoriasWithColors = response.data.map((categoria) => ({
+        ...categoria,
+        color: getRandomColor(),
+      }));
+      setCategorias(categoriasWithColors);
+      toast.success("Categorias cargadas exitosamente");
     } catch (error) {
       console.error('Error fetching categorias:', error);
     }
   };
 
-  const filtrar = categorias.filter(categoria =>{
-    const {nombre_categoria, IdCategoria} = categoria
-    const terminoABuscar = buscar.toLowerCase();
-    const IdCategoriaString = IdCategoria.toString(); 
-    return(
-      nombre_categoria.toLowerCase().includes(terminoABuscar) ||
-      IdCategoriaString.includes(terminoABuscar) 
-    )
-  })
-
+  const fetchInsumos = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/insumos');
+      setInsumos(response.data);
+    } catch (error) {
+      console.error('Error al obtener los insumos:', error);
+      toast.error('Error al obtener los insumos.');
+    }
+  };
+  
   const handleAddCategoria = async (formData) => {
     try {
-      const { nombre_categoria } = formData;
+      const { nombre_categoria, descripcion_categoria } = formData;
   
-      const camposObligatorios = ['nombre_categoria'];
+      const camposObligatorios = ['nombre_categoria', 'descripcion_categoria'];
       if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos de la categoría.')) {
         return;
       }
@@ -85,7 +97,7 @@ const Categorias = () => {
   
   const handleEditCategoria = async (formData) => {
     try {
-        const camposObligatorios = ['nombre_categoria'];
+        const camposObligatorios = ['nombre_categoria', 'descripcion_categoria'];
 
         if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos de la categoría.')) {
             return;
@@ -114,6 +126,7 @@ const Categorias = () => {
         }
 
         await axios.put(`http://localhost:5000/api/categorias/editar/${formData.IdCategoria}`, formData);
+        console.log('Datos a enviar:', formData);
         handleCloseModalEditar();
         fetchCategorias();
         window.Swal.fire('¡Categoría actualizada!', '', 'success');
@@ -130,11 +143,19 @@ const Categorias = () => {
     }));
   };
 
-const handleToggleSwitch = async (id) => {
+  const handleToggleSwitch = async (id) => {
     const categoria = categorias.find(categoria => categoria.IdCategoria === id);
     if (!categoria) {
         console.error('Categoría no encontrada');
         return;
+    }
+
+    // Verificar si hay algún insumo relacionado con esta categoría
+    const estaRelacionadoConInsumo = insumos.some(insumo => insumo.Idcategoria === id);
+
+    if (estaRelacionadoConInsumo) {
+        toast.error('No se puede inactivar esta categoría porque está relacionada con un insumo.');
+        return; // Detener el proceso si está relacionada
     }
 
     const newEstado = categoria.estado_categoria === 1 ? 0 : 1;
@@ -151,7 +172,7 @@ const handleToggleSwitch = async (id) => {
     if (result.isConfirmed) {
         try {
             await axios.put(`http://localhost:5000/api/categorias/editar/${id}`, { estado_categoria: newEstado });
-            fetchCategorias(); // Actualiza la lista de categorías después de la actualización
+            fetchCategorias(); 
             window.Swal.fire({
                 icon: 'success',
                 title: 'Estado actualizado',
@@ -178,65 +199,266 @@ const handleToggleSwitch = async (id) => {
     setCategoriaSeleccionado(null);
   };
 
+  const handleOpenDialog = (categoria) => {
+    setSelectedCategoria(categoria);
+    setOpenDialog(true);
+  };
+
+  // Función para manejar el cierre del diálogo
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedCategoria(null);
+  };
+
+
   const handleEditClick = (categoria) => {
     setCategoriaSeleccionado(categoria);
     setOpenModalEditar(true);
   };
 
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    setPage(1);
+  };
+
+  // Filtrar categorías según el término de búsqueda
+  const filteredCategorias = categorias.filter((categoria) =>
+    categoria.nombre_categoria.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  // Calcular categorías de la página actual
+  const indexOfLastCard = page * cardsPerPage;
+  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
+  const currentCategorias = filteredCategorias.slice(indexOfFirstCard, indexOfLastCard);
+
+  // Cambiar de página
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const getRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+  
 return (
   <div>
-      <ModalAgregarCategoria
+    <Container>
+      <ModalCategoria
         open={openModalAgregar}
         handleClose={handleCloseModalAgregar}
         onSubmit={handleAddCategoria}
-        title="Crear Nueva Categoria De Insumos"
+        title="Crear Categoría"
         fields={[
-          { name: 'nombre_categoria', label: 'Nombre', type: 'text' },
+          { name: 'nombre_categoria', label: 'Nombre Categoría', type: 'text' },
+          { name: 'descripcion_categoria', label: 'Descripción Categoría', type: 'textarea', rows: 4 }, // Ajusta el número de filas según sea necesario
         ]}
+        entityData={categoriaSeleccionado || {}}
         onChange={handleChange}
       />
 
-      <ModalEditarCategoria
+      <ModalCategoria
         open={openModalEditar}
         handleClose={handleCloseModalEditar}
         onSubmit={handleEditCategoria}
-        title="Editar Categoria De Insumos"
+        title="Editar Categoría"
         fields={[
-          { name: 'IdCategoria', label: 'Identificador', type: 'number', readOnly: true }, 
-          { name: 'nombre_categoria', label: 'Nombre', type: 'text' },
+          { name: 'nombre_categoria', label: 'Nombre Categoría', type: 'text' },
+          { name: 'descripcion_categoria', label: 'Descripción Categoría', type: 'textarea', rows: 4 }, // Ajusta el número de filas según sea necesario
         ]}
+        entityData={categoriaSeleccionado || {}}
         onChange={handleChange}
-        entityData={categoriaSeleccionado} 
       />
 
-      <Table
-        columns={[
-          { field: 'IdCategoria', headerName: 'ID', width: 'w-16' },
-          { field: 'nombre_categoria', headerName: 'NOMBRE CATEGORIA', width: 'w-36' },
-          {
-            field: 'Acciones',
-            headerName: 'ACCIONES',
-            width: 'w-48',
-            renderCell: (params) => (
-              <div className="flex justify-center space-x-4">
-                {params.row.estado_categoria === 1 && (
-                <button onClick={() => handleEditClick(params.row)} className="text-yellow-500">
-                  <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
-                </button>
-              )}
-              <CustomSwitch
-                active={params.row.estado_categoria === 1}
-                onToggle={() => handleToggleSwitch(params.row.IdCategoria)}
-              />
+    </Container>
+
+    <div
+      style={{
+        paddingTop: "5px",
+        margin: "0 auto",
+        borderRadius: "40px",
+        marginTop: "20px",
+        boxShadow: "0 4px 12px rgba(128, 0, 128, 0.1)",
+        position: "fixed",
+        left: "90px",
+        top: "80px",
+        width: "calc(100% - 100px)",
+      }}
+    >
+      <div className="bg-white rounded-lg shadow-md p-8">
+        <div className="flex justify-between items-center mb-4">
+          <h4
+            style={{ textAlign: "left", fontSize: "23px", fontWeight: "bold" }}
+            className="text-3xl"
+          >
+            Gestión de Categorías
+          </h4>
+          <div className="relative w-80">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg
+                className="w-5 h-5 text-gray-500"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                />
+              </svg>
             </div>
-               
-            ),
-          },
-        ]}
-        data={filtrar}
-        title="Gestion de Categorias"
 
-      />
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Buscar categoría"
+              aria-label="Buscar"
+            />
+          </div>
+        </div>
+        <>
+        <Box display="grid" gridTemplateColumns="repeat(3, 1fr)" gap={2} mb={2}>
+        {currentCategorias.map((categoria) => (
+          <motion.div
+            key={categoria.IdCategoria}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            whileTap={{ scale: 1.0 }}
+          >
+            <Card sx={{ backgroundColor: "#eff5f9", borderRadius: 2, width: '100%' }}>
+              <CardContent sx={{ height: 115, paddingBottom: '8px !important' }}>
+                <Box display="flex" alignItems="center" justifyContent="center" mb={1}>
+                  <Avatar sx={{ backgroundColor: categoria.color, marginRight: 2 }}>
+                    {categoria.nombre_categoria.charAt(0).toUpperCase()}
+                  </Avatar>
+                  <Box textAlign="center" flexGrow={1}>
+                    <CardActionArea onClick={() => handleOpenDialog(categoria)}>
+                      <Typography variant="h6" component="div">
+                        {categoria.nombre_categoria}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          display: "-webkit-box",
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          WebkitLineClamp: 1,
+                          mb: 1,
+                        }}
+                      >
+                        {categoria.descripcion_categoria}
+                      </Typography>
+                    </CardActionArea>
+                    <Typography variant="body2" sx={{ mb: 0, mt: 1 }}>
+                      <span
+                        className={`text-sm font-medium me-2 px-2.5 py-0.5 rounded 
+                          ${categoria.estado_categoria === 1
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}`}
+                      >
+                        {categoria.estado_categoria === 1 ? "Activo" : "Inactivo"}
+                      </span>
+                    </Typography>
+                  </Box>
+                  <Box display="flex" alignItems="center" ml={2}>
+                    {/* Condición para mostrar el botón de edición solo si la categoría está activa */}
+                    {categoria.estado_categoria === 1 && (
+                      <IconButton
+                        aria-label="edit"
+                        onClick={() => handleEditClick(categoria)}
+                        sx={{
+                          backgroundColor: "#ffffff",
+                          "&:hover": {
+                            backgroundColor: "#f3ecde",
+                          },
+                          borderRadius: "50%",
+                          padding: 1,
+                        }}
+                      >
+                        <i className="bx bx-edit" style={{ fontSize: "24px", color: "#ff9800" }}></i>
+                      </IconButton>
+                    )}
+                    <CustomSwitch
+                      active={categoria.estado_categoria === 1}
+                      onToggle={() => handleToggleSwitch(categoria.IdCategoria)}
+                    />
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </Box>
+
+      <Box display="flex" justifyContent="center" mb={2}>
+        <Pagination
+          count={Math.ceil(filteredCategorias.length / cardsPerPage)}
+          page={page}
+          onChange={handleChangePage}
+          color="primary"
+        />
+      </Box>
+
+      <Dialog 
+        open={openDialog} 
+        onClose={handleCloseDialog}
+        PaperProps={{
+          sx: { 
+            padding: 3, 
+            borderRadius: 3,
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)"
+          }
+        }}
+      >
+        <DialogTitle 
+          sx={{ 
+            fontWeight: 'bold', 
+            color: '#3f51b5', 
+            borderBottom: '1px solid #e0e0e0', 
+            marginBottom: 2 
+          }}
+        >
+          Descripción de la Categoría
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText 
+            sx={{ 
+              fontSize: '1rem', 
+              lineHeight: 1.6, 
+              color: '#333', 
+              marginBottom: 2 
+            }}
+          >
+            {selectedCategoria && selectedCategoria.descripcion_categoria}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+        <Button
+            onClick={handleCloseDialog}
+            color="secondary"
+            variant="contained"
+            style={{ marginRight: "1rem", borderRadius: '8px' }}
+          >
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+    </>
+      </div>
+    </div>
+
       <Fab
         aria-label="add"
         style={{

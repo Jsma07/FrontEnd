@@ -108,7 +108,7 @@ const ModalInsumos = ({
                     <div className="flex items-center">
                       <img
                         className="w-20 h-20 rounded-full"
-                        src={`http://localhost:5000${insumo.imagen}`}
+                        src={`http://localhost:5000/${insumo.imagen}`}
                         alt={insumo.NombreInsumos}
                       />
                       <div className="flex-1 min-w-0 ms-4">

@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
-import * as Swal from 'sweetalert2';
-import Table from "../../components/consts/Tabla";
 import Fab from '@mui/material/Fab';
-import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import * as Swal from 'sweetalert2';
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { Avatar, DataGrid } from '@mui/material'; 
+import Table from "../../components/consts/Tabla";
+import React, { useState, useEffect } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
+import PersonIcon from '@mui/icons-material/Person';
+import BusinessIcon from '@mui/icons-material/Business'; 
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 
 const Compras = () => {
   const [compras, setCompras] = useState([]);
@@ -22,9 +26,9 @@ const fetchCompras = async () => {
   try {
     const response = await axios.get('http://localhost:5000/api/compras');
     const data = response.data;
-
     // Ordenar por IdCompra en orden descendente
     data.sort((a, b) => b.IdCompra - a.IdCompra);
+    toast.success("Compras cargadas exitosamente");
     setCompras(data); 
   } catch (error) {
     console.error('Error fetching Compras:', error);
@@ -156,13 +160,48 @@ const filtrar = compras.filter(compra => {
     return diffDays <= 3;
   };
 
+  const renderEmpresa = (value) => {
+    const empresa = value ? value.trim() : 'Sin empresa';
+    return (
+      <div className="flex items-center">
+        <Avatar style={{ backgroundColor: '#FF5722', color: '#FFFFFF' }}> 
+          <BusinessIcon />
+        </Avatar>
+        <span className="ml-2">{empresa}</span>
+      </div>
+    );
+  };
+  
+  const NombreProveedorCell = ({ value }) => {
+    const nombre = value ? value.trim() : 'Sin nombre';
+    return (
+      <div className="flex items-center">
+        <Avatar style={{ backgroundColor: '#3F51B5', color: '#FFFFFF' }}>
+          <PersonIcon />
+        </Avatar>
+        <span className="ml-2">{nombre}</span>
+      </div>
+    );
+  };
+  
+
   return (
     <div>
       <Table
         columns={[
           { field: 'fecha_compra', headerName: 'FECHA', width: 'w-36' },
-          { field: 'empresa_proveedor', headerName: 'EMPRESA', width: 'w-36' },
-          { field: 'nombre_proveedor', headerName: 'NOMBRE', width: 'w-36' },
+          {
+            field: 'empresa_proveedor',
+            headerName: 'EMPRESA PROVEEDOR',
+            width: 'w-36',
+            renderCell: (params) => renderEmpresa(params.row.empresa_proveedor),
+          },
+          {
+            field: 'nombre_proveedor',
+            headerName: 'NOMBRE PROVEEDOR',
+            width: 'w-36',
+            renderCell: (params) => <NombreProveedorCell value={params.row.nombre_proveedor} />,
+          },
           { field: 'descuento_compra', headerName: 'DESCUENTO', width: 'w-36' },
           { field: 'total_compra', headerName: 'TOTAL', width: 'w-36' },
           {

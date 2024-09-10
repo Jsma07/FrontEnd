@@ -334,7 +334,7 @@ const Ventas = () => {
   return (
     <div>
       <Tabla
-        title="Gestion de ventas"
+        title="Gestion de ventas" 
         columns={columns}
         data={ventas}
         rowClassName={(row) => row.estiloFila}

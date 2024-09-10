@@ -359,18 +359,12 @@ const Servicios = () => {
         onChange={handleChange}
       />
 
-      <ModalEditarServicio
+      <ModalAgregarServicio
         open={openModalEditar}
         handleClose={handleCloseModalEditar}
         onSubmit={handleEditServicio}
         title="Editar Servicio"
         fields={[
-          {
-            name: "IdServicio",
-            label: "Identificador",
-            type: "number",
-            readOnly: true,
-          },
           { name: "Nombre_Servicio", label: "Nombre", type: "text" },
           {
       name: "Tiempo_Servicio",
@@ -430,7 +424,12 @@ const Servicios = () => {
             headerName: "PRECIO",
             width: "w-36",
             renderCell: (params) => (
-              <div>{`$${params.row.Precio_Servicio}`}</div>
+              <div>
+                {params.row.Precio_Servicio.toLocaleString('es-CO', {
+                  style: 'currency',
+                  currency: 'COP'
+                })}
+              </div>
             ),
           },
           {
@@ -467,7 +466,6 @@ const Servicios = () => {
                     <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
                   </button>
                 )}
-                {/* Supongo que CustomSwitch es un componente personalizado para el cambio de estado */}
                 <CustomSwitch
                   active={params.row.EstadoServicio === 1}
                   onToggle={() => handleToggleSwitch(params.row.IdServicio)}
