@@ -345,6 +345,8 @@ const Servicios = () => {
         onSubmit={handleAddServicio}
         title="Crear Nuevo Servicio!"
         fields={[
+          { name: "ImgServicio", label: "Imagen", type: "file" },
+
           { name: "Nombre_Servicio", label: "Nombre", type: "text" },
           {
             name: "Tiempo_Servicio",
@@ -354,7 +356,6 @@ const Servicios = () => {
           },
           { name: "Descripcion_Servicio", label: "Descripcion", type: "text" },
           { name: "Precio_Servicio", label: "Precio", type: "number" }, 
-          { name: "ImgServicio", label: "Imagen", type: "file" },
         ]}
         onChange={handleChange}
       />
@@ -365,6 +366,8 @@ const Servicios = () => {
         onSubmit={handleEditServicio}
         title="Editar Servicio"
         fields={[
+          { name: "ImgServicio", label: "Imagen", type: "file" },
+
           { name: "Nombre_Servicio", label: "Nombre", type: "text" },
           {
       name: "Tiempo_Servicio",
@@ -375,7 +378,6 @@ const Servicios = () => {
           { name: "Descripcion_Servicio", label: "Descripcion", type: "textarea" }, 
 
           { name: "Precio_Servicio", label: "Precio", type: "number" }, // Asegúrate de que 'type' sea 'number'
-          { name: "ImgServicio", label: "Imagen", type: "file" },
         ]}
         onChange={handleChange}
         entityData={servicioSeleccionado}

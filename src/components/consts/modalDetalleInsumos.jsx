@@ -37,6 +37,7 @@ const ModalInsumos = ({
   const categorias = [...new Set(insumos.map((insumo) => insumo.nombre_categoria))];
 
   const filteredInsumos = insumos
+    .filter((insumo) => insumo.estado_insumo === 1)
     .filter((insumo) => insumo.NombreInsumos.toLowerCase().includes(searchTerm.toLowerCase()))
     .filter((insumo) => (selectedCategory ? insumo.nombre_categoria === selectedCategory : true));
 
