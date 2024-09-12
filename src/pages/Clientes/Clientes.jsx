@@ -69,33 +69,42 @@ const Clientes = () => {
 
   const columns = [
     { field: "tipoDocumento", headerName: "Tipo Documento" },
-    { field: "Documento", headerName: "Documento" },
     {
       field: "Img",
       headerName: "Imagen",
       width: 100,
       renderCell: (params) => {
-        // Construir la URL completa de la imagen
-        <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100%",
-        }}
-      >
-        <img
-          src={`http://localhost:5000${params.row.Img}`}  
-          alt="Imagen"
-          style={{ maxWidth: "100%", height: "auto", width: "3rem", height: "3rem", borderRadius: "50%" }}
-        />
-      </div>
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <img
+            src={`http://localhost:5000${params.row.Img}`}
+            alt={params.row.Nombre}
+            style={{
+              maxWidth: "100%",
+              height: "auto",
+              width: "3rem",
+              height: "3rem",
+              borderRadius: "50%",
+            }}
+          />
+          </div>
+        );
       },
     },
     { field: "Nombre", headerName: "Nombre" },
     { field: "Apellido", headerName: "Apellido" },
     { field: "Correo", headerName: "Correo" },
     { field: "Telefono", headerName: "Teléfono" },
+    { field: "Documento", headerName: "Documento" },
+   
+  
     {
       field: "Acciones",
       headerName: "Acciones",
@@ -312,8 +321,10 @@ const Clientes = () => {
           IdRol: 2,
         };
 
+        console.log(formDataNumerico)
+
         // Verifica la URL y asegúrate de que IdCliente esté en la URL
-        const url = `http://localhost:5000/Jackenail/Actualizar/${formDataNumerico.IdCliente}`;
+        const url = `http://localhost:5000/Jackenail/actualizarClientes/${formDataNumerico.IdCliente}`;
         console.log("URL de solicitud:", url); // Agrega un log para depuración
 
         // Realizar la solicitud de actualización a la API utilizando axios.put
@@ -548,6 +559,12 @@ const Clientes = () => {
                       ],
                     },
                     {
+                      label: "Documento",
+                      name: "Documento",
+                      type: "text",
+                      required: true,
+                    },
+                    {
                       label: "Nombre",
                       name: "Nombre",
                       type: "text",
@@ -571,12 +588,7 @@ const Clientes = () => {
                       type: "text",
                       required: true,
                     },
-                    {
-                      label: "Documento",
-                      name: "Documento",
-                      type: "text",
-                      required: true,
-                    },
+                    
 
                     {
                       label: "Contraseña",
@@ -607,6 +619,12 @@ const Clientes = () => {
                       ],
                     },
                     {
+                      label: "Documento",
+                      name: "Documento",
+                      type: "text",
+                      required: true,
+                    },
+                    {
                       label: "Nombre",
                       name: "Nombre",
                       type: "text",
@@ -630,12 +648,7 @@ const Clientes = () => {
                       type: "text",
                       required: true,
                     },
-                    {
-                      label: "Documento",
-                      name: "Documento",
-                      type: "text",
-                      required: true,
-                    },
+                   
                   ]}
                   onSubmit={handleActualizacionSubmit}
                   seleccionado={modalData.seleccionado}

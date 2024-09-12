@@ -20,6 +20,21 @@ const Empleados = () => {
     confirmPassword: "",
   });
 
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/roles");
+        console.log("Roles response:", response.data);
+        setRoles(response.data);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+        setRoles([]);
+      }
+    };
+
+    fetchRoles();
+  }, []);
+
   const handlePasswordChangeClick = (IdEmpleado) => {
     const empleadoSeleccionado = empleados.find(
       (empleado) => empleado.IdEmpleado === IdEmpleado
@@ -42,22 +57,13 @@ const Empleados = () => {
   };
 
   const [modalData, setModalData] = useState(null);
-
   useEffect(() => {
     const fetchRoles = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/roles");
-        console.log("Roles response:", response.data);
-
-        // Filtrar para excluir roles de Administrador (ID 1) y Cliente (ID 4)
-        const rolesFiltrados = response.data.filter(
-          (role) => role.idRol !== 1 && role.idRol !== 4
-        );
-
-        setRoles(rolesFiltrados);
+        setRoles(response.data);
       } catch (error) {
         console.error("Error fetching roles:", error);
-        setRoles([]);
       }
     };
 
@@ -92,6 +98,35 @@ const Empleados = () => {
 
   const columns = [
     { field: "Tip_Documento", headerName: "Tipo de Documento" }, // Tipo de Documento primero
+    {
+      field: "Img",
+      headerName: "Imagen",
+      width: 100,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <img
+            src={`http://localhost:5000${params.row.Img}`}
+            alt={params.row.Nombre}
+            style={{
+              maxWidth: "100%",
+              height: "auto",
+              width: "3rem",
+              height: "3rem",
+              borderRadius: "50%",
+            }}
+          />
+          </div>
+        );
+      },
+    },
     { field: "Nombre", headerName: "Nombre" },
     { field: "Apellido", headerName: "Apellido" },
     { field: "Correo", headerName: "Correo" },
@@ -111,7 +146,6 @@ const Empleados = () => {
         <div className="flex justify-center space-x-4">
           {params.row.Estado === 1 && (
             <button
-              className="text-yellow-500 p-2"
               onClick={() =>
                 handleOpenModal({
                   ...params.row,
@@ -123,7 +157,7 @@ const Empleados = () => {
               <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>{" "}
             </button>
           )}
-
+  
           {params.row.Estado === 1 && (
             <button
               onClick={() => handlePasswordChangeClick(params.row.IdEmpleado)}
@@ -132,7 +166,7 @@ const Empleados = () => {
               <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>{" "}
             </button>
           )}
-
+  
           <CustomSwitch
             active={params.row.Estado === 1}
             onToggle={() => handleToggleSwitch(params.row.IdEmpleado)}
@@ -141,18 +175,19 @@ const Empleados = () => {
       ),
     },
   ];
-
+  
   const handleSubmit = async (formData) => {
     try {
       // Verificar si el correo electrónico está duplicado
       const correoExistente = empleados.some(
         (empleado) => empleado.Correo === formData.Correo
       );
-
+  
+      // Verificar si el documento está duplicado
       const documentoExistente = empleados.some(
         (empleado) => empleado.Documento === formData.Documento
       );
-
+  
       if (correoExistente) {
         toast.error(
           "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico."
@@ -170,50 +205,49 @@ const Empleados = () => {
           confirmButtonText: "Sí",
           cancelButtonText: "Cancelar",
         });
-
+  
         if (result.isConfirmed) {
-          const formDataNumerico = {
-            Nombre: formData.Nombre,
-            Apellido: formData.Apellido,
-            Correo: formData.Correo,
-            Telefono: formData.Telefono,
-            Estado: 1,
-            IdRol: formData.Rol,
-            Documento: formData.Documento,
-            Direccion: formData.Direccion,
-            Tip_Documento: formData.Tip_Documento,
-            Contrasena: formData.Contrasena,
-          };
-
-          console.log("Datos del formulario numéricos:", formDataNumerico);
-
+          // Crear un nuevo objeto FormData
+          const formDataToSend = new FormData();
+  
+          // Añadir todos los campos al FormData
+          formDataToSend.append("Nombre", formData.Nombre);
+          formDataToSend.append("Apellido", formData.Apellido);
+          formDataToSend.append("Correo", formData.Correo);
+          formDataToSend.append("Telefono", formData.Telefono);
+          formDataToSend.append("Estado", 1);
+          formDataToSend.append("IdRol", formData.IdRol);
+          formDataToSend.append("Documento", formData.Documento);
+          formDataToSend.append("Direccion", formData.Direccion);
+          formDataToSend.append("Tip_Documento", formData.Tip_Documento);
+          formDataToSend.append("Contrasena", formData.Contrasena);
+  
+          // Añadir imagen si existe
+          if (formData.Img) {
+            formDataToSend.append("Img", formData.Img);
+          }
+  
+          console.log("Datos del formulario numéricos:", formData);
+  
+          // Enviar la solicitud POST con FormData
           const response = await axios.post(
-            "http://localhost:5000/Jackenail/RegistrarEmpleados",
-            formDataNumerico
+            "http://localhost:5000/Jackenail/crearEmpleadoss",
+            formDataToSend,
+            { headers: { 'Content-Type': 'multipart/form-data' } }
           );
-
+  
+          // Suponiendo que el servidor devuelve el empleado creado con todos sus campos
           const nuevoEmpleado = response.data;
-
-          // Busca el rol correspondiente para mostrar en la tabla
-          const rolCorrespondiente = roles.find(
-            (role) => role.idRol === formDataNumerico.IdRol
-          );
-
-          // Añadir el nuevo empleado a la lista con el rol asignado
-          setEmpleados((prevEmpleados) => [
-            ...prevEmpleados,
-            {
-              ...nuevoEmpleado,
-              Rol: rolCorrespondiente ? rolCorrespondiente.nombre : "Sin rol",
-            },
-          ]);
-
+          console.log("Nuevo empleado:", nuevoEmpleado);
+  
+          setEmpleados((prevEmpleados) => [...prevEmpleados, nuevoEmpleado]);
+  
           Swal.fire({
             icon: "success",
             title: "¡Registro exitoso!",
             text: "El empleado se ha registrado correctamente.",
           });
-
+  
           setModalData(null);
         }
       }
@@ -223,12 +257,13 @@ const Empleados = () => {
         "Detalles del error:",
         error.response ? error.response.data : error.message
       );
-
+   
       toast.error(
         "Ocurrió un error al registrar el empleado. Inténtelo nuevamente."
       );
     }
   };
+  
 
   const handleToggleSwitch = async (id) => {
     const updatedEmpleados = empleados.map((empleado) => {
@@ -286,71 +321,91 @@ const Empleados = () => {
 
   const handleActualizacionSubmit = async (formData) => {
     try {
-      // Verificar si el correo o documento ya están en uso por otro empleado
-      const empleadoExistente = empleados.find(
-        (empleado) =>
-          (empleado.Correo === formData.Correo ||
-            empleado.Documento === formData.Documento) &&
-          empleado.IdEmpleado !== formData.IdEmpleado
-      );
+        // Validar datos
+        const empleadoExistente = empleados.find(
+            (empleado) =>
+                (empleado.Correo === formData.Correo ||
+                empleado.Documento === formData.Documento) &&
+                empleado.IdEmpleado !== formData.IdEmpleado
+        );
 
-      if (empleadoExistente) {
-        Swal.fire({
-          icon: "error",
-          title: "Error de actualización",
-          text: "El correo electrónico o el documento ya están registrados para otro empleado. Por favor, elija otro correo electrónico o documento.",
-        });
-        return;
-      }
-
-      // Convertir el teléfono a número entero
-      const formDataNumerico = {
-        ...formData,
-        Telefono: parseInt(formData.Telefono, 10),
-      };
-
-      // Construir la URL para la solicitud PUT
-      const url = `http://localhost:5000/Jackenail/ActualizarEmpleados/${formDataNumerico.IdEmpleado}`;
-
-      // Realizar la solicitud PUT
-      await axios.put(url, formDataNumerico);
-
-      // Actualizar la lista de empleados en el estado
-      setEmpleados((prevEmpleados) =>
-        prevEmpleados.map((empleado) =>
-          empleado.IdEmpleado === formDataNumerico.IdEmpleado
-            ? {
-                ...empleado,
-                ...formDataNumerico,
-                Rol:
-                  roles.find((role) => role.idRol === formDataNumerico.IdRol)
-                    ?.nombre || "Sin rol",
-              }
-            : empleado
-        )
-      );
-
-      // Mostrar mensaje de éxito
-      Swal.fire({
-        icon: "success",
-        title: "¡Actualización exitosa!",
-        text: "El empleado se ha actualizado correctamente.",
-      }).then((result) => {
-        if (result.isConfirmed || result.dismiss === Swal.DismissReason.close) {
-          setModalData(null); // Cerrar el modal si se confirma o se cierra
+        if (empleadoExistente) {
+            Swal.fire({
+                icon: "error",
+                title: "Error de actualización",
+                text: "El correo electrónico o el documento ya están registrados para otro empleado. Por favor, elija otro correo electrónico o documento.",
+            });
+            return;
         }
-      });
+
+        // Crear FormData
+        const formDataToSend = new FormData();
+        formDataToSend.append("IdEmpleado", formData.IdEmpleado);
+        formDataToSend.append("Nombre", formData.Nombre);
+        formDataToSend.append("Apellido", formData.Apellido);
+        formDataToSend.append("Correo", formData.Correo);
+        formDataToSend.append("Telefono", formData.Telefono);
+        formDataToSend.append("Estado", formData.Estado || 1);
+        formDataToSend.append("IdRol", formData.IdRol);
+        formDataToSend.append("Documento", formData.Documento);
+        formDataToSend.append("Direccion", formData.Direccion);
+        formDataToSend.append("Tip_Documento", formData.Tip_Documento);
+        formDataToSend.append("Contrasena", formData.Contrasena);
+        
+        // Añadir imagen si existe
+        if (formData.Img && formData.Img instanceof File) {
+            formDataToSend.append("Img", formData.Img);
+        }
+
+        console.log("Datos del formulario a enviar:");
+        for (const [key, value] of formDataToSend.entries()) {
+            console.log(`${key}:`, value);
+        }
+
+        // Corrección de la URL para editar empleados
+        const url = `http://localhost:5000/Jackenail/editarEmpleado/${formData.IdEmpleado}`;
+
+        await axios.put(url, formDataToSend, { headers: { 'Content-Type': 'multipart/form-data' } });
+
+        // Actualizar la lista de empleados
+        setEmpleados((prevEmpleados) =>
+            prevEmpleados.map((empleado) =>
+                empleado.IdEmpleado === formData.IdEmpleado
+                    ? {
+                        ...empleado,
+                        ...formData,
+                        role: {
+                            idRol: formData.Rol,
+                            nombre: roles.find(
+                                (role) => role.idRol === formData.Rol
+                            )?.nombre,
+                        },
+                    }
+                    : empleado
+            )
+        );
+
+        Swal.fire({
+            icon: "success",
+            title: "¡Actualización exitosa!",
+            text: "El empleado se ha actualizado correctamente.",
+        }).then((result) => {
+            if (result.isConfirmed || result.dismiss === Swal.DismissReason.close) {
+                setModalData(null);
+            }
+        });
     } catch (error) {
-      console.error("Error al actualizar el empleado:", error);
-      // Mostrar mensaje de error
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Ocurrió un error al actualizar el empleado.",
-        footer: '<a href="#">Inténtelo nuevamente</a>',
-      });
+        console.error("Error al actualizar el empleado:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Ocurrió un error al actualizar el empleado.",
+            footer: '<a href="#">Inténtelo nuevamente</a>',
+        });
     }
-  };
+};
+
+
 
   const empleadosFiltrados = empleados.filter((empleado) => {
     // Convertir el filtro a minúsculas una vez
@@ -469,7 +524,6 @@ const Empleados = () => {
         title="Gestion de Empleados"
         columns={columns}
         data={empleados}
-        roles={roles}
       />
       {modalData && !modalData.modo && (
         <ModalDinamico
@@ -492,12 +546,15 @@ const Empleados = () => {
               name: "Documento",
               type: "text",
               required: true,
+              icon: "bx-id-card",
             },
             {
               label: "Nombre",
               name: "Nombre",
               type: "text",
               required: true,
+              icon: "bx-user", // Icono para el nombre
+
             },
             {
               label: "Apellido",
@@ -516,12 +573,16 @@ const Empleados = () => {
               name: "Telefono",
               type: "text",
               required: true,
+              icon: "bx-phone", // Icono para el teléfono
+
             },
             {
               label: "Dirección",
               name: "Direccion",
               type: "text",
               required: true,
+              icon: "bx-home", // Icono para la dirección
+
             },
             {
               label: "Contraseña",
@@ -531,7 +592,7 @@ const Empleados = () => {
             },
             {
               label: "Rol",
-              name: "Rol",
+              name: "IdRol",
               type: "select",
               required: true,
               options: roles.map((role) => ({
