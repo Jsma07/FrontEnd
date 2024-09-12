@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { toast} from "react-toastify";
 
 const NewPassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false); // Estado para visibilidad de la contraseña
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -18,6 +21,11 @@ const NewPassword = () => {
       setError('Las contraseñas no coinciden');
       return;
     }
+    const validacionContrasena = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!validacionContrasena.test(newPassword)) {
+      setError('La contraseña debe tener mínimo 8 caracteres, una mayúscula y un número.');
+      return
+    }
 
     try {
       const response = await axios.post('http://localhost:5000/api/actualizarContrasena', {
@@ -26,6 +34,10 @@ const NewPassword = () => {
       });
 
       if (response.data.mensaje === 'Contraseña actualizada exitosamente') {
+        toast.success("Contrasena cambiada con exito.", {
+          position: "bottom-right",
+          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+        });
         navigate('/iniciarSesion'); // Redirigir al inicio de sesión después de cambiar la contraseña
       } else {
         setError(response.data.mensaje || 'Error al actualizar la contraseña');
@@ -74,39 +86,59 @@ const NewPassword = () => {
           <i className='bx bx-lock'></i> Restablecer Contraseña
         </h2>
         <form onSubmit={handleSubmit} className="w-full">
-          <div className="mb-4">
-            <label htmlFor="newPassword" className="flex items-center gap-2 mb-2 text-sm font-medium text-gray-700">
-              <i className='bx bx-lock' style={{ fontSize: '20px' }}></i>
-              Nueva Contraseña:
-            </label>
-            <input
-                        placeholder='*********'
+        <div className="relative mb-4"> {/* Añade 'relative' para el posicionamiento del ícono */}
+  <label htmlFor="newPassword" className="flex items-center gap-2 mb-2 text-sm font-medium text-gray-700">
+    <i className='bx bx-lock' style={{ fontSize: '20px' }}></i>
+    Nueva Contraseña:
+  </label>
+  <input
+    placeholder='*********'
+    style={{ borderRadius: '20px' }}
+    type={passwordVisible ? "text" : "password"}
+    id="newPassword"
+    value={newPassword}
+    onChange={(e) => setNewPassword(e.target.value)}
+    className="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mb-4"
+    required
+  />
+  <span
+    onClick={() => setPasswordVisible(!passwordVisible)}
+    className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer mt-4"
+  >
+    {passwordVisible ? 
+      <i className='bx bx-low-vision' style={{ fontSize: '25px' }}></i> 
+      : 
+      <i className='bx bx-show-alt' style={{ fontSize: '25px' }}></i>
+    }
+  </span>
+</div>
+<div className="relative mb-4"> {/* Añade 'relative' para el posicionamiento del ícono */}
+  <label htmlFor="newPassword" className="flex items-center gap-2 mb-2 text-sm font-medium text-gray-700">
+    <i className='bx bx-lock' style={{ fontSize: '20px' }}></i>
+    Confirmar Contraseña:
+  </label>
+  <input
+    placeholder='*********'
+    style={{ borderRadius: '20px' }}
+    type={passwordVisible ? "text" : "password"}
+    id="newPassword"
+    value={confirmPassword}
+    onChange={(e) => setConfirmPassword(e.target.value)}
+    className="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mb-4"
+    required
+  />
+  <span
+    onClick={() => setPasswordVisible(!passwordVisible)}
+    className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer mt-4"
+  >
+    {passwordVisible ? 
+      <i className='bx bx-low-vision' style={{ fontSize: '25px' }}></i> 
+      : 
+      <i className='bx bx-show-alt' style={{ fontSize: '25px' }}></i>
+    }
+  </span>
+</div>
 
-              style={{ borderRadius: '20px' }}
-              type="password"
-              id="newPassword"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mb-4"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="confirmPassword" className="flex items-center gap-2 mb-2 text-sm font-medium text-gray-700">
-              <i className='bx bx-lock' style={{ fontSize: '20px' }}></i>
-              Confirmar Contraseña:
-            </label>
-            <input
-            placeholder='*********'
-              style={{ borderRadius: '20px' }}
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mb-4"
-              required
-            />
-          </div>
           {error && <p className="text-red-600 mb-4">{error}</p>}
           <button 
                      style={{borderRadius:'20px'}}
