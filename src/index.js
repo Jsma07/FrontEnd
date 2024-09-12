@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route, Router } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate  } from "react-router-dom";
 import "./index.css";
 import App from "./App";
 import Roles from "./pages/Roles/Roles";
@@ -39,8 +39,8 @@ import Contrasena from "./components/consts/recuperarContrasena";
 import PrivateRoute from "./context/verificarSesion";
 import SolicitarCita from "./components/consts/VIewClients/solicitarCita";
 import ListarCitas from "./components/consts/VIewClients/ListarCitas/ListarCitas";
-
-
+import Codigo from "./pages/Clientes/Codigo";
+import NuevaContrasena from "./pages/Clientes/nuevaContrasena"
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -49,24 +49,39 @@ root.render(
       <BrowserRouter>
         <Routes>
           <Route path="/recuperarContrasena" element={<Contrasena />} />
+          <Route path="/codigo" element={<Codigo />} />
+          <Route path="/nuevaContrasena" element={<NuevaContrasena />} />
+
           <Route path="/iniciarSesion" element={<Login />} />
           <Route path="/Registrar" element={<CrearCuenta />} />
           <Route path="/Catalogo" element={<Contendioitems />} />
           <Route path="/vistaInicio" element={<VistaInicial />} />
-          <Route path="/solicitarCita" element={<SolicitarCita />} />
-          <Route path="/misCitas" element={<ListarCitas />}/>
-          <Route path="/Verificacion" element={<Verificacion />}/>
-          <Route path="/cambiarContrasena/:idCliente" element={<Cambiarcontraseña />}/>
-
+          <Route path="/solicitarCita" element={
+            <PrivateRoute requiredPermissions={["AgendaCliente"]}>
+            <SolicitarCita />
+           </PrivateRoute>
+            } />
+          <Route path="/misCitas" element={
+ <PrivateRoute requiredPermissions={["AgendaCliente"]}>
+ <ListarCitas />
+</PrivateRoute>
+          }/>
 
 
         <Route path="/" element={<App />}>
-           <Route index path="/panel/dashboard" 
-             element={
-              <PrivateRoute requiredPermissions={["Usuarios"]}>
-                <Panel />
-              </PrivateRoute>
-            }
+        <Route
+              index
+              element={
+                <Navigate to="/panel/dashboard" />
+              }
+            />
+              <Route
+              path="/panel/dashboard"
+              element={
+                <PrivateRoute requiredPermissions={["Dashboard"]}>
+                  <Panel />
+                </PrivateRoute>
+              }
             />
             <Route
               path="/configuracion/roles"
@@ -85,7 +100,6 @@ root.render(
                 </PrivateRoute>
               }
             />
-            {/* <Route path="/Usuarios" element={<Usuarios2 />} /> */}
             <Route
               path="/ventas"
               element={
@@ -144,11 +158,11 @@ root.render(
               </PrivateRoute>
             }
             />
-            <Route path="/FechasTrabajadas" element={<FechasTrabajo />}/>
-
-            {/* <Route path="/InactivarHoras" element={<InactivarHoras />}/> */}
-
-
+            <Route path="/FechasTrabajadas" element={
+<PrivateRoute requiredPermissions={["Agenda"]}>
+<FechasTrabajo />
+</PrivateRoute>
+            }/>
 
             <Route path="/Salida_Insumos" 
              element={

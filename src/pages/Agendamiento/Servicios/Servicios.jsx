@@ -314,6 +314,7 @@ const Servicios = () => {
     { value: "300", label: "5:00 horas" },
     { value: "360", label: "6:00 horas" },
   ];
+  
 
   return (
     <div>
@@ -351,7 +352,7 @@ const Servicios = () => {
             type: "select",
             options: opcionesTiempoServicio,
           },
-          { name: "Descripcion_Servicio", label: "Descripcion", type: "textarea" },
+          { name: "Descripcion_Servicio", label: "Descripcion", type: "text" },
           { name: "Precio_Servicio", label: "Precio", type: "number" }, 
           { name: "ImgServicio", label: "Imagen", type: "file" },
         ]}
@@ -429,7 +430,12 @@ const Servicios = () => {
             headerName: "PRECIO",
             width: "w-36",
             renderCell: (params) => (
-              <div>{`$${params.row.Precio_Servicio}`}</div>
+              <div>
+                {params.row.Precio_Servicio.toLocaleString('es-CO', {
+                  style: 'currency',
+                  currency: 'COP'
+                })}
+              </div>
             ),
           },
           {
@@ -466,7 +472,6 @@ const Servicios = () => {
                     <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
                   </button>
                 )}
-                {/* Supongo que CustomSwitch es un componente personalizado para el cambio de estado */}
                 <CustomSwitch
                   active={params.row.EstadoServicio === 1}
                   onToggle={() => handleToggleSwitch(params.row.IdServicio)}

@@ -5,7 +5,6 @@ import { Grid } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './components/consts/theme';
 import { toast, ToastContainer } from "react-toastify";
-
 import LoadingScreen from './components/consts/pantallaCarga'; 
 
 function App() {

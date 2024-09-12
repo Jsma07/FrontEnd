@@ -38,11 +38,6 @@ const Ventas = () => {
     }
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(amount);
-  };
-  
-
   useEffect(() => {
     const fetchVentas = async () => {
       try {
@@ -50,16 +45,6 @@ const Ventas = () => {
           "http://localhost:5000/Jackenail/Listarventas"
         );
 
-        // Función para formatear la fecha para mostrar
-        const formatDate = (dateString) => {
-          const date = new Date(dateString);
-          const day = String(date.getDate()).padStart(2, "0");
-          const month = String(date.getMonth() + 1).padStart(2, "0"); // Los meses empiezan en 0
-          const year = date.getFullYear();
-          return `${day}/${month}/${year}`;
-        };
-
-        // Crear una copia de las ventas y agregar el formato de fecha para mostrar
         const ventasConDetalles = response.data.map((venta) => ({
           id: venta.idVentas,
           idServicio: (
@@ -81,9 +66,8 @@ const Ventas = () => {
           idEmpleado: `${venta.empleado?.Nombre || ""} ${
             venta.empleado?.Apellido || ""
           }`,
-          Fecha: formatDate(venta.Fecha), // Fecha formateada para mostrar
-          FechaOriginal: new Date(venta.Fecha), // Fecha original para ordenar
-          Total: formatCurrency(venta.Total), // Total formateado como moneda
+          Fecha: venta.Fecha,
+          Total: venta.Total,
           Estado: (
             <div className="flex space-x-2">
               {renderEstadoButton(venta.Estado, venta.idVentas)}
@@ -125,15 +109,10 @@ const Ventas = () => {
           estiloFila: venta.Estado === 3 ? "bg-gray-200" : "",
         }));
 
-        // Ordenar las ventas por fecha original de forma descendente
-        ventasConDetalles.sort((a, b) => b.FechaOriginal - a.FechaOriginal);
+        // Ordenar las ventas por fecha de forma descendente
+        ventasConDetalles.sort((a, b) => new Date(b.Fecha) - new Date(a.Fecha));
 
-        // Eliminar la propiedad FechaOriginal antes de establecer el estado
-        const ventasFinales = ventasConDetalles.map(
-          ({ FechaOriginal, ...rest }) => rest
-        );
-
-        setVentas(ventasFinales);
+        setVentas(ventasConDetalles);
         toast.success("Ventas cargadas exitosamente");
       } catch (error) {
         console.error("Error al obtener los datos de ventas:", error);
@@ -334,7 +313,7 @@ const Ventas = () => {
   return (
     <div>
       <Tabla
-        title="Gestion de ventas" 
+        title="Gestion de ventas"
         columns={columns}
         data={ventas}
         rowClassName={(row) => row.estiloFila}

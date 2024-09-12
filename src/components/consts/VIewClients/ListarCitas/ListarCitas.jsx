@@ -1,56 +1,208 @@
-import React, { useEffect, useState, useContext } from 'react';
-import axios from 'axios';
-import { CircularProgress, Typography, Card, CardContent, Grid } from '@mui/material';
-import { UserContext } from "../../../../context/ContextoUsuario"; // Ajusta la ruta según sea necesario
+import React, { useEffect, useState, useContext } from "react";
+import axios from "axios";
+import { UserContext } from "../../../../context/ContextoUsuario";
+import { Typography, Box, Button } from "@mui/material";
+import NavbarClient from "../Navbarclient";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import esLocale from "@fullcalendar/core/locales/es";
+import EventModal from "../components/EventModal";
+import dayjs from "dayjs";
+import { Link } from 'react-router-dom';
 
 const MisCitas = () => {
   const [citas, setCitas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { token } = useContext(UserContext); // Usa useContext para obtener el token del usuario
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
     const fetchCitas = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/agendas', {
-          headers: {
-            Authorization: `Bearer ${token}`
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          "http://localhost:5000/api/agendas/misCitas",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        });
-        setCitas(response.data);
+        );
+
+        if (Array.isArray(response.data)) {
+          setCitas(response.data);
+        } else {
+          setCitas([]);
+        }
+
+        setLoading(false);
       } catch (error) {
-        setError('Error al cargar las citas');
-      } finally {
+        setError("Hubo un problema al cargar las citas.");
         setLoading(false);
       }
     };
 
-    fetchCitas();
-  }, [token]);
+    if (user) {
+      fetchCitas();
+    }
+  }, [user]);
 
-  if (loading) return <CircularProgress />;
-  if (error) return <Typography color="error">{error}</Typography>;
+  if (loading) {
+    return <p>Cargando citas...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+
+  const eventos = citas.map((cita) => ({
+    title: `${cita.servicio.Nombre_Servicio} con ${cita.empleado.Nombre}`,
+    start: `${cita.Fecha}T${cita.Hora}`,
+    end: `${cita.Fecha}T${cita.HoraFin}`,
+    extendedProps: {
+      servicio: cita.servicio.Nombre_Servicio,
+      empleado: `${cita.empleado.Nombre} ${cita.empleado.Apellido}`,
+      imgServicio: `http://localhost:5000${cita.servicio.ImgServicio}`,
+    },
+  }));
+
+  const handleEventClick = (clickInfo) => {
+    setSelectedEvent(clickInfo.event);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedEvent(null);
+  };
+
+  const truncateTitle = (title, maxLength = 20) => {
+    if (title.length > maxLength) {
+      return title.substring(0, maxLength) + "...";
+    }
+    return title;
+  };
+
+  const currentDate = new Date();
+  const minDate = currentDate.toISOString().split("T")[0];
+  const maxDate = new Date(currentDate.setMonth(currentDate.getMonth() + 1))
+    .toISOString()
+    .split("T")[0];
 
   return (
-    <Grid container spacing={2}>
-      {citas.length === 0 ? (
-        <Typography>No tienes citas.</Typography>
-      ) : (
-        citas.map(cita => (
-          <Grid item xs={12} sm={6} md={4} key={cita.id}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6">Servicio: {cita.servicio.Nombre_Servicio}</Typography>
-                <Typography>Fecha: {cita.Fecha}</Typography>
-                <Typography>Hora: {cita.Hora}</Typography>
-                <Typography>Empleado: {cita.empleado.Nombre} {cita.empleado.Apellido}</Typography>
-                <Typography>Estado: {cita.EstadoAgenda}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))
-      )}
-    </Grid>
+    <div className="mis-citas-container">
+      <NavbarClient />
+      <Box
+        sx={{
+          padding: "20px",
+          maxWidth: "1200px",
+          margin: "auto",
+          marginTop: "60px",
+        }}
+      >
+        {citas.length === 0 ? (
+          <Box
+          >
+            <Typography variant="h6" component="div" sx={{ mb: 2 }}>
+              🗓️ No tienes citas
+            </Typography>
+            <Typography variant="body1" sx={{ textAlign: "center" }}>
+              ¡No te preocupes! Intenta <Link to="/solicitarCita">agendar una cita</Link> para disfrutar de nuestros servicios 😊
+            </Typography>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              sx={{ mt: 2 }}
+              component={Link} 
+              to="/solicitarCita"
+            >
+              Registrar cita ahora
+            </Button>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              marginTop: "40px",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              padding: "10px",
+              backgroundColor: "#fdf7ff",
+            }}
+          >
+            <FullCalendar
+              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              initialView="dayGridMonth"
+              locale={esLocale}
+              events={eventos}
+              eventContent={(eventInfo) => {
+                const startTime = dayjs(eventInfo.event.start).format("HH:mm");
+                const endTime = dayjs(eventInfo.event.end).format("HH:mm");
+
+                return (
+                  <div style={{ position: "relative" }}>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "-35px",
+                        left: "16%",
+                        transform: "translateX(-50%)",
+                        fontSize: "20px",
+                      }}
+                    >
+                      💅✨
+                    </div>
+                    <div>
+                      <strong>{truncateTitle(eventInfo.event.title)}</strong>
+                      <br />
+                      {startTime} - {endTime}
+                    </div>
+                  </div>
+                );
+              }}
+              eventClick={handleEventClick}
+              height="auto"
+              contentHeight="500px"
+              aspectRatio={1.5}
+              dayMaxEventRows={3}
+              eventTextColor="white"
+              eventBackgroundColor="#e0aaff"
+              eventBorderColor="#d18bff"
+              headerToolbar={{
+                left: "prev,next today",
+                center: "title",
+                right: "dayGridMonth,timeGridWeek,timeGridDay",
+              }}
+              dayHeaderClassNames="fc-day-header"
+              validRange={{
+                start: minDate,
+                end: maxDate,
+              }}
+              views={{
+                dayGridMonth: {
+                  titleFormat: { year: "numeric", month: "long" },
+                },
+              }}
+              buttonText={{
+                today: "Hoy",
+                month: "Mes",
+                week: "Semana",
+                day: "Día",
+              }}
+              dayCellClassNames="day-cell"
+            />
+          </Box>
+        )}
+
+        {selectedEvent && (
+          <EventModal
+            open={!!selectedEvent}
+            handleClose={handleCloseModal}
+            event={selectedEvent}
+          />
+        )}
+      </Box>
+    </div>
   );
 };
 

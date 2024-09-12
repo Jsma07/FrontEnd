@@ -20,21 +20,6 @@ const Empleados = () => {
     confirmPassword: "",
   });
 
-  useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/roles");
-        console.log("Roles response:", response.data);
-        setRoles(response.data);
-      } catch (error) {
-        console.error("Error fetching roles:", error);
-        setRoles([]);
-      }
-    };
-
-    fetchRoles();
-  }, []);
-
   const handlePasswordChangeClick = (IdEmpleado) => {
     const empleadoSeleccionado = empleados.find(
       (empleado) => empleado.IdEmpleado === IdEmpleado
@@ -57,13 +42,22 @@ const Empleados = () => {
   };
 
   const [modalData, setModalData] = useState(null);
+
   useEffect(() => {
     const fetchRoles = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/roles");
-        setRoles(response.data);
+        console.log("Roles response:", response.data);
+
+        // Filtrar para excluir roles de Administrador (ID 1) y Cliente (ID 4)
+        const rolesFiltrados = response.data.filter(
+          (role) => role.idRol !== 1 && role.idRol !== 4
+        );
+
+        setRoles(rolesFiltrados);
       } catch (error) {
         console.error("Error fetching roles:", error);
+        setRoles([]);
       }
     };
 
@@ -117,6 +111,7 @@ const Empleados = () => {
         <div className="flex justify-center space-x-4">
           {params.row.Estado === 1 && (
             <button
+              className="text-yellow-500 p-2"
               onClick={() =>
                 handleOpenModal({
                   ...params.row,
@@ -154,7 +149,6 @@ const Empleados = () => {
         (empleado) => empleado.Correo === formData.Correo
       );
 
-      // Verificar si el documento está duplicado
       const documentoExistente = empleados.some(
         (empleado) => empleado.Documento === formData.Documento
       );
@@ -195,17 +189,26 @@ const Empleados = () => {
 
           console.log("Datos del formulario numéricos:", formDataNumerico);
 
-          // Enviar solicitud POST al servidor
           const response = await axios.post(
             "http://localhost:5000/Jackenail/RegistrarEmpleados",
             formDataNumerico
           );
 
-          // Suponiendo que el servidor devuelve el empleado creado con todos sus campos
           const nuevoEmpleado = response.data;
-          console.log("Nuevo empleado:", nuevoEmpleado);
 
-          setEmpleados((prevEmpleados) => [...prevEmpleados, nuevoEmpleado]);
+          // Busca el rol correspondiente para mostrar en la tabla
+          const rolCorrespondiente = roles.find(
+            (role) => role.idRol === formDataNumerico.IdRol
+          );
+
+          // Añadir el nuevo empleado a la lista con el rol asignado
+          setEmpleados((prevEmpleados) => [
+            ...prevEmpleados,
+            {
+              ...nuevoEmpleado,
+              Rol: rolCorrespondiente ? rolCorrespondiente.nombre : "Sin rol",
+            },
+          ]);
 
           Swal.fire({
             icon: "success",
@@ -285,6 +288,7 @@ const Empleados = () => {
 
   const handleActualizacionSubmit = async (formData) => {
     try {
+      // Verificar si el correo o documento ya están en uso por otro empleado
       const empleadoExistente = empleados.find(
         (empleado) =>
           (empleado.Correo === formData.Correo ||
@@ -301,45 +305,47 @@ const Empleados = () => {
         return;
       }
 
+      // Convertir el teléfono a número entero
       const formDataNumerico = {
         ...formData,
         Telefono: parseInt(formData.Telefono, 10),
         
       };
 
+      // Construir la URL para la solicitud PUT
       const url = `http://localhost:5000/Jackenail/ActualizarEmpleados/${formDataNumerico.IdEmpleado}`;
 
+      // Realizar la solicitud PUT
       await axios.put(url, formDataNumerico);
 
-      // Actualiza la lista de empleados
+      // Actualizar la lista de empleados en el estado
       setEmpleados((prevEmpleados) =>
         prevEmpleados.map((empleado) =>
           empleado.IdEmpleado === formDataNumerico.IdEmpleado
             ? {
                 ...empleado,
                 ...formDataNumerico,
-                role: {
-                  idRol: formDataNumerico.Rol,
-                  nombre: roles.find(
-                    (role) => role.idRol === formDataNumerico.Rol
-                  )?.nombre,
-                },
+                Rol:
+                  roles.find((role) => role.idRol === formDataNumerico.IdRol)
+                    ?.nombre || "Sin rol",
               }
             : empleado
         )
       );
 
+      // Mostrar mensaje de éxito
       Swal.fire({
         icon: "success",
         title: "¡Actualización exitosa!",
         text: "El empleado se ha actualizado correctamente.",
       }).then((result) => {
         if (result.isConfirmed || result.dismiss === Swal.DismissReason.close) {
-          setModalData(null);
+          setModalData(null); // Cerrar el modal si se confirma o se cierra
         }
       });
     } catch (error) {
       console.error("Error al actualizar el empleado:", error);
+      // Mostrar mensaje de error
       Swal.fire({
         icon: "error",
         title: "Oops...",

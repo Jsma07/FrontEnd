@@ -9,11 +9,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 const Compras = () => {
   const [compras, setCompras] = useState([]);
+  const [proveedores, setProveedores] = useState([]);
   const [buscar, setBuscar] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchCompras();
+    fetchProveedores();
   }, []);
 
 const fetchCompras = async () => {
@@ -28,8 +30,18 @@ const fetchCompras = async () => {
     console.error('Error fetching Compras:', error);
   }
 };
-  
-  const filtrar = compras.filter(compra => {
+
+const fetchProveedores = async () => {
+  try {
+    const response = await axios.get("http://localhost:5000/api/proveedores");
+    console.log("proveedores fetched:", response.data); 
+    setProveedores(response.data);
+  } catch (error) {
+    console.error("Error fetching proveedores:", error);
+  }
+};
+
+const filtrar = compras.filter(compra => {
     return (
       (compra.fecha_compra && compra.fecha_compra.toLowerCase().includes(buscar.toLowerCase())) ||
       (compra.descuento_compra && compra.descuento_compra.toLowerCase().includes(buscar.toLowerCase())) ||
@@ -38,7 +50,7 @@ const fetchCompras = async () => {
       (compra.total_compra && compra.total_compra.toLowerCase().includes(buscar.toLowerCase())) ||
       (compra.estado_compra && compra.estado_compra.toLowerCase().includes(buscar.toLowerCase()))
     );
-  });
+});
 
   const handleClick = () => {
     navigate('/compras/crearCompra'); 
@@ -149,9 +161,9 @@ const fetchCompras = async () => {
       <Table
         columns={[
           { field: 'fecha_compra', headerName: 'FECHA', width: 'w-36' },
+          { field: 'empresa_proveedor', headerName: 'EMPRESA', width: 'w-36' },
+          { field: 'nombre_proveedor', headerName: 'NOMBRE', width: 'w-36' },
           { field: 'descuento_compra', headerName: 'DESCUENTO', width: 'w-36' },
-          { field: 'iva_compra', headerName: 'IVA', width: 'w-36' },
-          { field: 'subtotal_compra', headerName: 'SUBTOTAL', width: 'w-36' },
           { field: 'total_compra', headerName: 'TOTAL', width: 'w-36' },
           {
             field: 'estado_compra',

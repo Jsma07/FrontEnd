@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import ModalDinamico from "../../components/consts/modaled";
 import Modal from "../../components/consts/modalContrasena";
 import CustomSwitch from "../../components/consts/switch";
+import { Pagination, Box, useMediaQuery } from "@mui/material";
 import { toast } from "react-toastify";
 
 const Clientes = () => {
@@ -12,7 +13,8 @@ const Clientes = () => {
   const [modalData, setModalData] = useState(null);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [openPasswordModal, setOpenPasswordModal] = useState(false);
-
+  const [page, setPage] = useState(1);
+  const [rowsPerPage] = useState(5);
   const [seleccionado, setSeleccionado] = useState(null);
 
   const [passwordForm, setPasswordForm] = useState({
@@ -104,7 +106,7 @@ const Clientes = () => {
         <div className="flex justify-center space-x-4">
           {params.row.Estado === 1 && (
             <button
-              className="text-yellow-500"
+              className="text-yellow-500 p-2"
               onClick={() =>
                 handleOpenModal({
                   ...params.row,
@@ -206,7 +208,14 @@ const Clientes = () => {
       }
     }
   };
-  
+
+  const filteredClientes = clientes.filter((cliente) =>
+    Object.values(cliente).some(
+      (value) =>
+        typeof value === "string" &&
+        value.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
 
   const handleToggleSwitch = async (id) => {
     if (!id) {
@@ -350,21 +359,6 @@ const Clientes = () => {
   };
 
   const handleSubmitPasswordChange = async (newPassword, confirmPassword) => {
-    // Paso 1: Validar que las contraseñas coincidan
-    if (newPassword !== confirmPassword) {
-      console.error(
-        "Las contraseñas no coinciden:",
-        newPassword,
-        confirmPassword
-      );
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Las contraseñas no coinciden.",
-      });
-      return;
-    }
-
     // Paso 2: Validar que la contraseña tenga al menos 8 caracteres
     if (newPassword.length < 8) {
       console.error("La contraseña es demasiado corta:", newPassword);
@@ -420,8 +414,24 @@ const Clientes = () => {
     }
   };
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  // Filtrar clientes según la búsqueda
+  const filteredData = clientes.filter(
+    (cliente) =>
+      cliente.Nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cliente.Documento.includes(searchTerm)
+  );
+
+  // Calcular los datos para la página actual
+  const startIndex = (page - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const currentClientes = filteredData.slice(startIndex, endIndex);
+
   return (
-    <section className="bg-gray-50 dark:bg-gray-900 py-3 sm:py-5">
+    <section>
       <div
         className="fixed bg-white rounded-lg shadow-md"
         style={{
@@ -429,15 +439,17 @@ const Clientes = () => {
           margin: "0 auto",
           borderRadius: "30px",
           marginTop: "20px",
-          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.5)",
+          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.3)",
           left: "82px",
           top: "70px",
           width: "calc(100% - 100px)",
         }}
       >
-        <div className="bg-white rounded-lg shadow-md p-8">
+        <div className="bg-white rounded-lg p-8">
           <div className="flex justify-between items-center mb-4">
-            <h4 className="text-3xl">Gestion de Clientes</h4>
+            <h4 className="text-3xl font-bold text-left">
+              Gestion de Clientes
+            </h4>
 
             <div className="relative w-80">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -458,190 +470,159 @@ const Clientes = () => {
                 </svg>
               </div>
               <input
-                type="search"
-                id="default-search"
+                type="text"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Search Mockups, Logos..."
-                required
+                placeholder="Buscar"
+                className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
 
           <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
-            <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
-              <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
-                <button
-                  type="button"
-                  className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
-                >
-                  <svg
-                    className="h-3.5 w-3.5 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <path
-                      clipRule="evenodd"
-                      fillRule="evenodd"
-                      d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                    />
-                  </svg>
-                  Add new product
-                </button>
-                {/* Otros botones... */}
-              </div>
-            </div>
-            {/* Tabla de datos */}
-            <div className="w-full overflow-x-auto">
-              <table className="w-full table-auto text-sm text-center text-gray-500 dark:text-gray-400">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                  <tr>
-                    {columns.map((column) => (
-                      <th
-                        key={column.field}
-                        scope="col"
-                        className="px-6 py-3 text-center"
-                      >
-                        {column.headerName}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {clientes.map((cliente, index) => (
-                    <tr
-                      key={index}
-                      className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
+            <div className="w-full h-96 bg-white">
+              <div className="flex flex-col w-full h-full">
+                {/* Tu tabla de clientes */}
+                <table className="w-full table-auto text-sm text-center text-gray-500">
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
                       {columns.map((column) => (
-                        <td
+                        <th
                           key={column.field}
-                          className="px-6 py-3 text-center whitespace-nowrap"
+                          className="px-6 py-3 text-center"
                         >
-                          {column.field === "Acciones"
-                            ? column.renderCell({ row: cliente })
-                            : cliente[column.field]}
-                        </td>
+                          {column.headerName}
+                        </th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {modalData && (
-                <ModalDinamico
-                  open={true}
-                  handleClose={() => setModalData(null)}
-                  title="Registrar clientes"
-                  fields={[
-                    {
-                      label: "Tip_Documento",
-                      name: "Tip_Documento",
-                      type: "select",
-                      required: true,
-                      options: [
-                        { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
-                        { value: "C.E", label: "Cédula de extranjería (C.E)" },
-                      ],
-                    },
-                    {
-                      label: "Nombre",
-                      name: "Nombre",
-                      type: "text",
-                      required: true,
-                    },
-                    {
-                      label: "Apellido",
-                      name: "Apellido", // Nombre ajustado a "Apellido"
-                      type: "text",
-                      required: true,
-                    },
-                    {
-                      label: "Correo",
-                      name: "Correo", // Nombre ajustado a "Correo"
-                      type: "text",
-                      required: true,
-                    },
-                    {
-                      label: "Teléfono",
-                      name: "Telefono", // Nombre ajustado a "Telefono"
-                      type: "text",
-                      required: true,
-                    },
-                    {
-                      label: "Documento",
-                      name: "Documento",
-                      type: "text",
-                      required: true,
-                    },
-
-                    {
-                      label: "Contraseña",
-                      name: "Contrasena",
-                      type: "password",
-                      required: true,
-                    },
-                  ]}
-                  onSubmit={handleSubmit}
-                  seleccionado={modalData}
-                />
-              )}
-
-              {modalData && modalData.modo === "actualizacion" && (
-                <ModalDinamico
-                  open={true}
-                  handleClose={() => setModalData(null)}
-                  title="Actualizar Cliente"
-                  fields={[
-                    {
-                      label: "Tip_Documento",
-                      name: "tipoDocumento",
-                      type: "select",
-                      required: true,
-                      options: [
-                        { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
-                        { value: "C.E", label: "Cédula de extranjería (C.E)" },
-                      ],
-                    },
-                    {
-                      label: "Nombre",
-                      name: "Nombre",
-                      type: "text",
-                      required: true,
-                    },
-                    {
-                      label: "Apellido",
-                      name: "Apellido",
-                      type: "text",
-                      required: true,
-                    },
-                    {
-                      label: "Correo",
-                      name: "Correo",
-                      type: "text",
-                      required: true,
-                    },
-                    {
-                      label: "Teléfono",
-                      name: "Telefono",
-                      type: "text",
-                      required: true,
-                    },
-                    {
-                      label: "Documento",
-                      name: "Documento",
-                      type: "text",
-                      required: true,
-                    },
-                  ]}
-                  onSubmit={handleActualizacionSubmit}
-                  seleccionado={modalData.seleccionado}
-                />
-              )}
+                  </thead>
+                  <tbody>
+                    {currentClientes.map((cliente) => (
+                      <tr key={cliente.IdCliente}>
+                        {columns.map((column) => (
+                          <td key={column.field} className="py-2 px-4 border-b">
+                            {column.field === "Acciones"
+                              ? column.renderCell({ row: cliente })
+                              : cliente[column.field]}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
+
+            {modalData && (
+              <ModalDinamico
+                open={true}
+                handleClose={() => setModalData(null)}
+                title="Registrar clientes"
+                fields={[
+                  {
+                    label: "Tip_Documento",
+                    name: "Tip_Documento",
+                    type: "select",
+                    required: true,
+                    options: [
+                      { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
+                      { value: "C.E", label: "Cédula de extranjería (C.E)" },
+                    ],
+                  },
+                  {
+                    label: "Nombre",
+                    name: "Nombre",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Apellido",
+                    name: "Apellido", // Nombre ajustado a "Apellido"
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Correo",
+                    name: "Correo", // Nombre ajustado a "Correo"
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Teléfono",
+                    name: "Telefono", // Nombre ajustado a "Telefono"
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Documento",
+                    name: "Documento",
+                    type: "text",
+                    required: true,
+                  },
+
+                  {
+                    label: "Contraseña",
+                    name: "Contrasena",
+                    type: "password",
+                    required: true,
+                  },
+                ]}
+                onSubmit={handleSubmit}
+                seleccionado={modalData}
+              />
+            )}
+
+            {modalData && modalData.modo === "actualizacion" && (
+              <ModalDinamico
+                open={true}
+                handleClose={() => setModalData(null)}
+                title="Actualizar Cliente"
+                fields={[
+                  {
+                    label: "Tip_Documento",
+                    name: "tipoDocumento",
+                    type: "select",
+                    required: true,
+                    options: [
+                      { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
+                      { value: "C.E", label: "Cédula de extranjería (C.E)" },
+                    ],
+                  },
+                  {
+                    label: "Nombre",
+                    name: "Nombre",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Apellido",
+                    name: "Apellido",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Correo",
+                    name: "Correo",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Teléfono",
+                    name: "Telefono",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    label: "Documento",
+                    name: "Documento",
+                    type: "text",
+                    required: true,
+                  },
+                ]}
+                onSubmit={handleActualizacionSubmit}
+                seleccionado={modalData.seleccionado}
+              />
+            )}
 
             <button
               className="fixed bottom-4 right-4 bg-blue-500 text-white rounded-full p-3 shadow-xl hover:shadow-2xl"
@@ -668,6 +649,14 @@ const Clientes = () => {
               </svg>
             </button>
           </div>
+          <Box display="flex" justifyContent="center" mt={2}>
+            <Pagination
+              count={Math.ceil(filteredData.length / rowsPerPage)}
+              page={page}
+              onChange={handleChangePage}
+              color="primary"
+            />
+          </Box>
         </div>
       </div>
       <Modal
