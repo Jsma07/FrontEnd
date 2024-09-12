@@ -14,7 +14,6 @@ const CambiarContrasena = () => {
   // Obtener idCliente de los parámetros de la URL
   const { idCliente } = useParams();
 
-  // Función para validar la contraseña
   const validatePassword = (password) => {
     const minLength = 8;
     const hasUppercase = /[A-Z]/.test(password);
