@@ -71,7 +71,7 @@ const ModalDinamico = ({
       setFormValues(initialData);
 
       if (entityData.ImgServicio) {
-        setImagePreview(`http://localhost:5000${entityData.ImgServicio}`);
+        setImagePreview(`https://back-bb2i.onrender.com${entityData.ImgServicio}`);
       } else if (entityData.image_preview) {
         setImagePreview(entityData.image_preview);
       } else {
@@ -79,7 +79,7 @@ const ModalDinamico = ({
       }
 
       if (entityData.imagen) {
-        setImagePreview(`http://localhost:5000${entityData.imagen}`);
+        setImagePreview(`https://back-bb2i.onrender.com${entityData.imagen}`);
       }
     }
   }, [entityData]);
@@ -232,24 +232,29 @@ if (name === "Descripcion_Servicio") {
       if (!/^\d+(-\d+)?$/.test(value)) {
         error = 'El NIT solo puede contener números.';
       }
-    }  else if (name === "NombreInsumos") {
-      if (!/[a-zA-ZñÑ]/.test(value)) {
-        error = "El nombre de la categoría debe contener al menos una letra.";
-      } 
+    }else if(name == "nombre_proveedor"){
+      if (!/[a-zA-ZñÑ]{4,}/.test(value)) {
+        error = "El nombre del proveedor debe contener al menos 4 letras.";
+      }
+
+    }else if (name === "NombreInsumos") {
+      if (!/[a-zA-ZñÑ]{4,}/.test(value)) {
+        error = "El nombre de la categoría debe contener al menos 4 letras.";
+      }      
       else if (/[^a-zA-Z0-9ñÑ\s]/.test(value)) {
         error = "El nombre de la categoría no puede contener caracteres especiales.";
       }
     } else if (name === "empresa_proveedor") {
-      if (!/[a-zA-ZñÑ]/.test(value)) {
-        error = "El nombre de la empresa debe contener al menos una letra.";
-      } 
-
+      if (!/[a-zA-ZñÑ]{4,}/.test(value)) {
+        error = "El nombre de la categoría debe contener al menos 4 letras.";
+      }
+      
       else if (/[^a-zA-Z0-9ñÑ\s]/.test(value)) {
         error = "El nombre de la empresa no puede contener caracteres especiales.";
       }
     }else if (name === "Precio_Servicio") {
       if (value < 20000) {
-        error = "El precio debe ser minimo de $20.000.";
+        error = "El precio debe ser mayor de $20.000.";
       }
     } else {
       switch (type) {
@@ -498,19 +503,19 @@ if (name === "Descripcion_Servicio") {
                 src={imagePreview}
                 alt="Preview"
                 style={{
-                  width: '100%',
-                  maxWidth: '500px',
+                  width: '150%',
+                  maxWidth: '150px',
                   height: 'auto',
                   maxHeight: '200px',
                   objectFit: 'contain',
-                  borderRadius: '8px',
+                  borderRadius: '50px',
                 }}
               />
               <IconButton
                 size="small"
                 style={{
                   position: 'absolute',
-                  top: '5px',
+                  top: '50px',
                   right: '5px',
                   backgroundColor: 'rgba(255, 255, 255, 0.7)',
                 }}
@@ -535,9 +540,9 @@ if (name === "Descripcion_Servicio") {
                   transform: 'translate(-50%, -50%)',
                 }}
               />
-              <Typography variant="body1" style={{ fontWeight: 'bold', marginTop: '2rem' }}>
+              {/* <Typography variant="body1" style={{ fontWeight: 'bold', marginTop: '2rem' }}>
                 Click para seleccionar una imagen
-              </Typography>
+              </Typography> */}
               <input
                 id={`file-input-${name}`}
                 type="file"
@@ -580,32 +585,38 @@ if (name === "Descripcion_Servicio") {
             </div>
           ) : (
             <label
-              htmlFor={`file-input-${name}`}
-              className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-              style={{ width: '100%', height: '150px', maxWidth: '500px', textAlign: 'center', marginBottom: '0.5rem', position: 'relative' }}
-            >
-              <CameraAltIcon
-                style={{
-                  fontSize: '4rem',
-                  color: '#9e9e9e',
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                }}
-              />
-              <Typography variant="body1" style={{ fontWeight: 'bold', marginTop: '6rem' }}>
-                Click para seleccionar una imagen
-              </Typography>
-              <input
-                id={`file-input-${name}`}
-                type="file"
-                name={name}
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => handleImageChange(e, name)}
-              />
-            </label>
+  htmlFor={`file-input-${name}`}
+  className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed cursor-pointer bg-gray-50 hover:bg-gray-100"
+  style={{
+    width: '150px', // Aseguramos que el ancho y alto sean iguales
+    height: '150px',
+    textAlign: 'center',
+    marginBottom: '0.5rem',
+    position: 'relative',
+    borderRadius: '50%', // Usamos 50% para que sea circular
+  }}
+>
+  <CameraAltIcon
+    style={{
+      fontSize: '4rem',
+      color: '#9e9e9e',
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+    }}
+  />
+  
+  <input
+    id={`file-input-${name}`}
+    type="file"
+    name={name}
+    accept="image/*"
+    className="hidden"
+    onChange={(e) => handleImageChange(e, name)}
+  />
+</label>
+
           )}
         </>
       )}

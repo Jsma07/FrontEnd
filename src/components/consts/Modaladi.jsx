@@ -75,7 +75,7 @@ const ModalAgregarAdicion = ({
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/Jackenail/AddAdicion",
+        "https://back-bb2i.onrender.com/Jackenail/AddAdicion",
         {
           NombreAdiciones,
           Precio,
@@ -124,7 +124,7 @@ const ModalAgregarAdicion = ({
       }
 
       const response = await axios.post(
-        "http://localhost:5000/Jackenail/Registraradiciones",
+        "https://back-bb2i.onrender.com/Jackenail/Registraradiciones",
         formDataToSend
       );
 

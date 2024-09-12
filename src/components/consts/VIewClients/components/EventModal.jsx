@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, Box, Typography, Button } from "@mui/material";
 
-const EventModal = ({ open, handleClose, event }) => {
+const EventModal = ({ open, handleClose, event, handleCancel  }) => {
   return (
     <Modal open={open} onClose={handleClose}>
       <Box
@@ -57,6 +57,14 @@ const EventModal = ({ open, handleClose, event }) => {
           color="primary"
         >
           Cerrar
+        </Button>
+        <Button
+          onClick={() => handleCancel(event.extendedProps.idAgenda)}
+          sx={{ mt: 3, display: "block", width: "100%" }}
+          variant="contained"
+          color="secondary"
+        >
+          Cancelar Cita
         </Button>
       </Box>
     </Modal>

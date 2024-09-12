@@ -22,7 +22,7 @@ const ModalInactivarFecha = ({ open, handleClose, onFechaInactivada }) => {
       return;
     }
 
-    axios.post('http://localhost:5000/api/horarios/crear', {
+    axios.post('https://back-bb2i.onrender.com/api/horarios/crear', {
       fecha: selectedDate.format('YYYY-MM-DD'),
       estado: 'inactivo'
     })

@@ -62,7 +62,7 @@ const Salida = () => {
             idInsumo: (
               <div>
                 <img
-                  src={`http://localhost:5000${salida.insumo.Imagen}`}
+                  src={`https://back-bb2i.onrender.com${salida.insumo.Imagen}`}
                   alt={salida.insumo.NombreInsumos}
                   style={{
                     maxWidth: "3rem",
@@ -250,7 +250,7 @@ const Salida = () => {
               >
                 <div className="relative">
                   <img
-                    src={`http://localhost:5000${detalleSalida.insumo?.Imagen}`}
+                    src={`https://back-bb2i.onrender.com${detalleSalida.insumo?.Imagen}`}
                     alt={
                       detalleSalida.insumo?.NombreInsumos || "Imagen del insumo"
                     }

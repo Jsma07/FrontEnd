@@ -20,7 +20,7 @@ function Contenidoitems() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/servicios")
+      .get("https://back-bb2i.onrender.com/api/servicios")
       .then((response) => {
         setServicios(response.data);
       })
@@ -235,7 +235,7 @@ function Contenidoitems() {
                     }}
                   >
                     <img
-                      src={`http://localhost:5000${servicio.ImgServicio}`}
+                      src={`https://back-bb2i.onrender.com${servicio.ImgServicio}`}
                       alt={servicio.Nombre_Servicio}
                       style={{
                         width: "100%",
@@ -316,7 +316,7 @@ function Contenidoitems() {
           <Box sx={{ display: "flex", alignItems: "flex-start", gap: 3 }}>
             <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
               <img
-                src={`http://localhost:5000${selectedService.ImgServicio}`}
+                src={`https://back-bb2i.onrender.com${selectedService.ImgServicio}`}
                 alt={selectedService.Nombre_Servicio}
                 style={{
                   maxWidth: "100%",

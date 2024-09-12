@@ -65,7 +65,7 @@ const Ventas = () => {
           idServicio: (
             <div style={{ display: "flex", alignItems: "center" }}>
               <img
-                src={`http://localhost:5000${venta.servicio.ImgServicio}`}
+                src={`https://back-bb2i.onrender.com${venta.servicio.ImgServicio}`}
                 alt={venta.servicio.Nombre_Servicio}
                 style={{
                   width: "3rem",

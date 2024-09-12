@@ -483,7 +483,7 @@ const Registrar = () => {
             >
               <div>
                 <img
-                  src={`http://localhost:5000${adicion.Img}`}
+                  src={`https://back-bb2i.onrender.com${adicion.Img}`}
                   alt={adicion.NombreAdiciones}
                   style={{ width: "50px", height: "50px", objectFit: "cover" }}
                 />

@@ -154,7 +154,7 @@ const InsumoDetalle = () => {
                 <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                   <td className="px-6 py-4 flex items-center space-x-4">
                     <img
-                      src={`http://localhost:5000${venta.venta.servicio.ImgServicio}`}
+                      src={`https://back-bb2i.onrender.com${venta.venta.servicio.ImgServicio}`}
                       alt={venta.venta.servicio.Nombre_Servicio}
                       className="w-12 h-12 rounded-full object-cover"
                     />
@@ -184,7 +184,7 @@ const InsumoDetalle = () => {
                   <div className="overflow-hidden rounded-full mx-auto mt-4 w-24 h-24">
                     <img
                       className="object-cover w-full h-full"
-                      src={`http://localhost:5000${adicion.Img}`}
+                      src={`https://back-bb2i.onrender.com${adicion.Img}`}
                       alt={adicion.NombreAdiciones}
                     />
                   </div>

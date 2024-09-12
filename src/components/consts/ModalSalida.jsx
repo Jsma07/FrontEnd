@@ -199,7 +199,7 @@ const ModalInsumos = ({
                       }}
                     >
                       <img
-                        src={`http://localhost:5000${item.imagen}`}
+                        src={`https://back-bb2i.onrender.com${item.imagen}`}
                         alt={item.NombreInsumos}
                         style={{
                           maxWidth: "100%",

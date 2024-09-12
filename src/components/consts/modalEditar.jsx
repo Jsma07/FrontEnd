@@ -16,19 +16,15 @@ const ModalEditar = ({ open, handleClose, title = '', fields, onSubmit, entityDa
       };
       setFormData(initialData);
 
-      if (entityData.ImgServicio) {
-        setImagePreview(`http://localhost:5000${entityData.ImgServicio}`);
-      } else if (entityData.image_preview) {
-        setImagePreview(entityData.image_preview);
-      } else {
-        setImagePreview(null);
-      }
-
-      if (entityData.imagen) {
-        setImagePreview(`http://localhost:5000${entityData.imagen}`);
-      }
+      // Configurar la vista previa de la imagen existente
+    if (entityData.ImgServicio || entityData.imagen) {
+      const imageUrl = `http://localhost:5000${entityData.ImgServicio || entityData.imagen}`;
+      setImagePreview(imageUrl);
+    } else {
+      setImagePreview(null);
     }
-  }, [entityData]);
+  }
+}, [entityData]);
 
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;

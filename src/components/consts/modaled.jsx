@@ -17,13 +17,13 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Flag from "react-flagkit";
 import PhoneIcon from "@mui/icons-material/Phone";
 import HomeIcon from "@mui/icons-material/Home";
 import { Box } from "@mui/system";
 import { useDropzone } from "react-dropzone";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import { toast } from "react-toastify";
+import Flag from "react-flagkit";
 
 const ModalDinamico = ({
   open,
@@ -37,6 +37,7 @@ const ModalDinamico = ({
   const [showPassword, setShowPassword] = useState({});
   const [avatar, setAvatar] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (seleccionado) {
@@ -50,14 +51,70 @@ const ModalDinamico = ({
     }
   }, [seleccionado]);
 
+  
+  const validateField = (name, value) => {
+    let error = '';
+
+    switch (name) {
+      case 'Documento':
+        if (!/^\d{10}$/.test(value)) {
+          error = 'Debe ser un número de 10 dígitos.';
+        }
+        break;
+      case 'Nombre':
+      case 'Apellido':
+        if (!/^[a-zA-Z\s]+$/.test(value) || !/\S/.test(value)) {
+          error = 'Solo se permiten letras y espacios, y no puede estar vacío.';
+        }
+        break;
+      case 'Correo':
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          error = 'Correo electrónico inválido.';
+        }
+        break;
+      case 'Telefono':
+        if (!/^\d{10,15}$/.test(value)) {
+          error = 'Debe ser un número entre 10 y 15 dígitos.';
+        }
+        break;
+      case 'Direccion':
+        if (!value.trim()) {
+          error = 'La dirección no puede estar vacía.';
+        }
+        break;
+      case 'Contrasena':
+        if (!/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/.test(value)) {
+          error = 'La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.';
+        }
+        break;
+      default:
+        break;
+    }
+
+    return error;
+  };
+
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
     const newValue = type === "checkbox" ? checked : value;
+
+    // Validar el campo y actualizar errores en tiempo real
+    const error = validateField(name, newValue);
+
     setFormData((prevData) => ({
       ...prevData,
       [name]: newValue,
     }));
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: error,
+    }));
   };
+
+  
+
+  
 
   const handleCancel = () => {
     handleClose();
@@ -96,9 +153,36 @@ const ModalDinamico = ({
   };
 
   const handleSubmit = () => {
+    const newErrors = {};
+    
+    // Validar campos del formulario
+    for (const field of fields) {
+      const error = validateField(field.name, formData[field.name] || '');
+      if (error) {
+        newErrors[field.name] = error;
+      }
+    }
+    
+    // Validar campos adicionales
+    if (!avatarFile) {
+      newErrors['avatar'] = 'La imagen no puede estar vacía.';
+    }
+    
+    if (!formData['Documento']) {
+      newErrors['Documento'] = 'El tipo de documento no puede estar vacío.';
+    }
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error('Por favor corrige los errores en el formulario.');
+      return;
+    }
+  
+    // Enviar formulario si no hay errores
     onSubmit({ ...formData, Img: avatarFile });
     handleClose();
   };
+  
 
   const onDrop = (acceptedFiles) => {
     const file = acceptedFiles[0];
@@ -218,6 +302,8 @@ const ModalDinamico = ({
                           size="small"
                           type="text"
                           value={formData[field.name] || ""}
+                          error={Boolean(errors[field.name])}
+                          helperText={errors[field.name]}
                           style={{
                             marginBottom: "0.5rem",
                             borderRadius: "8px",
@@ -247,6 +333,8 @@ const ModalDinamico = ({
                           size="small"
                           type={showPassword[field.name] ? "text" : "password"}
                           value={formData[field.name] || ""}
+                          error={Boolean(errors[field.name])}
+                          helperText={errors[field.name]}
                           style={{
                             marginBottom: "0.5rem",
                             borderRadius: "8px",

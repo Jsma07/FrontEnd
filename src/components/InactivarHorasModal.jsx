@@ -63,7 +63,7 @@ const InactivarHorasModal = ({ open, onClose, onHoursInactivated }) => {
 
         try {
             // Enviar solicitud al servidor
-            await axios.post('http://localhost:5000/api/horarios/inactivarHoras', {
+            await axios.post('https://back-bb2i.onrender.com/api/horarios/inactivarHoras', {
                 fecha: selectedDate,
                 horas: selectedHours
             });
