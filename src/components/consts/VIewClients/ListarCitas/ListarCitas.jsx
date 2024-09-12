@@ -24,7 +24,7 @@ const MisCitas = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          "http://localhost:5000/api/agendas/misCitas",
+          "https://back-bb2i.onrender.com/api/agendas/misCitas",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -65,7 +65,7 @@ const MisCitas = () => {
     extendedProps: {
       servicio: cita.servicio.Nombre_Servicio,
       empleado: `${cita.empleado.Nombre} ${cita.empleado.Apellido}`,
-      imgServicio: `http://localhost:5000${cita.servicio.ImgServicio}`,
+      imgServicio: `https://back-bb2i.onrender.com${cita.servicio.ImgServicio}`,
     },
   }));
 

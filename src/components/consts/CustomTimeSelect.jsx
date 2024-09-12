@@ -27,12 +27,12 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
         setIsInactiveDay(false);
 
         try {
-          const occupiedResponse = await axios.get('http://localhost:5000/api/agendas/horasOcupadas', {
+          const occupiedResponse = await axios.get('https://back-bb2i.onrender.com/api/agendas/horasOcupadas', {
             params: { fecha: selectedDate.format('YYYY-MM-DD') },
           });
           setOccupiedTimes(occupiedResponse.data);
 
-          const inactiveDayResponse = await axios.get('http://localhost:5000/api/horarios');
+          const inactiveDayResponse = await axios.get('https://back-bb2i.onrender.com/api/horarios');
           const inactiveDays = inactiveDayResponse.data
             .filter(horario => horario.estado === 'inactivo')
             .map(horario => dayjs(horario.fecha));
@@ -48,7 +48,7 @@ export default function CustomTimeSelect({ selectedTime, setSelectedTime, select
             });
           }
 
-          const inactiveTimesResponse = await axios.get('http://localhost:5000/api/horarios/listarFechasConHorasInactivas');
+          const inactiveTimesResponse = await axios.get('https://back-bb2i.onrender.com/api/horarios/listarFechasConHorasInactivas');
           const inactiveDateInfo = inactiveTimesResponse.data.find(info => dayjs(info.fecha).isSame(selectedDate, 'day'));
 
           if (inactiveDateInfo) {

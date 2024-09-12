@@ -46,7 +46,7 @@ const Empleados = () => {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/roles");
+        const response = await axios.get("https://back-bb2i.onrender.com/api/roles");
         console.log("Roles response:", response.data);
 
         // Filtrar para excluir roles de Administrador (ID 1) y Cliente (ID 4)
@@ -68,7 +68,7 @@ const Empleados = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/jackenail/Listar_Empleados"
+          "https://back-bb2i.onrender.com/jackenail/Listar_Empleados"
         );
         const empleadosConRol = response.data.map((empleado) => ({
           ...empleado,
@@ -188,7 +188,7 @@ const Empleados = () => {
           console.log("Datos del formulario numéricos:", formDataNumerico);
 
           const response = await axios.post(
-            "http://localhost:5000/Jackenail/RegistrarEmpleados",
+            "https://back-bb2i.onrender.com/Jackenail/RegistrarEmpleados",
             formDataNumerico
           );
 
@@ -259,7 +259,7 @@ const Empleados = () => {
 
       if (result.isConfirmed) {
         await axios.put(
-          `http://localhost:5000/Jackenail/CambiarEstadoEmpleado/${id}`,
+          `https://back-bb2i.onrender.com/Jackenail/CambiarEstadoEmpleado/${id}`,
           {
             Estado: updatedEmpleado.Estado,
           }
@@ -310,7 +310,7 @@ const Empleados = () => {
       };
 
       // Construir la URL para la solicitud PUT
-      const url = `http://localhost:5000/Jackenail/ActualizarEmpleados/${formDataNumerico.IdEmpleado}`;
+      const url = `https://back-bb2i.onrender.com/Jackenail/ActualizarEmpleados/${formDataNumerico.IdEmpleado}`;
 
       // Realizar la solicitud PUT
       await axios.put(url, formDataNumerico);
@@ -413,7 +413,7 @@ const Empleados = () => {
       });
 
       const response = await axios.put(
-        `http://localhost:5000/Jackenail/Empleado/${seleccionado.IdEmpleado}`,
+        `https://back-bb2i.onrender.com/Jackenail/Empleado/${seleccionado.IdEmpleado}`,
         {
           Contrasena: newPassword,
         }

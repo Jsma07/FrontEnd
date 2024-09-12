@@ -45,7 +45,7 @@ const VerificarCodigo = () => {
     }
   
     try {
-      const response = await axios.post('http://localhost:5000/api/verificar-codigo', {
+      const response = await axios.post('https://back-bb2i.onrender.com/api/verificar-codigo', {
         correo,
         codigo: codeString
       });

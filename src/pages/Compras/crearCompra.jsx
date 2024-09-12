@@ -66,7 +66,7 @@ const CrearCompra = () => {
 
 const fetchCompras = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/compras');
+      const response = await axios.get('https://back-bb2i.onrender.com/api/compras');
       setCompras(response.data);
     } catch (error) {
       console.error('Error fetching Compras:', error);
@@ -75,7 +75,7 @@ const fetchCompras = async () => {
 
 const fetchInsumos = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/insumos');
+      const response = await axios.get('https://back-bb2i.onrender.com/api/insumos');
       setInsumos(response.data);
     } catch (error) {
       console.error('Error fetching Insumos:', error);
@@ -84,7 +84,7 @@ const fetchInsumos = async () => {
 
 const fetchCategorias = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/categorias');
+      const response = await axios.get('https://back-bb2i.onrender.com/api/categorias');
       setCategorias(response.data);
     } catch (error) {
       console.error('Error fetching Categorias:', error);
@@ -93,7 +93,7 @@ const fetchCategorias = async () => {
 
 const fetchProveedores = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/proveedores");
+      const response = await axios.get("https://back-bb2i.onrender.com/api/proveedores");
       console.log("proveedores fetched:", response.data); 
       setProveedores(response.data);
     } catch (error) {
@@ -243,7 +243,7 @@ if (invalidDetalles) {
         });
 
         if (confirmation.isConfirmed) {
-            const postResponse = await axios.post('http://localhost:5000/api/compras/guardarCompra', formData);
+            const postResponse = await axios.post('https://back-bb2i.onrender.com/api/compras/guardarCompra', formData);
             console.log('Respuesta del servidor:', postResponse.data);
             fetchCompras();
             Swal.fire({

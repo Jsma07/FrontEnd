@@ -7,7 +7,7 @@ import CamposObligatorios from '../../components/consts/camposVacios';
 const handleAddProveedor = async (formData, handleCloseModalAgregar, fetchProveedores) => {
     try {
       const { NIT, correo_proveedor, telefono_proveedor, empresa_proveedor } = formData;
-      const response = await axios.get('http://localhost:5000/api/proveedores');
+      const response = await axios.get('https://back-bb2i.onrender.com/proveedores');
       const proveedores = response.data;
       const proveedorExistenteNIT = proveedores.find(proveedor => proveedor.NIT === NIT);
       const proveedorExistenteCorreo = proveedores.find(proveedor => proveedor.correo_proveedor === correo_proveedor);
@@ -89,7 +89,7 @@ const handleAddProveedor = async (formData, handleCloseModalAgregar, fetchProvee
 
       if (confirmation.isConfirmed) {
         formData.estado_proveedor = 1;
-        await axios.post('http://localhost:5000/api/proveedores/guardarProveedor', formData);
+        await axios.post('https://back-bb2i.onrender.com/proveedores/guardarProveedor', formData);
         handleCloseModalAgregar();
         fetchProveedores();
         window.Swal.fire('¡Proveedor agregado!', '', 'success');

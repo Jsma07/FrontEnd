@@ -24,7 +24,7 @@ const Insumos = () => {
 
   const fetchInsumos = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/insumos");
+      const response = await axios.get("https://back-bb2i.onrender.com/api/insumos");
       console.log("Insumos fetched:", response.data); 
       setInsumos(response.data);
     } catch (error) {
@@ -34,7 +34,7 @@ const Insumos = () => {
 
   const fetchCategorias = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/categorias");
+      const response = await axios.get("https://back-bb2i.onrender.com/api/categorias");
       setCategorias(response.data);
     } catch (error) {
       console.error("Error fetching categorias:", error);
@@ -87,7 +87,7 @@ const Insumos = () => {
     };
 
     formData.NombreInsumos = formatNombreInsumo(formData.NombreInsumos);
-    const response = await axios.get('http://localhost:5000/api/insumos');
+    const response = await axios.get('https://back-bb2i.onrender.com/api/insumos');
     const insumos = response.data;
     const insumoExistente = insumos.find(insumo => insumo.NombreInsumos === formData.NombreInsumos && insumo.IdInsumos !== formData.IdInsumos);
 
@@ -120,7 +120,7 @@ const Insumos = () => {
 
   
         const response = await axios.put(
-          `http://localhost:5000/api/insumos/editar/${formData.IdInsumos}`,
+          `https://back-bb2i.onrender.com/api/insumos/editar/${formData.IdInsumos}`,
           formDataWithNumbers,
           {
             headers: {
@@ -159,7 +159,7 @@ const Insumos = () => {
 
     if (result.isConfirmed) {
         try {
-            await axios.put(`http://localhost:5000/api/insumos/editar/${id}`, { estado_insumo: newEstado });
+            await axios.put(`https://back-bb2i.onrender.com/api/insumos/editar/${id}`, { estado_insumo: newEstado });
             fetchInsumos(); // Actualiza la lista de categorías después de la actualización
             window.Swal.fire({
                 icon: 'success',

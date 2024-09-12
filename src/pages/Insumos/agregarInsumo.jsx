@@ -18,7 +18,7 @@ const handleAddInsumo = async (formData, handleCloseModalAgregar, fetchInsumos) 
 
         try {
             const response = await axios.post(
-                "http://localhost:5000/api/insumos/guardarInsumo",
+                "https://back-bb2i.onrender.com/api/insumos/guardarInsumo",
                 formDataToSend,
                 {
                     headers: {

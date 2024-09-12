@@ -30,7 +30,7 @@ const Roles = () => {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/roles");
+      const response = await axios.get("https://back-bb2i.onrender.com/api/roles");
       if (response.data && Array.isArray(response.data)) {
         const rolesWithPermissions = response.data.map((role) => ({
           ...role,
@@ -81,7 +81,7 @@ const Roles = () => {
 
       if (result.isConfirmed) {
         const response = await axios.put(
-          `http://localhost:5000/api/editarRol/${id}`,
+          `https://back-bb2i.onrender.com/api/editarRol/${id}`,
           {
             EstadoRol: updatedRole.EstadoRol,
             nombre: updatedRole.nombre,

@@ -24,7 +24,7 @@ const Compras = () => {
 
 const fetchCompras = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/compras');
+    const response = await axios.get('https://back-bb2i.onrender.com/api/compras');
     const data = response.data;
     // Ordenar por IdCompra en orden descendente
     data.sort((a, b) => b.IdCompra - a.IdCompra);
@@ -37,7 +37,7 @@ const fetchCompras = async () => {
 
 const fetchProveedores = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/api/proveedores");
+    const response = await axios.get("https://back-bb2i.onrender.com/api/proveedores");
     console.log("proveedores fetched:", response.data); 
     setProveedores(response.data);
   } catch (error) {
@@ -77,7 +77,7 @@ const filtrar = compras.filter(compra => {
 
     if (result.isConfirmed) {
       try {
-        await axios.put(`http://localhost:5000/api/compras/Anular/${IdCompra}`);
+        await axios.put(`https://back-bb2i.onrender.com/api/compras/Anular/${IdCompra}`);
         fetchCompras(); 
         Swal.fire({
           icon: 'success',
@@ -98,7 +98,7 @@ const filtrar = compras.filter(compra => {
   const cambiarEstadoCompra = async (IdCompra, nuevoEstado) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/compras/cambiarEstado/${IdCompra}`,
+        `https://back-bb2i.onrender.com/api/compras/cambiarEstado/${IdCompra}`,
         { estado_compra: nuevoEstado },
         { headers: { 'Content-Type': 'application/json' } }
       );

@@ -28,7 +28,7 @@ const Proveedores = () => {
 
   const fetchProveedores = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/proveedores');
+      const response = await axios.get('https://back-bb2i.onrender.com/api/proveedores');
       console.log('Datos de proveedores:', response.data); // Verifica la estructura de los datos
       setProveedores(response.data);
       toast.success("Proveedores cargados exitosamente");
@@ -40,7 +40,7 @@ const Proveedores = () => {
 
   const fetchCompras = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/compras');
+      const response = await axios.get('https://back-bb2i.onrender.com/api/compras');
       const data = response.data;
       // Ordenar por IdCompra en orden descendente
       data.sort((a, b) => b.IdCompra - a.IdCompra);
@@ -70,7 +70,7 @@ const Proveedores = () => {
   const handleEditProveedor = async (formData) => {
     try {
       const { NIT, correo_proveedor, telefono_proveedor, empresa_proveedor } = formData;
-      const response = await axios.get('http://localhost:5000/api/proveedores');
+      const response = await axios.get('https://back-bb2i.onrender.com/api/proveedores');
       const proveedores = response.data;
       const proveedorExistenteNIT = proveedores.find(proveedor => proveedor.NIT === NIT && proveedor.IdProveedor !== formData.IdProveedor);
       const proveedorExistenteCorreo = proveedores.find(proveedor => proveedor.correo_proveedor === correo_proveedor && proveedor.IdProveedor !== formData.IdProveedor);
@@ -159,7 +159,7 @@ const Proveedores = () => {
   
       if (confirmation.isConfirmed) {
         formData.estado_proveedor = 1;
-        await axios.put(`http://localhost:5000/api/proveedores/editar/${formData.IdProveedor}`, formData);
+        await axios.put(`https://back-bb2i.onrender.com/api/proveedores/editar/${formData.IdProveedor}`, formData);
         handleCloseModalEditar();
         fetchProveedores();
         window.Swal.fire('¡Proveedor actualizado!', '', 'success');
@@ -204,7 +204,7 @@ const Proveedores = () => {
 
     if (result.isConfirmed) {
         try {
-            await axios.put(`http://localhost:5000/api/proveedores/editar/${id}`, { estado_proveedor: newEstado });
+            await axios.put(`https://back-bb2i.onrender.com/api/proveedores/editar/${id}`, { estado_proveedor: newEstado });
             await fetchProveedores(); // Actualiza la lista de proveedores después de la actualización
             window.Swal.fire({
                 icon: 'success',

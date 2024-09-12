@@ -28,7 +28,7 @@ const VentasPorMes = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/ventaspormes'); 
+                const response = await fetch('https://back-bb2i.onrender.com/api/ventaspormes'); 
                 const result = await response.json();
 
                 const labels = result.map(item => `${item.año}-${item.mes.toString().padStart(2, '0')}`);

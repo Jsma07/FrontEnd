@@ -24,7 +24,7 @@ const Agendamientos = () => {
   useEffect(() => {
     const fetchAgendamientos = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/agendas");
+        const response = await axios.get("https://back-bb2i.onrender.com/api/agendas");
         const agendamientosConDetalles = response.data.map((agendamiento) => ({
           id: agendamiento.IdAgenda,
           cliente: `${agendamiento.cliente.Nombre} ${agendamiento.cliente.Apellido}`,
@@ -121,7 +121,7 @@ const Agendamientos = () => {
   const cambiarEstadoAgendamiento = async (agendamientoId, nuevoEstado) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/agendas/editar/${agendamientoId}`,
+        `https://back-bb2i.onrender.com/api/agendas/editar/${agendamientoId}`,
         { EstadoAgenda: nuevoEstado },
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -166,7 +166,7 @@ const Agendamientos = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.put(`http://localhost:5000/api/agendas/anular/${IdAgenda}`);
+        await axios.put(`https://back-bb2i.onrender.com/api/agendas/anular/${IdAgenda}`);
         setAgendamientos((prevAgendamientos) =>
           prevAgendamientos.map((agendamiento) =>
             agendamiento.id === IdAgenda

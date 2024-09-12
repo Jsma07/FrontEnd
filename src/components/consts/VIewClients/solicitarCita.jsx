@@ -76,7 +76,7 @@ const SolicitarCita = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/servicios");
+        const response = await axios.get("https://back-bb2i.onrender.com/api/servicios");
         const activeServices = response.data.filter(
           (service) => service.EstadoServicio === 1
         );
@@ -90,7 +90,7 @@ const SolicitarCita = () => {
     const fetchEmployees = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/jackenail/Listar_Empleados"
+          "https://back-bb2i.onrender.com/jackenail/Listar_Empleados"
         );
         const manicuristasActivos = response.data.filter(
           (employee) => employee.Estado === 1 && employee.IdRol === 2
@@ -190,7 +190,7 @@ const SolicitarCita = () => {
       };
 
       axios
-        .post("http://localhost:5000/api/agendas/crearAgenda", appointmentData)
+        .post("https://back-bb2i.onrender.com/api/agendas/crearAgenda", appointmentData)
         .then((response) => {
           Swal.fire({
             title: "Cita Confirmada",

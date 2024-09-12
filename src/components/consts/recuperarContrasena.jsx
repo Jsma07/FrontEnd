@@ -14,7 +14,7 @@ const RecuperarContrasena = () => {
     setError('');
 
     try {
-      await axios.post('http://localhost:5000/api/recuperarContrasena', { correo, tipo: 'cliente' });
+      await axios.post('https://back-bb2i.onrender.com/api/recuperarContrasena', { correo, tipo: 'cliente' });
       setMensaje('Nueva contraseña enviada al correo.');
       navigate(`/codigo?correo=${encodeURIComponent(correo)}`); // Navega a la página de verificación con el correo en la URL
     } catch (err) {

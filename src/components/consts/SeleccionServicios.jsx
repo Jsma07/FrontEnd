@@ -17,7 +17,7 @@ const ServicioSeleccionado = ({ servicios }) => {
 
   const fetchServicios = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/servicios");
+      const response = await axios.get("https://back-bb2i.onrender.com/api/servicios");
       setServiciosDisponibles(response.data);
     } catch (error) {
       console.error("Error fetching servicios:", error);
@@ -58,7 +58,7 @@ const ServicioSeleccionado = ({ servicios }) => {
               <label htmlFor="Imagen">Imagen:</label>
               {servicioSeleccionado.ImgServicio && (
                 <img 
-                  src={`http://localhost:5000${servicioSeleccionado.ImgServicio}`}
+                  src={`https://back-bb2i.onrender.com${servicioSeleccionado.ImgServicio}`}
                   alt={servicioSeleccionado.Nombre_Servicio} 
                   className="w-12 h-12 rounded-full object-cover"
                 />

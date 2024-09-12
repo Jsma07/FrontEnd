@@ -71,7 +71,7 @@ const ModalDinamico = ({
       setFormValues(initialData);
 
       if (entityData.ImgServicio) {
-        setImagePreview(`http://localhost:5000${entityData.ImgServicio}`);
+        setImagePreview(`https://back-bb2i.onrender.com${entityData.ImgServicio}`);
       } else if (entityData.image_preview) {
         setImagePreview(entityData.image_preview);
       } else {
@@ -79,7 +79,7 @@ const ModalDinamico = ({
       }
 
       if (entityData.imagen) {
-        setImagePreview(`http://localhost:5000${entityData.imagen}`);
+        setImagePreview(`https://back-bb2i.onrender.com${entityData.imagen}`);
       }
     }
   }, [entityData]);
