@@ -6,7 +6,7 @@ import App from "./App";
 import Roles from "./pages/Roles/Roles";
 import Admin from "./pages/Administrador/Administradores";
 import Ventas from "./pages/Ventas/Ventas";
-import Verificacion from "./components/consts/VerificarCliente ";
+// import Verificacion from "./components/consts/VerificarCliente ";
 
 import Cambiarcontraseña from "./components/consts/Cambiarcontraseña";
 
