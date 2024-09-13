@@ -113,7 +113,7 @@ export default function MiniDrawer() {
   React.useEffect(() => {
     const fetchNotificaciones = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/notificaciones');
+        const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/notificaciones');
         setNotificaciones(response.data);
         // Asume que unreadCount se puede calcular con la longitud de las notificaciones no leídas
         setUnreadCount(response.data.filter(notif => !notif.Leido).length);

@@ -124,7 +124,7 @@ const Roles = () => {
   });
 
   const handleEditClick = (id) => {
-    if (id === 1 || id === 2 || id=== 4 ) {
+    if ( id === 2  ) {
       toast.error("No se puede editar este rol.", {
         position: "bottom-right",
         autoClose: 3000,
@@ -268,7 +268,7 @@ const Roles = () => {
                         </Typography>
                       </Box>
                       {rol.EstadoRol === 1 &&
-                        ![1, 2, 4].includes(rol.idRol) && (
+                        ![ 2].includes(rol.idRol) && (
                           <Fab
                             style={{
                               fontSize: "16px",
