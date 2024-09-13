@@ -6,7 +6,6 @@ import App from "./App";
 import Roles from "./pages/Roles/Roles";
 import Admin from "./pages/Administrador/Administradores";
 import Ventas from "./pages/Ventas/Ventas";
-// import Verificacion from "./components/consts/VerificarCliente ";
 
 import Cambiarcontraseña from "./components/consts/Cambiarcontraseña";
 
@@ -33,7 +32,6 @@ import { UserProvider } from "./context/ContextoUsuario";
 import CrearCita from "./pages/Agendamiento/CrearCita";
 import FechasTrabajo from './pages/Agendamiento/FechaTrabajo';
 import Panel from './pages/Panel/dashboard';
-// import Cambiarcontraseña from "./components/consts/Cambiarcontraseña";
 import Verificacion from "./components/consts/VerificarCliente ";
 
 // import InactivarHoras from "./pages/Agendamiento/InactivarHoras";
