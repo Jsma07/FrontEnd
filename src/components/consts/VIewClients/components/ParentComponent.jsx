@@ -318,7 +318,7 @@ const ParentComponent = ({ onDateSelect, onHourSelect }) => {
       try {
         // Obtener días inactivos
         const horariosResponse = await axios.get(
-          "http://localhost:5000/api/horarios"
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/horarios"
         );
         let inactiveDays = horariosResponse.data
           .filter((horario) => horario.estado === "inactivo")
@@ -363,7 +363,7 @@ const ParentComponent = ({ onDateSelect, onHourSelect }) => {
       setLoading(true);
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/agendas/horasOcupadas",
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/agendas/horasOcupadas",
           {
             params: { fecha: selectedDay },
           }
@@ -384,7 +384,7 @@ const ParentComponent = ({ onDateSelect, onHourSelect }) => {
       setLoading(true);
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/horarios/listarFechasConHorasInactivas",
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/horarios/listarFechasConHorasInactivas",
           {
             params: { fecha: selectedDay },
           }

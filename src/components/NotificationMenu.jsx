@@ -25,7 +25,7 @@ const NotificationModal = ({ open, handleClose, setNotificaciones, notificacione
   // Marcar notificación como leída
   const handleMarkAsRead = async (notifId) => {
     try {
-      await axios.put(`http://localhost:5000/api/notificaciones/${notifId}/leido`);
+      await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/notificaciones/${notifId}/leido`);
       setNotificaciones(prevNotifs => 
         prevNotifs.map(notif => 
           notif.IdNotificacion === notifId ? { ...notif, Leido: true } : notif
@@ -45,7 +45,7 @@ const NotificationModal = ({ open, handleClose, setNotificaciones, notificacione
   // Eliminar notificación
   const handleDeleteNotification = async (notifId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/notificaciones/${notifId}`);
+      await axios.delete(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/notificaciones/${notifId}`);
       setNotificaciones(prevNotifs => prevNotifs.filter(notif => notif.IdNotificacion !== notifId));
     } catch (error) {
       console.error("Error al eliminar la notificación", error);

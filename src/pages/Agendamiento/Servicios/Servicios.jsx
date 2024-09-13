@@ -24,7 +24,7 @@ const Servicios = () => {
 
   const fetchServicios = async () => {
     try {
-      const response = await axios.get("https://back-bb2i.onrender.com/api/servicios");
+      const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/servicios");
       setServicios(response.data);
     } catch (error) {
       console.error("Error fetching servicios:", error);
@@ -45,7 +45,7 @@ const Servicios = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://back-bb2i.onrender.com/jackenail/Listar_Clientes"
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/jackenail/Listar_Clientes"
         );
         setClientes(response.data);
       } catch (error) {
@@ -102,7 +102,7 @@ const Servicios = () => {
         return;
       }
 
-      const response = await axios.get("https://back-bb2i.onrender.com/api/servicios");
+      const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/servicios");
       const servicios = response.data;
       const servicioExistente = servicios.find(
         (servicio) =>
@@ -137,7 +137,7 @@ const Servicios = () => {
         }
         formDataObj.append("EstadoServicio", 1);
         await axios.post(
-          "https://back-bb2i.onrender.com/api/servicios/guardarServicio",
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/servicios/guardarServicio",
           formDataObj,
           {
             headers: {
@@ -193,7 +193,7 @@ const Servicios = () => {
         return;
       }
 
-      const response = await axios.get("https://back-bb2i.onrender.com/api/servicios");
+      const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/servicios");
       const servicios = response.data;
       const servicioExistente = servicios.find(
         (servicio) =>
@@ -227,7 +227,7 @@ const Servicios = () => {
           formDataObj.append(key, formData[key]);
         }
         await axios.put(
-          `https://back-bb2i.onrender.com/api/servicios/editar/${formData.IdServicio}`,
+          `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/servicios/editar/${formData.IdServicio}`,
           formDataObj,
           {
             headers: {
@@ -264,7 +264,7 @@ const Servicios = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.put(`https://back-bb2i.onrender.com/api/servicios/editar/${id}`, {
+        await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/servicios/editar/${id}`, {
           EstadoServicio: newEstado,
         });
         fetchServicios();

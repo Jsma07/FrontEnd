@@ -37,12 +37,12 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
           setIsInactiveDay(false);
 
         try {
-          const occupiedResponse = await axios.get('https://back-bb2i.onrender.com/api/agendas/horasOcupadas', {
+          const occupiedResponse = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/agendas/horasOcupadas', {
             params: { fecha: selectedDate.format('YYYY-MM-DD') },
           });
           setOccupiedTimes(occupiedResponse.data);
 
-          const inactiveDayResponse = await axios.get('https://back-bb2i.onrender.com/api/horarios');
+          const inactiveDayResponse = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/horarios');
           const inactiveDays = inactiveDayResponse.data
             .filter(horario => horario.estado === 'inactivo')
             .map(horario => dayjs(horario.fecha));
@@ -58,7 +58,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
               });
             }
 
-          const inactiveTimesResponse = await axios.get('https://back-bb2i.onrender.com/api/horarios/listarFechasConHorasInactivas');
+          const inactiveTimesResponse = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/horarios/listarFechasConHorasInactivas');
           const inactiveDateInfo = inactiveTimesResponse.data.find(info => dayjs(info.fecha).isSame(selectedDate, 'day'));
 
             if (inactiveDateInfo) {

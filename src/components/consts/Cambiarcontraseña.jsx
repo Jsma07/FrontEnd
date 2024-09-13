@@ -61,7 +61,7 @@ const CambiarContrasena = () => {
     }
 
     try {
-      const response = await axios.put(`https://back-bb2i.onrender.com/Jackenail/CambiarContrasena/${idCliente}`, { nuevaContrasena });
+      const response = await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/CambiarContrasena/${idCliente}`, { nuevaContrasena });
       
       if (response.status === 200) {
         toast.success('Contraseña cambiada correctamente.');

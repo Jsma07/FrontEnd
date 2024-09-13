@@ -28,7 +28,7 @@ const Categorias = () => {
 
   const fetchCategorias = async () => {
     try {
-      const response = await axios.get('https://back-bb2i.onrender.com/api/categorias');
+      const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/categorias');
       const categoriasWithColors = response.data.map((categoria) => ({
         ...categoria,
         color: getRandomColor(),
@@ -42,7 +42,7 @@ const Categorias = () => {
 
   const fetchInsumos = async () => {
     try {
-      const response = await axios.get('https://back-bb2i.onrender.com/api/insumos');
+      const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/insumos');
       setInsumos(response.data);
     } catch (error) {
       console.error('Error al obtener los insumos:', error);
@@ -61,7 +61,7 @@ const Categorias = () => {
   
       formData.estado_categoria = 1;
       try {
-        await axios.post('https://back-bb2i.onrender.com/api/categorias/guardarCategoria', formData);
+        await axios.post('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/categorias/guardarCategoria', formData);
         
         const confirmation = await window.Swal.fire({
           title: '¿Estás seguro?',
@@ -112,7 +112,7 @@ const Categorias = () => {
 
         formData.nombre_categoria = formatNombreCategoria(formData.nombre_categoria);
 
-        const response = await axios.get('https://back-bb2i.onrender.com/api/categorias');
+        const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/categorias');
         const categorias = response.data;
         const categoriaExistente = categorias.find(categoria => categoria.nombre_categoria === formData.nombre_categoria && categoria.IdCategoria !== formData.IdCategoria);
 
@@ -125,7 +125,7 @@ const Categorias = () => {
             return;
         }
 
-        await axios.put(`https://back-bb2i.onrender.com/api/categorias/editar/${formData.IdCategoria}`, formData);
+        await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/categorias/editar/${formData.IdCategoria}`, formData);
         console.log('Datos a enviar:', formData);
         handleCloseModalEditar();
         fetchCategorias();
@@ -171,7 +171,7 @@ const Categorias = () => {
 
     if (result.isConfirmed) {
         try {
-            await axios.put(`https://back-bb2i.onrender.com/api/categorias/editar/${id}`, { estado_categoria: newEstado });
+            await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/categorias/editar/${id}`, { estado_categoria: newEstado });
             fetchCategorias(); 
             window.Swal.fire({
                 icon: 'success',

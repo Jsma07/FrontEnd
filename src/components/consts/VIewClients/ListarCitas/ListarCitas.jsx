@@ -29,7 +29,7 @@ const MisCitas = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          "https://back-bb2i.onrender.com/api/agendas/misCitas",
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/agendas/misCitas",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -68,7 +68,7 @@ const MisCitas = () => {
     extendedProps: {
       servicio: cita.servicio.Nombre_Servicio,
       empleado: `${cita.empleado.Nombre} ${cita.empleado.Apellido}`,
-      imgServicio: `https://back-bb2i.onrender.com${cita.servicio.ImgServicio}`,
+      imgServicio: `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${cita.servicio.ImgServicio}`,
     },
   }));
 

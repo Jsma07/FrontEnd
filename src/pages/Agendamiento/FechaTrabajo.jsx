@@ -58,7 +58,7 @@ const FechasTrabajo = () => {
 
   const fetchHorarios = () => {
     axios
-      .get("https://back-bb2i.onrender.com/api/horarios")
+      .get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/horarios")
       .then((response) => {
         const horariosWithColors = response.data.map((horario) => ({
           ...horario,
@@ -73,7 +73,7 @@ const FechasTrabajo = () => {
 
   const fetchFechasConHorasInactivas = () => {
     axios
-      .get("https://back-bb2i.onrender.com/api/horarios/listarFechasConHorasInactivas")
+      .get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/horarios/listarFechasConHorasInactivas")
       .then((response) => {
         setFechasConHorasInactivas(response.data);
       })
@@ -127,7 +127,7 @@ const FechasTrabajo = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`https://back-bb2i.onrender.com/api/horarios/${id}`)
+          .delete(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/horarios/${id}`)
           .then(() => {
             setHorarios(horarios.filter((horario) => horario.id !== id));
             Swal.fire("Eliminado!", "El horario ha sido eliminado.", "success");
@@ -148,7 +148,7 @@ const FechasTrabajo = () => {
 
   const handleViewHorasInactivas = (fecha) => {
     axios
-      .get(`https://back-bb2i.onrender.com/api/horarios/listarHorasInactivas/${fecha}`)
+      .get(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/horarios/listarHorasInactivas/${fecha}`)
       .then((response) => {
         const horasInactivas = response.data.horas_inactivas.join(", ");
         Swal.fire({

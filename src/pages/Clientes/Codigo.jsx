@@ -45,7 +45,7 @@ const VerificarCodigo = () => {
     }
   
     try {
-      const response = await axios.post('https://back-bb2i.onrender.com/api/verificar-codigo', {
+      const response = await axios.post('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/verificar-codigo', {
         correo,
         codigo: codeString
       });

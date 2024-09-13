@@ -35,7 +35,7 @@ const Citas = () => {
     const cargarEmpleados = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/jackenail/Listar_Empleados"
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/jackenail/Listar_Empleados"
         );
         console.log("Empleados cargados:", response.data);
         if (Array.isArray(response.data)) {
@@ -61,7 +61,7 @@ const Citas = () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/agendas/horasOcupadas",
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/agendas/horasOcupadas",
           {
             params: {
               fecha: fechaSeleccionada.format("YYYY-MM-DD"),

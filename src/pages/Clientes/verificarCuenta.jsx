@@ -11,7 +11,7 @@ const VerificarCuenta = () => {
     e.preventDefault();
   
     try {
-      const response = await axios.post('https://back-bb2i.onrender.com/Jackenail/verificarCodigo', { codigoVerificacion: codigo });
+      const response = await axios.post('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/verificarCodigo', { codigoVerificacion: codigo });
       console.log('Respuesta del servidor:', response.data); // Verifica la estructura de la respuesta
   
       const { IdCliente } = response.data; // Asegúrate de que el nombre es correcto

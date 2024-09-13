@@ -24,12 +24,12 @@ const Agendamientos = () => {
   useEffect(() => {
     const fetchAgendamientos = async () => {
       try {
-        const response = await axios.get("https://back-bb2i.onrender.com/api/agendas");
+        const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/agendas");
         const agendamientosConDetalles = response.data.map((agendamiento) => ({
           id: agendamiento.IdAgenda,
           cliente: `${agendamiento.cliente.Nombre} ${agendamiento.cliente.Apellido}`,
           nombreServicio: agendamiento.servicio.Nombre_Servicio,
-          imagenServicio: `http://localhost:5000${agendamiento.servicio.ImgServicio}`,
+          imagenServicio: `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${agendamiento.servicio.ImgServicio}`,
           empleado: `${agendamiento.empleado.Nombre} ${agendamiento.empleado.Apellido}`,
           Fecha: dayjs(agendamiento.Fecha).format('DD/MM/YYYY'),
           Hora: agendamiento.Hora,
@@ -121,7 +121,7 @@ const Agendamientos = () => {
   const cambiarEstadoAgendamiento = async (agendamientoId, nuevoEstado) => {
     try {
       const response = await axios.put(
-        `https://back-bb2i.onrender.com/api/agendas/editar/${agendamientoId}`,
+        `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/agendas/editar/${agendamientoId}`,
         { EstadoAgenda: nuevoEstado },
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -166,7 +166,7 @@ const Agendamientos = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.put(`https://back-bb2i.onrender.com/api/agendas/anular/${IdAgenda}`);
+        await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/agendas/anular/${IdAgenda}`);
         setAgendamientos((prevAgendamientos) =>
           prevAgendamientos.map((agendamiento) =>
             agendamiento.id === IdAgenda

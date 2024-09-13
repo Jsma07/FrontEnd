@@ -16,7 +16,7 @@ const StyledStaticDatePicker = ({ date, onDateChange }) => {
   const endOfNextMonth = dayjs().add(1, 'month').endOf('month');
 
   useEffect(() => {
-    axios.get('https://back-bb2i.onrender.com/api/horarios')
+    axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/horarios')
       .then(response => {
         const inactiveDays = response.data
           .filter(horario => horario.estado === 'inactivo')

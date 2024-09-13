@@ -71,7 +71,7 @@ const ModalDinamico = ({
       setFormValues(initialData);
 
       if (entityData.ImgServicio) {
-        setImagePreview(`https://back-bb2i.onrender.com${entityData.ImgServicio}`);
+        setImagePreview(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${entityData.ImgServicio}`);
       } else if (entityData.image_preview) {
         setImagePreview(entityData.image_preview);
       } else {
@@ -79,7 +79,7 @@ const ModalDinamico = ({
       }
 
       if (entityData.imagen) {
-        setImagePreview(`https://back-bb2i.onrender.com${entityData.imagen}`);
+        setImagePreview(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${entityData.imagen}`);
       }
     }
   }, [entityData]);

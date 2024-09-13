@@ -39,7 +39,7 @@ const Usuarios = () => {
     //Traer los roles desde la api
     const fetchRoles = async () => {
       try {
-        const response = await axios.get("https://back-bb2i.onrender.com/api/roles");
+        const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/roles");
         console.log("Roles response:", response.data);
         setRoles(response.data);
       } catch (error) {
@@ -54,7 +54,7 @@ const Usuarios = () => {
         if (token) {
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }
-        const response = await axios.get("https://back-bb2i.onrender.com/api/users");
+        const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/users");
         setUsers(response.data.usuarios);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -120,7 +120,7 @@ const Usuarios = () => {
       });
       // si se confirma se procede a enviar la peticion a la api para cambiar el estado del usuario
       if (result.isConfirmed) {
-        await axios.put(`https://back-bb2i.onrender.com/api/editarUsuario/${id}`, {
+        await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/editarUsuario/${id}`, {
           estado: updatedUser.estado,
         });
         setUsers(updatedUsers);
@@ -203,7 +203,7 @@ const Usuarios = () => {
     try {
       //peticion put para actualizar la contraseña del usuario seleccionado
       await axios.put(
-        `https://back-bb2i.onrender.com/api/actualizarContrasena/${seleccionado.id}`,
+        `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/actualizarContrasena/${seleccionado.id}`,
         {
           newPassword: newPassword,
         }
@@ -352,7 +352,7 @@ const Usuarios = () => {
       let response;
       if (seleccionado) {
         response = await axios.put(
-          `https://back-bb2i.onrender.com/api/editarUsuario/${seleccionado.id}`,
+          `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/editarUsuario/${seleccionado.id}`,
           formData,
           {
             headers: {
@@ -371,7 +371,7 @@ const Usuarios = () => {
       } else {
         formData.estado = 1;
         response = await axios.post(
-          "https://back-bb2i.onrender.com/api/crearUsuario",
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/crearUsuario",
           formData,
           {
             headers: {

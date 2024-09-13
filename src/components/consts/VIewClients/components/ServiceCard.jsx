@@ -62,7 +62,7 @@ const ServiceCard = ({ service, onAddToCart, isSelected }) => {
         }}
       >
         <ServiceImage
-          src={`https://back-bb2i.onrender.com${service.ImgServicio}`}
+          src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${service.ImgServicio}`}
           alt={service.Nombre_Servicio}
           isSelected={isSelected}
         />

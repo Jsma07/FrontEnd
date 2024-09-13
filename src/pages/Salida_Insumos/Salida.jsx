@@ -29,7 +29,7 @@ const Salida = () => {
   useEffect(() => {
     const fetchSalidas = async () => {
       try {
-        const response = await axios.get("https://back-bb2i.onrender.com/ListarSalidas");
+        const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/ListarSalidas");
         const salidasConDetalles = response.data.map((salida) => {
           let estadoButton;
           if (salida.Estado === "Terminado") {
@@ -62,7 +62,7 @@ const Salida = () => {
             idInsumo: (
               <div>
                 <img
-                  src={`https://back-bb2i.onrender.com${salida.insumo.Imagen}`}
+                  src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${salida.insumo.Imagen}`}
                   alt={salida.insumo.NombreInsumos}
                   style={{
                     maxWidth: "3rem",
@@ -126,13 +126,13 @@ const Salida = () => {
         try {
           // Anula la salida
           await axios.patch(
-            `https://back-bb2i.onrender.com/salidas/${salida.IdSalida}`,
+            `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/salidas/${salida.IdSalida}`,
             { nuevoEstado: "Anulado" }
           );
 
           // Restaura la cantidad en los insumos
           await axios.put(
-            `https://back-bb2i.onrender.com/api/existenciainsumos/editar/${salida.insumo.IdInsumos}`,
+            `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/existenciainsumos/editar/${salida.insumo.IdInsumos}`,
             { Cantidad: salida.insumo.Cantidad + salida.Cantidad }
           );
 
@@ -250,7 +250,7 @@ const Salida = () => {
               >
                 <div className="relative">
                   <img
-                    src={`https://back-bb2i.onrender.com${detalleSalida.insumo?.Imagen}`}
+                    src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${detalleSalida.insumo?.Imagen}`}
                     alt={
                       detalleSalida.insumo?.NombreInsumos || "Imagen del insumo"
                     }

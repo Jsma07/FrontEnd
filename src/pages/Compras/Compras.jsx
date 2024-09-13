@@ -24,7 +24,7 @@ const Compras = () => {
 
 const fetchCompras = async () => {
   try {
-    const response = await axios.get('https://back-bb2i.onrender.com/api/compras');
+    const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/compras');
     const data = response.data;
     // Ordenar por IdCompra en orden descendente
     data.sort((a, b) => b.IdCompra - a.IdCompra);
@@ -37,7 +37,7 @@ const fetchCompras = async () => {
 
 const fetchProveedores = async () => {
   try {
-    const response = await axios.get("https://back-bb2i.onrender.com/api/proveedores");
+    const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/proveedores");
     console.log("proveedores fetched:", response.data); 
     setProveedores(response.data);
   } catch (error) {
@@ -77,7 +77,7 @@ const filtrar = compras.filter(compra => {
 
     if (result.isConfirmed) {
       try {
-        await axios.put(`https://back-bb2i.onrender.com/api/compras/Anular/${IdCompra}`);
+        await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/compras/Anular/${IdCompra}`);
         fetchCompras(); 
         Swal.fire({
           icon: 'success',
@@ -98,7 +98,7 @@ const filtrar = compras.filter(compra => {
   const cambiarEstadoCompra = async (IdCompra, nuevoEstado) => {
     try {
       const response = await axios.put(
-        `https://back-bb2i.onrender.com/api/compras/cambiarEstado/${IdCompra}`,
+        `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/compras/cambiarEstado/${IdCompra}`,
         { estado_compra: nuevoEstado },
         { headers: { 'Content-Type': 'application/json' } }
       );

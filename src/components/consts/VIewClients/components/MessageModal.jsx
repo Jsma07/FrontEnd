@@ -29,7 +29,7 @@ const MessageModal = ({ open, handleClose, idAgenda }) => {
       const token = localStorage.getItem("token");
       // Aquí envías el mensaje personalizado con el tipo seleccionado y la fecha/hora actual
       await axios.post(
-        "http://localhost:5000/api/notificaciones/crear",
+        "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/notificaciones/crear",
         {
           Tipo: tipo,
           Mensaje: `${message} (Enviado el ${currentDateTime})`, // Añadir la fecha y hora al mensaje

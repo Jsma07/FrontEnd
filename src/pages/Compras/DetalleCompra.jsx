@@ -18,7 +18,7 @@ const DetalleCompra = () => {
   useEffect(() => {
     const fetchDetalleCompra = async () => {
       try {
-        const response = await axios.get(`https://back-bb2i.onrender.com/api/detallecompras/${id}`);
+        const response = await axios.get(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/detallecompras/${id}`);
         setDetalleCompra(response.data);
         setLoading(false);
       } catch (error) {

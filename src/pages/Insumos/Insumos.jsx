@@ -26,7 +26,7 @@ const Insumos = () => {
 
   const fetchInsumos = async () => {
     try {
-      const response = await axios.get("https://back-bb2i.onrender.com/api/insumos");
+      const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/insumos");
       console.log("Insumos fetched:", response.data); 
       setInsumos(response.data);
     } catch (error) {
@@ -36,7 +36,7 @@ const Insumos = () => {
 
   const fetchCategorias = async () => {
     try {
-      const response = await axios.get("https://back-bb2i.onrender.com/api/categorias");
+      const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/categorias");
       setCategorias(response.data);
     } catch (error) {
       console.error("Error fetching categorias:", error);
@@ -89,7 +89,7 @@ const Insumos = () => {
     };
 
     formData.NombreInsumos = formatNombreInsumo(formData.NombreInsumos);
-    const response = await axios.get('https://back-bb2i.onrender.com/api/insumos');
+    const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/insumos');
     const insumos = response.data;
     const insumoExistente = insumos.find(insumo => insumo.NombreInsumos === formData.NombreInsumos && insumo.IdInsumos !== formData.IdInsumos);
 
@@ -121,7 +121,7 @@ const Insumos = () => {
         formDataWithNumbers.append("IdCategoria", formData.Idcategoria);
   
         const response = await axios.put(
-          `https://back-bb2i.onrender.com/api/insumos/editar/${formData.IdInsumos}`,
+          `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/insumos/editar/${formData.IdInsumos}`,
           formDataWithNumbers,
           {
             headers: {
@@ -161,7 +161,7 @@ const Insumos = () => {
   
     if (result.isConfirmed) {
         try {
-            await axios.put(`https://back-bb2i.onrender.com/api/insumos/editar/${id}`, { estado_insumo: newEstado });
+            await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/insumos/editar/${id}`, { estado_insumo: newEstado });
             fetchInsumos(); // Actualiza la lista de categorías después de la actualización
             window.Swal.fire({
                 icon: 'success',

@@ -20,7 +20,7 @@ function Contenidoitems() {
 
   useEffect(() => {
     axios
-      .get("https://back-bb2i.onrender.com/api/servicios")
+      .get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/servicios")
       .then((response) => {
         setServicios(response.data);
       })
@@ -235,7 +235,7 @@ function Contenidoitems() {
                     }}
                   >
                     <img
-                      src={`https://back-bb2i.onrender.com${servicio.ImgServicio}`}
+                      src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${servicio.ImgServicio}`}
                       alt={servicio.Nombre_Servicio}
                       style={{
                         width: "100%",
@@ -316,7 +316,7 @@ function Contenidoitems() {
           <Box sx={{ display: "flex", alignItems: "flex-start", gap: 3 }}>
             <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
               <img
-                src={`https://back-bb2i.onrender.com${selectedService.ImgServicio}`}
+                src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${selectedService.ImgServicio}`}
                 alt={selectedService.Nombre_Servicio}
                 style={{
                   maxWidth: "100%",

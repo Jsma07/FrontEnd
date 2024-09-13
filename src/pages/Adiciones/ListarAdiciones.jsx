@@ -13,7 +13,7 @@ const ListarAdiciones = () => {
   const fetchAdiciones = async () => {
     try {
       const response = await axios.get(
-        "https://back-bb2i.onrender.com/Jackenail/Listarventas/adiciones"
+        "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/Listarventas/adiciones"
       );
       setAdiciones(response.data);
     } catch (error) {
@@ -110,7 +110,7 @@ const ListarAdiciones = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .put(`https://back-bb2i.onrender.com/Jackenail/CambiaEstado/${adicionId}`, {
+          .put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/CambiaEstado/${adicionId}`, {
             Estado: nuevoEstado,
           })
           .then((response) => {

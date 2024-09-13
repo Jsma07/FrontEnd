@@ -56,7 +56,7 @@ const CrearCitas = () => {
   useEffect(() => {
     const fetchServicios = async () => {
       try {
-        const response = await axios.get("https://back-bb2i.onrender.com/api/servicios");
+        const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/servicios");
         const activeServices = response.data.filter(servicios => servicios.EstadoServicio ===1)
         setServicios(activeServices);
       } catch (error) {
@@ -66,7 +66,7 @@ const CrearCitas = () => {
 
     const fetchEmpleados = async () => {
       try {
-        const response = await axios.get("https://back-bb2i.onrender.com/jackenail/Listar_Empleados");
+        const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/jackenail/Listar_Empleados");
         const activeManicuristas = response.data.filter(empleados => empleados.Estado === 1 && empleados.IdRol === 2)
         setEmpleados(activeManicuristas);
       } catch (error) {
@@ -77,7 +77,7 @@ const CrearCitas = () => {
     const fetchClientes = async () => {
       try {
         
-        const response = await axios.get("https://back-bb2i.onrender.com/jackenail/Listar_Clientes");
+        const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/jackenail/Listar_Clientes");
         const activeClient = response.data.filter(clientes => clientes.Estado ===1 )
         setClientes(activeClient);
       } catch (error) {
@@ -92,7 +92,7 @@ const CrearCitas = () => {
 
   const fetchOccupiedTimes = async () => {
     try {
-      const response = await axios.get(`https://back-bb2i.onrender.com/api/agendas/horasOcupadas?fecha=${dayjs(date).format('YYYY-MM-DD')}`);
+      const response = await axios.get(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/agendas/horasOcupadas?fecha=${dayjs(date).format('YYYY-MM-DD')}`);
       setOccupiedTimes(response.data);
     } catch (error) {
       console.error("Error fetching occupied times:", error);
@@ -117,7 +117,7 @@ const CrearCitas = () => {
       };
 
       try {
-        const response = await axios.post("https://back-bb2i.onrender.com/api/agendas/crearAgenda", newAppointment);
+        const response = await axios.post("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/agendas/crearAgenda", newAppointment);
         console.log("Agendamiento creado exitosamente:", response.data);
         navigate("/Agendamiento");
       } catch (error) {

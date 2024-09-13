@@ -109,7 +109,7 @@ const ModalInsumos = ({
                     <div className="flex items-center">
                       <img
                         className="w-20 h-20 rounded-full"
-                        src={`https://back-bb2i.onrender.com/${insumo.imagen}`}
+                        src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/${insumo.imagen}`}
                         alt={insumo.NombreInsumos}
                       />
                       <div className="flex-1 min-w-0 ms-4">
