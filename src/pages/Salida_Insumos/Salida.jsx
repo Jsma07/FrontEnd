@@ -29,7 +29,7 @@ const Salida = () => {
   useEffect(() => {
     const fetchSalidas = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/ListarSalidas");
+        const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/ListarSalidas");
         const salidasConDetalles = response.data.map((salida) => {
           let estadoButton;
           if (salida.Estado === "Terminado") {
@@ -62,7 +62,7 @@ const Salida = () => {
             idInsumo: (
               <div>
                 <img
-                  src={`http://localhost:5000${salida.insumo.Imagen}`}
+                  src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${salida.insumo.Imagen}`}
                   alt={salida.insumo.NombreInsumos}
                   style={{
                     maxWidth: "3rem",
@@ -126,13 +126,13 @@ const Salida = () => {
         try {
           // Anula la salida
           await axios.patch(
-            `http://localhost:5000/salidas/${salida.IdSalida}`,
+            `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/salidas/${salida.IdSalida}`,
             { nuevoEstado: "Anulado" }
           );
 
           // Restaura la cantidad en los insumos
           await axios.put(
-            `http://localhost:5000/api/existenciainsumos/editar/${salida.insumo.IdInsumos}`,
+            `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/existenciainsumos/editar/${salida.insumo.IdInsumos}`,
             { Cantidad: salida.insumo.Cantidad + salida.Cantidad }
           );
 
@@ -250,7 +250,7 @@ const Salida = () => {
               >
                 <div className="relative">
                   <img
-                    src={`http://localhost:5000${detalleSalida.insumo?.Imagen}`}
+                    src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${detalleSalida.insumo?.Imagen}`}
                     alt={
                       detalleSalida.insumo?.NombreInsumos || "Imagen del insumo"
                     }

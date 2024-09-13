@@ -30,7 +30,7 @@ const Dashboard = () => {
 
     const fetchTotalClientes = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/totalclientes");
+            const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/totalclientes");
             setTotalClientes(response.data.totalClientes); 
         } catch (error) {
             console.error("Error fetching clientes:", error);
@@ -39,7 +39,7 @@ const Dashboard = () => {
 
     const fetchTotalVentas = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/totalventas");
+            const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/totalventas");
             setTotalVentas(response.data.totalVentas); 
         } catch (error) {
             console.error("Error fetching ventas:", error);
@@ -48,7 +48,7 @@ const Dashboard = () => {
 
     const fetchTotalCompras = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/totalcompras");
+            const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/totalcompras");
             setTotalCompras(response.data.totalCompras); 
         } catch (error) {
             console.error("Error fetching compras:", error);
@@ -57,7 +57,7 @@ const Dashboard = () => {
 
     const fetchTotalServicios = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/totalservicios");
+            const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/totalservicios");
             setTotalServicios(response.data.totalServicios); 
         } catch (error) {
             console.error("Error fetching servicios:", error);
@@ -66,7 +66,7 @@ const Dashboard = () => {
 
     const fetchTotalEmpleados = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/totalempleados");
+            const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/totalempleados");
             setTotalEmpleados(response.data.totalEmpleados);
         } catch (error) {
             console.error("Error fetching empleados:", error);
@@ -75,7 +75,7 @@ const Dashboard = () => {
 
     const fetchServiciosMasAgendados = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/masagendados");
+            const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/masagendados");
             setServiciosMasAgendados(response.data);
         } catch (error) {
             console.error("Error fetching servicios más agendados:", error);

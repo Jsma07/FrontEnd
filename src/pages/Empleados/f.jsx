@@ -1,639 +1,467 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import Swal from "sweetalert2";
-import ModalDinamico from "../../components/consts/modaled";
-import CustomSwitch from "../../components/consts/switch";
-import TablePrueba from "../../components/consts/Tabla";
-import Modal from "../../components/consts/modalContrasena";
+import {
+  Button,
+  Modal,
+  Typography,
+  Grid,
+  TextField,
+  Select,
+  MenuItem,
+  InputLabel,
+  Switch,
+  FormControl,
+  FormControlLabel,
+  IconButton,
+  InputAdornment,
+} from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import PhoneIcon from "@mui/icons-material/Phone";
+import HomeIcon from "@mui/icons-material/Home";
+import { Box } from "@mui/system";
+import { useDropzone } from "react-dropzone";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import { toast } from "react-toastify";
+import Flag from "react-flagkit";
 
-const Empleados = () => {
-  const [empleados, setEmpleados] = useState([]);
-  const [empleado, setEmpleado] = useState([]);
-  const [filtro, setFiltro] = useState("");
-  const [openPasswordModal, setOpenPasswordModal] = useState(false);
-  const [seleccionado, setSeleccionado] = useState(null);
-  const [roles, setRoles] = useState([]);
-
-  const [passwordForm, setPasswordForm] = useState({
-    newPassword: "",
-    confirmPassword: "",
-  });
+const ModalDinamico = ({
+  open,
+  handleClose,
+  title = "",
+  fields,
+  onSubmit,
+  seleccionado,
+}) => {
+  const [formData, setFormData] = useState({});
+  const [showPassword, setShowPassword] = useState({});
+  const [avatar, setAvatar] = useState(null);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/roles");
-        console.log("Roles response:", response.data);
-        setRoles(response.data);
-      } catch (error) {
-        console.error("Error fetching roles:", error);
-        setRoles([]);
-      }
-    };
-
-    fetchRoles();
-  }, []);
-
-  const handlePasswordChangeClick = (IdEmpleado) => {
-    const empleadoSeleccionado = empleados.find(
-      (empleado) => empleado.IdEmpleado === IdEmpleado
-    );
-    if (empleadoSeleccionado) {
-      setSeleccionado(empleadoSeleccionado);
-      setOpenPasswordModal(true);
+    if (seleccionado) {
+      setFormData(seleccionado);
+      setAvatar(seleccionado.avatar || null);
+      setAvatarFile(seleccionado.avatarFile || null);
     } else {
-      console.error("Empleado no encontrado");
+      setFormData({});
+      setAvatar(null);
+      setAvatarFile(null);
     }
-  };
+  }, [seleccionado]);
 
-  const handlePasswordModalClose = () => {
-    setOpenPasswordModal(false);
-    setPasswordForm({
-      newPassword: "",
-      confirmPassword: "",
-    });
-    setSeleccionado(null); // Limpiar el empleado seleccionado al cerrar el modal
-  };
+  
+  const validateField = (name, value) => {
+    let error = '';
 
-  const [modalData, setModalData] = useState(null);
-  useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/roles");
-        setRoles(response.data);
-      } catch (error) {
-        console.error("Error fetching roles:", error);
-      }
-    };
-
-    fetchRoles();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/jackenail/Listar_Empleados"
-        );
-        const empleadosConRol = response.data.map((empleado) => ({
-          ...empleado,
-          Rol: empleado.role?.nombre || "Sin rol", // Añade el nombre del rol directamente
-        }));
-        setEmpleados(empleadosConRol);
-      } catch (error) {
-        console.error("Error al obtener los datos de empleados:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleOpenModal = (data) => {
-    console.log("Datos del empleado al abrir el modal:", data);
-    setModalData({
-      ...data,
-    });
-  };
-
-  const columns = [
-    { field: "Tip_Documento", headerName: "Tipo de Documento" }, // Tipo de Documento primero
-    { field: "Nombre", headerName: "Nombre" },
-    { field: "Apellido", headerName: "Apellido" },
-    { field: "Correo", headerName: "Correo" },
-    { field: "Telefono", headerName: "Teléfono" },
-    { field: "Documento", headerName: "Documento" },
-    { field: "Direccion", headerName: "Dirección" },
-    {
-      field: "Rol", // Un nombre de campo simple
-      headerName: "Rol",
-      valueGetter: (params) => params.row.role?.nombre || "Sin rol",
-    },
-    {
-      field: "Acciones",
-      headerName: "Acciones",
-      width: "w-48",
-      renderCell: (params) => (
-        <div className="flex justify-center space-x-4">
-          {params.row.Estado === 1 && (
-            <button
-              onClick={() =>
-                handleOpenModal({
-                  ...params.row,
-                  modo: "actualizacion",
-                  seleccionado: params.row,
-                })
-              }
-            >
-              <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>{" "}
-            </button>
-          )}
-
-          {params.row.Estado === 1 && (
-            <button
-              onClick={() => handlePasswordChangeClick(params.row.IdEmpleado)}
-              className="text-black-500"
-            >
-              <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>{" "}
-            </button>
-          )}
-
-          <CustomSwitch
-            active={params.row.Estado === 1}
-            onToggle={() => handleToggleSwitch(params.row.IdEmpleado)}
-          />
-        </div>
-      ),
-    },
-  ];
-
-  const handleSubmit = async (formData) => {
-    try {
-      // Verificar si el correo electrónico está duplicado
-      const correoExistente = empleados.some(
-        (empleado) => empleado.Correo === formData.Correo
-      );
-
-      // Verificar si el documento está duplicado
-      const documentoExistente = empleados.some(
-        (empleado) => empleado.Documento === formData.Documento
-      );
-
-      if (correoExistente) {
-        toast.error(
-          "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico."
-        );
-      } else if (documentoExistente) {
-        toast.error(
-          "El documento ingresado ya está registrado. Por favor, elija otro documento."
-        );
-      } else {
-        const result = await Swal.fire({
-          title: "¿Estás seguro?",
-          text: "¿Quieres registrar este empleado?",
-          icon: "question",
-          showCancelButton: true,
-          confirmButtonText: "Sí",
-          cancelButtonText: "Cancelar",
-        });
-
-        if (result.isConfirmed) {
-          const formDataNumerico = {
-            Nombre: formData.Nombre,
-            Apellido: formData.Apellido,
-            Correo: formData.Correo,
-            Telefono: formData.Telefono,
-            Estado: 1,
-            IdRol: formData.Rol,
-            Documento: formData.Documento,
-            Direccion: formData.Direccion,
-            Tip_Documento: formData.Tip_Documento,
-            Contrasena: formData.Contrasena,
-          };
-
-          console.log("Datos del formulario numéricos:", formDataNumerico);
-
-          // Enviar solicitud POST al servidor
-          const response = await axios.post(
-            "http://localhost:5000/Jackenail/RegistrarEmpleados",
-            formDataNumerico
-          );
-
-          // Suponiendo que el servidor devuelve el empleado creado con todos sus campos
-          const nuevoEmpleado = response.data;
-          console.log("Nuevo empleado:", nuevoEmpleado);
-
-          setEmpleados((prevEmpleados) => [...prevEmpleados, nuevoEmpleado]);
-
-          Swal.fire({
-            icon: "success",
-            title: "¡Registro exitoso!",
-            text: "El empleado se ha registrado correctamente.",
-          });
-
-          setModalData(null);
+    switch (name) {
+      case 'Documento':
+        if (!/^\d{10}$/.test(value)) {
+          error = 'Debe ser un número de 10 dígitos.';
         }
-      }
-    } catch (error) {
-      console.error("Error al registrar el empleado:", error);
-      console.error(
-        "Detalles del error:",
-        error.response ? error.response.data : error.message
-      );
-
-      toast.error(
-        "Ocurrió un error al registrar el empleado. Inténtelo nuevamente."
-      );
-    }
-  };
-
-  const handleToggleSwitch = async (id) => {
-    const updatedEmpleados = empleados.map((empleado) => {
-      if (empleado.IdEmpleado === id) {
-        const newEstado = empleado.Estado === 1 ? 0 : 1;
-        return { ...empleado, Estado: newEstado };
-      }
-      return empleado;
-    });
-
-    try {
-      const updatedEmpleado = updatedEmpleados.find(
-        (empleado) => empleado.IdEmpleado === id
-      );
-      if (!updatedEmpleado) {
-        console.error("No se encontró el empleado actualizado");
-        return;
-      }
-
-      const result = await Swal.fire({
-        icon: "warning",
-        title: "¿Estás seguro?",
-        text: "¿Quieres cambiar el estado del empleado?",
-        showCancelButton: true,
-        confirmButtonText: "Sí",
-        cancelButtonText: "Cancelar",
-      });
-
-      if (result.isConfirmed) {
-        await axios.put(
-          `http://localhost:5000/Jackenail/CambiarEstadoEmpleado/${id}`,
-          {
-            Estado: updatedEmpleado.Estado,
-          }
-        );
-        setEmpleados(updatedEmpleados);
-
-        toast.success(
-          "El estado del empleado ha sido actualizado correctamente.",
-          {
-            position: "bottom-right",
-            autoClose: 3000, // Cierra automáticamente después de 3 segundos
-          }
-        );
-      }
-    } catch (error) {
-      console.error("Error al cambiar el estado del empleado:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Hubo un error al cambiar el estado del empleado. Por favor, inténtalo de nuevo más tarde.",
-      });
-    }
-  };
-
-  const handleActualizacionSubmit = async (formData) => {
-    try {
-      // Verificar si el correo o el documento están siendo utilizados por otro empleado
-      const empleadoExistente = empleados.find(
-        (empleado) =>
-          (empleado.Correo === formData.Correo ||
-            empleado.Documento === formData.Documento) &&
-          empleado.IdEmpleado !== formData.IdEmpleado
-      );
-
-      if (empleadoExistente) {
-        Swal.fire({
-          icon: "error",
-          title: "Error de actualización",
-          text: "El correo electrónico o el documento ya están registrados para otro empleado. Por favor, elija otro correo electrónico o documento.",
-        });
-        return;
-      }
-
-      // Verificar que se haya seleccionado un rol nuevo si el usuario cambió la selección
-      const rolSeleccionado = formData.Rol || modalData.seleccionado.IdRol;
-
-      const formDataNumerico = {
-        ...formData,
-        Telefono: parseInt(formData.Telefono, 10),
-        IdRol: rolSeleccionado, // Asegurarse de que el rol seleccionado se pase aquí
-      };
-
-      const url = `http://localhost:5000/Jackenail/ActualizarEmpleados/${formDataNumerico.IdEmpleado}`;
-
-      await axios.put(url, formDataNumerico);
-
-      const empleadosActualizados = empleados.map((empleado) =>
-        empleado.IdEmpleado === formDataNumerico.IdEmpleado
-          ? { ...empleado, ...formDataNumerico }
-          : empleado
-      );
-
-      setEmpleados(empleadosActualizados);
-
-      Swal.fire({
-        icon: "success",
-        title: "¡Actualización exitosa!",
-        text: "El empleado se ha actualizado correctamente.",
-      }).then((result) => {
-        if (result.isConfirmed || result.dismiss === Swal.DismissReason.close) {
-          setModalData(null);
+        break;
+      case 'Nombre':
+      case 'Apellido':
+        if (!/^[a-zA-Z\s]+$/.test(value) || !/\S/.test(value)) {
+          error = 'Solo se permiten letras y espacios, y no puede estar vacío.';
         }
-      });
-    } catch (error) {
-      console.error("Error al actualizar el empleado:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Ocurrió un error al actualizar el empleado.",
-        footer: '<a href="#">Inténtelo nuevamente</a>',
-      });
+        break;
+      case 'Correo':
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          error = 'Correo electrónico inválido.';
+        }
+        break;
+      case 'Telefono':
+        if (!/^\d{10,15}$/.test(value)) {
+          error = 'Debe ser un número entre 10 y 15 dígitos.';
+        }
+        break;
+      case 'Direccion':
+        if (!value.trim()) {
+          error = 'La dirección no puede estar vacía.';
+        }
+        break;
+      case 'Contrasena':
+        if (!/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/.test(value)) {
+          error = 'La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.';
+        }
+        break;
+      default:
+        break;
+    }
+
+    return error;
+  };
+
+  const handleChange = (e) => {
+    const { name, value, checked, type } = e.target;
+    const newValue = type === "checkbox" ? checked : value;
+
+    // Validar el campo y actualizar errores en tiempo real
+    const error = validateField(name, newValue);
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: newValue,
+    }));
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: error,
+    }));
+  };
+
+  
+
+  
+
+  const handleCancel = () => {
+    handleClose();
+  };
+
+  const handleClickShowPassword = (name) => {
+    setShowPassword((prevState) => ({
+      ...prevState,
+      [name]: !prevState[name],
+    }));
+  };
+
+  const getIcon = (type) => {
+    switch (type.toLowerCase()) {
+      case 'documento':
+        return <i className='bx bx-id-card' style={{ fontSize: '24px', marginRight: '8px' }}></i>;
+      case 'nombre':
+      case 'apellido':
+        return <i className='bx bx-user' style={{ fontSize: '24px', marginRight: '8px' }}></i>;
+      case 'correo':
+        return <i className='bx bx-envelope' style={{ fontSize: '24px', marginRight: '8px' }}></i>;
+      case 'teléfono':
+      case 'telefono':
+        return <PhoneIcon style={{ fontSize: '24px', marginRight: '8px' }} />;
+      case 'dirección':
+      case 'direccion':
+        return <HomeIcon style={{ fontSize: '24px', marginRight: '8px' }} />;
+      case 'contraseña':
+      case 'contrasena':
+        return <i className='bx bx-key' style={{ fontSize: '24px', marginRight: '8px' }}></i>;
+      case 'rol':
+        return <i className='bx bx-briefcase' style={{ fontSize: '24px', marginRight: '8px' }}></i>;
+      default:
+        return <i className='bx bx-question-mark' style={{ fontSize: '24px', marginRight: '8px' }}></i>;
     }
   };
 
-  const empleadosFiltrados = empleados.filter((empleado) => {
-    // Convertir el filtro a minúsculas una vez
-    const filtroLower = filtro.toLowerCase();
+  const handleSubmit = () => {
+    const newErrors = {};
+    for (const field of fields) {
+      const error = validateField(field.name, formData[field.name] || '');
+      if (error) {
+        newErrors[field.name] = error;
+      }
+    }
 
-    // Verificar y convertir cada campo a minúsculas si está definido
-    const nombreLower = empleado.Nombre ? empleado.Nombre.toLowerCase() : "";
-    const apellidoLower = empleado.Apellido
-      ? empleado.Apellido.toLowerCase()
-      : "";
-    const correoLower = empleado.Correo ? empleado.Correo.toLowerCase() : "";
-    const documentoLower = empleado.Documento
-      ? empleado.Documento.toLowerCase()
-      : "";
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error('Por favor corrige los errores en el formulario.');
+      return;
+    }
 
-    return (
-      nombreLower.includes(filtroLower) ||
-      apellidoLower.includes(filtroLower) ||
-      correoLower.includes(filtroLower) ||
-      documentoLower.includes(filtroLower) ||
-      empleado.Telefono.toString().includes(filtro) ||
-      (empleado.Estado === 1 ? "Activo" : "Inactivo")
-        .toLowerCase()
-        .includes(filtroLower)
-    );
+    onSubmit({ ...formData, Img: avatarFile });
+    handleClose();
+  };
+
+  const onDrop = (acceptedFiles) => {
+    const file = acceptedFiles[0];
+    setAvatarFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatar(URL.createObjectURL(file));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: 'image/*',
+    maxSize: 5242880, // 5 MB
+    onDropRejected: () => {
+      toast.error("El archivo es demasiado grande o no es una imagen válida.");
+    },
   });
-
-  const handleSubmitPasswordChange = async (newPassword, confirmPassword) => {
-    // Paso 1: Validar que las contraseñas coincidan
-    if (newPassword !== confirmPassword) {
-      console.error(
-        "Las contraseñas no coinciden:",
-        newPassword,
-        confirmPassword
-      );
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Las contraseñas no coinciden.",
-      });
-      return;
-    }
-
-    // Paso 2: Validar que la contraseña tenga al menos 8 caracteres
-    if (newPassword.length < 8) {
-      console.error("La contraseña es demasiado corta:", newPassword);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "La contraseña debe tener al menos 8 caracteres.",
-      });
-      return;
-    }
-
-    try {
-      // Paso 3: Realizar la solicitud PUT para actualizar la contraseña
-      console.log("Datos a enviar al servidor:", {
-        IdEmpleado: seleccionado.IdEmpleado,
-        newPassword: newPassword,
-      });
-
-      const response = await axios.put(
-        `http://localhost:5000/Jackenail/Empleado/${seleccionado.IdEmpleado}`,
-        {
-          Contrasena: newPassword,
-        }
-      );
-
-      // Verificar la respuesta de la solicitud PUT
-      console.log("Respuesta de la API:", response);
-
-      if (response.status === 200) {
-        // La solicitud PUT fue exitosa
-        console.log("Contraseña actualizada correctamente");
-        Swal.fire({
-          icon: "success",
-          title: "Contraseña actualizada",
-          text: "La contraseña del empleado ha sido actualizada correctamente.",
-        });
-
-        // Cerrar el modal después de actualizar la contraseña
-        handlePasswordModalClose();
-      } else {
-        // Manejar un caso donde la solicitud no tenga éxito
-        console.error("Error en la solicitud PUT:", response);
-        throw new Error("Error al actualizar la contraseña del empleado");
-      }
-    } catch (error) {
-      // Manejar errores capturados durante la solicitud PUT
-      console.error("Error al cambiar la contraseña del empleado:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Hubo un error al cambiar la contraseña del empleado. Por favor, inténtalo de nuevo más tarde.",
-      });
-    }
-  };
 
   return (
-    <div
-      style={{
-        paddingTop: "5px",
-        margin: "0 auto",
-        borderRadius: "40px",
-        marginTop: "20px",
-        boxShadow: "0 4px 12px rgba(128, 0, 128, 0.1)",
-        position: "fixed",
-        left: "90px",
-        top: "80px",
-        width: "calc(100% - 100px)",
-        overflowY: "auto",
+    <Modal
+      open={open}
+      onClose={handleClose}
+      BackdropProps={{
+        style: {
+          backdropFilter: "blur(5px)",
+        },
       }}
-      className="w-full mx-auto max-w-full"
     >
-      <TablePrueba
-        title="Gestion de Empleados"
-        columns={columns}
-        data={empleados}
-        roles={roles}
-      />
-      {modalData && !modalData.modo && (
-        <ModalDinamico
-          open={true}
-          handleClose={() => setModalData(null)}
-          title="Registrar empleados"
-          fields={[
-            {
-              label: "Tip_Documento",
-              name: "Tip_Documento",
-              type: "select",
-              required: true,
-              options: [
-                { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
-                { value: "C.E", label: "Cédula de extranjería (C.E)" },
-              ],
-            },
-            {
-              label: "Documento",
-              name: "Documento",
-              type: "text",
-              required: true,
-            },
-            {
-              label: "Nombre",
-              name: "Nombre",
-              type: "text",
-              required: true,
-            },
-            {
-              label: "Apellido",
-              name: "Apellido",
-              type: "text",
-              required: true,
-            },
-            {
-              label: "Correo",
-              name: "Correo",
-              type: "text",
-              required: true,
-            },
-            {
-              label: "Teléfono",
-              name: "Telefono",
-              type: "text",
-              required: true,
-            },
-            {
-              label: "Dirección",
-              name: "Direccion",
-              type: "text",
-              required: true,
-            },
-            {
-              label: "Contraseña",
-              name: "Contrasena",
-              type: "password",
-              required: true,
-            },
-            {
-              label: "Rol",
-              name: "Rol",
-              type: "select",
-              required: true,
-              options: roles.map((role) => ({
-                value: role.idRol,
-                label: role.nombre,
-              })),
-            },
-          ]}
-          onSubmit={handleSubmit}
-          seleccionado={modalData.seleccionado} // Asegúrate de que `modalData.seleccionado` tiene el rol seleccionado
-        />
-      )}
-
-      {modalData && modalData.modo === "actualizacion" && (
-        <ModalDinamico
-          open={true}
-          handleClose={() => setModalData(null)}
-          title="Actualizar Empleado"
-          fields={[
-            {
-              label: "Tip_Documento",
-              name: "Tip_Documento",
-              type: "select",
-              required: true,
-              options: [
-                { value: "C.C", label: "Cédula de Ciudadanía (C.C)" },
-                { value: "C.E", label: "Cédula de extranjería (C.E)" },
-              ],
-            },
-            {
-              label: "Nombre",
-              name: "Nombre",
-              type: "text",
-              required: true,
-            },
-            {
-              label: "Apellido",
-              name: "Apellido",
-              type: "text",
-              required: true,
-            },
-            {
-              label: "Correo",
-              name: "Correo",
-              type: "text",
-              required: true,
-            },
-            {
-              label: "Teléfono",
-              name: "Telefono",
-              type: "text",
-              required: true,
-            },
-            {
-              label: "Documento",
-              name: "Documento",
-              type: "text",
-              required: true,
-            },
-            {
-              label: "Rol",
-              name: "IdRol",
-              type: "select",
-              required: true,
-              options: roles.map((role) => ({
-                value: role.idRol, // ID del rol como valor
-                label: role.nombre, // Nombre del rol como texto visible
-              })),
-              defaultValue: modalData.seleccionado.IdRol, // Usa el ID del rol como valor por defecto
-            },
-            {
-              label: "Direccion",
-              name: "Direccion",
-              type: "text",
-              required: true,
-            },
-          ]}
-          onSubmit={handleActualizacionSubmit}
-          seleccionado={modalData.seleccionado}
-        />
-      )}
-
-      <Modal
-        open={openPasswordModal}
-        handleClose={handlePasswordModalClose}
-        handleSubmit={handleSubmitPasswordChange}
-      />
-      <button
-        className="fixed bottom-4 right-4 bg-blue-500 text-white rounded-full p-3 shadow-xl hover:shadow-2xl"
+      <div
         style={{
-          right: "4rem",
-          bottom: "4rem",
-          boxShadow: "0 8px 20px rgba(0, 0, 0, 0.5)",
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          backgroundColor: "#ffffff",
+          borderRadius: "20px",
+          width: "70%",
+          maxWidth: "40rem",
+          maxHeight: "80%",
+          overflow: "hidden",
+          padding: "2rem",
+          boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.2)",
+          zIndex: 1300,
+          border: "none",
         }}
-        onClick={() => handleOpenModal(empleado)}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+        <div
+          style={{
+            height: "100%",
+            overflowY: "scroll", // Permite el desplazamiento vertical
+            overflowX: "hidden", // Oculta el desplazamiento horizontal
+            scrollbarWidth: "none", // Firefox
+          }}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
-      </button>
-    </div>
+          <style>
+            {`
+              /* Chrome, Safari, and Edge */
+              .modal-content::-webkit-scrollbar {
+                display: none; /* Hide scrollbar */
+              }
+            `}
+          </style>
+
+          <Typography
+            variant="h5"
+            gutterBottom
+            style={{ textAlign: "center", marginBottom: "1.5rem", color: "#000000", fontWeight: "bold" }}
+          >
+            {title}
+          </Typography>
+
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
+            <div
+              {...getRootProps()}
+              style={{
+                width: "120px",
+                height: "120px",
+                borderRadius: "50%",
+                border: "2px solid #ddd",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#f4f4f4",
+                position: "relative",
+                cursor: "pointer",
+                overflow: "hidden",
+                backgroundImage: avatar ? `url(${avatar})` : `none`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            >
+              <input {...getInputProps()} />
+              {!avatar && <CameraAltIcon style={{ fontSize: "48px", color: "#aaa" }} />}
+            </div>
+          </div>
+
+          <Grid container spacing={2}>
+            {fields &&
+              fields.length > 0 &&
+              fields.map((field, index) => (
+                <Grid item xs={12} sm={6} key={index}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      {getIcon(field.label)}
+                    </span>
+                    <div style={{ flex: 1 }}>
+                      {field.type === "text" && (
+                        <TextField
+                          id={field.name}
+                          name={field.name}
+                          label={field.label}
+                          variant="standard"
+                          onChange={handleChange}
+                          fullWidth
+                          size="small"
+                          type="text"
+                          value={formData[field.name] || ""}
+                          error={Boolean(errors[field.name])}
+                          helperText={errors[field.name]}
+                          style={{
+                            marginBottom: "0.5rem",
+                            borderRadius: "8px",
+                            padding: "8px",
+                            fontSize: "14px",
+                          }}
+                          InputProps={{
+                            style: {
+                              borderRadius: "8px",
+                            },
+                          }}
+                          InputLabelProps={{
+                            style: {
+                              fontSize: "14px",
+                            },
+                          }}
+                        />
+                      )}
+                      {field.type === "password" && (
+                        <TextField
+                          id={field.name}
+                          name={field.name}
+                          label={field.label}
+                          variant="standard"
+                          onChange={handleChange}
+                          fullWidth
+                          size="small"
+                          type={showPassword[field.name] ? "text" : "password"}
+                          value={formData[field.name] || ""}
+                          error={Boolean(errors[field.name])}
+                          helperText={errors[field.name]}
+                          style={{
+                            marginBottom: "0.5rem",
+                            borderRadius: "8px",
+                            padding: "8px",
+                            fontSize: "14px",
+                          }}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <IconButton
+                                  onClick={() => handleClickShowPassword(field.name)}
+                                  edge="end"
+                                >
+                                  {showPassword[field.name] ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                            style: {
+                              borderRadius: "8px",
+                            },
+                          }}
+                          InputLabelProps={{
+                            style: {
+                              fontSize: "14px",
+                            },
+                          }}
+                        />
+                      )}
+                      {field.type === "select" && (
+                        <FormControl fullWidth variant="outlined">
+                          <InputLabel id={`${field.name}-label`}>
+                            {field.label}
+                          </InputLabel>
+                          <Select
+                            labelId={`${field.name}-label`}
+                            id={field.name}
+                            name={field.name}
+                            variant="standard"
+                            onChange={handleChange}
+                            value={formData[field.name] || ""}
+                            size="small"
+                            renderValue={(selected) => {
+                              switch (selected) {
+                                case "C.C":
+                                  return (
+                                    <div style={{ display: "flex", alignItems: "center" }}>
+                                      <Flag country="CO" style={{ marginRight: "8px" }} /> Cédula de Ciudadanía (C.C)
+                                    </div>
+                                  );
+                                case "C.E":
+                                  return (
+                                    <div style={{ display: "flex", alignItems: "center" }}>
+                                      <span role="img" aria-label="Globe" style={{ marginRight: "8px" }}>🌍</span> Cédula de extranjería (C.E)
+                                    </div>
+                                  );
+                                default:
+                                  return selected;
+                              }
+                            }}
+                            style={{
+                              marginBottom: "0.5rem",
+                              borderRadius: "8px",
+                              padding: "4px 8px",
+                              fontSize: "14px",
+                            }}
+                          >
+                            {field.options.map((option) => (
+                              <MenuItem key={option.value} value={option.value}>
+                                <div style={{ display: "flex", alignItems: "center" }}>
+                                  {option.value === "C.C" && <span role="img" aria-label="Colombia" style={{ marginRight: "8px" }}>🇨🇴</span>}
+                                  {option.value === "C.E" && <span role="img" aria-label="Globe" style={{ marginRight: "8px" }}>🌍</span>}
+                                  {option.label}
+                                </div>
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      )}
+                      {field.type === "switch" && (
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={formData[field.name] || false}
+                              onChange={handleChange}
+                              name={field.name}
+                              color="primary"
+                            />
+                          }
+                          label={field.label}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </Grid>
+              ))}
+          </Grid>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginTop: "1rem",
+            }}
+          >
+            <Button
+              onClick={handleCancel}
+              variant="contained"
+              sx={{
+                marginRight: "1rem",
+                backgroundColor: "#000000",
+                color: "#ffffff",
+                "&:hover": {
+                  backgroundColor: "#333333",
+                },
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              variant="contained"
+              endIcon={<SendIcon />}
+              sx={{
+                backgroundColor: "#9c27b0",
+                color: "#ffffff",
+                borderRadius: "8px",
+                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                "&:hover": {
+                  backgroundColor: "#7b1fa2",
+                  boxShadow: "0 6px 8px rgba(0, 0, 0, 0.15)",
+                },
+              }}
+            >
+              Enviar
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Modal>
   );
 };
 
-export default Empleados;
+export default ModalDinamico;

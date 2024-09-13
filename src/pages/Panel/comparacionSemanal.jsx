@@ -38,7 +38,7 @@ const ComparacionSemanal = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/comprararsemanaCV'); 
+                const response = await fetch('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/comprararsemanaCV'); 
                 const result = await response.json();
 
                 setData({

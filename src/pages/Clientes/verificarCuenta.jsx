@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-const VerificarCodigo = () => {
+const VerificarCuenta = () => {
   const [codigo, setCodigo] = useState('');
   const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ const VerificarCodigo = () => {
       }
   
       toast.success('Código verificado correctamente.');
-      navigate(`/cambiarContrasena/${IdCliente}`);
+      navigate(`/iniciarSesion`);
     } catch (err) {
       console.error('Error en la verificación:', err); // Para debugging
       toast.error('Código de verificación inválido o expirado.');
@@ -80,4 +80,4 @@ const VerificarCodigo = () => {
   );
 };
 
-export default VerificarCodigo;
+export default VerificarCuenta;

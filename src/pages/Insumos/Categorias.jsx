@@ -1,50 +1,67 @@
-import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import { toast } from "react-toastify";
+import React, { useState, useEffect } from "react";
 import CustomSwitch from "../../components/consts/switch";
 import ModalCategoria from "../../components/consts/modalCategorias";
 import CamposObligatorios from "../../components/consts/camposVacios";
-import {Container,Typography,Card,CardContent,Fab,Tooltip,Box,Avatar,Input,Pagination,CardActionArea,IconButton,} from "@mui/material";
+import {Container,Typography,Card,CardContent,Fab,Tooltip,Box,Avatar,Input,Pagination,CardActionArea,IconButton, Dialog,
+  DialogTitle, DialogContent, DialogContentText, DialogActions,Button} from "@mui/material";
 import { motion } from "framer-motion";
 
 const Categorias = () => {
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedCategoria, setSelectedCategoria] = useState(null);
   const [selectedRows, setSelectedRows] = useState([]);
   const [openModalAgregar, setOpenModalAgregar] = useState(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [categorias, setCategorias] = useState([]);
+  const [insumos, setInsumos] = useState([]);
   const [categoriaSeleccionado, setCategoriaSeleccionado] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const cardsPerPage = 6;
 
   useEffect(() => {
+    fetchInsumos();
     fetchCategorias();
   }, []);
 
   const fetchCategorias = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/categorias');
+      const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/categorias');
       const categoriasWithColors = response.data.map((categoria) => ({
         ...categoria,
         color: getRandomColor(),
       }));
       setCategorias(categoriasWithColors);
+      toast.success("Categorias cargadas exitosamente");
     } catch (error) {
       console.error('Error fetching categorias:', error);
+    }
+  };
+
+  const fetchInsumos = async () => {
+    try {
+      const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/insumos');
+      setInsumos(response.data);
+    } catch (error) {
+      console.error('Error al obtener los insumos:', error);
+      toast.error('Error al obtener los insumos.');
     }
   };
   
   const handleAddCategoria = async (formData) => {
     try {
-      const { nombre_categoria } = formData;
+      const { nombre_categoria, descripcion_categoria } = formData;
   
-      const camposObligatorios = ['nombre_categoria'];
+      const camposObligatorios = ['nombre_categoria', 'descripcion_categoria'];
       if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos de la categoría.')) {
         return;
       }
   
       formData.estado_categoria = 1;
       try {
-        await axios.post('http://localhost:5000/api/categorias/guardarCategoria', formData);
+        await axios.post('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/categorias/guardarCategoria', formData);
         
         const confirmation = await window.Swal.fire({
           title: '¿Estás seguro?',
@@ -80,7 +97,7 @@ const Categorias = () => {
   
   const handleEditCategoria = async (formData) => {
     try {
-        const camposObligatorios = ['nombre_categoria'];
+        const camposObligatorios = ['nombre_categoria', 'descripcion_categoria'];
 
         if (!CamposObligatorios(formData, camposObligatorios, 'Por favor, complete todos los campos de la categoría.')) {
             return;
@@ -95,7 +112,7 @@ const Categorias = () => {
 
         formData.nombre_categoria = formatNombreCategoria(formData.nombre_categoria);
 
-        const response = await axios.get('http://localhost:5000/api/categorias');
+        const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/categorias');
         const categorias = response.data;
         const categoriaExistente = categorias.find(categoria => categoria.nombre_categoria === formData.nombre_categoria && categoria.IdCategoria !== formData.IdCategoria);
 
@@ -108,7 +125,8 @@ const Categorias = () => {
             return;
         }
 
-        await axios.put(`http://localhost:5000/api/categorias/editar/${formData.IdCategoria}`, formData);
+        await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/categorias/editar/${formData.IdCategoria}`, formData);
+        console.log('Datos a enviar:', formData);
         handleCloseModalEditar();
         fetchCategorias();
         window.Swal.fire('¡Categoría actualizada!', '', 'success');
@@ -125,11 +143,19 @@ const Categorias = () => {
     }));
   };
 
-const handleToggleSwitch = async (id) => {
+  const handleToggleSwitch = async (id) => {
     const categoria = categorias.find(categoria => categoria.IdCategoria === id);
     if (!categoria) {
         console.error('Categoría no encontrada');
         return;
+    }
+
+    // Verificar si hay algún insumo relacionado con esta categoría
+    const estaRelacionadoConInsumo = insumos.some(insumo => insumo.Idcategoria === id);
+
+    if (estaRelacionadoConInsumo) {
+        toast.error('No se puede inactivar esta categoría porque está relacionada con un insumo.');
+        return; // Detener el proceso si está relacionada
     }
 
     const newEstado = categoria.estado_categoria === 1 ? 0 : 1;
@@ -145,8 +171,8 @@ const handleToggleSwitch = async (id) => {
 
     if (result.isConfirmed) {
         try {
-            await axios.put(`http://localhost:5000/api/categorias/editar/${id}`, { estado_categoria: newEstado });
-            fetchCategorias(); // Actualiza la lista de categorías después de la actualización
+            await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/categorias/editar/${id}`, { estado_categoria: newEstado });
+            fetchCategorias(); 
             window.Swal.fire({
                 icon: 'success',
                 title: 'Estado actualizado',
@@ -172,6 +198,18 @@ const handleToggleSwitch = async (id) => {
     setOpenModalEditar(false);
     setCategoriaSeleccionado(null);
   };
+
+  const handleOpenDialog = (categoria) => {
+    setSelectedCategoria(categoria);
+    setOpenDialog(true);
+  };
+
+  // Función para manejar el cierre del diálogo
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedCategoria(null);
+  };
+
 
   const handleEditClick = (categoria) => {
     setCategoriaSeleccionado(categoria);
@@ -287,34 +325,46 @@ return (
               aria-label="Buscar"
             />
           </div>
-
         </div>
+        <>
         <Box display="grid" gridTemplateColumns="repeat(3, 1fr)" gap={2} mb={2}>
-      {currentCategorias.map((categoria) => (
-        <motion.div
-          key={categoria.IdCategoria}
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          whileTap={{ scale: 1.0 }}
-        >
-          <Card sx={{ backgroundColor: "#eff5f9", borderRadius: 2 }}>
-            <CardActionArea>
-              <CardContent>
-                <Box display="flex" alignItems="center" justifyContent="center">
-                  <Avatar
-                    sx={{ backgroundColor: categoria.color, marginRight: 2 }}
-                  >
+        {currentCategorias.map((categoria) => (
+          <motion.div
+            key={categoria.IdCategoria}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            whileTap={{ scale: 1.0 }}
+          >
+            <Card sx={{ backgroundColor: "#eff5f9", borderRadius: 2, width: '100%' }}>
+              <CardContent sx={{ height: 115, paddingBottom: '8px !important' }}>
+                <Box display="flex" alignItems="center" justifyContent="center" mb={1}>
+                  <Avatar sx={{ backgroundColor: categoria.color, marginRight: 2 }}>
                     {categoria.nombre_categoria.charAt(0).toUpperCase()}
                   </Avatar>
                   <Box textAlign="center" flexGrow={1}>
-                    <Typography variant="h6" component="div">
-                      {categoria.nombre_categoria}
-                    </Typography>
-                    <Typography variant="body2">
-                      <span 
+                    <CardActionArea onClick={() => handleOpenDialog(categoria)}>
+                      <Typography variant="h6" component="div">
+                        {categoria.nombre_categoria}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          display: "-webkit-box",
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          WebkitLineClamp: 1,
+                          mb: 1,
+                        }}
+                      >
+                        {categoria.descripcion_categoria}
+                      </Typography>
+                    </CardActionArea>
+                    <Typography variant="body2" sx={{ mb: 0, mt: 1 }}>
+                      <span
                         className={`text-sm font-medium me-2 px-2.5 py-0.5 rounded 
-                          ${categoria.estado_categoria === 1 
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
+                          ${categoria.estado_categoria === 1
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
                             : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}`}
                       >
                         {categoria.estado_categoria === 1 ? "Activo" : "Inactivo"}
@@ -322,20 +372,23 @@ return (
                     </Typography>
                   </Box>
                   <Box display="flex" alignItems="center" ml={2}>
-                    <IconButton
-                      aria-label="edit"
-                      onClick={() => handleEditClick(categoria)}
-                      sx={{
-                        backgroundColor: "#ffffff",
-                        "&:hover": {
-                          backgroundColor: "#f3ecde",
-                        },
-                        borderRadius: "50%",
-                        padding: 1,
-                      }}
-                    >
-                      <i className="bx bx-edit" style={{ fontSize: "24px", color: "#ff9800" }}></i>
-                    </IconButton>
+                    {/* Condición para mostrar el botón de edición solo si la categoría está activa */}
+                    {categoria.estado_categoria === 1 && (
+                      <IconButton
+                        aria-label="edit"
+                        onClick={() => handleEditClick(categoria)}
+                        sx={{
+                          backgroundColor: "#ffffff",
+                          "&:hover": {
+                            backgroundColor: "#f3ecde",
+                          },
+                          borderRadius: "50%",
+                          padding: 1,
+                        }}
+                      >
+                        <i className="bx bx-edit" style={{ fontSize: "24px", color: "#ff9800" }}></i>
+                      </IconButton>
+                    )}
                     <CustomSwitch
                       active={categoria.estado_categoria === 1}
                       onToggle={() => handleToggleSwitch(categoria.IdCategoria)}
@@ -343,20 +396,66 @@ return (
                   </Box>
                 </Box>
               </CardContent>
-            </CardActionArea>
-          </Card>
-        </motion.div>
-      ))}
-    </Box>
+            </Card>
+          </motion.div>
+        ))}
+      </Box>
 
-        <Box display="flex" justifyContent="center" mb={2}>
-          <Pagination
-            count={Math.ceil(filteredCategorias.length / cardsPerPage)}
-            page={page}
-            onChange={handleChangePage}
-            color="primary"
-          />
-        </Box>
+      <Box display="flex" justifyContent="center" mb={2}>
+        <Pagination
+          count={Math.ceil(filteredCategorias.length / cardsPerPage)}
+          page={page}
+          onChange={handleChangePage}
+          color="primary"
+        />
+      </Box>
+
+      <Dialog 
+        open={openDialog} 
+        onClose={handleCloseDialog}
+        PaperProps={{
+          sx: { 
+            padding: 3, 
+            borderRadius: 3,
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)"
+          }
+        }}
+      >
+        <DialogTitle 
+          sx={{ 
+            fontWeight: 'bold', 
+            color: '#3f51b5', 
+            borderBottom: '1px solid #e0e0e0', 
+            marginBottom: 2 
+          }}
+        >
+          Descripción de la Categoría
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText 
+            sx={{ 
+              fontSize: '1rem', 
+              lineHeight: 1.6, 
+              color: '#333', 
+              marginBottom: 2 
+            }}
+          >
+            {selectedCategoria && selectedCategoria.descripcion_categoria}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+        <Button
+            onClick={handleCloseDialog}
+            color="secondary"
+            variant="contained"
+            style={{ marginRight: "1rem", borderRadius: '8px' }}
+          >
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+    </>
       </div>
     </div>
 

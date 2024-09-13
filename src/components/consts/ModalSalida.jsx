@@ -113,7 +113,7 @@ const ModalInsumos = ({
 
       // Enviar la solicitud POST a la API para registrar la salida de insumos
       const response = await axios.post(
-        "http://localhost:5000/salidasInsumos",
+        "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/salidasInsumos",
         salidaInsumos
       );
 
@@ -126,7 +126,7 @@ const ModalInsumos = ({
         const updatePromises = carrito.map((item) => {
           const nuevaCantidad = item.Cantidad - item.cantidad; // Calcular la nueva cantidad
           return axios.put(
-            `http://localhost:5000/api/existenciainsumos/editar/${item.IdInsumos}`,
+            `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/existenciainsumos/editar/${item.IdInsumos}`,
             { Cantidad: nuevaCantidad }
           );
         });
@@ -199,7 +199,7 @@ const ModalInsumos = ({
                       }}
                     >
                       <img
-                        src={`http://localhost:5000${item.imagen}`}
+                        src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${item.imagen}`}
                         alt={item.NombreInsumos}
                         style={{
                           maxWidth: "100%",

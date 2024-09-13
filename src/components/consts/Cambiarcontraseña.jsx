@@ -14,7 +14,6 @@ const CambiarContrasena = () => {
   // Obtener idCliente de los parámetros de la URL
   const { idCliente } = useParams();
 
-  // Función para validar la contraseña
   const validatePassword = (password) => {
     const minLength = 8;
     const hasUppercase = /[A-Z]/.test(password);
@@ -62,7 +61,7 @@ const CambiarContrasena = () => {
     }
 
     try {
-      const response = await axios.put(`http://localhost:5000/Jackenail/CambiarContrasena/${idCliente}`, { nuevaContrasena });
+      const response = await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/CambiarContrasena/${idCliente}`, { nuevaContrasena });
       
       if (response.status === 200) {
         toast.success('Contraseña cambiada correctamente.');

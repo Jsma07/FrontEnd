@@ -42,7 +42,7 @@ const Ventas = () => {
     const fetchVentas = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/Jackenail/Listarventas"
+          "https://back-bb2i.onrender.com/Jackenail/Listarventas"
         );
 
         const ventasConDetalles = response.data.map((venta) => ({
@@ -50,7 +50,7 @@ const Ventas = () => {
           idServicio: (
             <div style={{ display: "flex", alignItems: "center" }}>
               <img
-                src={`http://localhost:5000${venta.servicio.ImgServicio}`}
+                src={`https://back-bb2i.onrender.com${venta.servicio.ImgServicio}`}
                 alt={venta.servicio.Nombre_Servicio}
                 style={{
                   width: "3rem",
@@ -187,7 +187,7 @@ const Ventas = () => {
     const fetchAdiciones = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/Jackenail/Listarventas/adiciones"
+          "https://back-bb2i.onrender.com/Jackenail/Listarventas/adiciones"
         );
         setAdiciones(response.data);
       } catch (error) {
@@ -201,7 +201,7 @@ const Ventas = () => {
   const cambiarEstadoVenta = async (ventaId, nuevoEstado) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/Jackenail/CambiarEstado/${ventaId}`,
+        `https://back-bb2i.onrender.com/Jackenail/CambiarEstado/${ventaId}`,
         { Estado: nuevoEstado }
       );
       // Actualizar el estado local de la venta
@@ -248,7 +248,7 @@ const Ventas = () => {
   const handleAnularVenta = async (ventaId) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/Jackenail/CambiarEstado/${ventaId}`,
+        `https://back-bb2i.onrender.com/Jackenail/CambiarEstado/${ventaId}`,
         { Estado: 3 }
       );
 

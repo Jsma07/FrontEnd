@@ -5,7 +5,6 @@ import "./index.css";
 import App from "./App";
 import Roles from "./pages/Roles/Roles";
 import Admin from "./pages/Administrador/Administradores";
-import Usuarios2 from "./pages/Usuarios2/Usuarios2";
 import Ventas from "./pages/Ventas/Ventas";
 import Verificacion from "./components/consts/VerificarCliente ";
 
@@ -34,6 +33,9 @@ import { UserProvider } from "./context/ContextoUsuario";
 import CrearCita from "./pages/Agendamiento/CrearCita";
 import FechasTrabajo from './pages/Agendamiento/FechaTrabajo';
 import Panel from './pages/Panel/dashboard';
+import Cambiarcontraseña from "./components/consts/Cambiarcontraseña";
+import Verificacion from "./components/consts/VerificarCliente ";
+
 // import InactivarHoras from "./pages/Agendamiento/InactivarHoras";
 import Contrasena from "./components/consts/recuperarContrasena";
 import PrivateRoute from "./context/verificarSesion";
@@ -41,6 +43,7 @@ import SolicitarCita from "./components/consts/VIewClients/solicitarCita";
 import ListarCitas from "./components/consts/VIewClients/ListarCitas/ListarCitas";
 import Codigo from "./pages/Clientes/Codigo";
 import NuevaContrasena from "./pages/Clientes/nuevaContrasena"
+import VerificarCuenta from "./pages/Clientes/verificarCuenta";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -51,11 +54,15 @@ root.render(
           <Route path="/recuperarContrasena" element={<Contrasena />} />
           <Route path="/codigo" element={<Codigo />} />
           <Route path="/nuevaContrasena" element={<NuevaContrasena />} />
+          <Route path="/VerificarCuenta" element={<VerificarCuenta />}/>
 
           <Route path="/iniciarSesion" element={<Login />} />
           <Route path="/Registrar" element={<CrearCuenta />} />
           <Route path="/Catalogo" element={<Contendioitems />} />
           <Route path="/vistaInicio" element={<VistaInicial />} />
+          <Route path="/Verificacion" element={<Verificacion />}/>
+          <Route path="/cambiarContrasena/:idCliente" element={<Cambiarcontraseña />}/>
+          
           <Route path="/solicitarCita" element={
             <PrivateRoute requiredPermissions={["AgendaCliente"]}>
             <SolicitarCita />
@@ -180,7 +187,7 @@ root.render(
             />
             <Route path="/Clientes"
              element={
-              <PrivateRoute requiredPermissions={["Clientes"]}>
+              <PrivateRoute requiredPermissions={[]}>
                 <Clientes />
               </PrivateRoute>
             }

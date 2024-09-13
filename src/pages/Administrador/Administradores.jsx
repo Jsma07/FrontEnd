@@ -39,7 +39,7 @@ const Usuarios = () => {
     //Traer los roles desde la api
     const fetchRoles = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/roles");
+        const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/roles");
         console.log("Roles response:", response.data);
         setRoles(response.data);
       } catch (error) {
@@ -54,7 +54,7 @@ const Usuarios = () => {
         if (token) {
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }
-        const response = await axios.get("http://localhost:5000/api/users");
+        const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/users");
         setUsers(response.data.usuarios);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -120,12 +120,12 @@ const Usuarios = () => {
       });
       // si se confirma se procede a enviar la peticion a la api para cambiar el estado del usuario
       if (result.isConfirmed) {
-        await axios.put(`http://localhost:5000/api/editarUsuario/${id}`, {
+        await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/editarUsuario/${id}`, {
           estado: updatedUser.estado,
         });
         setUsers(updatedUsers);
         toast.success("El estado del usuario fue cambiado exitosamente.", {
-          position: "top-right",
+          position: "bottom-right",
           autoClose: 3000, // Cierra automáticamente después de 3 segundos
         });
       }
@@ -183,7 +183,6 @@ const Usuarios = () => {
     });
   };
 
-  //metodo para enviar la nueva contraseña a la api
   const handleSubmitPasswordChange = async (newPassword, confirmPassword) => {
     if (newPassword !== confirmPassword) {
       toast.error("Las contraseñas no coinciden.", {
@@ -204,7 +203,7 @@ const Usuarios = () => {
     try {
       //peticion put para actualizar la contraseña del usuario seleccionado
       await axios.put(
-        `http://localhost:5000/api/actualizarContrasena/${seleccionado.id}`,
+        `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/actualizarContrasena/${seleccionado.id}`,
         {
           newPassword: newPassword,
         }
@@ -353,7 +352,7 @@ const Usuarios = () => {
       let response;
       if (seleccionado) {
         response = await axios.put(
-          `http://localhost:5000/api/editarUsuario/${seleccionado.id}`,
+          `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/editarUsuario/${seleccionado.id}`,
           formData,
           {
             headers: {
@@ -372,7 +371,7 @@ const Usuarios = () => {
       } else {
         formData.estado = 1;
         response = await axios.post(
-          "http://localhost:5000/api/crearUsuario",
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/crearUsuario",
           formData,
           {
             headers: {

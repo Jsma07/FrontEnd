@@ -32,7 +32,7 @@ export const UserProvider = ({ children }) => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   
-      axios.get('http://localhost:5000/api/usuario')
+      axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/usuario')
         .then(response => {
           console.log('Datos del usuario:', response.data);
           setUser(response.data.user);

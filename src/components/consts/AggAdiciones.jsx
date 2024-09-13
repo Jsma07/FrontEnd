@@ -56,7 +56,7 @@ const ModalAdiciones = ({
   const cambiarEstadoVenta = async (ventaId, nuevoEstado) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/Jackenail/CambiarEstado/${ventaId}`,
+        `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/CambiarEstado/${ventaId}`,
         { Estado: nuevoEstado }
       );
       setVentas((prevVentas) =>
@@ -93,7 +93,7 @@ const ModalAdiciones = ({
     if (result.isConfirmed) {
       try {
         // Actualizar el total de la venta
-        await axios.put(`http://localhost:5000/Jackenail/Totales/${idVentas}`, {
+        await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/Totales/${idVentas}`, {
           Subtotal: totalVenta,
           Descuento: 0,
           Total: totalConAdiciones,
@@ -104,7 +104,7 @@ const ModalAdiciones = ({
 
         // Guardar los detalles de la venta
         const response = await fetch(
-          "http://localhost:5000/Jackenail/Detalleregistrar",
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/Detalleregistrar",
           {
             method: "POST",
             headers: {
@@ -185,7 +185,7 @@ const ModalAdiciones = ({
                         <div className="flex items-center">
                           <img
                             className="w-20 h-20 rounded-full"
-                            src={`http://localhost:5000${adicion.Img}`}
+                            src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${adicion.Img}`}
                             alt={adicion.NombreAdiciones}
                           />
                           <div className="flex-1 min-w-0 ms-4">

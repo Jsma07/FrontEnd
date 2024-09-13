@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-import jsPDF from "jspdf";
 import "jspdf-autotable";
+import axios from "axios";
+import jsPDF from "jspdf";
+import Avatar from '@mui/material/Avatar';
+import { useParams } from "react-router-dom";
+import TagIcon from '@mui/icons-material/Tag';
+import React, { useState, useEffect } from "react";
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 
 const DetalleCompra = () => {
   const { id } = useParams();
@@ -13,7 +18,7 @@ const DetalleCompra = () => {
   useEffect(() => {
     const fetchDetalleCompra = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/detallecompras/${id}`);
+        const response = await axios.get(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/detallecompras/${id}`);
         setDetalleCompra(response.data);
         setLoading(false);
       } catch (error) {
@@ -267,102 +272,58 @@ const DetalleCompra = () => {
               <ul className="divide-y divide-gray-200">
                 {detalleCompra.map((compra, index) => (
                   <React.Fragment key={index}>
-                    <li className="py-4 flex items-center space-x-4">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="w-6 h-6 text-gray-500"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M8.25 4.75h7.5m-12 12.25h16.5m-16.5 0h16.5M3 8.25l6 5.25 6-5.25"
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-base font-semibold text-gray-800">Fecha:</p>
-                        <p className="text-sm text-gray-600">
-                          {compra.compra.fecha_compra}
-                        </p>
-                      </div>
-                    </li>
-                    <li className="py-4 flex items-center space-x-4">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="w-6 h-6 text-gray-500"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.25 3h19.5m-19.5 0h19.5m-18 18h16.5m-16.5 0h16.5"
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-base font-semibold text-gray-800">Descuento:</p>
-                        <p className="text-sm text-gray-600">
-                          {compra.compra.descuento_compra}
-                        </p>
-                      </div>
-                    </li>
-                    <li className="py-4 flex items-center space-x-4">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="w-6 h-6 text-gray-500"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M8.25 4.75h7.5m-12 12.25h16.5m-16.5 0h16.5M3 8.25l6 5.25 6-5.25"
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-base font-semibold text-gray-800">IVA:</p>
-                        <p className="text-sm text-gray-600">
-                          {compra.compra.iva_compra}
-                        </p>
-                      </div>
-                    </li>
-                    <li className="py-4 flex items-center space-x-4">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="w-6 h-6 text-gray-500"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M8.25 4.75h7.5m-12 12.25h16.5m-16.5 0h16.5M3 8.25l6 5.25 6-5.25"
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-base font-semibold text-gray-800">Total:</p>
-                        <p className="text-sm text-gray-600">
-                           {compra.compra.total_compra}
-                        </p>
-                      </div>
-                    </li>
+                   <li className="py-4 flex items-center space-x-4">
+                    <div className="flex-shrink-0">
+                      <Avatar>
+                        <CalendarTodayIcon />
+                      </Avatar>
+                    </div>
+                    <div>
+                      <p className="text-base font-semibold text-gray-800">Fecha:</p>
+                      <p className="text-sm text-gray-600">
+                        {compra.compra.fecha_compra}
+                      </p>
+                    </div>
+                  </li>
+                  <li className="py-4 flex items-center space-x-4">
+                    <div className="flex-shrink-0">
+                      <Avatar>
+                        <TagIcon />
+                      </Avatar>
+                    </div>
+                    <div>
+                      <p className="text-base font-semibold text-gray-800">Descuento:</p>
+                      <p className="text-sm text-gray-600">
+                        {compra.compra.descuento_compra}
+                      </p>
+                    </div>
+                  </li>
+                  <li className="py-4 flex items-center space-x-4">
+                    <div className="flex-shrink-0">
+                      <Avatar>
+                        <MonetizationOnIcon />
+                      </Avatar>
+                    </div>
+                    <div>
+                      <p className="text-base font-semibold text-gray-800">IVA:</p>
+                      <p className="text-sm text-gray-600">
+                        {compra.compra.iva_compra}
+                      </p>
+                    </div>
+                  </li>
+                  <li className="py-4 flex items-center space-x-4">
+                    <div className="flex-shrink-0">
+                      <Avatar>
+                        <AttachMoneyIcon />
+                      </Avatar>
+                    </div>
+                    <div>
+                      <p className="text-base font-semibold text-gray-800">Total:</p>
+                      <p className="text-sm text-gray-600">
+                        {compra.compra.total_compra}
+                      </p>
+                    </div>
+                  </li>
                   </React.Fragment>
                 ))}
               </ul>

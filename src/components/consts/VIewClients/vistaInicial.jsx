@@ -43,7 +43,7 @@ const VistaInicial = () => {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/masagendados');
+        const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/masagendados');
         setProductos(response.data); 
       } catch (error) {
         console.error('Error al obtener los productos:', error);
@@ -201,7 +201,7 @@ const VistaInicial = () => {
                 transition={{ duration: 0.6, delay: index * 0.2 }}
               >
                 <img
-                  src={`http://localhost:5000${producto.ImgServicio}`|| 'default-image-url.jpg'}
+                  src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${producto.ImgServicio}`|| 'default-image-url.jpg'}
                   alt={producto.Nombre_Servicio}
                 />
                 <figcaption>{producto.Nombre_Servicio}</figcaption>

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import Table from "../../components/consts/Tabla";
 import ModalAgregarInsumo from "../../components/consts/modal";
 import ModalEditarInsumo from "../../components/consts/modalEditar";
 import CamposObligatorios from "../../components/consts/camposVacios";
 import handleAddInsumo from './agregarInsumo';
 import Fab from "@mui/material/Fab";
+import CustomSwitch from "../../components/consts/switch";
+
 
 const Insumos = () => {
   const [selectedRows, setSelectedRows] = useState([]);
@@ -23,7 +26,7 @@ const Insumos = () => {
 
   const fetchInsumos = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/insumos");
+      const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/insumos");
       console.log("Insumos fetched:", response.data); 
       setInsumos(response.data);
     } catch (error) {
@@ -33,7 +36,7 @@ const Insumos = () => {
 
   const fetchCategorias = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/categorias");
+      const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/categorias");
       setCategorias(response.data);
     } catch (error) {
       console.error("Error fetching categorias:", error);
@@ -66,8 +69,8 @@ const Insumos = () => {
 
   const handleEditInsumo = async (formData) => {
     try {
-      const camposObligatorios = ["NombreInsumos","Imagen","Idcategoria"];
-
+      const camposObligatorios = ["NombreInsumos", "Imagen", "Idcategoria"];
+  
       if (
         !CamposObligatorios(
           formData,
@@ -77,7 +80,7 @@ const Insumos = () => {
       ) {
         return;
       }
-
+  
       const formatNombreInsumo = (nombre) => {
         const nombreSinEspacios = nombre.trim();
         const nombreMinusculas = nombreSinEspacios.toLowerCase();
@@ -86,7 +89,7 @@ const Insumos = () => {
     };
 
     formData.NombreInsumos = formatNombreInsumo(formData.NombreInsumos);
-    const response = await axios.get('http://localhost:5000/api/insumos');
+    const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/insumos');
     const insumos = response.data;
     const insumoExistente = insumos.find(insumo => insumo.NombreInsumos === formData.NombreInsumos && insumo.IdInsumos !== formData.IdInsumos);
 
@@ -113,13 +116,12 @@ const Insumos = () => {
       if (confirmation.isConfirmed) {
         const formDataWithNumbers = new FormData();
         formDataWithNumbers.append("NombreInsumos", formData.NombreInsumos);
-        formDataWithNumbers.append("Imagen", formData.Imagen); 
+        formDataWithNumbers.append("Imagen", formData.Imagen);
         formDataWithNumbers.append("Estado", formData.Estado);
         formDataWithNumbers.append("IdCategoria", formData.Idcategoria);
-
   
         const response = await axios.put(
-          `http://localhost:5000/api/insumos/editar/${formData.IdInsumos}`,
+          `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/insumos/editar/${formData.IdInsumos}`,
           formDataWithNumbers,
           {
             headers: {
@@ -137,6 +139,47 @@ const Insumos = () => {
       window.Swal.fire("Error", "Hubo un error al intentar actualizar el insumo", "error");
     }
   };
+  
+
+  const handleToggleSwitch = async (id) => {
+    const insumo = insumos.find(insumo => insumo.IdInsumos === id);
+    if (!insumo) {
+      console.error('Insumo no encontrado');
+      return;
+    }
+  
+    const newEstado = insumo.estado_insumo === 1 ? 0 : 1;
+  
+    const result = await window.Swal.fire({
+      icon: 'warning',
+      title: '¿Estás seguro?',
+      text: '¿Quieres cambiar el estado del insumo?',
+      showCancelButton: true,
+      confirmButtonText: 'Sí',
+      cancelButtonText: 'Cancelar',
+    });
+  
+    if (result.isConfirmed) {
+        try {
+            await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/insumos/editar/${id}`, { estado_insumo: newEstado });
+            fetchInsumos(); // Actualiza la lista de categorías después de la actualización
+            window.Swal.fire({
+                icon: 'success',
+                title: 'Estado actualizado',
+                text: 'El estado del insumo ha sido actualizado correctamente.',
+            });
+        } catch (error) {
+            console.error('Error al cambiar el estado del insumo:', error);
+            window.Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un error al cambiar el estado del insumo. Por favor, inténtalo de nuevo más tarde.',
+            });
+        }
+    }
+  };
+  
+  
   
   const handleChange = (name, value) => {
     setInsumoSeleccionado((prevInsumo) => ({
@@ -189,18 +232,12 @@ const Insumos = () => {
         ]}
         onChange={handleChange}
       />
-      <ModalEditarInsumo
+      <ModalAgregarInsumo
         open={openModalEditar}
         handleClose={handleCloseModalEditar}
         onSubmit={handleEditInsumo}
         title="Editar Insumo"
         fields={[
-          {
-            name: "IdInsumos",
-            label: "Identificador",
-            type: "number",
-            readOnly: true,
-          },
           { name: "NombreInsumos", label: "Nombre insumo", type: "text" },
           {
             name: "Idcategoria",
@@ -287,9 +324,14 @@ const Insumos = () => {
                 >
                   <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
                 </button>
+                <CustomSwitch
+                  active={params.row.estado_insumo === 1}
+                  onToggle={() => handleToggleSwitch(params.row.IdInsumos)}
+                />
               </div>
             ),
-          },
+          }
+          
         ]}
         data={filtrar}
         title={'Gestion de insumos'}

@@ -13,12 +13,21 @@ const handleAddInsumo = async (formData, handleCloseModalAgregar, fetchInsumos) 
         }
         const formDataToSend = new FormData();
         formDataToSend.append("NombreInsumos", NombreInsumos);
-        formDataToSend.append("IdCategoria", IdCategoria);
+        formDataToSend.append("IdCategoria", IdCategoria); // Enviar como cadena
         formDataToSend.append("Imagen", Imagen);
+        formDataToSend.append("estado_insumo", 1); // Enviar como cadena
+
+        // Imprimir valores antes de enviar
+        console.log("Valores a enviar:", {
+            NombreInsumos,
+            IdCategoria,
+            Imagen,
+            estado_insumo: 1
+        });
 
         try {
             const response = await axios.post(
-                "http://localhost:5000/api/insumos/guardarInsumo",
+                "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/insumos/guardarInsumo",
                 formDataToSend,
                 {
                     headers: {
