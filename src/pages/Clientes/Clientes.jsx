@@ -52,7 +52,7 @@ const Clientes = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://back-bb2i.onrender.com/jackenail/Listar_Clientes"
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/jackenail/Listar_Clientes"
         );
         setClientes(response.data);
       } catch (error) {
@@ -176,7 +176,7 @@ const Clientes = () => {
   
         // Enviar los datos al backend
         const response = await axios.post(
-          "https://back-bb2i.onrender.com/Jackenail/crearClientesedu",
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/crearClientesedu",
           formDataNumerico,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -253,7 +253,7 @@ const Clientes = () => {
       if (result.isConfirmed) {
         // Asegúrate de usar el ID correcto aquí
         await axios.put(
-          `https://back-bb2i.onrender.com/Jackenail/CambiarEstadocliente/${id}`,
+          `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/CambiarEstadocliente/${id}`,
           {
             Estado: updatedCliente.Estado,
           }
@@ -324,7 +324,7 @@ const Clientes = () => {
         console.log(formDataNumerico)
 
         // Verifica la URL y asegúrate de que IdCliente esté en la URL
-        const url = `https://back-bb2i.onrender.com/Jackenail/Actualizar/${formDataNumerico.IdCliente}`;
+        const url = `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/Actualizar/${formDataNumerico.IdCliente}`;
         console.log("URL de solicitud:", url); // Agrega un log para depuración
 
         // Realizar la solicitud de actualización a la API utilizando axios.put
@@ -395,7 +395,7 @@ const Clientes = () => {
       });
 
       const response = await axios.put(
-        `https://back-bb2i.onrender.com/Jackenail/CambiarContrasena/${seleccionado.IdCliente}`,
+        `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/CambiarContrasena/${seleccionado.IdCliente}`,
         {
           nuevaContrasena: newPassword,
         }
