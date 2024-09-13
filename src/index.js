@@ -33,7 +33,7 @@ import { UserProvider } from "./context/ContextoUsuario";
 import CrearCita from "./pages/Agendamiento/CrearCita";
 import FechasTrabajo from './pages/Agendamiento/FechaTrabajo';
 import Panel from './pages/Panel/dashboard';
-import Cambiarcontraseña from "./components/consts/Cambiarcontraseña";
+// import Cambiarcontraseña from "./components/consts/Cambiarcontraseña";
 import Verificacion from "./components/consts/VerificarCliente ";
 
 // import InactivarHoras from "./pages/Agendamiento/InactivarHoras";
