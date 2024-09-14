@@ -15,7 +15,7 @@ const AddRoleModal = ({ open, handleClose, setRoles }) => {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/roles');
+      const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/roles');
       if (response.data && Array.isArray(response.data)) {
         const rolesWithPermissions = response.data.map(role => ({
           ...role,
@@ -33,7 +33,7 @@ const AddRoleModal = ({ open, handleClose, setRoles }) => {
 
   const fetchPermisos = async () => {
     try {
-      const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/permisos");
+      const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/permisos");
       if (response.data) {
         const permisosFromApi = response.data.map(permiso => ({
           ...permiso,
