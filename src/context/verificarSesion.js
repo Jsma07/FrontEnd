@@ -8,7 +8,7 @@ const PrivateRoute = ({ children, requiredPermissions }) => {
 
   useEffect(() => {
     if (!user) {
-      toast.error('No has iniciado sesión. Serás redirigido...');
+      // toast.error('No has iniciado sesión. Serás redirigido...');
     } else {
       const hasRequiredPermissions = requiredPermissions.some(permission => 
         permissions.includes(permission)

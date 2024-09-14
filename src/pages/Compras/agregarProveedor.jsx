@@ -7,7 +7,7 @@ import CamposObligatorios from '../../components/consts/camposVacios';
 const handleAddProveedor = async (formData, handleCloseModalAgregar, fetchProveedores) => {
     try {
       const { NIT, correo_proveedor, telefono_proveedor, empresa_proveedor } = formData;
-      const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/proveedores');
+      const response = await axios.get('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/proveedores');
       const proveedores = response.data;
       const proveedorExistenteNIT = proveedores.find(proveedor => proveedor.NIT === NIT);
       const proveedorExistenteCorreo = proveedores.find(proveedor => proveedor.correo_proveedor === correo_proveedor);
@@ -89,7 +89,7 @@ const handleAddProveedor = async (formData, handleCloseModalAgregar, fetchProvee
 
       if (confirmation.isConfirmed) {
         formData.estado_proveedor = 1;
-        await axios.post('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/proveedores/guardarProveedor', formData);
+        await axios.post('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/proveedores/guardarProveedor', formData);
         handleCloseModalAgregar();
         fetchProveedores();
         window.Swal.fire('¡Proveedor agregado!', '', 'success');
