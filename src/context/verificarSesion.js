@@ -26,7 +26,7 @@ const PrivateRoute = ({ children, requiredPermissions }) => {
     if (!user) {
       const timer = setTimeout(() => {
         window.location.href = '/iniciarSesion';
-      }, 3000);
+      }, 1000);
       return () => clearTimeout(timer);
     } else if (!isAccessible) {
       const timer = setTimeout(() => {

@@ -309,14 +309,20 @@ const Roles = () => {
             color="primary"
           />
         </Box>
-
+        
+         
         <Fab
-          color="primary"
-          aria-label="add"
-          style={{ position: "fixed", bottom: "20px", right: "20px" }}
+        style={{
+          border: "0.5px solid grey",
+          backgroundColor: "#94CEF2",
+          position: "fixed",
+          bottom: "16px",
+          right: "16px",
+          zIndex: 1000,
+        }}
           onClick={handleOpenModal}
         >
-          <i className="bx bx-plus"></i>
+          <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
         </Fab>
       </div>
 

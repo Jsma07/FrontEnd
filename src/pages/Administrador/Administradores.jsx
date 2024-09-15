@@ -560,7 +560,7 @@ const Usuarios = () => {
         aria-label="add"
         style={{
           border: "0.5px solid grey",
-          backgroundColor: "#389EFF",
+          backgroundColor: "#94CEF2",
           position: "fixed",
           bottom: "16px",
           right: "16px",
