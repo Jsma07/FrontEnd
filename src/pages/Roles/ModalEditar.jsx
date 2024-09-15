@@ -112,6 +112,15 @@ const ModalEditar = ({ open, handleClose, roleId, setRoles }) => {
       return;
     }
 
+    const permisosSeleccionados = Object.keys(formData)
+      .filter((key) => key !== "nombre" && formData[key])
+      .map(Number);
+
+    if (permisosSeleccionados.length === 0) {
+      toast.error("Por favor, selecciona al menos un permiso.");
+      return;
+    }
+
     try {
       const response = await axios.put(
         `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/editarRol/${roleId}`,
