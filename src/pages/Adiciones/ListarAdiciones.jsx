@@ -45,7 +45,7 @@ const ListarAdiciones = () => {
           }}
         >
           <img
-            src={`http://localhost:5000${params.row.Img}`}
+            src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${params.row.Img}`}
             alt={params.row.NombreAdiciones}
             style={{
               maxWidth: "100%",

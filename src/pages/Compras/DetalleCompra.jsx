@@ -184,7 +184,7 @@ const DetalleCompra = () => {
                     >
                       <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
                         <img
-                          src={`http://localhost:5000${insumo.imagen}`}
+                          src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${insumo.imagen}`}
                           alt="Imagen"
                           style={{
                             maxWidth: "100%",

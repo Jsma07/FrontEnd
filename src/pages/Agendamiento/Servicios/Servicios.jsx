@@ -400,7 +400,7 @@ const Servicios = () => {
               >
                 <Tooltip title="Imagen del Servicio">
                   <img
-                    src={`http://localhost:5000${params.row.ImgServicio}`}
+                    src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${params.row.ImgServicio}`}
                     alt="Imagen"
                     style={{
                       maxWidth: "100%",
