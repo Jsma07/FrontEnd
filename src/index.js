@@ -74,12 +74,6 @@ root.render(
 
 
         <Route path="/" element={<App />}>
-        <Route
-              index
-              element={
-                <Navigate to="/panel/dashboard" />
-              }
-            />
               <Route
               path="/panel/dashboard"
               element={
