@@ -3,8 +3,11 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import ModalDinamico from "../../components/consts/modaled";
 import Modal from "../../components/consts/modalContrasena";
+import TablePrueba from "../../components/consts/Tabla";
 import CustomSwitch from "../../components/consts/switch";
 import { toast } from "react-toastify";
+import Fab from '@mui/material/Fab';
+
 
 const Clientes = () => {
   const [clientes, setClientes] = useState([]);
@@ -49,19 +52,30 @@ const Clientes = () => {
   };
 
   useEffect(() => {
+    let isMounted = true; // Flag para evitar actualizar el estado si el componente se desmonta
+
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/jackenail/Listar_Clientes"
-        );
-        setClientes(response.data);
+        const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/jackenail/Listar_Clientes");
+        if (isMounted) {
+          setClientes(response.data);
+        }
       } catch (error) {
         console.error("Error al obtener los datos de clientes:", error);
       }
     };
 
-    fetchData();
+    fetchData(); // Obtener datos iniciales
+
+    const intervalId = setInterval(fetchData, 5000); // Actualizar cada 5 segundos
+
+    // Cleanup function para detener el intervalo cuando el componente se desmonta
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
   }, []);
+
 
   const handleOpenModal = (data) => {
     setModalData(data);
@@ -74,6 +88,7 @@ const Clientes = () => {
       headerName: "Imagen",
       width: 100,
       renderCell: (params) => {
+        const imageUrl = `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/${params.row.Img}?${new Date().getTime()}`;
         return (
           <div
             style={{
@@ -84,16 +99,16 @@ const Clientes = () => {
             }}
           >
             <img
-            src={`http://localhost:5000${params.row.Img}`}
-            alt={params.row.Nombre}
-            style={{
-              maxWidth: "100%",
-              height: "auto",
-              width: "3rem",
-              height: "3rem",
-              borderRadius: "50%",
-            }}
-          />
+              src={imageUrl}
+              alt={params.row.Nombre}
+              style={{
+                maxWidth: "100%",
+                height: "auto",
+                width: "3rem",
+                height: "3rem",
+                borderRadius: "50%",
+              }}
+            />
           </div>
         );
       },
@@ -103,8 +118,43 @@ const Clientes = () => {
     { field: "Correo", headerName: "Correo" },
     { field: "Telefono", headerName: "Teléfono" },
     { field: "Documento", headerName: "Documento" },
-   
-  
+    {
+      field: "Verificado",
+      headerName: "Verificación",
+      width: 150,
+      renderCell: (params) => {
+        const isVerified = params.row.Verificado;
+        return (
+          <button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "0.25rem 0.5rem",
+              border: "none",
+              borderRadius: "12px",
+              backgroundColor: isVerified ? "green" : "red",
+              color: "white",
+              cursor: "pointer",
+              fontSize: "0.75rem",
+              fontWeight: "bold",
+            }}
+            onClick={() => {
+              if (!isVerified) {
+                toast.error("No se puede activar al cliente porque no está verificado.");
+                return;
+              }
+              toast.info(`El estado de verificación es ${isVerified ? "Sí" : "No"}`);
+            }}
+          >
+            <i
+              className={`bx bx-${isVerified ? "check" : "x"}`}
+              style={{ marginRight: "0.25rem", fontSize: "1rem" }}
+            ></i>
+            {isVerified ? "Verificado" : "No Verificado"}
+          </button>
+        );
+      },
+    },
     {
       field: "Acciones",
       headerName: "Acciones",
@@ -112,8 +162,13 @@ const Clientes = () => {
       renderCell: (params) => (
         <div className="flex justify-center space-x-4">
           {params.row.Estado === 1 && (
-            <button
-              className="text-yellow-500"
+            <Fab
+              style={{
+                fontSize: '16px',
+                width: '40px',
+                height: '40px',
+                backgroundColor: '#F0F0F0',
+              }}
               onClick={() =>
                 handleOpenModal({
                   ...params.row,
@@ -121,26 +176,36 @@ const Clientes = () => {
                   seleccionado: params.row,
                 })
               }
+              className="text-yellow-500"
             >
-              <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
-            </button>
+              <i className="bx bx-edit" style={{ fontSize: "23px", color: "#F0AC00" }}></i>
+            </Fab>
           )}
           {params.row.Estado === 1 && (
-            <button
+            <Fab
+              style={{
+                fontSize: '16px',
+                width: '40px',
+                height: '40px',
+                backgroundColor: '#F0F0F0',
+              }}
               onClick={() => handlePasswordChangeClick(params.row.IdCliente)}
               className="text-black-500"
             >
-              <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>{" "}
-            </button>
+              <i className="bx bx-lock" style={{ fontSize: "24px" }}></i>
+            </Fab>
           )}
           <CustomSwitch
             active={params.row.Estado === 1}
-            onToggle={() => handleToggleSwitch(params.row.IdCliente)}
+            onToggle={() => handleToggleSwitch(params.row)}
+            disabled={params.row.Estado === 2}
           />
         </div>
       ),
     },
   ];
+  
+  
   
   
   const handleSubmit = async (formData) => {
@@ -217,29 +282,34 @@ const Clientes = () => {
   };
   
 
-  const handleToggleSwitch = async (id) => {
-    if (!id) {
+  const handleToggleSwitch = async (cliente) => {
+    if (!cliente.IdCliente) {
       console.error("El ID del cliente es inválido");
       return;
     }
-
-    const updatedClientes = clientes.map((cliente) => {
-      if (cliente.IdCliente === id) {
-        const newEstado = cliente.Estado === 1 ? 2 : 1; // Cambia 0 por 2 para el estado inactivo
-        return { ...cliente, Estado: newEstado };
+  
+    if (!cliente.Verificado) {
+      toast.error("No se puede activar al cliente porque no está verificado.");
+      return;
+    }
+  
+    const updatedClientes = clientes.map((c) => {
+      if (c.IdCliente === cliente.IdCliente) {
+        const newEstado = c.Estado === 1 ? 2 : 1; // Cambia 1 por 2 para el estado inactivo
+        return { ...c, Estado: newEstado };
       }
-      return cliente;
+      return c;
     });
-
+  
     const updatedCliente = updatedClientes.find(
-      (cliente) => cliente.IdCliente === id
+      (c) => c.IdCliente === cliente.IdCliente
     );
-
+  
     if (!updatedCliente) {
       console.error("No se encontró el cliente actualizado");
       return;
     }
-
+  
     try {
       const result = await Swal.fire({
         icon: "warning",
@@ -249,21 +319,20 @@ const Clientes = () => {
         confirmButtonText: "Sí",
         cancelButtonText: "Cancelar",
       });
-
+  
       if (result.isConfirmed) {
-        // Asegúrate de usar el ID correcto aquí
         await axios.put(
-          `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/CambiarEstadocliente/${id}`,
+          `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/CambiarEstadocliente/${cliente.IdCliente}`,
           {
             Estado: updatedCliente.Estado,
           }
         );
-
+  
         setClientes(updatedClientes);
-
+  
         toast.info("El estado del cliente ha sido actualizado correctamente.", {
           position: "bottom-right",
-          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+          autoClose: 3000,
         });
       }
     } catch (error) {
@@ -272,7 +341,7 @@ const Clientes = () => {
         "Hubo un error al cambiar el estado del cliente. Por favor, inténtalo de nuevo más tarde.",
         {
           position: "bottom-right",
-          autoClose: 3000, // Cierra automáticamente después de 3 segundos
+          autoClose: 3000,
         }
       );
     }
@@ -280,24 +349,23 @@ const Clientes = () => {
 
   const handleActualizacionSubmit = async (formData) => {
     try {
-      // Verificar que formData tenga el IdCliente
       if (!formData.IdCliente) {
         throw new Error("El ID del cliente no está definido.");
       }
-
-      // Verificar si el correo electrónico o el documento están siendo utilizados por otro cliente
+  
+      // Verifica la existencia de correo y documento
       const correoExistente = clientes.some(
         (cliente) =>
           cliente.Correo === formData.Correo &&
           cliente.IdCliente !== formData.IdCliente
       );
-
+  
       const documentoExistente = clientes.some(
         (cliente) =>
           cliente.Documento === formData.Documento &&
           cliente.IdCliente !== formData.IdCliente
       );
-
+  
       if (correoExistente) {
         toast.error(
           "El correo electrónico ingresado ya está registrado. Por favor, elija otro correo electrónico.",
@@ -306,7 +374,10 @@ const Clientes = () => {
             autoClose: 3000,
           }
         );
-      } else if (documentoExistente) {
+        return;
+      }
+  
+      if (documentoExistente) {
         toast.error(
           "El documento ingresado ya está registrado. Por favor, elija otro documento.",
           {
@@ -314,40 +385,46 @@ const Clientes = () => {
             autoClose: 3000,
           }
         );
-      } else {
-        const formDataNumerico = {
-          ...formData,
-          Telefono: parseInt(formData.Telefono, 10), // Asegúrate de que Telefono sea un número entero
-          IdRol: 2,
-        };
-
-        console.log(formDataNumerico)
-
-        // Verifica la URL y asegúrate de que IdCliente esté en la URL
-        const url = `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/Actualizar/${formDataNumerico.IdCliente}`;
-        console.log("URL de solicitud:", url); // Agrega un log para depuración
-
-        // Realizar la solicitud de actualización a la API utilizando axios.put
-        const response = await axios.put(url, formDataNumerico);
-        console.log("Respuesta de la API:", response.data); // Agrega un log para depuración
-
-        // Actualizar el estado local de clientes
-        const updatedClientes = clientes.map((cliente) =>
-          cliente.IdCliente === formDataNumerico.IdCliente
-            ? { ...cliente, ...formDataNumerico }
-            : cliente
-        );
-
-        setClientes(updatedClientes);
-
-        toast.success("El cliente se ha actualizado correctamente.", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-
-        // Acciones adicionales después de la actualización
-        setModalData(null);
+        return;
       }
+  
+      const data = new FormData();
+      data.append("IdCliente", formData.IdCliente);
+      data.append("Nombre", formData.Nombre);
+      data.append("Apellido", formData.Apellido);
+      data.append("Correo", formData.Correo);
+      data.append("Telefono", formData.Telefono);
+      data.append("Documento", formData.Documento);
+      data.append("tipoDocumento", formData.tipoDocumento);
+      data.append("Contrasena", formData.Contrasena);
+      data.append("Estado", formData.Estado);
+      data.append("IdRol", formData.IdRol);
+      if (formData.Img) {
+        data.append("Img", formData.Img); // Aquí estamos agregando el archivo
+      }
+  
+      const url = `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/actualizarClientes/${formData.IdCliente}`;
+      const response = await axios.put(url, data, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+  
+      console.log("Respuesta de la API:", response.data);
+  
+      // Actualiza el cliente en el estado, incluyendo la nueva imagen
+      const updatedClientes = clientes.map((cliente) =>
+        cliente.IdCliente === formData.IdCliente
+          ? { ...cliente, ...formData, Img: response.data.Img }
+          : cliente
+      );
+  
+      setClientes(updatedClientes);
+  
+      toast.success("El cliente se ha actualizado correctamente.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+  
+      setModalData(null);
     } catch (error) {
       console.error("Error al actualizar el cliente:", error);
       toast.error(
@@ -359,6 +436,7 @@ const Clientes = () => {
       );
     }
   };
+  
 
   const handleSubmitPasswordChange = async (newPassword, confirmPassword) => {
     // Paso 1: Validar que las contraseñas coincidan
@@ -433,115 +511,14 @@ const Clientes = () => {
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900 py-3 sm:py-5">
-      <div
-        className="fixed bg-white rounded-lg shadow-md"
-        style={{
-          padding: "5px",
-          margin: "0 auto",
-          borderRadius: "30px",
-          marginTop: "20px",
-          boxShadow: "0 4px 12px rgba(128, 0, 128, 0.5)",
-          left: "82px",
-          top: "70px",
-          width: "calc(100% - 100px)",
-        }}
-      >
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <div className="flex justify-between items-center mb-4">
-            <h4 className="text-3xl">Gestion de Clientes</h4>
-
-            <div className="relative w-80">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg
-                  className="w-5 h-5 text-gray-500 dark:text-gray-400"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                  />
-                </svg>
-              </div>
-              <input
-                type="search"
-                id="default-search"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Search Mockups, Logos..."
-                required
-              />
-            </div>
-          </div>
-
-          <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
-            <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
-              <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
-                <button
-                  type="button"
-                  className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
-                >
-                  <svg
-                    className="h-3.5 w-3.5 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <path
-                      clipRule="evenodd"
-                      fillRule="evenodd"
-                      d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                    />
-                  </svg>
-                  Add new product
-                </button>
-                {/* Otros botones... */}
-              </div>
-            </div>
-            {/* Tabla de datos */}
-            <div className="w-full overflow-x-auto">
-              <table className="w-full table-auto text-sm text-center text-gray-500 dark:text-gray-400">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                  <tr>
-                    {columns.map((column) => (
-                      <th
-                        key={column.field}
-                        scope="col"
-                        className="px-6 py-3 text-center"
-                      >
-                        {column.headerName}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {clientes.map((cliente, index) => (
-                    <tr
-                      key={index}
-                      className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      {columns.map((column) => (
-                        <td
-                          key={column.field}
-                          className="px-6 py-3 text-center whitespace-nowrap"
-                        >
-                          {column.field === "Acciones"
-                            ? column.renderCell({ row: cliente })
-                            : cliente[column.field]}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
+     
+       
+       <TablePrueba
+        title="Gestion Clientes"
+        columns={columns}
+        data={clientes}
+      />
+          
               {modalData && (
                 <ModalDinamico
                   open={true}
@@ -654,7 +631,6 @@ const Clientes = () => {
                   seleccionado={modalData.seleccionado}
                 />
               )}
-            </div>
 
             <button
               className="fixed bottom-4 right-4 bg-blue-500 text-white rounded-full p-3 shadow-xl hover:shadow-2xl"
@@ -680,9 +656,7 @@ const Clientes = () => {
                 />
               </svg>
             </button>
-          </div>
-        </div>
-      </div>
+        
       <Modal
         open={openPasswordModal}
         handleClose={handlePasswordModalClose}
