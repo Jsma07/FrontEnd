@@ -51,46 +51,60 @@ const ModalDinamico = ({
     }
   }, [seleccionado]);
 
-  
   const validateField = (name, value) => {
     let error = '';
 
+    // Verifica que value sea una cadena de texto antes de aplicar trim()
+    value = typeof value === 'string' ? value.trim() : '';
+
+    // Verificar si el valor está vacío después de eliminar espacios
+    if (!value) {
+      return 'El campo no puede estar vacío.';
+    }
+
     switch (name) {
       case 'Documento':
-        if (!/^\d{7,10}$/.test(value)) {
-          error = 'Debe ser un número de entre 7 y 10 dígitos.';
-        }
+        if (!/^\d{7,17}$/.test(value)) {
+          error = 'Debe ser un número de entre 7 y 17 dígitos.';
+        } 
         break;
+
       case 'Nombre':
       case 'Apellido':
-        if (!/^[a-zA-Z\s]+$/.test(value) || !/\S/.test(value)) {
-          error = 'Solo se permiten letras y espacios, y no puede estar vacío.';
+        if (!/^[a-zA-Z\s]+$/.test(value)) {
+          error = 'Solo se permiten letras y espacios.';
+        } else if (value.length < 4) {
+          error = 'Debe tener al menos 4 caracteres.';
         }
         break;
+
       case 'Correo':
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
           error = 'Correo electrónico inválido.';
         }
         break;
+
       case 'Telefono':
         if (!/^\d{10,15}$/.test(value)) {
           error = 'Debe ser un número entre 10 y 15 dígitos.';
         }
         break;
+
       case 'Direccion':
-        if (!value.trim()) {
-          error = 'La dirección no puede estar vacía.';
+        if (!/^[a-zA-Z0-9\s#-]+$/.test(value)) {
+          error = 'La dirección solo puede contener letras, números, espacios, numeral (#) y guion (-).';
         }
         break;
+
       case 'Contrasena':
         if (!/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/.test(value)) {
           error = 'La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.';
         }
         break;
+
       default:
         break;
     }
-    
 
     return error;
   };
@@ -112,10 +126,6 @@ const ModalDinamico = ({
       [name]: error,
     }));
   };
-
-  
-
-  
 
   const handleCancel = () => {
     handleClose();
@@ -155,7 +165,7 @@ const ModalDinamico = ({
 
   const handleSubmit = () => {
     const newErrors = {};
-    
+
     // Validar campos del formulario
     for (const field of fields) {
       const error = validateField(field.name, formData[field.name] || '');
@@ -163,27 +173,26 @@ const ModalDinamico = ({
         newErrors[field.name] = error;
       }
     }
-    
+
     // Validar campos adicionales
     if (!avatarFile) {
       newErrors['avatar'] = 'La imagen no puede estar vacía.';
     }
-    
+
     if (!formData['Documento']) {
       newErrors['Documento'] = 'El tipo de documento no puede estar vacío.';
     }
-    
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       toast.error('Por favor corrige los errores en el formulario.');
       return;
     }
-  
+
     // Enviar formulario si no hay errores
     onSubmit({ ...formData, Img: avatarFile });
     handleClose();
   };
-  
 
   const onDrop = (acceptedFiles) => {
     const file = acceptedFiles[0];
