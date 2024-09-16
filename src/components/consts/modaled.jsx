@@ -57,8 +57,8 @@ const ModalDinamico = ({
 
     switch (name) {
       case 'Documento':
-        if (!/^\d{10}$/.test(value)) {
-          error = 'Debe ser un número de 10 dígitos.';
+        if (!/^\d{7,10}$/.test(value)) {
+          error = 'Debe ser un número de entre 7 y 10 dígitos.';
         }
         break;
       case 'Nombre':
@@ -90,6 +90,7 @@ const ModalDinamico = ({
       default:
         break;
     }
+    
 
     return error;
   };
