@@ -42,7 +42,7 @@ const InactivarHorasModal = ({ open, onClose, onHoursInactivated }) => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/horarios")
+      .get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/horarios")
       .then((response) => {
         const inactiveDays = response.data
           .filter((horario) => horario.estado === "inactivo")
