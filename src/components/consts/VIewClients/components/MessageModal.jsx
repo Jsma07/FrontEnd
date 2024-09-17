@@ -20,8 +20,7 @@ const MessageModal = ({ open, handleClose, idAgenda }) => {
     { label: "Otro", value: "otro" },
   ];
 
-  const imageUrl = `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${user.img}`;
-
+const imageUrl = `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${user.img}`;
   const handleSend = async () => {
     if (!message || !tipo) {
       Swal.fire("Error", "Por favor selecciona un tipo de solicitud y escribe un mensaje.", "error");
