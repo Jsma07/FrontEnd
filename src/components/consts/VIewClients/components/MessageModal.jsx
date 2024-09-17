@@ -76,7 +76,7 @@ const MessageModal = ({ open, handleClose, idAgenda }) => {
 
         {/* Muestra la imagen del usuario y su nombre */}
         <Box display="flex" alignItems="center" sx={{ marginBottom: 2 }}>
-          <Avatar src={user.img} alt={user.nombre} sx={{ marginRight: 2 }} /> {/* Mostrar imagen */}
+          <Avatar src={user.Img} alt={user.nombre} sx={{ marginRight: 2 }} /> {/* Mostrar imagen */}
           <Typography variant="body1">{`${user.nombre} ${user.apellido}`}</Typography>
         </Box>
 
