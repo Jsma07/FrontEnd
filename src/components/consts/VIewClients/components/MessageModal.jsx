@@ -10,12 +10,17 @@ const MessageModal = ({ open, handleClose, idAgenda }) => {
   const [tipo, setTipo] = useState(""); // Tipo de mensaje
   const { user } = useContext(UserContext); // Accede al usuario desde el contexto
 
+
+
+  
   // Opciones para el selector
   const opciones = [
     { label: "Anular cita", value: "anular" },
     { label: "Aplazar cita", value: "aplazar" },
     { label: "Otro", value: "otro" },
   ];
+
+  const imageUrl = `${https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev}${user.img}`;
 
   const handleSend = async () => {
     if (!message || !tipo) {
@@ -54,6 +59,7 @@ const MessageModal = ({ open, handleClose, idAgenda }) => {
       Swal.fire("Error", "Hubo un problema al enviar tu mensaje.", "error");
     }
   };
+  
 
   return (
     <Modal open={open} onClose={handleClose}>
@@ -76,7 +82,7 @@ const MessageModal = ({ open, handleClose, idAgenda }) => {
 
         {/* Muestra la imagen del usuario y su nombre */}
         <Box display="flex" alignItems="center" sx={{ marginBottom: 2 }}>
-          <Avatar src={user.Img} alt={user.nombre} sx={{ marginRight: 2 }} /> {/* Mostrar imagen */}
+          <Avatar src={imageUrl} alt={user.nombre} sx={{ marginRight: 2 }} /> {/* Mostrar imagen */}
           <Typography variant="body1">{`${user.nombre} ${user.apellido}`}</Typography>
         </Box>
 
