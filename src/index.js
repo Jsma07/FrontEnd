@@ -179,7 +179,7 @@ root.render(
             />
             <Route path="/Clientes"
              element={
-              <PrivateRoute requiredPermissions={[]}>
+              <PrivateRoute requiredPermissions={[Clientes]}>
                 <Clientes />
               </PrivateRoute>
             }
