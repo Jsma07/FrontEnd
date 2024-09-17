@@ -4,6 +4,8 @@ import { styled } from '@mui/material/styles';
 import axios from 'axios';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
+import Avatar from '@mui/material/Avatar';  // Importa el componente Avatar
+
 
 const NotificationCard = styled('div')(({ theme, read, expanded }) => ({
   padding: theme.spacing(2),
@@ -13,8 +15,7 @@ const NotificationCard = styled('div')(({ theme, read, expanded }) => ({
   cursor: 'pointer',
   minHeight: expanded ? '100px' : '50px',  // Expande el tamaño al hacer clic
   display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
+  alignItems: 'center',  // Alineación vertical
 }));
 
 const NotificationModal = ({ open, handleClose, setNotificaciones, notificaciones, unreadCount, setUnreadCount }) => {
@@ -22,7 +23,6 @@ const NotificationModal = ({ open, handleClose, setNotificaciones, notificacione
   const [searchQuery, setSearchQuery] = useState("");
   const [tabValue, setTabValue] = useState('aplazamiento'); // Estado para el valor de la pestaña
 
-  // Marcar notificación como leída
   const handleMarkAsRead = async (notifId) => {
     try {
       await axios.put(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/notificaciones/${notifId}/leido`);
@@ -37,12 +37,10 @@ const NotificationModal = ({ open, handleClose, setNotificaciones, notificacione
     }
   };
 
-  // Expandir notificación
   const handleExpandNotification = (notifId) => {
     setExpandedNotification(prev => prev === notifId ? null : notifId);
   };
 
-  // Eliminar notificación
   const handleDeleteNotification = async (notifId) => {
     try {
       await axios.delete(`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/notificaciones/${notifId}`);
@@ -52,21 +50,15 @@ const NotificationModal = ({ open, handleClose, setNotificaciones, notificacione
     }
   };
 
-  // Filtrar notificaciones basadas en la pestaña seleccionada
   const filteredNotificaciones = notificaciones
-  .filter(notif => tabValue === 'otro' || notif.Tipo === tabValue)  // Añadido el filtro para "Otro"
-  .filter(notif =>
-    notif.Tipo.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    notif.Mensaje.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    .filter(notif => tabValue === 'otro' || notif.Tipo === tabValue)
+    .filter(notif =>
+      notif.Tipo.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      notif.Mensaje.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      fullWidth
-      maxWidth="md"  // Esto hace que el modal sea más grande
-    >
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
       <DialogTitle>
         Notificaciones
         <IconButton aria-label="close" onClick={handleClose} style={{ position: 'absolute', right: 8, top: 8 }}>
@@ -74,21 +66,19 @@ const NotificationModal = ({ open, handleClose, setNotificaciones, notificacione
         </IconButton>
       </DialogTitle>
       <DialogContent>
-        {/* Barra de pestañas */}
         <Tabs
-  value={tabValue}
-  onChange={(e, newValue) => setTabValue(newValue)}
-  aria-label="notificaciones tabs"
-  variant="scrollable"
-  scrollButtons="auto"
-  sx={{ marginBottom: '20px' }}
->
-  <Tab label="Aplazar cita" value="aplazar" />
-  <Tab label="Anular cita" value="anular" />
-  <Tab label="Otro" value="otro" />
-</Tabs>
+          value={tabValue}
+          onChange={(e, newValue) => setTabValue(newValue)}
+          aria-label="notificaciones tabs"
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{ marginBottom: '20px' }}
+        >
+          <Tab label="Aplazar cita" value="aplazar" />
+          <Tab label="Anular cita" value="anular" />
+          <Tab label="Otro" value="otro" />
+        </Tabs>
 
-        {/* Barra de búsqueda */}
         <TextField
           label="Buscar"
           variant="outlined"
@@ -99,7 +89,6 @@ const NotificationModal = ({ open, handleClose, setNotificaciones, notificacione
         />
         <Divider />
 
-        {/* Lista de Notificaciones */}
         {filteredNotificaciones.length === 0 ? (
           <Typography variant="body2" color="textSecondary" style={{ marginTop: '20px' }}>
             No se encontraron notificaciones.
@@ -112,11 +101,12 @@ const NotificationModal = ({ open, handleClose, setNotificaciones, notificacione
               read={notif.Leido}
               expanded={expandedNotification === notif.IdNotificacion}
             >
-              <div onClick={() => handleExpandNotification(notif.IdNotificacion)} style={{ flex: 1 }}>
-                <Typography variant="body1" component="p" noWrap={!expandedNotification === notif.IdNotificacion}>
+              <Avatar src={notif.cliente.Img} alt={`${notif.cliente.nombre} ${notif.cliente.apellido}`} /> {/* Imagen del usuario */}
+              <div onClick={() => handleExpandNotification(notif.IdNotificacion)} style={{ flex: 1, marginLeft: '10px' }}>
+                <Typography variant="body1" component="p" noWrap={expandedNotification !== notif.IdNotificacion}>
                   <strong>{notif.Tipo}</strong>
                 </Typography>
-                <Typography variant="body2" component="p" noWrap={!expandedNotification === notif.IdNotificacion}>
+                <Typography variant="body2" component="p" noWrap={expandedNotification !== notif.IdNotificacion}>
                   {notif.Mensaje}
                 </Typography>
               </div>
