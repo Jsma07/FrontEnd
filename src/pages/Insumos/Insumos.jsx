@@ -169,17 +169,22 @@ const Insumos = () => {
                 text: 'El estado del insumo ha sido actualizado correctamente.',
             });
         } catch (error) {
-            console.error('Error al cambiar el estado del insumo:', error);
-            window.Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Hubo un error al cambiar el estado del insumo. Por favor, inténtalo de nuevo más tarde.',
-            });
+        console.error('Error al cambiar el estado del insumo:', error);
+        
+        // Mostrar la alerta específica según el mensaje de error del backend
+        if (error.response && error.response.data && error.response.data.error) {
+          const errorMessage = error.response.data.error;
+          toast.error(errorMessage);
+        } else {
+          window.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un error al cambiar el estado del insumo. Por favor, inténtalo de nuevo más tarde.',
+          });
         }
+      }
     }
   };
-  
-  
   
   const handleChange = (name, value) => {
     setInsumoSeleccionado((prevInsumo) => ({
