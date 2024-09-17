@@ -279,7 +279,7 @@ function Contenidoitems() {
                         className="bx bx-calendar"
                         style={{ fontSize: "20px", marginRight: "8px" }}
                       ></i>
-                      Agendar
+                      Visualizar servicios
                     </Button>
                   </CardActions>
                 </Card>
@@ -289,71 +289,70 @@ function Contenidoitems() {
         </Grid>
       </Box>
   
-      <Dialog
-      open={dialogOpen}
-      onClose={handleDialogClose}
-      fullWidth
-      maxWidth="md"
-      sx={{
-        "& .MuiDialog-paper": {
-          width: "70%", // Ajusta el ancho como desees
-          maxWidth: "none", // Desactiva el ancho máximo predeterminado
-          height: "70%", // Ajusta la altura como desees
-          maxHeight: "90vh", // Limita la altura máxima con un valor en vista altura
-        }
-      }}
-    >
-      <DialogTitle>Detalles del Servicio</DialogTitle>
-      <DialogContent
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          height: "calc(60% - 56px)", // Ajusta la altura restante después del título y acciones
-          overflowY: "auto", // Habilita el desplazamiento vertical si el contenido excede la altura
-        }}
-      >
-        {selectedService && (
-          <Box sx={{ display: "flex", alignItems: "flex-start", gap: 3 }}>
-            <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
-              <img
-                src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${selectedService.ImgServicio}`}
-                alt={selectedService.Nombre_Servicio}
-                style={{
-                  maxWidth: "100%",
-                  width: "400px", // Ajusta el ancho de la imagen
-                  height: "auto",
-                  borderRadius: "8px",
-                  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-                }}
-              />
-            </Box>
-            <Box sx={{ flex: 2 }}>
-              <Typography variant="h6" component="div" sx={{ fontWeight: "bold" }}>
-                {selectedService.Nombre_Servicio}
-              </Typography>
-              <Typography variant="body1" sx={{ mt: 1 }}>
-                <strong>Tiempo:</strong> {selectedService.Tiempo_Servicio}
-              </Typography>
-              <Typography variant="body1" sx={{ mt: 1 }}>
-                <strong>Precio:</strong> {selectedService.Precio_Servicio.toLocaleString('es-CO', {
-                  style: 'currency',
-                  currency: 'COP',
-                  maximumFractionDigits: 0,
-                })}
-              </Typography>
-              <Typography variant="body1" sx={{ mt: 1 }}>
-                <strong>Descripción:</strong> {selectedService.Descripcion_Servicio}
-              </Typography>
-            </Box>
-          </Box>
-        )}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleDialogClose} color="primary">
-          Cerrar
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <Dialog
+  open={dialogOpen}
+  onClose={handleDialogClose}
+  fullWidth
+  maxWidth="sm" // Cambié a "sm" para hacer el modal más pequeño
+  sx={{
+    "& .MuiDialog-paper": {
+      borderRadius: "12px", // Bordes redondeados
+      width: "90%", // Ancho reducido
+      maxWidth: "none", // Desactiva el ancho máximo predeterminado
+      height: "auto", // Ajusta la altura automáticamente
+      maxHeight: "80vh", // Limita la altura máxima en vista altura
+      padding: "16px", // Añade un poco de espacio interno
+    },
+  }}
+>
+  <DialogTitle sx={{ fontSize: "1.25rem" }}>Detalles del Servicio</DialogTitle>
+  <DialogContent
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      gap: 2,
+      overflowY: "auto",
+    }}
+  >
+    {selectedService && (
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+        <img
+          src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${selectedService.ImgServicio}`}
+          alt={selectedService.Nombre_Servicio}
+          style={{
+            maxWidth: "100%",
+            width: "300px", // Ajusta el ancho de la imagen
+            height: "auto",
+            borderRadius: "8px",
+            boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+          }}
+        />
+        <Typography variant="h6" component="div" sx={{ fontWeight: "bold", textAlign: "center" }}>
+          {selectedService.Nombre_Servicio}
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 1 }}>
+          <strong>Tiempo:</strong> {selectedService.Tiempo_Servicio}
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 1 }}>
+          <strong>Precio:</strong> {selectedService.Precio_Servicio.toLocaleString('es-CO', {
+            style: 'currency',
+            currency: 'COP',
+            maximumFractionDigits: 0,
+          })}
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 1 }}>
+          <strong>Descripción:</strong> {selectedService.Descripcion_Servicio}
+        </Typography>
+      </Box>
+    )}
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleDialogClose} color="primary">
+      Cerrar
+    </Button>
+  </DialogActions>
+</Dialog>
+
       <Footer />
     </div>
   );
