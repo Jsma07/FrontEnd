@@ -43,7 +43,7 @@ const Registrar = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/jackenail/Listar_Empleados"
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/jackenail/Listar_Empleados"
         );
 
         // Filtrar empleados para incluir solo aquellos con estado 1 y rol 2
@@ -66,7 +66,7 @@ const Registrar = () => {
 
   const fetchServicios = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/servicios");
+      const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/servicios");
       // Filtrar servicios para incluir solo aquellos con estado 1
       const serviciosFiltrados = response.data.filter(
         (servicio) => servicio.EstadoServicio === 1
@@ -81,7 +81,7 @@ const Registrar = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/jackenail/Listar_Clientes"
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/jackenail/Listar_Clientes"
         );
 
         // Filtrar clientes para incluir solo aquellos con estado 1
@@ -117,7 +117,7 @@ const Registrar = () => {
     const fetchAdiciones = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/Jackenail/Listarventas/adiciones"
+          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/Listarventas/adiciones"
         );
         setAdiciones(response.data);
       } catch (error) {
@@ -227,7 +227,7 @@ const Registrar = () => {
     try {
       // Registrar la venta
       const ventaResponse = await axios.post(
-        "http://localhost:5000/Jackenail/RegistrarVenta",
+        "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/RegistrarVenta",
         ventaData
       );
 
@@ -241,7 +241,7 @@ const Registrar = () => {
 
       // Registrar los detalles de venta en una sola solicitud
       const detallesResponse = await axios.post(
-        "http://localhost:5000/Jackenail/Detalleregistrar",
+        "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/Detalleregistrar",
         {
           Idventa: ventaResponse.data.idVentas,
           IdAdiciones: detallesVentaData.map((d) => d.IdAdiciones),
