@@ -20,7 +20,6 @@ const MessageModal = ({ open, handleClose, idAgenda }) => {
     { label: "Otro", value: "otro" },
   ];
 
-const imageUrl = `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${user.img}`;
   const handleSend = async () => {
     if (!message || !tipo) {
       Swal.fire("Error", "Por favor selecciona un tipo de solicitud y escribe un mensaje.", "error");
@@ -79,9 +78,12 @@ const imageUrl = `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.k
           Enviar mensaje personalizado
         </Typography>
 
-        {/* Muestra la imagen del usuario y su nombre */}
-        <Box display="flex" alignItems="center" sx={{ marginBottom: 2 }}>
-          <Avatar src={imageUrl} alt={user.nombre} sx={{ marginRight: 2 }} /> {/* Mostrar imagen */}
+       <Box display="flex" alignItems="center" sx={{ marginBottom: 2 }}>
+          <Avatar 
+            src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${user.img}`} 
+            alt={user.nombre} 
+            sx={{ marginRight: 2 }} 
+          /> {/* Mostrar imagen */}
           <Typography variant="body1">{`${user.nombre} ${user.apellido}`}</Typography>
         </Box>
 
