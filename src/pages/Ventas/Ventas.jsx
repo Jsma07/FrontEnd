@@ -46,10 +46,8 @@ const Ventas = () => {
   useEffect(() => {
     const fetchVentas = async () => {
       try {
-        const response = await axios.get(
-          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/Listarventas"
-        );
-
+        const response = await axios.get("http://localhost:5000/Jackenail/Listarventas");
+  
         // Función para formatear la fecha para mostrar
         const formatDate = (dateString) => {
           const date = new Date(dateString);
@@ -58,14 +56,28 @@ const Ventas = () => {
           const year = date.getFullYear();
           return `${day}/${month}/${year}`;
         };
-
-        // Crear una copia de las ventas y agregar el formato de fecha para mostrar
+  
+        // Función para formatear el precio a pesos colombianos sin decimales
+        const formatCurrency = (amount) => {
+          // Redondear el monto al número entero más cercano
+          const roundedAmount = Math.round(amount);
+          
+          // Formatear el monto redondeado como moneda en pesos colombianos
+          return roundedAmount.toLocaleString('es-CO', {
+            style: 'currency',
+            currency: 'COP',
+            minimumFractionDigits: 0, // Asegura que no se muestren decimales
+            maximumFractionDigits: 0  // Asegura que no se muestren decimales
+          });
+        };
+  
+        // Crear una copia de las ventas y agregar el formato de fecha y moneda para mostrar
         const ventasConDetalles = response.data.map((venta) => ({
           id: venta.idVentas,
           idServicio: (
             <div style={{ display: "flex", alignItems: "center" }}>
               <img
-                src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${venta.servicio.ImgServicio}`}
+                src={`http://localhost:5000${venta.servicio.ImgServicio}`}
                 alt={venta.servicio.Nombre_Servicio}
                 style={{
                   width: "3rem",
@@ -78,12 +90,10 @@ const Ventas = () => {
             </div>
           ),
           IdCliente: `${venta.cliente.Nombre} ${venta.cliente.Apellido}`,
-          idEmpleado: `${venta.empleado?.Nombre || ""} ${
-            venta.empleado?.Apellido || ""
-          }`,
+          idEmpleado: `${venta.empleado?.Nombre || ""} ${venta.empleado?.Apellido || ""}`,
           Fecha: formatDate(venta.Fecha), // Fecha formateada para mostrar
           FechaOriginal: new Date(venta.Fecha), // Fecha original para ordenar
-          Total: formatCurrency(venta.Total), // Total formateado como moneda
+          Total: formatCurrency(venta.Total), // Total formateado como moneda sin decimales
           Estado: (
             <div className="flex space-x-2">
               {renderEstadoButton(venta.Estado, venta.idVentas)}
@@ -91,12 +101,22 @@ const Ventas = () => {
           ),
           Acciones: (
             <div className="flex space-x-2">
-              <Link
-                to={`/Detalleventa/${venta.idVentas}`}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white"
+              <Fab
+                style={{
+                  fontSize: '16px',
+                  width: '40px',
+                  height: '40px',
+                  backgroundColor: '#F0F0F0',
+                }}
+                className="text-black-500"
               >
-                <RemoveRedEyeIcon />
-              </Link>
+                <Link
+                  to={`/Detalleventa/${venta.idVentas}`}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white"
+                >
+                  <RemoveRedEyeIcon />
+                </Link>
+              </Fab>
               {/* Muestra el botón de editar solo si el estado no es Anulado */}
               {venta.Estado !== 3 && (
                 <>
@@ -124,15 +144,13 @@ const Ventas = () => {
           ),
           estiloFila: venta.Estado === 3 ? "bg-gray-200" : "",
         }));
-
+  
         // Ordenar las ventas por fecha original de forma descendente
         ventasConDetalles.sort((a, b) => b.FechaOriginal - a.FechaOriginal);
-
+  
         // Eliminar la propiedad FechaOriginal antes de establecer el estado
-        const ventasFinales = ventasConDetalles.map(
-          ({ FechaOriginal, ...rest }) => rest
-        );
-
+        const ventasFinales = ventasConDetalles.map(({ FechaOriginal, ...rest }) => rest);
+  
         setVentas(ventasFinales);
         toast.success("Ventas cargadas exitosamente");
       } catch (error) {
@@ -140,9 +158,13 @@ const Ventas = () => {
         toast.error("Error al cargar las ventas");
       }
     };
-
+  
     fetchVentas();
   }, []);
+
+  
+  
+  
 
   const renderEstadoButton = (estado) => {
     let buttonClass, estadoTexto;
@@ -208,7 +230,7 @@ const Ventas = () => {
     const fetchAdiciones = async () => {
       try {
         const response = await axios.get(
-          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/Listarventas/adiciones"
+          "http://localhost:5000/Jackenail/Listarventas/adiciones"
         );
         setAdiciones(response.data);
       } catch (error) {
@@ -222,7 +244,7 @@ const Ventas = () => {
   const cambiarEstadoVenta = async (ventaId, nuevoEstado) => {
     try {
       const response = await axios.put(
-        `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/CambiarEstado/${ventaId}`,
+        `http://localhost:5000/Jackenail/CambiarEstado/${ventaId}`,
         { Estado: nuevoEstado }
       );
       // Actualizar el estado local de la venta
@@ -269,7 +291,7 @@ const Ventas = () => {
   const handleAnularVenta = async (ventaId) => {
     try {
       const response = await axios.put(
-        `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/CambiarEstado/${ventaId}`,
+        `http://localhost:5000/Jackenail/CambiarEstado/${ventaId}`,
         { Estado: 3 }
       );
 
