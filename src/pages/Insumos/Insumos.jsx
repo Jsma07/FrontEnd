@@ -318,12 +318,15 @@ const Insumos = () => {
             width: "w-48",
             renderCell: (params) => (
               <div className="flex justify-center space-x-4">
+              {params.row.estado_insumo === 1  && (
                 <button
                   onClick={() => handleEditClick(params.row)}
                   className="text-yellow-500"
                 >
                   <i className="bx bx-edit" style={{ fontSize: "24px" }}></i>
                 </button>
+              )}
+                
                 <CustomSwitch
                   active={params.row.estado_insumo === 1}
                   onToggle={() => handleToggleSwitch(params.row.IdInsumos)}
