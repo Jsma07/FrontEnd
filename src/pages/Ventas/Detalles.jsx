@@ -3,34 +3,44 @@ import axios from "axios";
 import jsPDF from "jspdf";
 import { useParams } from "react-router-dom";
 import "jspdf-autotable";
+
 const InsumoDetalle = () => {
   const { id } = useParams();
   const [venta, setVenta] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Función para formatear el precio en pesos colombianos sin decimales
+  const formatCurrency = (amount) => {
+    const roundedAmount = Math.round(amount);
+    return roundedAmount.toLocaleString('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+  };
+
   useEffect(() => {
     const fetchVenta = async () => {
       try {
         const response = await axios.get(
-          `https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Buscardetalle/${id}`
+          `http://localhost:5000/Buscardetalle/${id}`
         );
         const ventaData = response.data;
 
         if (Array.isArray(ventaData)) {
-          // Maneja el caso de múltiples ventas o detalles
-          const venta = ventaData[0]; // Suponiendo que el backend devuelve un array con un solo objeto de venta
+          const venta = ventaData[0];
           setVenta({
             venta: venta.venta,
-            adiciones: Array.isArray(venta.adiciones) ? venta.adiciones : [], // Asegúrate de que `adiciones` sea un array
+            adiciones: Array.isArray(venta.adiciones) ? venta.adiciones : [],
           });
         } else {
-          // Maneja el caso de respuesta directa si no es un array
           setVenta({
             venta: ventaData.venta,
             adiciones: Array.isArray(ventaData.adiciones)
               ? ventaData.adiciones
-              : [], // Asegúrate de que `adiciones` sea un array
+              : [],
           });
         }
 
@@ -46,30 +56,23 @@ const InsumoDetalle = () => {
   }, [id]);
 
   const generarPDF = () => {
-    if (!venta) return; // Asegurar que venta tenga datos antes de generar el PDF
+    if (!venta) return;
 
-    // Crear un nuevo documento PDF
     const doc = new jsPDF();
+    const logoImg = "/jacke.png";
 
-    // Configuración de estilos y contenido
-    const logoImg = "/jacke.png"; // Ruta al logo de la aplicación
-
-    // Encabezado: Logo y Nombre de la Aplicación
-    doc.addImage(logoImg, "JPEG", 20, 10, 30, 30); // Ajusta las coordenadas y el tamaño según tu necesidad
+    doc.addImage(logoImg, "JPEG", 20, 10, 30, 30);
     doc.setFontSize(16);
     doc.text("Jacke Nail", 60, 25);
 
-    // Línea separadora
     doc.line(20, 45, 190, 45);
 
-    // Fecha y hora de generación del PDF
     const fecha = new Date().toLocaleDateString("es-CO");
     const hora = new Date().toLocaleTimeString("es-CO");
     doc.setFontSize(12);
     doc.text(`Fecha: ${fecha}`, 140, 20);
     doc.text(`Hora: ${hora}`, 140, 30);
 
-    // Datos del Empleado
     doc.setFontSize(12);
     doc.text("Datos del Empleado:", 20, 55);
     doc.text(
@@ -78,7 +81,7 @@ const InsumoDetalle = () => {
       65
     );
 
-    // Datos del Cliente
+    doc.setFontSize(12);
     doc.text("Datos del Cliente:", 20, 75);
     doc.text(
       `Nombre: ${venta.venta.cliente.Nombre} ${venta.venta.cliente.Apellido}`,
@@ -86,27 +89,24 @@ const InsumoDetalle = () => {
       85
     );
 
-    // Servicio
+    doc.setFontSize(12);
     doc.text("Servicio:", 20, 95);
     doc.text(`Nombre: ${venta.venta.servicio.Nombre_Servicio}`, 20, 105);
 
-    // Tabla de Insumos
-    let y = 115; // Posición inicial para la tabla
-    const headers = ["Nombre Insumo", "Precio Unitario"];
+    let y = 115;
+    const headers = ["Nombre de adicion", "Precio Unitario"];
     const data = venta.adiciones.map((Adicion) => [
       Adicion.NombreAdiciones,
-      `$ ${Adicion.Precio}`,
+      formatCurrency(Adicion.Precio),
     ]);
 
-    // Utilizamos autoTable para generar la tabla
     doc.autoTable({
       startY: y,
       head: [headers],
       body: data,
-      theme: "plain", // Opcional: puedes usar "striped", "grid", etc.
+      theme: "plain",
     });
 
-    // Guardar el PDF con un nombre específico
     doc.save(`factura_${venta.idVenta}.pdf`);
   };
 
@@ -118,7 +118,7 @@ const InsumoDetalle = () => {
       {venta && (
         <div
           style={{
-            paddingTop: "40px", // Ajuste el padding superior para dar espacio al título
+            paddingTop: "40px",
             margin: "0 auto",
             borderRadius: "30px",
             marginTop: "20px",
@@ -154,7 +154,7 @@ const InsumoDetalle = () => {
                 <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                   <td className="px-6 py-4 flex items-center space-x-4">
                     <img
-                      src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${venta.venta.servicio.ImgServicio}`}
+                      src={`http://localhost:5000${venta.venta.servicio.ImgServicio}`}
                       alt={venta.venta.servicio.Nombre_Servicio}
                       className="w-12 h-12 rounded-full object-cover"
                     />
@@ -164,11 +164,10 @@ const InsumoDetalle = () => {
                     {venta.venta.cliente.Nombre} {venta.venta.cliente.Apellido}
                   </td>
                   <td className="px-6 py-4">
-                    {venta.venta.empleado.Nombre}{" "}
-                    {venta.venta.empleado.Apellido}
+                    {venta.venta.empleado.Nombre} {venta.venta.empleado.Apellido}
                   </td>
                   <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
-                    ${venta.venta.Total.toFixed(2)}
+                    {formatCurrency(venta.venta.Total)}
                   </td>
                 </tr>
               </tbody>
@@ -184,7 +183,7 @@ const InsumoDetalle = () => {
                   <div className="overflow-hidden rounded-full mx-auto mt-4 w-24 h-24">
                     <img
                       className="object-cover w-full h-full"
-                      src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${adicion.Img}`}
+                      src={`http://localhost:5000${adicion.Img}`}
                       alt={adicion.NombreAdiciones}
                     />
                   </div>
@@ -193,7 +192,7 @@ const InsumoDetalle = () => {
                       {adicion.NombreAdiciones}
                     </h5>
                     <p className="text-gray-700 dark:text-gray-400">
-                      Precio unitario: ${adicion.Precio.toFixed(2)}
+                      Precio unitario: {formatCurrency(adicion.Precio)}
                     </p>
                   </div>
                 </div>
@@ -209,10 +208,10 @@ const InsumoDetalle = () => {
               marginTop: "20px",
               boxShadow: "0 4px 12px rgba(128, 0, 128, 0.3)",
               position: "fixed",
-              right: "20px", // Alineado a la derecha
+              right: "20px",
               top: "80px",
               width: "calc(40% - 100px)",
-              padding: "20px", // Agregado espacio interior para separar los elementos
+              padding: "20px",
             }}
           >
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
@@ -243,27 +242,20 @@ const InsumoDetalle = () => {
                         Subtotal:
                       </p>
                       <p className="text-sm text-gray-600">
-                        $
-                        {venta.venta.Subtotal !== undefined
-                          ? venta.venta.Subtotal.toFixed(2)
-                          : "0.00"}
+                        {formatCurrency(venta.venta.Subtotal)}
                       </p>
                     </div>
                   </li>
                   <li className="py-4 flex items-center space-x-4">
                     <div className="flex-shrink-0">
                       <i className="bx bx-gift w-10 h-10 text-gray-500"></i>{" "}
-                      {/* Cambié el icono */}
                     </div>
                     <div>
                       <p className="text-base font-semibold text-gray-800">
                         Descuento:
                       </p>
                       <p className="text-sm text-gray-600">
-                        $
-                        {venta.venta.Descuento !== undefined
-                          ? venta.venta.Descuento.toFixed(2)
-                          : "0.00"}
+                        {formatCurrency(venta.venta.Descuento)}
                       </p>
                     </div>
                   </li>
@@ -276,10 +268,7 @@ const InsumoDetalle = () => {
                         Total:
                       </p>
                       <p className="text-sm text-gray-600">
-                        $
-                        {venta.venta.Total !== undefined
-                          ? venta.venta.Total.toFixed(2)
-                          : "0.00"}
+                        {formatCurrency(venta.venta.Total)}
                       </p>
                     </div>
                   </li>
