@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Modal, Box, Typography, Button, TextField, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import Swal from "sweetalert2";
 import axios from "axios";
 import dayjs from "dayjs";
-
+import { UserContext } from "../../../../context/ContextoUsuario"; // Importa el contexto de usuario
 
 const MessageModal = ({ open, handleClose, idAgenda }) => {
   const [message, setMessage] = useState(""); // Mensaje personalizado
   const [tipo, setTipo] = useState(""); // Tipo de mensaje
+  const { user } = useContext(UserContext); // Accede al usuario desde el contexto
 
   // Opciones para el selector
   const opciones = [
@@ -21,18 +22,22 @@ const MessageModal = ({ open, handleClose, idAgenda }) => {
       Swal.fire("Error", "Por favor selecciona un tipo de solicitud y escribe un mensaje.", "error");
       return;
     }
-  
+
     // Obtener la fecha y hora actual
     const currentDateTime = dayjs().format('DD/MM/YYYY HH:mm');
-  
+
     try {
       const token = localStorage.getItem("token");
-      // Aquí envías el mensaje personalizado con el tipo seleccionado y la fecha/hora actual
+
+      // Añade el nombre del usuario al mensaje
+      const nombreCompleto = `${user.nombre} ${user.apellido}`;
+
+      // Aquí envías el mensaje personalizado con el tipo seleccionado, el nombre del usuario y la fecha/hora actual
       await axios.post(
         "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/notificaciones/crear",
         {
           Tipo: tipo,
-          Mensaje: `${message} (Enviado el ${currentDateTime})`, // Añadir la fecha y hora al mensaje
+          Mensaje: `${nombreCompleto}: ${message} (Enviado el ${currentDateTime})`, // Añadir el nombre y la fecha/hora al mensaje
           IdAgenda: idAgenda, // Relaciona el mensaje con la cita
         },
         {
@@ -41,7 +46,7 @@ const MessageModal = ({ open, handleClose, idAgenda }) => {
           },
         }
       );
-  
+
       Swal.fire("Enviado", "Tu mensaje ha sido enviado correctamente.", "success");
       handleClose(); // Cierra el modal después de enviar el mensaje
     } catch (error) {
