@@ -139,7 +139,7 @@ const SalidaInsumos = () => {
               }}
             >
               <img
-                src={`http://localhost:5000${insumo.imagen}`}
+                src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${insumo.imagen}`}
                 alt={insumo.NombreInsumos}
                 className="h-40 w-full object-cover rounded-t-lg" // Controla la altura de la imagen
               />
