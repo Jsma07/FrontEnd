@@ -1,298 +1,232 @@
-import React, { useState, useEffect } from "react";
-import {
-  Modal,
-  Button,
-  IconButton,
-  Typography,
-  Box,
-  Paper,
-  Checkbox,
-} from "@mui/material";
-import { ArrowLeft, ArrowRight, Close as CloseIcon } from "@mui/icons-material";
-import { motion } from "framer-motion";
-import dayjs from "dayjs";
-import "dayjs/locale/es";
-import axios from "axios";
-import Swal from "sweetalert2";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { StaticDatePicker, PickersDay } from "@mui/x-date-pickers";
-
-dayjs.locale("es");
+import React, { useState } from 'react';
+import { Modal, Button, TextField, IconButton, Checkbox, Typography, Box } from '@mui/material';
+import { ArrowLeft, ArrowRight, Close as CloseIcon } from '@mui/icons-material';
+import axios from 'axios';
+import { motion } from 'framer-motion';
+import dayjs from 'dayjs';
+import Swal from 'sweetalert2';
 
 const generateTimeOptions = () => {
-  const times = [];
-  for (let hour = 8; hour <= 11; hour++) {
-    times.push(dayjs().hour(hour).minute(0).format("HH:mm"));
-  }
-  for (let hour = 13; hour <= 16; hour++) {
-    times.push(dayjs().hour(hour).minute(0).format("HH:mm"));
-  }
-  return times;
+    const times = [];
+    // Horario de trabajo 8 AM - 11 AM
+    for (let hour = 8; hour <= 11; hour++) {
+        times.push(dayjs().hour(hour).minute(0).format('HH:mm'));
+    }
+    // Horario de trabajo 1 PM - 4 PM
+    for (let hour = 13; hour <= 16; hour++) {
+        times.push(dayjs().hour(hour).minute(0).format('HH:mm'));
+    }
+    return times;
 };
 
 const InactivarHorasModal = ({ open, onClose, onHoursInactivated }) => {
-  const [selectedDate, setSelectedDate] = useState(dayjs());
-  const [selectedHours, setSelectedHours] = useState([]);
-  const [carouselIndex, setCarouselIndex] = useState(0);
-  const [inactiveDates, setInactiveDates] = useState([]);
-  const [isDateInactive, setIsDateInactive] = useState(false); // Para verificar si el día es inactivo
-   const today = dayjs().startOf('day');
-  const endOfNextMonth = dayjs().add(1, 'month').endOf('month');
+    const [selectedDate, setSelectedDate] = useState('');
+    const [selectedHours, setSelectedHours] = useState([]);
+    const [carouselIndex, setCarouselIndex] = useState(0);
 
-  useEffect(() => {
-    axios
-      .get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/horarios")
-      .then((response) => {
-        const inactiveDays = response.data
-          .filter((horario) => horario.estado === "inactivo")
-          .map((horario) => dayjs(horario.fecha));
-        setInactiveDates(inactiveDays);
-      })
-      .catch((error) => console.error("Error al obtener horarios:", error));
-  }, []);
+    const handleDateChange = (event) => {
+        setSelectedDate(event.target.value);
+    };
 
-  useEffect(() => {
-    // Verificar si la fecha seleccionada está marcada como inactiva
-    const isInactive = inactiveDates.some((inactiveDate) =>
-      inactiveDate.isSame(selectedDate, "day")
-    );
-    setIsDateInactive(isInactive);
+    const handleToggleHour = (hour) => {
+        setSelectedHours(prevHours =>
+            prevHours.includes(hour) ? prevHours.filter(h => h !== hour) : [...prevHours, hour]
+        );
+    };
 
-    if (isInactive) {
-      Swal.fire({
-        icon: "warning",
-        title: "Fecha Inactiva",
-        text: "No puedes inactivar horas en un día ya inactivo.",
-      });
-      setSelectedHours([]); // Limpiar las horas seleccionadas si el día está inactivo
-    }
-  }, [selectedDate, inactiveDates]);
+    const handleSubmit = async () => {
+        // Validar campos vacíos
+        if (!selectedDate || selectedHours.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campos vacíos',
+                text: 'Por favor, selecciona una fecha y al menos una hora.',
+            });
+            return;
+        }
 
-  const handleToggleHour = (hour) => {
-    if (isDateInactive) return; // Evitar selección si el día está inactivo
+        // Confirmación de inactivación
+        const confirmation = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: '¿Quieres inactivar las horas seleccionadas?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, inactivar',
+            cancelButtonText: 'Cancelar'
+        });
 
-    setSelectedHours((prevHours) =>
-      prevHours.includes(hour)
-        ? prevHours.filter((h) => h !== hour)
-        : [...prevHours, hour]
-    );
-  };
+        if (!confirmation.isConfirmed) {
+            return; // Salir si el usuario cancela
+        }
 
-  const handleSubmit = async () => {
-    if (!selectedDate || selectedHours.length === 0) {
-      Swal.fire({
-        icon: "warning",
-        title: "Campos vacíos",
-        text: "Por favor, selecciona una fecha y al menos una hora.",
-      });
-      return;
-    }
+        try {
+            // Enviar solicitud al servidor
+            await axios.post('https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/horarios/inactivarHoras', {
+                fecha: selectedDate,
+                horas: selectedHours
+            });
 
-    const confirmation = await Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¿Quieres inactivar las horas seleccionadas?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Sí, inactivar",
-      cancelButtonText: "Cancelar",
-    });
+            // Confirmar éxito y cerrar modal
+            if (typeof onHoursInactivated === 'function') {
+                onHoursInactivated(); 
+            } else {
+                console.warn('onHoursInactivated no es una función');
+            }
+            Swal.fire('¡Horas inactivadas!', 'Las horas han sido registradas como inactivas con éxito.', 'success');
+            onClose();
 
-    if (!confirmation.isConfirmed) return;
+        } catch (error) {
+            console.error('Error al inactivar horas', error);
 
-    try {
-      await axios.post("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/horarios/inactivarHoras", {
-        fecha: selectedDate.format("YYYY-MM-DD"),
-        horas: selectedHours,
-      });
+            if (error.response) {
+                // Manejar errores específicos basados en la respuesta del backend
+                switch (error.response.status) {
+                    case 400:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error.response.data.error || 'Error al procesar la solicitud.',
+                        });
+                        break;
+                    case 500:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error en el servidor. Inténtalo de nuevo más tarde.',
+                        });
+                        break;
+                    default:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Hubo un problema con la solicitud. Por favor, inténtalo de nuevo.',
+                        });
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error en la conexión. Por favor, revisa tu conexión a Internet.',
+                });
+            }
+        }
+    };
 
-      if (typeof onHoursInactivated === "function") {
-        onHoursInactivated();
-      }
+    const handleCarouselChange = (direction) => {
+        setCarouselIndex(prev => {
+            if (direction === 'left') {
+                return Math.max(prev - 5, 0);
+            } else if (direction === 'right') {
+                return Math.min(prev + 5, generateTimeOptions().length - 5);
+            }
+        });
+    };
 
-      Swal.fire(
-        "¡Horas inactivadas!",
-        "Las horas han sido registradas como inactivas con éxito.",
-        "success"
-      );
-      onClose();
-    } catch (error) {
-      console.error("Error al inactivar horas", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Hubo un problema con la solicitud. Por favor, inténtalo de nuevo.",
-      });
-    }
-  };
+    const timeOptions = generateTimeOptions();
 
-  const handleCarouselChange = (direction) => {
-    setCarouselIndex((prev) => {
-      if (direction === "left") {
-        return Math.max(prev - 5, 0);
-      } else if (direction === "right") {
-        return Math.min(prev + 5, generateTimeOptions().length - 5);
-      }
-    });
-  };
-
-  const renderDay = (date, selectedDate, pickersDayProps) => {
-    const isInactive = inactiveDates.some((inactiveDate) =>
-      inactiveDate.isSame(date, "day")
-    );
     return (
-      <PickersDay
-        {...pickersDayProps}
-        sx={{
-          ...(isInactive && {
-            backgroundColor: "red",
-            color: "white",
-            "&:hover": {
-              backgroundColor: "darkred",
-            },
-          }),
-        }}
-        disabled={isInactive}
-      />
-    );
-  };
-
-  const timeOptions = generateTimeOptions();
-
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
-    >
-      <Box
-        sx={{
-          width: "90%",
-          maxWidth: 600,
-          bgcolor: "background.paper",
-          p: 4,
-          borderRadius: 2,
-          boxShadow: 24,
-          position: "relative",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            width: "100%",
-            mb: 2,
-          }}
-        >
-          <Typography variant="h6" id="modal-title">
-            Inactivar Horas De Trabajo
-          </Typography>
-          <IconButton onClick={onClose} color="inherit">
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Paper elevation={5} sx={{ mb: 2 }}>
-            <StaticDatePicker
-              displayStaticWrapperAs="desktop"
-              orientation="landscape"
-              openTo="day"
-              value={selectedDate}
-              onChange={setSelectedDate}
-              minDate={today}
-              maxDate={endOfNextMonth}
-              renderDay={renderDay}
-            />
-          </Paper>
-        </LocalizationProvider>
-
-        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-          <IconButton
-            onClick={() => handleCarouselChange("left")}
-            disabled={carouselIndex === 0}
-          >
-            <ArrowLeft />
-          </IconButton>
-          <Box sx={{ flex: 1, overflowX: "auto" }}>
-            <motion.div
-              className="carousel-items"
-              initial={{ x: -100 }}
-              animate={{ x: 0 }}
-              exit={{ x: 100 }}
-              transition={{ duration: 0.3 }}
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                paddingBottom: 16,
-              }}
+        <Modal open={open} onClose={onClose} aria-labelledby="modal-title" aria-describedby="modal-description">
+            <Box
+                sx={{
+                    width: '90%',
+                    maxWidth: 600,
+                    bgcolor: 'background.paper',
+                    p: 4,
+                    borderRadius: 2,
+                    boxShadow: 24,
+                    position: 'relative',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    overflow: 'hidden'
+                }}
             >
-              {timeOptions
-                .slice(carouselIndex, carouselIndex + 5)
-                .map((hour, index) => (
-                  <Box
-                    key={index}
+                <Box
                     sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      width: 80,
-                      height: 60,
-                      borderRadius: 1,
-                      backgroundColor: "#f0f0f0", // Color de fondo estándar
-                      border: selectedHours.includes(hour)
-                        ? "2px solid transparent"
-                        : "2px solid transparent", // Borde morado solo si está seleccionado
-                      mx: 1,
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      boxShadow: 1,
-                      "&:hover": {
-                        backgroundColor: "#e0e0e0", // Color de fondo al hacer hover
-                      },
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                        mb: 2
                     }}
-                    onClick={() => handleToggleHour(hour)}
-                  >
-                    <Typography variant="body2">{hour}</Typography>
-                    <Checkbox checked={selectedHours.includes(hour)} />
-                  </Box>
-                ))}
-            </motion.div>
-          </Box>
-          <IconButton
-            onClick={() => handleCarouselChange("right")}
-            disabled={carouselIndex >= timeOptions.length - 5}
-          >
-            <ArrowRight />
-          </IconButton>
-        </Box>
+                >
+                    <Typography variant="h6" id="modal-title">
+                        Inactivar Horas De Trabajo
+                    </Typography>
+                    <IconButton onClick={onClose} color="inherit">
+                        <CloseIcon />
+                    </IconButton>
+                </Box>
 
-        <Box mt={2} display="flex" justifyContent="space-between">
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-            sx={{ marginRight: 2 }}
-            disabled={isDateInactive}
-          >
-            Inactivar
-          </Button>
-          <Button variant="outlined" color="secondary" onClick={onClose}>
-            Cancelar
-          </Button>
-        </Box>
-      </Box>
-    </Modal>
-  );
+                <TextField
+                    label="Fecha"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    value={selectedDate}
+                    onChange={handleDateChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                />
+
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <IconButton onClick={() => handleCarouselChange('left')} disabled={carouselIndex === 0}>
+                        <ArrowLeft />
+                    </IconButton>
+                    <Box sx={{ flex: 1, overflowX: 'auto' }}>
+                        <motion.div
+                            className="carousel-items"
+                            initial={{ x: -100 }}
+                            animate={{ x: 0 }}
+                            exit={{ x: 100 }}
+                            transition={{ duration: 0.3 }}
+                            style={{ display: 'flex', flexDirection: 'row', paddingBottom: 16 }}
+                        >
+                            {timeOptions.slice(carouselIndex, carouselIndex + 5).map((hour, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        width: 80,
+                                        height: 60,
+                                        borderRadius: 1,
+                                        backgroundColor: '#f0f0f0',
+                                        mx: 1,
+                                        justifyContent: 'center',
+                                        cursor: 'pointer',
+                                        boxShadow: 1,
+                                        '&:hover': {
+                                            backgroundColor: '#e0e0e0'
+                                        }
+                                    }}
+                                    onClick={() => handleToggleHour(hour)}
+                                >
+                                    <Typography variant="body2">{hour}</Typography>
+                                    <Checkbox checked={selectedHours.includes(hour)} />
+                                </Box>
+                            ))}
+                        </motion.div>
+                    </Box>
+                    <IconButton onClick={() => handleCarouselChange('right')} disabled={carouselIndex >= timeOptions.length - 5}>
+                        <ArrowRight />
+                    </IconButton>
+                </Box>
+                <Box mt={2} display="flex" justifyContent="space-between">
+                    <Button variant="contained" color="primary" onClick={handleSubmit} sx={{ marginRight: 2 }} >
+                        Inactivar
+                    </Button>
+                    <Button variant="outlined" color="secondary" onClick={onClose}>
+                        Cancelar
+                    </Button>
+                </Box>
+            </Box>
+        </Modal>
+    );
 };
 
 export default InactivarHorasModal;
