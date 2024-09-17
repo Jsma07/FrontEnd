@@ -69,7 +69,7 @@ const Insumos = () => {
 
   const handleEditInsumo = async (formData) => {
     try {
-      const camposObligatorios = ["NombreInsumos", "Imagen", "Idcategoria"];
+      const camposObligatorios = ["NombreInsumos", "imagen", "Idcategoria"];
   
       if (
         !CamposObligatorios(
@@ -116,7 +116,7 @@ const Insumos = () => {
       if (confirmation.isConfirmed) {
         const formDataWithNumbers = new FormData();
         formDataWithNumbers.append("NombreInsumos", formData.NombreInsumos);
-        formDataWithNumbers.append("Imagen", formData.Imagen);
+        formDataWithNumbers.append("Imagen", formData.imagen);
         formDataWithNumbers.append("Estado", formData.Estado);
         formDataWithNumbers.append("IdCategoria", formData.Idcategoria);
   
@@ -250,7 +250,7 @@ const Insumos = () => {
                 label: categoria.nombre_categoria,
               })),
           },
-          { name: "Imagen", label: "Imagen", type: "file" },
+          { name: "imagen", label: "Imagen", type: "file" },
         ]}
         onChange={handleChange}
         entityData={insumoSeleccionado}
