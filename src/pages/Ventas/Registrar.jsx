@@ -6,6 +6,15 @@ import ServicioSeleccionado from "../../components/consts/SeleccionServicios";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Fab from "@mui/material/Fab";
 
+const formatCurrency = (amount) => {
+  return amount.toLocaleString('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+};
+
 const Registrar = () => {
   const [empleados, setEmpleados] = useState([]);
   const [clientes, setClientes] = useState([]);
@@ -17,6 +26,7 @@ const Registrar = () => {
   const [totalGeneral, setTotalGeneral] = useState(0);
   const [descuento, setDescuento] = useState(0);
   const [fechaFactura, setFechaFactura] = useState("");
+  
   const [servicioSeleccionado, setServicioSeleccionado] = useState(null);
   const [minDate, setMinDate] = useState("");
   const [maxDate, setMaxDate] = useState("");
@@ -33,7 +43,7 @@ const Registrar = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/jackenail/Listar_Empleados"
+          "http://localhost:5000/jackenail/Listar_Empleados"
         );
 
         // Filtrar empleados para incluir solo aquellos con estado 1 y rol 2
@@ -56,7 +66,7 @@ const Registrar = () => {
 
   const fetchServicios = async () => {
     try {
-      const response = await axios.get("https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/api/servicios");
+      const response = await axios.get("http://localhost:5000/api/servicios");
       // Filtrar servicios para incluir solo aquellos con estado 1
       const serviciosFiltrados = response.data.filter(
         (servicio) => servicio.EstadoServicio === 1
@@ -71,7 +81,7 @@ const Registrar = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/jackenail/Listar_Clientes"
+          "http://localhost:5000/jackenail/Listar_Clientes"
         );
 
         // Filtrar clientes para incluir solo aquellos con estado 1
@@ -107,7 +117,7 @@ const Registrar = () => {
     const fetchAdiciones = async () => {
       try {
         const response = await axios.get(
-          "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/Listarventas/adiciones"
+          "http://localhost:5000/Jackenail/Listarventas/adiciones"
         );
         setAdiciones(response.data);
       } catch (error) {
@@ -121,8 +131,8 @@ const Registrar = () => {
   useEffect(() => {
     const calcularTotal = () => {
       const precioServicio = servicioSeleccionado
-        ? parseInt(servicioSeleccionado.Precio_Servicio) * 1000
-        : 0; // Convertir a número y manejar valores nulos
+        ? parseFloat(servicioSeleccionado.Precio_Servicio) // Asegúrate de convertir a número
+        : 0;
 
       const subtotalAdiciones = adicionSeleccionada.reduce(
         (acc, item) => acc + parseFloat(item.Precio), // Convertir a número
@@ -130,23 +140,48 @@ const Registrar = () => {
       );
 
       const subtotalCalculado = subtotalAdiciones + precioServicio;
-      console.log(subtotalCalculado);
       const totalConDescuento = subtotalCalculado - descuento;
-      console.log(totalConDescuento);
 
-      // Eliminando el cálculo del IVA
-      setSubtotal(subtotalCalculado);
-      setTotalGeneral(totalConDescuento);
+      // Asegurarse de que el descuento no sea mayor que el subtotal
+      if (descuento > subtotalCalculado) {
+        setDescuento(subtotalCalculado);
+      }
+
+      // Redondear los valores a enteros
+      setSubtotal(Math.round(subtotalCalculado));
+      setTotalGeneral(Math.round(totalConDescuento));
     };
 
     calcularTotal(); // Llamar inicialmente
   }, [servicioSeleccionado, adicionSeleccionada, descuento]);
+
+  const handleDescuentoChange = (e) => {
+    // Obtener el valor del input
+    const value = e.target.value;
+
+    // Verificar si el campo está vacío o no
+    if (value === '') {
+      setDescuento(0); // Establecer descuento a 0 si el campo está vacío
+    } else {
+      const nuevoDescuento = parseFloat(value);
+      // Si el nuevo descuento es mayor que el subtotal, ajustar el descuento
+      if (nuevoDescuento > subtotal) {
+        setDescuento(subtotal);
+      } else {
+        setDescuento(nuevoDescuento);
+      }
+    }
+  };
 
   const handleServicioChange = (e) => {
     const servicioId = parseInt(e.target.value);
     const servicio = servicios.find((s) => s.IdServicio === servicioId);
     setServicioSeleccionado(servicio);
   };
+
+
+  
+  
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -192,7 +227,7 @@ const Registrar = () => {
     try {
       // Registrar la venta
       const ventaResponse = await axios.post(
-        "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/RegistrarVenta",
+        "http://localhost:5000/Jackenail/RegistrarVenta",
         ventaData
       );
 
@@ -206,7 +241,7 @@ const Registrar = () => {
 
       // Registrar los detalles de venta en una sola solicitud
       const detallesResponse = await axios.post(
-        "https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev/Jackenail/Detalleregistrar",
+        "http://localhost:5000/Jackenail/Detalleregistrar",
         {
           Idventa: ventaResponse.data.idVentas,
           IdAdiciones: detallesVentaData.map((d) => d.IdAdiciones),
@@ -404,8 +439,8 @@ const Registrar = () => {
                 className="form-select mt-1 block w-full py-2.5 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
                 placeholder="Descuento"
                 name="Descuento"
-                value={descuento}
-                onChange={(e) => setDescuento(parseFloat(e.target.value))}
+                value={descuento || 0}
+                                onChange={(e) => setDescuento(parseFloat(e.target.value))}
                 required
               />
             </div>
@@ -483,7 +518,7 @@ const Registrar = () => {
             >
               <div>
                 <img
-                  src={`https://47f025a5-3539-4402-babd-ba031526efb2-00-xwv8yewbkh7t.kirk.replit.dev${adicion.Img}`}
+                  src={`http://localhost:5000${adicion.Img}`}
                   alt={adicion.NombreAdiciones}
                   style={{ width: "50px", height: "50px", objectFit: "cover" }}
                 />
@@ -519,17 +554,17 @@ const Registrar = () => {
               marginBottom: "10px",
             }}
           >
-            <div style={{ fontWeight: "bold", marginRight: "20px" }}>
-              TOTAL:
-            </div>
-            <div>{totalGeneral.toFixed(2)}</div>
+            <div style={{ fontWeight: 'bold', marginRight: '20px' }}>
+            TOTAL:
           </div>
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <div style={{ fontWeight: "bold", marginRight: "20px" }}>
-              Descuento aplicado:
-            </div>
-            <div>{descuento.toFixed(2)}</div>
+          <div>{formatCurrency(totalGeneral)}</div>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ fontWeight: 'bold', marginRight: '20px' }}>
+            Descuento aplicado:
           </div>
+          <div>{formatCurrency(descuento)}</div>
+        </div>
         </div>
 
         <div
