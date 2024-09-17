@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Modal, Box, Typography, Button, TextField, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
+import { Modal, Box, Typography, Button, TextField, MenuItem, Select, InputLabel, FormControl, Avatar } from "@mui/material";
 import Swal from "sweetalert2";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -73,6 +73,13 @@ const MessageModal = ({ open, handleClose, idAgenda }) => {
         <Typography variant="h6" component="h2" gutterBottom>
           Enviar mensaje personalizado
         </Typography>
+
+        {/* Muestra la imagen del usuario y su nombre */}
+        <Box display="flex" alignItems="center" sx={{ marginBottom: 2 }}>
+          <Avatar src={user.img} alt={user.nombre} sx={{ marginRight: 2 }} /> {/* Mostrar imagen */}
+          <Typography variant="body1">{`${user.nombre} ${user.apellido}`}</Typography>
+        </Box>
+
         <FormControl fullWidth sx={{ marginBottom: 2 }}>
           <InputLabel>Tipo de solicitud</InputLabel>
           <Select value={tipo} onChange={(e) => setTipo(e.target.value)} label="Tipo de solicitud">
