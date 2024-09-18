@@ -183,11 +183,7 @@ const ModalDinamico = ({
       newErrors['Documento'] = 'El tipo de documento no puede estar vacío.';
     }
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      toast.error('Por favor corrige los errores en el formulario.');
-      return;
-    }
+    
 
     // Enviar formulario si no hay errores
     onSubmit({ ...formData, Img: avatarFile });
