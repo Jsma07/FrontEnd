@@ -97,7 +97,7 @@ const DrawerComponent = styled(MuiDrawer, {
     "& .MuiDrawer-paper": closedMixin(theme),
   }),
 }));
-export default function MiniDrawer() {
+export default function MiniDrawer({ sidebarOpen, setSidebarOpen }) {
   const theme = useTheme();
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
@@ -166,22 +166,17 @@ export default function MiniDrawer() {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open} sx={{ backgroundColor: "#FFFEF1" }}>
+      <AppBar position="fixed" open={sidebarOpen} sx={{ backgroundColor: "#FFFEF1" }}>
         <Toolbar>
           {/* Botón de menú */}
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            onClick={() => setSidebarOpen(true)}
             edge="start"
             sx={{
               marginRight: 5,
-              backgroundColor: "#FFE0E3",
-              "&:hover": {
-                backgroundColor: "#F291B5",
-                color: "white",
-              },
-              ...(open && { display: "none" }),
+              ...(sidebarOpen && { display: "none" }),
             }}
           >
             <MenuIcon />
@@ -226,7 +221,7 @@ export default function MiniDrawer() {
       
       <DrawerComponent
         variant="permanent"
-        open={open}
+        open={sidebarOpen}
         classes={{ paper: "drawer-paper" }}
       >
         <DrawerHeader>
