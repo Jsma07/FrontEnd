@@ -97,7 +97,7 @@ const DrawerComponent = styled(MuiDrawer, {
     "& .MuiDrawer-paper": closedMixin(theme),
   }),
 }));
-export default function MiniDrawer({ sidebarOpen, setSidebarOpen }) {
+export default function MiniDrawer() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
@@ -166,17 +166,21 @@ export default function MiniDrawer({ sidebarOpen, setSidebarOpen }) {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" open={sidebarOpen} sx={{ backgroundColor: "#FFFEF1" }}>
+      <AppBar position="fixed" open={open} sx={{ backgroundColor: "#FFFEF1" }}>
         <Toolbar>
           {/* Botón de menú */}
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            onClick={() => setSidebarOpen(true)}
             edge="start"
             sx={{
               marginRight: 5,
-              ...(sidebarOpen && { display: "none" }),
+              backgroundColor: "#FFE0E3",
+              "&:hover": {
+                backgroundColor: "#F291B5",
+                color: "white",
+              },
+              ...(open && { display: "none" }),
             }}
           >
             <MenuIcon />
@@ -221,7 +225,7 @@ export default function MiniDrawer({ sidebarOpen, setSidebarOpen }) {
       
       <DrawerComponent
         variant="permanent"
-        open={sidebarOpen}
+        open={open}
         classes={{ paper: "drawer-paper" }}
       >
         <DrawerHeader>
@@ -235,82 +239,86 @@ export default function MiniDrawer({ sidebarOpen, setSidebarOpen }) {
         </DrawerHeader>
   
         <List>
-          {filteredNavbarItems.map((item) => (
-            <React.Fragment key={item.id}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10, duration: 0.1 }}
-                whileHover={{ scale: 1.1 }}
-              >
-                <ListItem
-                  button
-                  onClick={() => handleCategoryClick(item.id)}
-                  sx={{
-                    borderRadius: "10px",
-                    backgroundColor:
-                      openCategory === item.id ? "#EFD4F5" : "#EFD4F5",
-                    mt: 1,
-                    "&:hover": {
-                      backgroundColor: open ? "#8C09FF" : "#8C09FF",
-                      color: open ? "white" : "white",
-                      "& .MuiListItemIcon-root .MuiSvgIcon-root": {
-                        color: "white !important",
+  {filteredNavbarItems.map((item) => (
+    <React.Fragment key={item.id}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ type: "spring", stiffness: 400, damping: 10, duration: 0.1 }}
+        whileHover={{ scale: 1.1 }}
+      >
+        <Tooltip title={item.label}>
+          <ListItem
+            button
+            onClick={() => handleCategoryClick(item.id)}
+            sx={{
+              borderRadius: "10px",
+              backgroundColor:
+                openCategory === item.id ? "#EFD4F5" : "#EFD4F5",
+              mt: 1,
+              "&:hover": {
+                backgroundColor: open ? "#8C09FF" : "#8C09FF",
+                color: open ? "white" : "white",
+                "& .MuiListItemIcon-root .MuiSvgIcon-root": {
+                  color: "white !important",
+                },
+              },
+            }}
+          >
+            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.label} />
+            {openCategory === item.id ? (
+              <ChevronLeftIcon />
+            ) : (
+              <ChevronRightIcon />
+            )}
+          </ListItem>
+        </Tooltip>
+      </motion.div>
+      {openCategory === item.id && item.subitems && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <List sx={{ pl: 1, paddingRight: "10px" }}>
+            {item.subitems.filter(subitem => subitem.requiredPermissions.some(perm => permissions.includes(perm)))
+              .map((subitem) => (
+                <Tooltip title={subitem.label}>
+                  <ListItem
+                    key={subitem.id}
+                    button
+                    onClick={() => navigate(subitem.route)}
+                    sx={{
+                      paddingLeft: "15px",
+                      paddingRight: "20px",
+                      borderRadius: "10px",
+                      backgroundColor: "#EFD4F5",
+                      mt: 1,
+                      "&:hover": {
+                        backgroundColor: "#8C09FF",
+                        color: "white",
+                        "& .MuiListItemIcon-root .MuiSvgIcon-root": {
+                          color: "white !important",
+                        },
                       },
-                    },
-                  }}
-                >
-                  <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.label} />
-                  {openCategory === item.id ? (
-                    <ChevronLeftIcon />
-                  ) : (
-                    <ChevronRightIcon />
-                  )}
-                </ListItem>
-              </motion.div>
-              {openCategory === item.id && item.subitems && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <List sx={{ pl: 1, paddingRight: "10px" }}>
-                    {item.subitems.filter(subitem => subitem.requiredPermissions.some(perm => permissions.includes(perm)))
-                      .map((subitem) => (
-                        <ListItem
-                          key={subitem.id}
-                          button
-                          onClick={() => navigate(subitem.route)}
-                          sx={{
-                            paddingLeft: "15px",
-                            paddingRight: "20px",
-                            borderRadius: "10px",
-                            backgroundColor: "#EFD4F5",
-                            mt: 1,
-                            "&:hover": {
-                              backgroundColor: "#8C09FF",
-                              color: "white",
-                              "& .MuiListItemIcon-root .MuiSvgIcon-root": {
-                                color: "white !important",
-                              },
-                            },
-                          }}
-                        >
-                          <ListItemIcon sx={{ minWidth: "40px" }}>
-                            {subitem.icon}
-                          </ListItemIcon>
-                          <ListItemText primary={subitem.label} />
-                        </ListItem>
-                      ))}
-                  </List>
-                </motion.div>
-              )}
-            </React.Fragment>
-          ))}
-        </List>
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: "40px" }}>
+                      {subitem.icon}
+                    </ListItemIcon>
+                    <ListItemText primary={subitem.label} />
+                  </ListItem>
+                </Tooltip>
+              ))}
+          </List>
+        </motion.div>
+      )}
+    </React.Fragment>
+  ))}
+</List>
   
         <Box sx={{ flexGrow: 1 }} />
         <List sx={{ position: 'absolute', bottom: 0, width: '100%' }}>
