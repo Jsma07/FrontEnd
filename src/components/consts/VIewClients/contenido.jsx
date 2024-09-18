@@ -115,7 +115,7 @@ function Contenidoitems() {
             key={index}
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.3 }}
-            style={{ textAlign: "center", color: "#ff6f61", maxWidth: 200 }} // Color coral claro
+            style={{ textAlign: "center", color: "black", maxWidth: 200 }} // Color coral claro
           >
             <i className={`bx ${index === 0 ? "bxs-paint" : index === 1 ? "bxs-brush" : "bxs-heart"}`} style={{ fontSize: "55px" }}></i>
             <Typography variant="h6" sx={{ mt: 2, fontWeight: "bold", fontFamily: "Franklin Gothic Medium", textTransform: "uppercase" }}>
