@@ -733,30 +733,20 @@ const Empleados = () => {
         handleClose={handlePasswordModalClose}
         handleSubmit={handleSubmitPasswordChange}
       />
-      <button
-        className="fixed bottom-4 right-4 bg-blue-500 text-white rounded-full p-3 shadow-xl hover:shadow-2xl"
+          <Fab
+        aria-label="add"
         style={{
-          right: "4rem",
-          bottom: "4rem",
-          boxShadow: "0 8px 20px rgba(0, 0, 0, 0.5)",
+          border: "0.5px solid grey",
+          backgroundColor: "#94CEF2",
+          position: "fixed",
+          bottom: "16px",
+          right: "16px",
+          zIndex: 1000,
         }}
         onClick={() => handleOpenModal(empleado)}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
-      </button>
+        <i className="bx bx-plus" style={{ fontSize: "1.3rem" }}></i>
+      </Fab>
     </div>
   );
 };
